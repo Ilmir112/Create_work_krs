@@ -19,11 +19,11 @@ class TabPageSoBlock(TabPageUnion):
         self.current_edit.setText(str(self.data_well.current_bottom))
 
         self.pero_combo_Label = QLabel("выбор компоновки", self)
-        self.pero_combo_QCombo = QComboBox(self)
-        self.pero_combo_QCombo.addItems(['перо', 'обточную муфту', 'перо-110мм', 'пило-муфту', 'по затрубу'])
+        self.pero_combo_combo = QComboBox(self)
+        self.pero_combo_combo.addItems(['перо', 'обточную муфту', 'перо-110мм', 'пило-муфту', 'по затрубу'])
 
         if self.data_well.column_additional or self.data_well.column_diameter.get_value < 120:
-            self.pero_combo_QCombo.setCurrentIndex(1)
+            self.pero_combo_combo.setCurrentIndex(1)
 
         plast_work = ['']
         plast_work.extend(self.data_well.plast_work)
@@ -60,7 +60,7 @@ class TabPageSoBlock(TabPageUnion):
         self.grid.addWidget(self.current_edit, 5, 3)
 
         self.grid.addWidget(self.pero_combo_Label, 4, 4)
-        self.grid.addWidget(self.pero_combo_QCombo, 5, 4)
+        self.grid.addWidget(self.pero_combo_combo, 5, 4)
         self.grid.addWidget(self.block_Label, 4, 5)
         self.grid.addWidget(self.block_volume_edit, 5, 5)
         self.grid.addWidget(self.block_type_Label, 4, 6)
@@ -142,7 +142,7 @@ class BlockPackWindow(WindowUnion):
 
     def add_work(self):
         try:
-            pero_combo_QCombo = self.tabWidget.currentWidget().pero_combo_QCombo.currentText()
+            pero_combo_combo = self.tabWidget.currentWidget().pero_combo_combo.currentText()
             current_edit = int(float(self.tabWidget.currentWidget().current_edit.text().replace(',', '.')))
             if current_edit >= self.data_well.bottom_hole_artificial.get_value:
                 QMessageBox.warning(self, 'Ошибка',
@@ -165,7 +165,7 @@ class BlockPackWindow(WindowUnion):
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
 
-        work_list = self.block_pack_work(current_edit, pero_combo_QCombo,
+        work_list = self.block_pack_work(current_edit, pero_combo_combo,
                                          type_of_block_processing_combo, block_volume_edit, oil_volume_edit,
                                          fluid_new_edit, block_type_edit)
 
@@ -180,7 +180,7 @@ class BlockPackWindow(WindowUnion):
         self.data_well.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
-    def block_pack_work(self, current_edit, pero_combo_QCombo,
+    def block_pack_work(self, current_edit, pero_combo_combo,
                         type_of_block_processing_combo, block_volume_edit, oil_volume_edit, fluid_new_edit,
                         block_type_edit):
         from .rir import RirWindow
@@ -203,8 +203,8 @@ class BlockPackWindow(WindowUnion):
             self.data_well.dict_nkt_before) - volume_nkt(self.data_well.dict_nkt_before)
         count_cycle = int(block_volume_edit / 4)
 
-        pero_list = RirWindow.pero_select(self, current_edit, pero_combo_QCombo)
-        if pero_combo_QCombo != 'по затрубу':
+        pero_list = RirWindow.pero_select(self, current_edit, pero_combo_combo)
+        if pero_combo_combo != 'по затрубу':
             block_pack_list = [
                 [f'Спустить {pero_list} на тНКТ{self.data_well.nkt_diam} до глубины {current_edit}мм', None,
                  f'Спустить {pero_list} на тНКТ{self.data_well.nkt_diam}мм до глубины {current_edit}м '

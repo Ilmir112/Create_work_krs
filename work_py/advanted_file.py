@@ -10,31 +10,30 @@ import data_list
 from openpyxl.styles import Font, Alignment
 
 def skm_interval(self, template):
-    sgm_True = False
+    sgm_true = False
     if template in ['СГМ ЭК', 'СГМ открытый ствол' 'СГМ в основной колонне',
                                          'СГМ в доп колонне + открытый ствол',
                                          'СГМ в доп колонне']:
-        sgm_True = True
+        sgm_true = True
 
-    str_raid = []
+    interval_raid = []
     if self.data_well.paker_before["posle"] != 0:
-        str_raid.append(
+        interval_raid.append(
             [float(self.data_well.depth_fond_paker_before["posle"]) - 20,
              float(self.data_well.depth_fond_paker_before["posle"]) + 20])
 
     if self.data_well.dict_leakiness:
-        a = self.data_well.dict_leakiness
         for nek in list(self.data_well.dict_leakiness['НЭК']['интервал'].keys()):
             if int(float(nek.split('-')[1])) + 20 < self.data_well.current_bottom:
-                str_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
+                interval_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
             else:
-                str_raid.append([int(float(nek.split('-')[0])) - 90,
+                interval_raid.append([int(float(nek.split('-')[0])) - 90,
                                  self.data_well.current_bottom - 2])
 
     if all(
             [self.data_well.dict_perforation[plast]['отрайбировано'] is True for plast in self.data_well.plast_all
-             if self.data_well.dict_perforation[plast]['подошва'] < self.data_well.current_bottom]) or sgm_True:
-        str_raid = []
+             if self.data_well.dict_perforation[plast]['подошва'] < self.data_well.current_bottom]) or sgm_true:
+        interval_raid = []
 
         perforating_intervals = []
 
@@ -43,17 +42,16 @@ def skm_interval(self, template):
                 if interval[1] < self.data_well.current_bottom:
                     perforating_intervals.append(list(interval))
 
-        str_raid.extend(remove_overlapping_intervals(self, perforating_intervals))
+        interval_raid.extend(remove_overlapping_intervals(self, perforating_intervals))
 
     elif all([self.data_well.dict_perforation[plast]['отрайбировано'] is False for plast in self.data_well.plast_all]):
-        str_raid.append([self.data_well.perforation_roof - 90, self.data_well.skm_depth])
+        interval_raid.append([self.data_well.perforation_roof - 90, self.data_well.skm_depth])
         if self.data_well.dict_leakiness:
             for nek in list(self.data_well.dict_leakiness['НЭК']['интервал'].keys()):
-                # print(f' наруш {nek}')
                 if float(nek.split('-')[1]) + 20 < self.data_well.current_bottom:
-                    str_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
+                    interval_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
                 else:
-                    str_raid.append([int(float(nek.split('-')[0])) - 90,
+                    interval_raid.append([int(float(nek.split('-')[0])) - 90,
                                      self.data_well.current_bottom - 2])
 
 
@@ -64,21 +62,21 @@ def skm_interval(self, template):
 
                 for interval in self.data_well.dict_perforation_project[plast]['интервал']:
                     if interval[1] < self.data_well.current_bottom:
-                        str_raid.append([interval[0] - 70, interval[1] + 20])
+                        interval_raid.append([interval[0] - 70, interval[1] + 20])
                     else:
-                        str_raid.append([interval[0] - 70, self.data_well.current_bottom - 2])
+                        interval_raid.append([interval[0] - 70, self.data_well.current_bottom - 2])
 
-    # print(f'скреперо {str_raid}')
-    merged_segments = merge_overlapping_intervals(str_raid)
-    # print(f'скреперо после {merged_segments}')
+    
+    merged_segments = merge_overlapping_intervals(interval_raid)
+    
     merged_segments_new = []
 
     for interval in merged_segments:
 
         if template in ['ПСШ ЭК', 'ПСШ без хвоста', 'ПСШ открытый ствол', 'СГМ ЭК', 'СГМ открытый ствол']:
-            if self.data_well.skm_depth >= interval[1] and interval[1] > interval[0]:
+            if self.data_well.skm_depth >= interval[1] > interval[0]:
                 merged_segments_new.append(interval)
-            elif self.data_well.skm_depth <= interval[1] and self.data_well.skm_depth >= interval[0] and interval[1] > interval[
+            elif interval[1] >= self.data_well.skm_depth >= interval[0] and interval[1] > interval[
                 0]:
                 merged_segments_new.append([interval[0], self.data_well.skm_depth])
 
@@ -87,34 +85,30 @@ def skm_interval(self, template):
                                          'СГМ в доп колонне + открытый ствол',
                                          'СГМ в доп колонне'] and self.data_well.skm_depth >= interval[1]:
 
-            if interval[0] > float(self.data_well.head_column_additional.get_value) and interval[1] >= float(
-                    self.data_well.head_column_additional.get_value) and self.data_well.skm_depth >= interval[1] \
-                    and interval[1] > interval[0]:
+            if float(self.data_well.head_column_additional.get_value) < interval[0] < interval[1] and float(
+                    self.data_well.head_column_additional.get_value) <= interval[1] <= self.data_well.skm_depth:
                 # print(f'1 {interval, merged_segments}')
                 merged_segments_new.append(interval)
 
-            elif interval[0] < float(self.data_well.head_column_additional.get_value) and interval[1] > float(
-                    self.data_well.head_column_additional.get_value) and self.data_well.skm_depth <= interval[1] \
-                    and self.data_well.skm_depth >= interval[0] and interval[1] > interval[0]:
+            elif (interval[0] < float(self.data_well.head_column_additional.get_value) < interval[1] 
+                  and interval[1] >= self.data_well.skm_depth >= interval[0] and interval[1] > interval[0]):
                 # print(f'2 {interval, merged_segments}')
 
                 merged_segments_new.append((self.data_well.head_column_additional.get_value + 2, self.data_well.skm_depth))
-            elif interval[0] < float(self.data_well.head_column_additional.get_value) and interval[1] > float(
-                    self.data_well.head_column_additional.get_value) and self.data_well.skm_depth >= interval[1] and interval[1] > \
-                    interval[0]:
+            elif (interval[0] < float(self.data_well.head_column_additional.get_value) <
+                  interval[1] <= self.data_well.skm_depth and interval[1] > interval[0]):
 
                 merged_segments_new.append((self.data_well.head_column_additional.get_value + 2, interval[1]))
                 # print(f'3 {interval, merged_segments}')
 
         elif template in ['ПСШ Доп колонна СКМ в основной колонне', 'СГМ в основной колонне']:
-            if interval[0] < float(self.data_well.head_column_additional.get_value) and interval[1] < float(
-                    self.data_well.head_column_additional.get_value) and self.data_well.skm_depth >= interval[1] and interval[1] > \
-                    interval[0]:
+            if (interval[0] < float(self.data_well.head_column_additional.get_value) and
+                    interval[1] < float(self.data_well.head_column_additional.get_value) and 
+                    self.data_well.skm_depth >= interval[1] > interval[0]):
                 merged_segments_new.append(interval)
 
-            elif interval[0] < float(self.data_well.head_column_additional.get_value) and interval[1] > float(
-                    self.data_well.head_column_additional.get_value) and self.data_well.skm_depth <= interval[1] \
-                    and self.data_well.skm_depth >= interval[0] and interval[1] > interval[0]:
+            elif (interval[0] < float(self.data_well.head_column_additional.get_value) < interval[1] and
+                  interval[1] >= self.data_well.skm_depth >= interval[0] and interval[1] > interval[0]):
                 # merged_segments.remove(interval)
                 merged_segments_new.append((interval[0], self.data_well.skm_depth))
 
@@ -163,15 +157,13 @@ def remove_overlapping_intervals(self, perforating_intervals, skm_interval=None)
                 if [pvr[1] + 1, self.data_well.skm_depth] not in skipping_intervals:
                     skipping_intervals.append([pvr[1] + 1, self.data_well.skm_depth])
 
-        # print(f'СКМ на основе ПВР{sorted(skipping_intervals, key=lambda x: x[0])}')
-
         skipping_intervals = merge_overlapping_intervals(sorted(skipping_intervals, key=lambda x: x[0]))
         skipping_intervals_new = []
         for skm in sorted(skipping_intervals, key=lambda x: x[0]):
-            kroly_skm = int(skm[0])
+            krovly_skm = int(skm[0])
             pod_skm = int(skm[1])
 
-            skm_range = list(range(kroly_skm, pod_skm))
+            skm_range = list(range(krovly_skm, pod_skm))
             for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
                 # print(int(pvr[0]) in skm_range, skm_range[0], int(pvr[0]))
                 if int(pvr[0]) in skm_range and int(pvr[1]) in skm_range and skm_range[0] + 1 <= int(pvr[0]):
@@ -189,7 +181,7 @@ def remove_overlapping_intervals(self, perforating_intervals, skm_interval=None)
 
 
 def raiding_interval(data_well, ryber_key):
-    str_raid = []
+    interval_raid = []
     crt = 0
     for plast in data_well.plast_all:
 
@@ -197,16 +189,15 @@ def raiding_interval(data_well, ryber_key):
                 data_well.dict_perforation[plast]['кровля'] <= data_well.current_bottom:
 
             for interval in data_well.dict_perforation[plast]['интервал']:
-                if float(interval[1]) < data_well.current_bottom and float(interval[0]) < float(interval[1]):
-                    if data_well.column_additional is False or \
-                            (data_well.column_additional and \
-                             data_well.head_column_additional.get_value > data_well.current_bottom):
+                if data_well.current_bottom > float(interval[1]) > float(interval[0]):
+                    if (data_well.column_additional is False or 
+                            (data_well.column_additional and data_well.head_column_additional.get_value 
+                             > data_well.current_bottom)):
 
                         if float(interval[1]) + 20 <= data_well.current_bottom and \
                                 data_well.shoe_column.get_value >= float(interval[1]) + 20:
                             crt = [float(interval[0]) - 20, float(interval[1]) + 20]
-                        elif float(interval[1]) + 20 >= data_well.shoe_column.get_value and \
-                                data_well.shoe_column.get_value > data_well.current_bottom:
+                        elif float(interval[1]) + 20 >= data_well.shoe_column.get_value > data_well.current_bottom:
                             crt = [float(interval[0]) - 20, data_well.shoe_column.get_value]
                         elif float(interval[1]) + 20 >= data_well.shoe_column.get_value and \
                                 data_well.shoe_column.get_value <= data_well.current_bottom:
@@ -223,15 +214,15 @@ def raiding_interval(data_well, ryber_key):
                         elif float(interval[1]) + 20 < data_well.shoe_column_additional.get_value and \
                                 float(interval[1] + 20) > data_well.current_bottom:
                             crt = [float(interval[0]) - 20, data_well.current_bottom]
-                if crt != 0 and crt not in str_raid:
-                    str_raid.append(crt)
+                if crt != 0 and crt not in interval_raid:
+                    interval_raid.append(crt)
 
     if len(data_well.drilling_interval) != 0:
         for interval in data_well.drilling_interval:
             if float(interval[1]) + 20 <= data_well.current_bottom and interval[0] < interval[1]:
-                str_raid.append((float(interval[0]) - 20, float(interval[1]) + 20))
+                interval_raid.append((float(interval[0]) - 20, float(interval[1]) + 20))
             elif float(interval[1]) + 20 > data_well.current_bottom and interval[0] < interval[1]:
-                str_raid.append((float(interval[0]) - 20, data_well.current_bottom))
+                interval_raid.append((float(interval[0]) - 20, data_well.current_bottom))
 
     if len(data_well.dict_leakiness) != 0:
 
@@ -243,38 +234,38 @@ def raiding_interval(data_well, ryber_key):
                     crt = (float(nek.split('-')[0]) - 30, float(nek.split('-')[1]) + 30)
                 else:
                     crt = (float(nek.split('-')[0]) - 30, data_well.current_bottom)
-                str_raid.append(crt)
+                interval_raid.append(crt)
 
-    merged_segments = merge_overlapping_intervals(str_raid)
+    merged_segments = merge_overlapping_intervals(interval_raid)
     merged_segments_new = []
     if ryber_key == 'райбер в ЭК' and data_well.column_additional:
-        for str in merged_segments:
-            if str[0] < data_well.head_column_additional.get_value and str[0] < str[1]:
-                merged_segments_new.append(str)
+        for interval in merged_segments:
+            if interval[0] < data_well.head_column_additional.get_value and interval[0] < interval[1]:
+                merged_segments_new.append(interval)
 
     elif ryber_key == 'райбер в ДП' and data_well.column_additional:
-        for str in merged_segments:
-            if str[1] > data_well.head_column_additional.get_value and str[0] < str[1]:
-                merged_segments_new.append(str)
+        for interval in merged_segments:
+            if interval[1] > data_well.head_column_additional.get_value and interval[0] < interval[1]:
+                merged_segments_new.append(interval)
     else:
-        for str in merged_segments:
-            if str[0] < str[1]:
+        for interval in merged_segments:
+            if interval[0] < interval[1]:
                 merged_segments_new = merged_segments
     return merged_segments_new
 
 
-def change_true_raid(self, str_raid):
+def change_true_raid(self, interval_raid):
     if self.data_well.dict_leakiness:
         for nek in list(self.data_well.dict_leakiness['НЭК']['интервал'].keys()):
-            for str in str_raid:
-                # print(str[0], list(nek)[0], str[1])
-                if str[0] <= float(nek.split('-')[0]) <= str[1]:
+            for interval in interval_raid:
+                # print(interval[0], list(nek)[0], interval[1])
+                if interval[0] <= float(nek.split('-')[0]) <= interval[1]:
                     self.data_well.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] = True
     if self.data_well.plast_all:
         for plast in self.data_well.plast_all:
-            for interval in list((self.data_well.dict_perforation[plast]['интервал'])):
-                for str in str_raid:
-                    if str[0] <= list(interval)[0] <= str[1]:
+            for _ in list((self.data_well.dict_perforation[plast]['интервал'])):
+                for interval in interval_raid:
+                    if interval[0] <= list(interval)[0] <= interval[1]:
                         self.data_well.dict_perforation[plast]['отрайбировано'] = True
 
 
@@ -299,11 +290,11 @@ def raid(string):
     if len(string) == 0:
         return 'разбуренного цем моста'
     elif len(string) > 1:
-        d = ''
+        interval = ''
         for i in list(string):
-            d += f'{int(float(i[0]))} - {int(float(i[1]))}, '
+            interval += f'{int(float(i[0]))} - {int(float(i[1]))}, '
 
-    return d[:-2]
+    return interval[:-2]
 
 
 def definition_plast_work(self):
@@ -326,7 +317,7 @@ def definition_plast_work(self):
 
                 if perforation_roof >= roof and self.data_well.current_bottom > roof:
                     perforation_roof = roof
-                if perforation_sole < sole and self.data_well.current_bottom > sole:
+                if perforation_sole < sole < self.data_well.current_bottom:
                     perforation_sole = sole
         zhgs = 1.01
         if "вертикаль" in list(self.data_well.dict_perforation[plast].keys()):
@@ -372,9 +363,9 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
     for ind, _range in enumerate(ws.merged_cells.ranges):
         boundaries_dict[ind] = range_boundaries(str(_range))
 
-    rowHeights1 = [ws.row_dimensions[i].height for i in range(ws.max_row)]
-    colWidth = [ws.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
-    # print(colWidth)
+    row_heights1 = [ws.row_dimensions[i].height for i in range(ws.max_row)]
+    col_width = [ws.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
+    # print(col_width)
     for i, row_data in enumerate(work_list):
         for column, data in enumerate(row_data):
             if column == 2:
@@ -390,7 +381,6 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
     boundaries_dict_index = 1000
     stop_str = 1500
     for i in range(1, len(work_list) + 1):  # Добавлением работ
-        a = work_list[i - 1]
         if 'Наименование работ' in work_list[i - 1][2]:
             boundaries_dict_index = i + 1
 
@@ -514,13 +504,13 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
             ws2.row_dimensions[index_row].hidden = True
         try:
             if index_row < ind_ins:
-                ws2.row_dimensions[index_row].height = rowHeights1[index_row]
+                ws2.row_dimensions[index_row].height = row_heights1[index_row]
         except:
             pass
         if index_row == 2:
             for col_ind, col in enumerate(row):
                 if col_ind <= 12:
-                    ws2.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind]
+                    ws2.column_dimensions[get_column_letter(col_ind + 1)].width = col_width[col_ind]
     ws2.column_dimensions[get_column_letter(11)].width = 20
     ws2.column_dimensions[get_column_letter(12)].width = 20
 

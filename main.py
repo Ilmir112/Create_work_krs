@@ -33,8 +33,9 @@ from PyQt5.QtCore import Qt, QObject, pyqtSignal
 class UncaughtExceptions(QObject):
     _exception_caught = pyqtSignal(object)
 
-    def __init__(self):
+    def __init__(self, data_well):
         super().__init__()
+        self.data_well = data_well
 
     @pyqtSlot(object)
     def handle_exception(self, ex):
@@ -382,7 +383,7 @@ class MyMainWindow(QMainWindow):
             data_list.pause = True
             self.pause_app()
 
-            self.ws = insert_data_new_excel_file(self, data_list.data, data_list.rowHeights, data_list.colWidth,
+            self.ws = insert_data_new_excel_file(self, data_list.data, data_list.rowHeights, data_list.col_width,
                                                  data_list.boundaries_dict)
 
             self.copy_pz(self.ws, self.table_widget, self.work_plan)
@@ -839,26 +840,26 @@ class MyMainWindow(QMainWindow):
                 self.work_window = None
 
             if work_plan in ['gnkt_frez'] and list_page == 2:
-                colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
+                col_width = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
                             13.0, 5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
                             13.0,
                             13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
                             13.0,
                             13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
                 for column in range(table_widget.columnCount()):
-                    table_widget.setColumnWidth(column, int(colWidth[column]))  # Здесь задайте требуемую ширину столбца
+                    table_widget.setColumnWidth(column, int(col_width[column]))  # Здесь задайте требуемую ширину столбца
             elif work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz'] and list_page == 2:
 
-                colWidth = property_excel.property_excel_pvr.colWidth_gnkt_osv
+                col_width = property_excel.property_excel_pvr.col_width_gnkt_osv
                 for column in range(table_widget.columnCount()):
                     table_widget.setColumnWidth(column,
-                                                int(colWidth[column] * 9))  # Здесь задайте требуемую ширину столбца
+                                                int(col_width[column] * 9))  # Здесь задайте требуемую ширину столбца
 
             elif work_plan == 'application_pvr':
                 from property_excel import property_excel_pvr
                 for column in range(table_widget.columnCount()):
                     table_widget.setColumnWidth(column, int(
-                        property_excel_pvr.colWidth[column]))  # Здесь задайте требуемую ширину столбца
+                        property_excel_pvr.col_width[column]))  # Здесь задайте требуемую ширину столбца
             data_list.pause = True
 
 
@@ -903,7 +904,7 @@ class MyWindow(MyMainWindow):
         self.setCentralWidget(self.log_widget.widget)
 
         # Обработка критических ошибок
-        self.excepthook = UncaughtExceptions()
+        self.excepthook = UncaughtExceptions(self.data_well)
         self.excepthook._exception_caught.connect(self.excepthook.handle_exception)
 
         # # Запускаем обработчик исключений в отдельном потоке
@@ -1868,7 +1869,7 @@ class MyWindow(MyMainWindow):
             self.data_well.head_column_additional = ProtectedIsNonNone('не корректно')
             self.data_well.leakiness_count = 0
             self.data_well.bur_rastvor = ''
-            data_list.data, data_list.rowHeights, data_list.colWidth, data_list.boundaries_dict = '', '', '', ''
+            data_list.data, data_list.rowHeights, data_list.col_width, data_list.boundaries_dict = '', '', '', ''
             data_list.data_in_base = False
             self.data_well.well_volume_in_pz = []
             self.data_well.expected_pick_up = {}

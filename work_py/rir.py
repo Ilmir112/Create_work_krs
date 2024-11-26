@@ -992,19 +992,19 @@ class RirWindow(WindowUnion):
         self.data_well.for_paker_list = None
         return rir_list
 
-    def pero_select(self, sole_rir_edit, pero_combo_QCombo='перо'):
+    def pero_select(self, sole_rir_edit, pero_combo_combo='перо'):
 
         if self.data_well.column_additional is False or self.data_well.column_additional is True \
                 and sole_rir_edit < self.data_well.head_column_additional.get_value:
-            pero_select = f'{pero_combo_QCombo} + опрессовочное седло + НКТ{self.data_well.nkt_diam} 20м + репер'
+            pero_select = f'{pero_combo_combo} + опрессовочное седло + НКТ{self.data_well.nkt_diam} 20м + репер'
 
         elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 \
                 and sole_rir_edit > self.data_well.head_column_additional.get_value:
-            pero_select = f'{pero_combo_QCombo} + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- ' \
+            pero_select = f'{pero_combo_combo} + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- ' \
                           f'{round(sole_rir_edit - self.data_well.head_column_additional.get_value, 1)}м'
         elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110 \
                 and sole_rir_edit > self.data_well.head_column_additional.get_value:
-            pero_select = f'{pero_combo_QCombo} + опрессовочное седло + НКТ{self.data_well.nkt_diam}мм со снятыми фасками 20м + ' \
+            pero_select = f'{pero_combo_combo} + опрессовочное седло + НКТ{self.data_well.nkt_diam}мм со снятыми фасками 20м + ' \
                           f'НКТ{self.data_well.nkt_diam}мм со снятыми фасками' \
                           f' L- {sole_rir_edit - self.data_well.head_column_additional.get_value}м'
         return pero_select

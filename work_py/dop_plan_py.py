@@ -383,7 +383,7 @@ class DopPlanWindow(WindowUnion):
         else:
             self.insert_index = self.data_well.insert_index
 
-        self.data, self.rowHeights, self.colWidth, self.boundaries_dict = None, None, None, None
+        self.data, self.rowHeights, self.col_width, self.boundaries_dict = None, None, None, None
         self.target_row_index = None
         self.target_row_index_cancel = None
         self.old_index = 0
@@ -476,7 +476,7 @@ class DopPlanWindow(WindowUnion):
         from data_correct import DataWindow
 
         self.data_well.gips_in_well = False
-        self.data, self.rowHeights, self.colWidth, self.boundaries_dict = \
+        self.data, self.rowHeights, self.col_width, self.boundaries_dict = \
             DopPlanWindow.read_excel_in_base(well_number, well_area, work_plan, type_kr)
 
         self.target_row_index = 5000
@@ -549,16 +549,16 @@ class DopPlanWindow(WindowUnion):
             dict_well = json.loads(data_well[len(data_well) - 1][0])
             data = dict_well['data']
             rowHeights = dict_well['rowHeights']
-            colWidth = dict_well['colWidth']
+            col_width = dict_well['col_width']
             boundaries_dict = dict_well['merged_cells']
 
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f'Введены не все параметры {type(e).__name__}\n\n{str(e)}')
             return
 
-        return data, rowHeights, colWidth, boundaries_dict
+        return data, rowHeights, col_width, boundaries_dict
 
-    def change_pvr_in_bottom(self, data, rowHeights, colWidth, boundaries_dict, current_bottom=0,
+    def change_pvr_in_bottom(self, data, rowHeights, col_width, boundaries_dict, current_bottom=0,
                              current_bottom_date_edit=0, method_bottom_combo=0):
 
         for i, row in data.items():
@@ -572,9 +572,9 @@ class DopPlanWindow(WindowUnion):
             data[str(self.bottom_row_index)][5]['value'] = current_bottom_date_edit
             data[str(self.bottom_row_index)][-1]['value'] = method_bottom_combo
 
-        return data, rowHeights, colWidth, boundaries_dict
+        return data, rowHeights, col_width, boundaries_dict
 
-    def insert_row_in_pvr(self, data, rowHeights, colWidth, boundaries_dict, plast_list, current_bottom,
+    def insert_row_in_pvr(self, data, rowHeights, col_width, boundaries_dict, plast_list, current_bottom,
                           current_bottom_date_edit, method_bottom_combo):
         count_row_insert = len(plast_list)
         count_row_in_plan = self.target_row_index_cancel - self.target_row_index - 1
@@ -720,7 +720,7 @@ class DopPlanWindow(WindowUnion):
         data[str(self.bottom_row_index)][10 - self.old_index]['value'] = method_bottom_combo
         #     print(i)
 
-        return data, rowHeights, colWidth, boundaries_dict_new
+        return data, rowHeights, col_width, boundaries_dict_new
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()
@@ -938,13 +938,13 @@ class DopPlanWindow(WindowUnion):
                         else:
                             list_row.append(None)
                     plast_row.append(list_row)
-                data_list.data, data_list.rowHeights, data_list.colWidth, data_list.boundaries_dict = \
-                    self.insert_row_in_pvr(self.data, self.rowHeights, self.colWidth, self.boundaries_dict, plast_row,
+                data_list.data, data_list.rowHeights, data_list.col_width, data_list.boundaries_dict = \
+                    self.insert_row_in_pvr(self.data, self.rowHeights, self.col_width, self.boundaries_dict, plast_row,
                                            current_bottom, current_bottom_date_edit, method_bottom_combo)
             else:
 
-                data_list.data, data_list.rowHeights, data_list.colWidth, data_list.boundaries_dict = \
-                    self.change_pvr_in_bottom(self.data, self.rowHeights, self.colWidth, self.boundaries_dict,
+                data_list.data, data_list.rowHeights, data_list.col_width, data_list.boundaries_dict = \
+                    self.change_pvr_in_bottom(self.data, self.rowHeights, self.col_width, self.boundaries_dict,
                                               current_bottom, current_bottom_date_edit, method_bottom_combo)
             if data_list.data_in_base:
                 data_list.dop_work_list = self.work_list(work_earlier)

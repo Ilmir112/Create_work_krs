@@ -1,25 +1,16 @@
 import json
-import sqlite3
-
 import data_list
-import psycopg2
 from openpyxl.styles import Font, Alignment
-
-from PyQt5.QtGui import QIntValidator, QDoubleValidator
-from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
-    QMainWindow, QPushButton
+from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QPushButton
 from PyQt5.QtCore import Qt
-from datetime import datetime
-
 from data_base.config_base import connection_to_database, WorkDatabaseWell
 
-from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
+from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
 
 class TabPageDp(TabPageUnion):
     def __init__(self, data_well, tableWidget, old_index):
         super().__init__(data_well)
-
 
         self.tableWidget = tableWidget
         self.old_index = old_index
@@ -72,14 +63,12 @@ class TabPageDp(TabPageUnion):
         self.well_area_edit.setText(well_area)
         self.well_number_edit.setText(table_in_base_combo.split(" ")[0])
 
-
-
     def update_well(self):
-        from .dop_plan_py import TabPageDp
+        from work_py.dop_plan_py import TabPageDp
 
         if data_list.data_in_base:
 
-            well_list =TabPageDp.check_in_database_well_data2(self, self.well_number_edit.text())
+            well_list = TabPageDp.check_in_database_well_data2(self, self.well_number_edit.text())
 
             if well_list:
                 self.well_data_in_base_combo.clear()
@@ -93,10 +82,10 @@ class TabWidget(TabWidgetUnion):
 
 
 class CorrectPlanWindow(WindowUnion):
-    def __init__(self, data_well, table_widget,  parent=None):
+    def __init__(self, data_well, table_widget):
         super().__init__(data_well)
 
-
+        self.current_widget = None
         self.data_well.insert_index = 0
         self.tabWidget = TabWidget(self.data_well)
 
@@ -107,8 +96,7 @@ class CorrectPlanWindow(WindowUnion):
         self.work_plan = self.data_well.work_plan
         self.dict_perforation = []
 
-
-        self.data, self.rowHeights, self.colWidth, self.boundaries_dict = None, None, None, None
+        self.data, self.rowHeights, self.col_width, self.boundaries_dict = None, None, None, None
         self.target_row_index = None
         self.target_row_index_cancel = None
         self.old_index = 0
@@ -121,21 +109,19 @@ class CorrectPlanWindow(WindowUnion):
 
         vbox.addWidget(self.buttonadd_work, 3, 0, 1, 2)
 
-
-
     def add_work(self):
-        from data_base.work_with_base import insert_data_well_dop_plan, round_cell
+        from data_base.work_with_base import insert_data_well_dop_plan
         from work_py.dop_plan_py import DopPlanWindow
 
         from data_list import ProtectedIsNonNone
+        self.current_widget = self.tabWidget.currentWidget()
 
-        well_number = self.tabWidget.currentWidget().well_number_edit.text()
-        well_area = self.tabWidget.currentWidget().well_area_edit.text()
+        well_number = self.current_widget.well_number_edit.text()
+        well_area = self.current_widget.well_area_edit.text()
 
         if data_list.data_in_base:
             data_well_data_in_base_combo, data_table_in_base_combo = '', ''
-
-            well_data_in_base_combo = self.tabWidget.currentWidget().well_data_in_base_combo.currentText()
+            well_data_in_base_combo = self.current_widget.well_data_in_base_combo.currentText()
 
             if ' от' in well_data_in_base_combo:
                 data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-1]
@@ -149,15 +135,15 @@ class CorrectPlanWindow(WindowUnion):
             db = connection_to_database(data_list.DB_WELL_DATA)
             data_well_base = WorkDatabaseWell(db, self.data_well)
 
-            data_well = data_well_base.check_in_database_well_data(well_number, well_area,
-                                                                   well_data_in_base, data_well_data_in_base_combo)
+            data_well = data_well_base.check_in_database_well_data(
+                well_number, well_area, well_data_in_base, data_well_data_in_base_combo)
 
             if data_well:
                 self.data_well.type_kr = data_well[2]
                 if data_well[3]:
                     self.data_well.dict_category = json.loads(data_well[3])
                     self.data_well.well_oilfield = ProtectedIsNonNone(data_well[4])
-                    self.data_well.appointment =ProtectedIsNonNone(data_well[5])
+                    self.data_well.appointment = ProtectedIsNonNone(data_well[5])
                     self.data_well.inventory_number = ProtectedIsNonNone(data_well[6])
                     self.data_well.wellhead_fittings = data_well[7]
                     self.data_well.emergency_well = False
@@ -172,16 +158,13 @@ class CorrectPlanWindow(WindowUnion):
 
             DopPlanWindow.work_with_excel(self, well_number, well_area, well_data_in_base, self.data_well.type_kr)
 
-            data_list.data, data_list.rowHeights, data_list.colWidth, data_list.boundaries_dict = \
-                DopPlanWindow.change_pvr_in_bottom(self, self.data, self.rowHeights, self.colWidth,
+            data_list.data, data_list.rowHeights, data_list.col_width, data_list.boundaries_dict = \
+                DopPlanWindow.change_pvr_in_bottom(self, self.data, self.rowHeights, self.col_width,
                                                    self.boundaries_dict)
-
 
             if well_number != '' and well_area != '':
                 self.data_well.well_number, self.data_well.well_area = \
                     ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
-
-
 
             data_list.pause = False
             self.close()
@@ -221,15 +204,10 @@ class CorrectPlanWindow(WindowUnion):
                             ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
                             ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                             vertical='center')
-
-
-
-
-
-    def work_list(self, work_earlier):
-        krs_begin = [[None, None,
-                      f' Ранее проведенные работ: \n {work_earlier}',
-                      None, None, None, None, None, None, None,
+    @staticmethod
+    def work_list(work_earlier):
+        krs_begin = [
+            [None, None, f' Ранее проведенные работ: \n {work_earlier}', None, None, None, None, None, None, None,
                       'Мастер КРС', None]]
 
         return krs_begin

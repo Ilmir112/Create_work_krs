@@ -320,7 +320,7 @@ class GnktModel(WindowUnion):
 
         from openpyxl.utils.cell import range_boundaries, get_column_letter
 
-        colWidth = [2.85546875, 14.42578125, 16.140625, 22.85546875, 17.140625, 14.42578125, 13.0, 13.0, 17.0,
+        col_width = [2.85546875, 14.42578125, 16.140625, 22.85546875, 17.140625, 14.42578125, 13.0, 13.0, 17.0,
                     14.42578125, 13.0, 21, 12.140625, None]
 
         text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 110: (301, 400), 120: (401, 500),
@@ -439,7 +439,7 @@ class GnktModel(WindowUnion):
                                                                          vertical='center')
 
             for col in range(13):
-                ws2.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
+                ws2.column_dimensions[get_column_letter(col + 1)].width = col_width[col]
             ws2.column_dimensions[get_column_letter(11)].width = 30
             ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
             ws2.page_setup.fitToPage = True

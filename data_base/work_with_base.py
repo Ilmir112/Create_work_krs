@@ -11,7 +11,7 @@ from datetime import datetime
 
 from PyQt5 import QtWidgets
 
-from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QHeaderView, QVBoxLayout, QMainWindow, QWidget, \
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QHeaderView, QVBoxLayout,  QWidget, \
     QTableWidget
 
 from openpyxl import load_workbook
@@ -19,9 +19,7 @@ from openpyxl.styles import PatternFill, Font, Color
 from openpyxl.utils import get_column_letter, range_boundaries
 from data_base.config_base import connect_to_database, connection_to_database, CheckWellExistence
 
-from PIL import Image
 from main import MyMainWindow
-from work_py.advanted_file import definition_plast_work
 
 
 class ClassifierWell(MyMainWindow):
@@ -534,14 +532,14 @@ def excel_in_json(self, sheet):
     data['image'] = self.data_well.image_data
     rowHeights = [sheet.row_dimensions[i + 1].height for i in range(sheet.max_row) if i <= index_end_copy]
     # rowHeights = [sheet.row_dimensions[i + 1].height for i in range(sheet.max_row)if i <= 46]
-    colWidth = [sheet.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 80)] + [None]
+    col_width = [sheet.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 80)] + [None]
     boundaries_dict = {}
 
     for ind, _range in enumerate(sheet.merged_cells.ranges):
         if range_boundaries(str(_range))[1] <= index_end_copy:
             boundaries_dict[ind] = range_boundaries(str(_range))
 
-    data_excel = {'data': data, 'rowHeights': rowHeights, 'colWidth': colWidth, 'merged_cells': boundaries_dict}
+    data_excel = {'data': data, 'rowHeights': rowHeights, 'col_width': col_width, 'merged_cells': boundaries_dict}
 
     return data_excel
 
@@ -632,7 +630,7 @@ def round_cell(data):
         return data
 
 
-def insert_data_new_excel_file(self, data, rowHeights, colWidth, boundaries_dict):
+def insert_data_new_excel_file(self, data, rowHeights, col_width, boundaries_dict):
     wb_new = openpyxl.Workbook()
     sheet_new = wb_new.active
 
@@ -723,7 +721,7 @@ def insert_data_new_excel_file(self, data, rowHeights, colWidth, boundaries_dict
         print(f"Ошибка при вставке изображения: {type(e).__name__}\n\n{str(e)}")
 
     for col in range(13):
-        sheet_new.column_dimensions[get_column_letter(col + 1)].width = colWidth[col]
+        sheet_new.column_dimensions[get_column_letter(col + 1)].width = col_width[col]
     index_delete = 47
 
     for index_row, row in enumerate(sheet_new.iter_rows()):

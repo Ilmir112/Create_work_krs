@@ -29,16 +29,16 @@ class TabPageGno(TabPageUnion):
 
         self.volume_jumping_label = QLabel("Объем глушения", self)
         self.volume_jumping_edit = QLineEdit(self)
-        volume_well_jaming = self.volume()
-        if abs(float(self.data_well.well_volume_in_pz[0]) - volume_well_jaming) > 0.5:
+        volume_well_jamming = self.volume()
+        if abs(float(self.data_well.well_volume_in_pz[0]) - volume_well_jamming) > 0.5:
             QMessageBox.warning(None, 'Некорректный объем скважины',
                                 f'Объем скважины указанный в ПЗ -{self.data_well.well_volume_in_pz}м3 '
                                 f'не совпадает '
-                                f'с расчетным {volume_well_jaming}м3')
-            volume_well_jaming, _ = QInputDialog.getDouble(self,
+                                f'с расчетным {volume_well_jamming}м3')
+            volume_well_jamming, _ = QInputDialog.getDouble(self,
                                                            "корректный объем",
-                                                           'Введите корректный объем', volume_well_jaming, 1, 80, 1)
-        self.volume_jumping_edit.setText(f'{volume_well_jaming}')
+                                                           'Введите корректный объем', volume_well_jamming, 1, 80, 1)
+        self.volume_jumping_edit.setText(f'{volume_well_jamming}')
 
         self.gno_label = QLabel("вид поднимаемого ГНО", self)
         self.gno_combo = QComboBox(self)
@@ -129,10 +129,10 @@ class TabPageGno(TabPageUnion):
     def volume(self):
         from work_py.alone_oreration import volume_jamming_well, volume_rod, volume_nkt_metal
 
-        volume_well_jaming = round((volume_jamming_well(self, self.data_well.current_bottom) - volume_nkt_metal(
+        volume_well_jamming = round((volume_jamming_well(self, self.data_well.current_bottom) - volume_nkt_metal(
             self.data_well.dict_nkt_before) - volume_rod(self, self.data_well.dict_sucker_rod) - 0.2) * 1.1, 1)
 
-        return volume_well_jaming
+        return volume_well_jamming
 
     def calc_fluid(self, work_plan, current_bottom):
         fluid_list = []
@@ -284,7 +284,7 @@ class GnoParent(ABC):
         try:
             self.surfactant_hydrofabizer_combo = self.current_widget.surfactant_hydrofabizer_combo.currentText()
             self.current_bottom = round(float(self.current_widget.current_bottom_edit.text().replace(',', '.')), 1)
-            self.volume_well_jaming = round(float(self.current_widget.volume_jumping_edit.text().replace(',', '.')), 1)
+            self.volume_well_jamming = round(float(self.current_widget.volume_jumping_edit.text().replace(',', '.')), 1)
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
 
@@ -295,7 +295,7 @@ class GnoParent(ABC):
         self.well_jamming_str = self.well_jamming()
 
         self.well_jamming_ord = volume_jamming_well(self, float(self.data_well.depth_fond_paker_before["do"]))
-        self.sucker_pod_jaming = "".join([
+        self.sucker_pod_jamming = "".join([
             " " if self.without_damping_true is True else f"Приподнять штангу. Произвести глушение в "
                                                           f"затрубное пространство в объеме{self.well_jamming_ord}м3 "
                                                           f"(объем колонны от пакера до устья уд.весом"
@@ -365,7 +365,7 @@ class GnoParent(ABC):
 
         surfactant_hydrofabizer_str = ''
         if self.surfactant_hydrofabizer_combo == 'Да':
-            self.calculate_chemistry('гидрофабизатор', round(self.volume_well_jaming * 0.05, 2))
+            self.calculate_chemistry('гидрофабизатор', round(self.volume_well_jamming * 0.05, 2))
             surfactant_hydrofabizer_str = 'с добавлением в жидкость глушения гидрофобизатора из расчёта' \
                                           ' 0,05% на 1м3 (0,5л)'
 
@@ -463,7 +463,7 @@ class GnoParent(ABC):
 
         # экземпляр функции расчета глушения
         well_jamming_ord = volume_jamming_well(self, float(self.data_well.depth_fond_paker_before["do"]))
-        self.sucker_pod_jaming = "".join([
+        self.sucker_pod_jamming = "".join([
             " " if self.without_damping_true is True else f"Приподнять штангу. Произвести глушение в "
                                                           f"затрубное пространство в объеме{well_jamming_ord}м3 "
                                                           f"(объем колонны от пакера до устья уд.весом"
@@ -494,9 +494,9 @@ class GnoParent(ABC):
         volume_nkt_str = volume_nkt(self.data_well)
         volume_nkt_metal_str = volume_nkt_metal(self.data_well)
         volume_rod_str = volume_rod(self.data_well)
-        volume_nkt_ustie = round(self.volume_well_jaming - volume_pod_nkt_str, 1)
-        well_volume_str_after = f'{round(self.volume_well_jaming - well_volume, 1)}м3.' if round(
-            self.volume_well_jaming - well_volume, 1) > 0.1 else ''
+        volume_nkt_ustie = round(self.volume_well_jamming - volume_pod_nkt_str, 1)
+        well_volume_str_after = f'{round(self.volume_well_jamming - well_volume, 1)}м3.' if round(
+            self.volume_well_jamming - well_volume, 1) > 0.1 else ''
 
         if self.without_damping_true:
             well_jamming_str = f'Скважина состоит в перечне скважин ООО Башнефть-Добыча, на которых допускается ' \
@@ -510,7 +510,7 @@ class GnoParent(ABC):
 
             well_jamming_str = f'Произвести закачку в трубное пространство тех жидкости уд.весом ' \
                                f'{self.data_well.fluid_work} в ' \
-                               f'объеме {round(self.volume_well_jaming - volume_pod_nkt_str, 1)}м3 на циркуляцию. ' \
+                               f'объеме {round(self.volume_well_jamming - volume_pod_nkt_str, 1)}м3 на циркуляцию. ' \
                                f'Закрыть затрубное пространство. Закрыть скважину на стабилизацию не менее 2 часов. ' \
                                f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)'
 
@@ -530,7 +530,7 @@ class GnoParent(ABC):
                                  f'объеме ' \
                                  f'{round(well_volume(self, self.data_well.depth_fond_paker_before["do"]), 1)}м3 '
         elif self.without_damping_true is False and self.lift_key in ['НН', 'НВ', 'ЭЦН']:
-            well_jamming_str = f'Произвести глушение скважины в объеме {self.volume_well_jaming}м3 тех ' \
+            well_jamming_str = f'Произвести глушение скважины в объеме {self.volume_well_jamming}м3 тех ' \
                                f'жидкостью уд.весом {self.data_well.fluid_work}' \
                                f' на циркуляцию в следующим алгоритме: \n Произвести закачку в' \
                                f' затрубное пространство тех жидкости в объеме {volume_nkt_ustie}м3 на ' \
@@ -542,10 +542,10 @@ class GnoParent(ABC):
                                f'Закрыть скважину на ' \
                                f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае ' \
                                f'отсутствия на желобную емкость'
-            well_jamming_short = f'Глушение в затруб в объеме {self.volume_well_jaming}м3 тех ' \
+            well_jamming_short = f'Глушение в затруб в объеме {self.volume_well_jamming}м3 тех ' \
                                  f'жидкостью уд.весом {self.data_well.fluid_work_short}'
         elif abs(self.length_nkt - self.data_well.perforation_roof) > 150:
-            well_jamming_str = f'Произвести глушение скважины объеме {self.volume_well_jaming}м3 тех ' \
+            well_jamming_str = f'Произвести глушение скважины объеме {self.volume_well_jamming}м3 тех ' \
                                f'жидкостью уд.весом {self.data_well.fluid_work}' \
                                f' на циркуляцию в следующим алгоритме: \n Произвести закачку ' \
                                f'в затрубное пространство ' \
@@ -559,16 +559,16 @@ class GnoParent(ABC):
                                f'Закрыть скважину на ' \
                                f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае ' \
                                f'отсутствия на желобную емкость'
-            well_jamming_short = f'Глушение в затруб в объеме {self.volume_well_jaming}м3 тех ' \
+            well_jamming_short = f'Глушение в затруб в объеме {self.volume_well_jamming}м3 тех ' \
                                  f'жидкостью уд.весом {self.data_well.fluid_work_short}'
         elif abs(self.length_nkt - self.data_well.perforation_roof) <= 150:
-            well_jamming_str = f'Произвести глушение скважины  в объеме {self.volume_well_jaming}м3 тех ' \
+            well_jamming_str = f'Произвести глушение скважины  в объеме {self.volume_well_jamming}м3 тех ' \
                                f'жидкостью уд.весом {self.data_well.fluid_work}' \
                                f' на циркуляцию. Закрыть скважину на ' \
                                f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, ' \
                                f'в случае отсутствия ' \
                                f'на желобную емкость)'
-            well_jamming_short = (f'Глушение в затруб в объеме {self.volume_well_jaming}м3 уд.весом '
+            well_jamming_short = (f'Глушение в затруб в объеме {self.volume_well_jamming}м3 уд.весом '
                                   f'{self.data_well.fluid_work_short}')
 
         if len(self.data_well.plast_work) == 0 and self.data_well.dict_leakiness:
@@ -861,7 +861,7 @@ class LiftOrd(GnoParent):
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
              f'{self.data_well.max_admissible_pressure.get_value}атм. '
-             f'{self.sucker_pod_jaming}'
+             f'{self.sucker_pod_jamming}'
              f'Поднять на штангах насос с гл. {self.data_well.dict_pump_shgn_depth["do"]}м с доливом тех жидкости '
              f'уд.весом {self.data_well.fluid_work} '
              f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве '
@@ -1062,9 +1062,9 @@ class LiftPumpNnWithPaker(GnoParent):
         return work_list
 
     def lifting_nn_with_paker(self):
-        sucker_jaming = ""
+        sucker_jamming = ""
         if self.without_damping_true is False:
-            sucker_jaming = f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу." \
+            sucker_jamming = f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу." \
                             f" Произвести глушение в НКТ в объеме {volume_pod_nkt(self)}м3"
         lift_pump_nn_with_paker = [
             [f'Опрессовать ГНО на Р={40}атм', None,
@@ -1083,7 +1083,7 @@ class LiftPumpNnWithPaker(GnoParent):
              f'инженером {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
              f'{self.data_well.max_admissible_pressure.get_value}атм. Спуском одной штанги заловить конус. '
-             f'{sucker_jaming}м3. Техостой 2ч. '
+             f'{sucker_jamming}м3. Техостой 2ч. '
              f'Поднять на штангах плунжер с гл. {int(self.data_well.dict_pump_shgn_depth["do"])}м с доливом тех '
              f'жидкости уд.весом {self.data_well.fluid_work} '
              f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве '
@@ -1315,7 +1315,7 @@ class LiftEcnWithPaker(GnoParent):
         return work_list
 
     def lifting_ecn_with_paker(self):
-        enc_jaming = "".join([" " if self.without_damping_true is True
+        enc_jamming = "".join([" " if self.without_damping_true is True
                               else f"При наличии Избыточного давления не позволяющее сорвать пакера: "
                                    f"Произвести глушение в НКТ в объеме {volume_pod_nkt(self)}м3."
                                    f" {self.data_well.fluid_work}"])
@@ -1333,7 +1333,7 @@ class LiftEcnWithPaker(GnoParent):
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
             [None, None,
              f'Сбить сбивной клапан. '
-             f'{enc_jaming}', None, None,
+             f'{enc_jamming}', None, None,
              None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
             [f'срыв пакера не более {round(weigth_pipe(self.data_well.dict_nkt_before) * 1.2, 1)}т. '

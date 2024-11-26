@@ -1,14 +1,14 @@
-from PyQt5 import Qt
+
 from PyQt5.QtGui import QDoubleValidator
 
 import data_list
-from main import MyMainWindow
-from PyQt5.QtWidgets import QMessageBox, QInputDialog, QMainWindow, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
-    QTabWidget, QPushButton, QHeaderView, QTableWidget, QTableWidgetItem
+
+from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
+     QPushButton, QHeaderView, QTableWidget, QTableWidgetItem
 
 from work_py.alone_oreration import privyazka_nkt
-from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
-from .rationingKRS import descentNKT_norm, liftingNKT_norm
+from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
+from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm
 
 
 class TabPageSo(TabPageUnion):
@@ -31,7 +31,7 @@ class TabPageSo(TabPageUnion):
         self.need_privyazka_Label = QLabel("Привязка оборудования", self)
         self.need_privyazka_q_combo = QComboBox()
         self.need_privyazka_q_combo.addItems(['Нет', 'Да'])
-
+        paker_depth = None
         if len(self.data_well.plast_work) != 0:
             paker_depth = self.data_well.perforation_roof - 20
         else:
@@ -69,12 +69,12 @@ class TabPageSo(TabPageUnion):
 
         self.grid_layout.addWidget(self.pressure_zumpf_question_Label, 3, 5)
         self.grid_layout.addWidget(self.pressure_zumpf_question_QCombo, 4, 5)
-
         self.grid_layout.addWidget(self.need_privyazka_Label, 3, 4)
         self.grid_layout.addWidget(self.need_privyazka_q_combo, 4, 4)
 
     def update_paker_need(self, index):
         if index == 'Да':
+            paker_depth_zumpf = None
             if len(self.data_well.plast_work) != 0:
                 paker_depth_zumpf = int(self.data_well.perforation_roof + 10)
             else:
@@ -284,7 +284,9 @@ class OpressovkaEK(WindowUnion):
                 paker_depth = self.tableWidget.item(row, 1)
                 depth_paker_list.append(int(float(paker_depth.text())))
                 pressure_zumpf_question = self.tableWidget.item(row, 2)
-            work_list = OpressovkaEK.interval_pressure_testing(self, paker_khost, diameter_paker, depth_paker_list, pressure_zumpf_question, paker_depth_zumpf)
+            work_list = OpressovkaEK.interval_pressure_testing(self, paker_khost, diameter_paker,
+                                                               depth_paker_list, pressure_zumpf_question,
+                                                               paker_depth_zumpf)
 
         self.populate_row(self.insert_index, work_list, self.table_widget)
         data_list.pause = False

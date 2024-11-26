@@ -133,7 +133,7 @@ class WorkWithGnkt(GnktModel):
                            176: (7, 17, 12, 17), 177: (32, 19, 39, 19), 178: (27, 14, 28, 14), 179: (9, 36, 43, 36),
                            180: (7, 14, 10, 14)}
 
-        rowHeights1 = [None, None, 27.75, 20.25, 20.25, 20.25, 20.25, 18.0, 22.5, 22.5, 22.5, 18.0, 18.0, 20.25,
+        row_heights1 = [None, None, 27.75, 20.25, 20.25, 20.25, 20.25, 18.0, 22.5, 22.5, 22.5, 18.0, 18.0, 20.25,
                        20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 20.25, 18.0, 20.25, 35.25, 17.25, 17.25, 79.5, 60.0,
                        13.5, 13.5, 43.5, 13.5, None, 45.75, None, 74.25, None, None, None, None, None, None, 13.5,
                        12.75, 12.75, 12.75, None, None, None, None, None, None, None, 15.75, 12.75, 12.75, 12.75,
@@ -143,7 +143,7 @@ class WorkWithGnkt(GnktModel):
                        None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                        None, None, 134.25, None, None, None, None, None, None, None]
 
-        colWidth = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
+        col_width = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
                     13.0, 5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
                     13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
                     13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
@@ -509,10 +509,10 @@ class WorkWithGnkt(GnktModel):
                             end_column=value[2], end_row=value[3])
 
         for index_row, row in enumerate(ws3.iter_rows()):  # Копирование высоты строки
-            ws3.row_dimensions[index_row].height = rowHeights1[index_row - 1]
+            ws3.row_dimensions[index_row].height = row_heights1[index_row - 1]
 
         for col_ind in range(50):  # копирование ширины столба
-            ws3.column_dimensions[get_column_letter(col_ind + 1)].width = colWidth[col_ind] / 1.9
+            ws3.column_dimensions[get_column_letter(col_ind + 1)].width = col_width[col_ind] / 1.9
 
         coordinate = f'B3'
 

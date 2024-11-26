@@ -13,7 +13,7 @@ def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
         boundaries_dict[ind] = range_boundaries(str(_range))
 
     # rowHeights_top = [None, 18.0, 18, 18,None, 18.0, 18, 18,None, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18]
-    rowHeights1 = [ws.row_dimensions[i + 1].height for i in range(cat_well_min.get_value, ws.max_row)]
+    row_heights1 = [ws.row_dimensions[i + 1].height for i in range(cat_well_min.get_value, ws.max_row)]
     for key, value in boundaries_dict.items():
         try:
             ws.unmerge_cells(start_column=value[0], start_row=value[1],
@@ -27,7 +27,7 @@ def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
     ws.delete_rows(1, cat_well_min.get_value - 1)
 
     # print(sorted(boundaries_dict))
-    data_list.rowHeights = rowHeights1
+    data_list.rowHeights = row_heights1
 
     for _ in range(16):
         ws.insert_rows(1, 1)

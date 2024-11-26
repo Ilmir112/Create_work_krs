@@ -27,6 +27,9 @@ class FindIndexPZ(MyMainWindow):
     def __init__(self, ws, work_plan, parent=None):
         super().__init__()
 
+        self.nkt_template = None
+        self.nkt_diam = None
+        self.perforation_roof = 5000
         self.old_version = False
         self.region = None
         self.fluid = ''
@@ -180,6 +183,7 @@ class FindIndexPZ(MyMainWindow):
         self.dict_perforation_short = {}
         self.dict_perforation_project = {}
         self.category_pressure_list = []
+        self.category_pressure = None
         self.skm_interval = []
         self.leakiness = False
         self.check_data_in_pz = []
@@ -1257,7 +1261,7 @@ class WellData(FindIndexPZ):
                     if paker_diameter not in self.paker_before["do"]:
                         self.check_data_in_pz.append(
                             f'Не корректно указан диаметр фондового пакера в карте спуска '
-                            f'ремонта {self.paker_before["do"].split("/")[0]} требуется пакер '
+                            f'ремонта {str(self.paker_before["do"]).split("/")[0]} требуется пакер '
                             f'диаметром {paker_diameter}мм')
                 else:
                     if self.depth_fond_paker_before["do"] != 0:
@@ -1479,7 +1483,6 @@ class WellPerforation(FindIndexPZ):
                     lst = []
 
                     if str(row[col_roof_index + 1].value).replace('.', '').replace(',', '').isdigit():
-
                         if row[1].value is not None:
                             plast = row[1].value
                             lst.append(plast)
@@ -1670,7 +1673,7 @@ class WellPerforation(FindIndexPZ):
 
 class WellCategory(FindIndexPZ):
     def __init__(self):
-        super(WellCategory, self).__init__()
+        super().__init__()
         # self.read_well(self.ws, self.cat_well_min.get_value, data_list.data_well_min.get_value)
 
     def read_well(self, begin_index, cancel_index):

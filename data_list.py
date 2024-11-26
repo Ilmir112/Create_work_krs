@@ -119,7 +119,7 @@ rowHeights = ''
 data_well_is_True = False
 current_date = datetime.now().date()
 
-colWidth = ''
+col_width = ''
 boundaries_dict = ''
 
 plast_project = []

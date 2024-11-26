@@ -74,14 +74,14 @@ class TabPageSo(TabPageUnion):
         self.solvent_volume_edit.setText("2")
 
         self.solvent_question_Label = QLabel("необходимость растворителя", self)
-        self.solvent_question_QCombo = QComboBox(self)
-        self.solvent_question_QCombo.addItems(['Нет', 'Да'])
+        self.solvent_question_combo = QComboBox(self)
+        self.solvent_question_combo.addItems(['Нет', 'Да'])
 
         self.template_Combo.currentTextChanged.connect(self.update_template_edit)
 
         if self.data_well.count_template == 0:
             self.note_question_qcombo.setCurrentIndex(1)
-            self.solvent_question_QCombo.setCurrentIndex(1)
+            self.solvent_question_combo.setCurrentIndex(1)
 
         self.grid = QGridLayout(self)
         if self.data_well.column_additional is False or \
@@ -140,7 +140,7 @@ class TabPageSo(TabPageUnion):
         self.grid.addWidget(self.current_bottom_edit, 9, 3)
 
         self.grid.addWidget(self.solvent_question_Label, 8, 4)
-        self.grid.addWidget(self.solvent_question_QCombo, 9, 4)
+        self.grid.addWidget(self.solvent_question_combo, 9, 4)
 
         self.grid.addWidget(self.solvent_Label, 8, 5)
         self.grid.addWidget(self.solvent_volume_edit, 9, 5)
@@ -688,7 +688,7 @@ class TemplateWithoutSkm(WindowUnion):
 
     def template_ek(self, template_str, template, temlate_ek):
 
-        solvent_question = self.tabWidget.currentWidget().solvent_question_QCombo.currentText()
+        solvent_question = self.tabWidget.currentWidget().solvent_question_combo.currentText()
         solvent_volume_edit = self.tabWidget.currentWidget().solvent_volume_edit.text()
         if solvent_volume_edit != '':
             solvent_volume_edit = round(float(solvent_volume_edit), 1)
@@ -858,7 +858,7 @@ class TemplateWithoutSkm(WindowUnion):
         from .drilling import Drill_window
 
         pero_list = RirWindow.pero_select(self, self.data_well.current_bottom)
-        gipsPero_list = [
+        gips_pero_list = [
             [f'Спустить {pero_list}  на тНКТ{self.data_well.nkt_diam}мм', None,
              f'Спустить {pero_list}  на тНКТ{self.data_well.nkt_diam}мм до глубины '
              f'{self.data_well.current_bottom}м '
@@ -905,7 +905,7 @@ class TemplateWithoutSkm(WindowUnion):
 
             if self.data_well.dict_pump_shgn["do"] != 0:
 
-                gipsPero_list = [gipsPero_list[-1]]
+                gips_pero_list = [gips_pero_list[-1]]
                 from .drilling import Drill_window
                 if self.raid_window is None:
                     self.raid_window = Drill_window(self.table_widget, self.insert_index)
@@ -921,7 +921,7 @@ class TemplateWithoutSkm(WindowUnion):
                     self.raid_window = None
 
                 for row in drill_work_list:
-                    gipsPero_list.append(row)
+                    gips_pero_list.append(row)
             else:
                 if self.raid_window is None:
                     self.raid_window = Drill_window(self.table_widget, self.insert_index)
@@ -936,9 +936,9 @@ class TemplateWithoutSkm(WindowUnion):
                     self.raid_window.close()  # Close window.
                     self.raid_window = None
                 for row in drill_work_list:
-                    gipsPero_list.append(row)
+                    gips_pero_list.append(row)
 
-        return gipsPero_list
+        return gips_pero_list
 
 
 if __name__ == "__main__":

@@ -1,20 +1,17 @@
 from PyQt5 import QtWidgets
 
-from PyQt5.Qt import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
+from PyQt5.Qt import QWidget, QLabel, QComboBox, QGridLayout, \
     QInputDialog, QPushButton
 from PyQt5.QtCore import QEvent, Qt
 from PyQt5.QtGui import QPalette, QStandardItem, QIntValidator
 from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox, QCompleter, QTableWidget, \
-    QTableWidgetItem
+    QTableWidgetItem, QLineEdit
 
 import data_list
-
 from work_py.alone_oreration import volume_vn_nkt, well_volume, kot_work
-
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
-
-from .rationingKRS import descentNKT_norm, well_volume_norm, liftingNKT_norm
-from .swabbing import SwabWindow
+from work_py.rationingKRS import descentNKT_norm, well_volume_norm, liftingNKT_norm
+from work_py.swabbing import SwabWindow
 
 
 class CheckableComboBox(TabPageUnion):

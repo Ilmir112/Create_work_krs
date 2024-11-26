@@ -127,7 +127,7 @@ def need_h2s(self, fluid_new, plast_edit, expected_pressure):
                     [self.data_well.dict_category[self.data_well.plast_project[0]]['по сероводороду'].poglot
                      for plast in self.data_well.plast_project])
             except:
-                expenditure_h2s_plan = QInputDialog.getDouble(None, 'нет данных',
+                expenditure_h2s_plan = QInputDialog.getDouble(self, 'нет данных',
                                                               'ВВедите расход поглотетеля сероводорода', 0.25, 0, 3)
 
             expenditure_h2s = max(

@@ -58,12 +58,12 @@ class TabPageSoWith(TabPageUnion):
         self.solvent_volume_edit.setText("2")
 
         self.solvent_question_Label = QLabel("необходимость растворителя", self)
-        self.solvent_question_QCombo = QComboBox(self)
-        self.solvent_question_QCombo.addItems(['Нет', 'Да'])
+        self.solvent_question_combo = QComboBox(self)
+        self.solvent_question_combo.addItems(['Нет', 'Да'])
 
         if self.data_well.count_template == 0:
             self.note_question_qcombo.setCurrentIndex(1)
-            self.solvent_question_QCombo.setCurrentIndex(1)
+            self.solvent_question_combo.setCurrentIndex(1)
 
         self.skm_Label = QLabel("диаметр СКМ", self)
         self.skm_Edit = QLineEdit(self)
@@ -111,7 +111,7 @@ class TabPageSoWith(TabPageUnion):
         self.grid.addWidget(self.current_bottom_edit, 9, 3)
 
         self.grid.addWidget(self.solvent_question_Label, 8, 4)
-        self.grid.addWidget(self.solvent_question_QCombo, 9, 4)
+        self.grid.addWidget(self.solvent_question_combo, 9, 4)
 
         self.grid.addWidget(self.solvent_Label, 8, 5)
         self.grid.addWidget(self.solvent_volume_edit, 9, 5)
@@ -1154,7 +1154,7 @@ class TemplateKrs(WindowUnion):
         # print(f'внут {skm_list}')
         skm_interval = raid(skm_list)
 
-        solvent_question = self.tabWidget.currentWidget().solvent_question_QCombo.currentText()
+        solvent_question = self.tabWidget.currentWidget().solvent_question_combo.currentText()
         solvent_volume_edit = self.tabWidget.currentWidget().solvent_volume_edit.text()
         if solvent_volume_edit != '':
             solvent_volume_edit = round(float(solvent_volume_edit), 1)
@@ -1333,7 +1333,7 @@ class TemplateKrs(WindowUnion):
             gips_str = f'С ГЛУБИНЫ 1100м СНИЗИТЬ СКОРОСТЬ  СПУСКА до 0.25м/с ВОЗМОЖНО ОТЛОЖЕНИЕ ГИПСА'
         else:
             gips_str = ''
-        gipsPero_list = [
+        gips_pero_list = [
             [f'Спустить {pero_list[3:]}  на тНКТ{self.data_well.nkt_diam}мм', None,
              f'Спустить {pero_list[3:]}  на тНКТ{self.data_well.nkt_diam}мм до глубины {self.data_well.current_bottom}м '
              f'с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. '
@@ -1390,21 +1390,21 @@ class TemplateKrs(WindowUnion):
                 downhole_motor = 'Д-76'
 
             if self.data_well.dict_pump_shgn["do"] != 0 and self.data_well.paker_before["do"] == 0:
-                gipsPero_list = [gipsPero_list[-1]]
+                gips_pero_list = [gips_pero_list[-1]]
                 drill_list = Drill_window.drilling_nkt(self,
                                                        [(self.data_well.current_bottom, 'гипсовых отложениий')],
                                                        'долото', template_diameter, downhole_motor)
                 for row in drill_list:
-                    gipsPero_list.append(row)
+                    gips_pero_list.append(row)
             else:
                 drill_list = Drill_window.drilling_nkt(self,
                                                        [(self.data_well.current_bottom, 'гипсовых отложениий')],
                                                        'долото', template_diameter, downhole_motor)
 
                 for row in drill_list:
-                    gipsPero_list.append(row)
+                    gips_pero_list.append(row)
 
-        return gipsPero_list
+        return gips_pero_list
 
     def calc_combo_nkt(self, type_nkt, current):
         if self.data_well.column_additional is False or \
