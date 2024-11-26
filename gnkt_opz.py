@@ -134,8 +134,8 @@ class TabPageGnkt(QWidget):
         self.grid.addWidget(self.acid_volume_edit, 7, 2)
         self.grid.addWidget(self.acid_proc_label, 6, 3)
         self.grid.addWidget(self.acid_proc_edit, 7, 3)
-        # grid.addWidget(self.acidOilProcLabel, 4, 4)
-        # grid.addWidget(self.acidOilProcEdit, 5, 4)
+        # grid.addWidget(self.acid_oil_proc_label, 4, 4)
+        # grid.addWidget(self.acid_oil_proc_edit, 5, 4)
         self.grid.addWidget(self.pressure_Label, 6, 5)
         self.grid.addWidget(self.pressure_edit, 7, 5)
 

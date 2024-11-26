@@ -33,7 +33,7 @@ class TabPageSo(TabPageUnion):
             if plast not in self.plast_all:
                 self.plast_all.append(plast)
 
-        self.cat_P_1 = self.data_well.category_pressure
+        self.cat_P_1 = self.data_well.category_pressure_list
         self.category_h2s_list = self.data_well.category_h2s_list
         self.cat_gaz_f_pr = self.data_well.category_gaz_factor_percent
         self.gaz_f_pr = self.data_well.gaz_factor_percent

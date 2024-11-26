@@ -126,10 +126,12 @@ class MyMainWindow(QMainWindow):
         else:
             return False
 
+    # def move_window(self, x, y):
+    #     self.move(x, y)
     def add_window(self, window):
         if self.operation_window is None:
             self.operation_window = window(self.data_well, self.table_widget)
-            # self.raid_window.setGeometry(200, 400, 300, 400)
+            self.operation_window.move(100, 100)
             self.set_modal_window(self.operation_window)
 
             self.pause_app()

@@ -30,13 +30,14 @@ class FindIndexPZ(MyMainWindow):
         self.old_version = False
         self.region = None
         self.fluid = ''
+        self.curator = None
         self.data_well_max = ProtectedIsDigit(0)
         self.plan_correct_index = ProtectedIsDigit(0)
         self.condition_of_wells = ProtectedIsDigit(0)
         self.plan_correct_index = ProtectedIsDigit(0)
         self.type_absorbent = ''
         self.sucker_rod_none = False
-        self.perforation_sole = 0
+
         self.ws = ws
         self.wb = parent.wb
 
@@ -171,14 +172,14 @@ class FindIndexPZ(MyMainWindow):
         self.konte_true = False
         self.bvo = False
         self.category_pvo = 2
-        self.perforation_roof = 5000
+
         self.problem_with_ek = False
         self.problem_with_ek_diameter = 220
         self.problem_with_ek_depth = 10000
         self.dict_perforation = {}
         self.dict_perforation_short = {}
         self.dict_perforation_project = {}
-        self.category_pressure = []
+        self.category_pressure_list = []
         self.skm_interval = []
         self.leakiness = False
         self.check_data_in_pz = []
@@ -1680,7 +1681,7 @@ class WellCategory(FindIndexPZ):
                         cell = self.ws.cell(row=row, column=col).value
                         if cell:
                             if str(cell) in ['атм'] and self.ws.cell(row=row, column=col - 2).value:
-                                self.category_pressure.append(self.ws.cell(row=row, column=col - 2).value)
+                                self.category_pressure_list.append(self.ws.cell(row=row, column=col - 2).value)
                                 self.category_pressure_well.append(self.ws.cell(row=row, column=col - 1).value)
 
                             elif str(cell) in ['%', 'мг/л', 'мг/дм3', 'мг/м3', 'мг/дм', 'мгдм3']:
@@ -1771,7 +1772,7 @@ class WellCategory(FindIndexPZ):
 
                 self.value_h2s_percent.append(h2s_pr)
 
-            self.category_pressure = self.category_pressure_well[0]
+            self.category_pressure = self.category_pressure_list[0]
             # print(f'категория по давлению {self.category_pressure}')
             self.category_h2s = self.category_h2s_list[0]
             self.category_gas_factor = self.category_gaz_factor_percent[0]

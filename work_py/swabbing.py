@@ -73,7 +73,7 @@ class TabPageSoSwab(TabPageUnion):
         self.plast_combo.combo_box.addItems(plast_work)
         self.plast_combo.combo_box.currentTextChanged.connect(self.update_plast_edit)
 
-        self.swabTypeLabel = QLabel("задача при освоении", self)
+        self.swab_type_label = QLabel("задача при освоении", self)
         self.swab_type_combo = QComboBox(self)
         self.swab_type_combo.addItems(['', 'Задача №2.1.13', 'Задача №2.1.14', 'Задача №2.1.16', 'Задача №2.1.11',
                                      'Задача №2.1.16 + герметичность пакера', 'ГРР'
@@ -135,7 +135,7 @@ class TabPageSoSwab(TabPageUnion):
         self.grid.addWidget(self.paker2Label, 0, 5)
         self.grid.addWidget(self.paker2Edit, 1, 5)
 
-        self.grid.addWidget(self.swabTypeLabel, 6, 1)
+        self.grid.addWidget(self.swab_type_label, 6, 1)
         self.grid.addWidget(self.swab_type_combo, 7, 1)
 
         self.grid.addWidget(self.swab_volume_editLabel, 6, 2)
@@ -426,7 +426,7 @@ class TabPageSoSwab(TabPageUnion):
             paker_layout_list_tab = ["Пласт", "воронка", "вид освоения", "объем освоения"]
 
         elif self.swab_true_edit_type.currentText() == 'пакер с заглушкой':
-            # self.swabTypeLabel.setParent(None)
+            # self.swab_type_label.setParent(None)
             # self.swab_type_combo.setParent(None)
             # self.swab_volume_edit.setParent(None)
 
@@ -456,7 +456,7 @@ class TabPageSoSwab(TabPageUnion):
             self.depth_gauge_label.setParent(None)
             self.depth_gauge_combo.setParent(None)
             self.swab_volume_editLabel.setParent(None)
-            self.swabTypeLabel.setParent(None)
+            self.swab_type_label.setParent(None)
             self.swab_type_combo.setParent(None)
             self.swab_volume_edit.setParent(None)
             self.plast_label.setParent(None)
