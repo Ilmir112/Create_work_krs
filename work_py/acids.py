@@ -23,7 +23,7 @@ class TabPageDp(TabPageUnion):
         self.poins_sko_edit = QLineEdit(self)
 
         plast_work = ['']
-        plast_work.extend(self.dict_data_well['plast_work'])
+        plast_work.extend(self.data_well.plast_work)
 
         self.plast_label = QLabel("Выбор пласта", self)
         self.plast_combo = CheckableComboBox(self)
@@ -53,7 +53,7 @@ class TabPageDp(TabPageUnion):
         self.pressure_Label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
         self.pressure_edit.setClearButtonEnabled(True)
-        self.pressure_edit.setText(str(self.dict_data_well["max_admissible_pressure"]._value))
+        self.pressure_edit.setText(str(self.data_well.max_admissible_pressure._value))
 
         self.grid = QGridLayout(self)
 
@@ -112,17 +112,17 @@ class TabWidget(TabWidgetUnion):
 
 
 class GonsWindow(WindowUnion):
-    def __init__(self, dict_data_well, table_widget, parent=None):
-        super().__init__()
+    def __init__(self, data_well, table_widget, parent=None):
+        super().__init__(data_well)
 
-        self.dict_data_well = dict_data_well
-        self.ins_ind = dict_data_well['ins_ind']
-        self.tabWidget = TabWidget(self.dict_data_well)
+
+        self.insert_index = data_well.insert_index
+        self.tabWidget = TabWidget(self.data_well)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
-        self.dict_perforation = self.dict_data_well["dict_perforation"]
+        self.dict_perforation = self.data_well.dict_perforation
 
         self.table_widget = table_widget
         self.buttonAdd = QPushButton('Добавить данные в план работ')
@@ -144,7 +144,7 @@ class GonsWindow(WindowUnion):
         iron_true_combo = self.tabWidget.currentWidget().iron_true_combo.currentText()
         iron_volume_edit = self.tabWidget.currentWidget().iron_volume_edit.text()
 
-        if int(bottom_point) >= self.dict_data_well["current_bottom"]:
+        if int(bottom_point) >= self.data_well.current_bottom:
             QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
             return
         if not acid_edit or not acid_volume_edit or not acid_proc_edit or not bottom_point or not acid_calcul_Edit \
@@ -154,7 +154,7 @@ class GonsWindow(WindowUnion):
 
         work_list = self.acidGons(plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, poins_sko_edit, bottom_point,
                                   acid_calcul_Edit, pressure_edit, iron_true_combo, iron_volume_edit)
-        self.populate_row(self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.insert_index, work_list, self.table_widget)
         self.calculate_chemistry(acid_edit, acid_volume_edit)
         data_list.pause = False
         self.close()
@@ -162,7 +162,7 @@ class GonsWindow(WindowUnion):
 
     def closeEvent(self, event):
                 # Закрываем основное окно при закрытии окна входа
-        self.operation_window = None
+        self.data_well.operation_window = None
         event.accept()  # Принимаем событие закрытия
     def acidGons(self, plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, poins_sko_edit, bottom_point,
                                   acid_calcul_Edit, pressure_edit, iron_true_combo, iron_volume_edit):
@@ -171,12 +171,12 @@ class GonsWindow(WindowUnion):
         else:
             iron_str = ""
 
-        nkt_combo = f' + НКТ60мм {round(self.dict_data_well["current_bottom"] -self.dict_data_well["head_column_additional"]._value, 0)}' \
-            if self.dict_data_well["column_additional"] is True else ''
+        nkt_combo = f' + НКТ60мм {round(self.data_well.current_bottom -self.data_well.head_column_additional._value, 0)}' \
+            if self.data_well.column_additional is True else ''
         gons_list = [[f'Спуск гидромониторную насадку yf {nkt_combo} до глубины нижней точки до {bottom_point}', None,
          f'Спустить  гидромониторную насадку {nkt_combo}'         
-         f'на НКТ{self.dict_data_well["nkt_diam"]}мм до глубины нижней точки до {bottom_point}'
-         f' с замером, шаблонированием шаблоном {self.dict_data_well["nkt_template"]}мм.',
+         f'на НКТ{self.data_well.nkt_diam}мм до глубины нижней точки до {bottom_point}'
+         f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм.',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(bottom_point,1)],
          [f' ГОНС пласта {plast_combo} (общий объем {acid_volume_edit}м3) в инт. {poins_sko_edit}м', None,
@@ -189,18 +189,18 @@ class GonsWindow(WindowUnion):
           None, None, None, None, None, None, None,
           'мастер КРС', 8],
          [None, None,
-          f'По согласованию с заказчиком  допустить компоновку до глубины {self.dict_data_well["current_bottom"]}м, промыть скважину '
-          f'прямой промывкой через желобную ёмкость водой у= {self.dict_data_well["fluid_work"]} в присутствии представителя заказчика в '
-          f'объеме {round(well_volume(self, self.dict_data_well["current_bottom"]), 1)}м3. Промывку производить в емкость '
+          f'По согласованию с заказчиком  допустить компоновку до глубины {self.data_well.current_bottom}м, промыть скважину '
+          f'прямой промывкой через желобную ёмкость водой у= {self.data_well.fluid_work} в присутствии представителя заказчика в '
+          f'объеме {round(well_volume(self, self.data_well.current_bottom), 1)}м3. Промывку производить в емкость '
           f'для дальнейшей утилизации на НШУ с целью недопущения попадания кислоты в систему сбора.',
           None, None, None, None, None, None, None,
           'мастер КРС', 1.2],
          [None, None,
-          f'Поднять гидромониторную насадку на НКТ{self.dict_data_well["nkt_diam"]}мм c глубины {self.dict_data_well["current_bottom"]}м с '
+          f'Поднять гидромониторную насадку на НКТ{self.data_well.nkt_diam}мм c глубины {self.data_well.current_bottom}м с '
           f'доливом скважины в '
-          f'объеме {round(self.dict_data_well["current_bottom"] * 1.12 / 1000, 1)}м3 удельным весом {self.dict_data_well["fluid_work"]}',
+          f'объеме {round(self.data_well.current_bottom * 1.12 / 1000, 1)}м3 удельным весом {self.data_well.fluid_work}',
           None, None, None, None, None, None, None,
           'мастер КРС',
-          liftingNKT_norm(self.dict_data_well["current_bottom"], 1)]]
+          liftingNKT_norm(self.data_well.current_bottom, 1)]]
 
         return gons_list

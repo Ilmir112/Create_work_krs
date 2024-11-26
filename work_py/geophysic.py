@@ -8,9 +8,7 @@ from work_py.parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
 
 class TabPageSo(TabPageUnion):
     def __init__(self, parent=None):
-        super().__init__()
-
-        self.dict_data_well = parent
+        super().__init__(parent)
 
         self.labelType = QLabel("Кровля записи", self)
         self.lineedit_type = QLineEdit(self)
@@ -44,7 +42,7 @@ class TabPageSo(TabPageUnion):
     def geophygist_data(self):
         if self.ComboBoxGeophygist.currentText() in ['Гироскоп', 'АКЦ', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ']:
             self.lineedit_type.setText('0')
-            self.lineedit_type2.setText(f'{self.dict_data_well["current_bottom"]}')
+            self.lineedit_type2.setText(f'{self.data_well.current_bottom}')
 
 
 class TabWidget(TabWidgetUnion):
@@ -55,12 +53,10 @@ class TabWidget(TabWidgetUnion):
 
 class GeophysicWindow(WindowUnion):
 
-    def __init__(self, dict_data_well, table_widget, parent=None):
-        super().__init__()
-
-        self.dict_data_well = dict_data_well
-        self.ins_ind = dict_data_well['ins_ind']
-        self.tabWidget = TabWidget(self.dict_data_well)
+    def __init__(self, data_well, table_widget, parent=None):
+        super().__init__(data_well)
+        self.insert_index = data_well.insert_index
+        self.tabWidget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -93,7 +89,7 @@ class GeophysicWindow(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        self.operation_window = None
+        self.data_well.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
     def add_row_table(self):
@@ -106,7 +102,7 @@ class GeophysicWindow(WindowUnion):
         if not edit_type or not edit_type2 or not researchGis:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        if self.dict_data_well["current_bottom"] < float(edit_type2):
+        if self.data_well.current_bottom < float(edit_type2):
             QMessageBox.information(self, 'Внимание', 'глубина исследований ниже текущего забоя')
             return
 
@@ -135,9 +131,9 @@ class GeophysicWindow(WindowUnion):
             research = f'ЗАДАЧА 2.7.3  Определение состояния цементного камня (АКЦ, АК сканирование). в интервале ' \
                        f'{edit_type}-{edit_type2}м,' \
                        f'Определение плотности, дефектов цементного камня, эксцентриситета колонны (СГДТ) в ' \
-                       f'интервале 0 - {self.dict_data_well["perforation_roof"] - 20}м '
+                       f'интервале 0 - {self.data_well.perforation_roof - 20}м '
             research_short = f'АКЦ в интервале {edit_type}-{edit_type2}м.' \
-                             f'СГДТ в интервале 0 - {self.dict_data_well["perforation_roof"] - 20}'
+                             f'СГДТ в интервале 0 - {self.data_well.perforation_roof - 20}'
 
         elif geophysic == 'ИНГК':
             research = f'ЗАДАЧА 2.4.3 Определение текущей нефтенасыщенности по данным интегрального импульсного ' \
@@ -193,12 +189,12 @@ class GeophysicWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер КРС', ' '],
             [' ', None,
-             f'Долить скважину до устья тех жидкостью уд.весом {self.dict_data_well["fluid_work"]} .Установить ПВО по'
+             f'Долить скважину до устья тех жидкостью уд.весом {self.data_well.fluid_work} .Установить ПВО по'
              f' схеме №8а утвержденной '
              f'главным инженером {data_list.contractor} '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. Опрессовать  плашки  ПВО '
              f'(на давление опрессовки ЭК, но '
-             f'не ниже максимального ожидаемого давления на устье) {self.dict_data_well["max_admissible_pressure"]._value}атм, '
+             f'не ниже максимального ожидаемого давления на устье) {self.data_well.max_admissible_pressure._value}атм, '
              f'по невозможности на давление поглощения, но '
              f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). ',
              None, None, None, None, None, None, None,
@@ -237,15 +233,15 @@ class GeophysicWindow(WindowUnion):
                            120: (501, 600), 140: (601, 700)}
         # print(researchGis_list)
         for i, row_data in enumerate(geophysicalResearch):
-            row = self.ins_ind + i
+            row = self.insert_index + i
             self.table_widget.insertRow(row)
             row_max = self.table_widget.rowCount()
             self.insert_data_in_database(row, row_max)
             # lst = [1, 0, 2, len(geophysicalResearch)-1]
-            # if float(self.dict_data_well["max_angle"]._value) >= 50:
+            # if float(self.data_well.max_angle._value) >= 50:
             #     lst.extend([3, 4])
             # Объединение ячеек по горизонтали в столбце "отвественные и норма"
-            self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
+            self.table_widget.setSpan(i + self.insert_index, 2, 1, 8)
             for column, data in enumerate(row_data):
 
                 self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
@@ -260,8 +256,8 @@ class GeophysicWindow(WindowUnion):
                 else:
                     self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
 
-        self.table_widget.setRowHeight(self.ins_ind, 60)
-        self.table_widget.setRowHeight(self.ins_ind + 1, 60)
+        self.table_widget.setRowHeight(self.insert_index, 60)
+        self.table_widget.setRowHeight(self.insert_index + 1, 60)
 
         self.close()
 

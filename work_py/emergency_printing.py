@@ -14,11 +14,10 @@ from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_n
 
 class TabPageSoPrint(TabPageUnion):
     def __init__(self, parent=None):
-        super().__init__()
-        self.dict_data_well = parent
+        super().__init__(parent)
 
-        self.print_diametr_label = QLabel("Диаметр печати", self)
-        self.print_diametr_line = QLineEdit(self)
+        self.print_diameter_label = QLabel("Диаметр печати", self)
+        self.print_diameter_line = QLineEdit(self)
 
         self.print_type_label = QLabel("Тип печати", self)
         self.print_type_combo = QComboBox(self)
@@ -29,8 +28,8 @@ class TabPageSoPrint(TabPageUnion):
         self.nkt_select_combo = QComboBox(self)
         self.nkt_select_combo.addItems(['печать в ЭК', 'печать в ДП'])
 
-        if self.dict_data_well["column_additional"] is False or (self.dict_data_well["column_additional"] and
-                                                    self.dict_data_well["head_column_additional"]._value < self.dict_data_well["current_bottom"]):
+        if self.data_well.column_additional is False or (self.data_well.column_additional and
+                                                    self.data_well.head_column_additional._value < self.data_well.current_bottom):
             self.nkt_select_combo.setCurrentIndex(0)
         else:
             
@@ -52,8 +51,8 @@ class TabPageSoPrint(TabPageUnion):
         self.grid.addWidget(self.print_type_label, 2, 1)
         self.grid.addWidget(self.print_type_combo, 3, 1)
 
-        self.grid.addWidget(self.print_diametr_label, 2, 2)
-        self.grid.addWidget(self.print_diametr_line, 3, 2)
+        self.grid.addWidget(self.print_diameter_label, 2, 2)
+        self.grid.addWidget(self.print_diameter_line, 3, 2)
 
         self.grid.addWidget(self.nkt_str_label, 2, 3)
         self.grid.addWidget(self.nkt_str_combo, 3, 3)
@@ -68,21 +67,21 @@ class TabPageSoPrint(TabPageUnion):
         
         self.nkt_select_combo.setCurrentIndex(1)
 
-        if self.dict_data_well["column_additional"] is False or \
-                (self.dict_data_well["column_additional"] and self.dict_data_well["current_bottom"] < self.dict_data_well["head_column_additional"]._value):
+        if self.data_well.column_additional is False or \
+                (self.data_well.column_additional and self.data_well.current_bottom < self.data_well.head_column_additional._value):
             self.nkt_select_combo.setCurrentIndex(1)
             self.nkt_select_combo.setCurrentIndex(0)
         else:
             self.nkt_select_combo.setCurrentIndex(1)
 
-        if self.dict_data_well["emergency_well"] is True:
-            self.emergency_bottom_line.setText(f'{self.dict_data_well["emergency_bottom"]}')
+        if self.data_well.emergency_well is True:
+            self.emergency_bottom_line.setText(f'{self.data_well.emergency_bottom}')
     
     def update_raid_edit(self, index):
         if index == 'печать в ЭК':
-            self.print_diametr_line.setText(str(self.raiding_Bit_diam_select(self.dict_data_well["head_column_additional"]._value - 10)))
+            self.print_diameter_line.setText(str(self.raiding_Bit_diam_select(self.data_well.head_column_additional._value - 10)))
         elif index == 'печать в ДП':
-            self.print_diametr_line.setText(str(self.raiding_Bit_diam_select(self.dict_data_well["current_bottom"])))
+            self.print_diameter_line.setText(str(self.raiding_Bit_diam_select(self.data_well.current_bottom)))
                 
     def raiding_Bit_diam_select(self, depth):
         try:
@@ -101,16 +100,16 @@ class TabPageSoPrint(TabPageUnion):
                 146: (154.1, 221)
             }
     
-            if self.dict_data_well["column_additional"] is False or (
-                    self.dict_data_well["column_additional"] is True and depth <= self.dict_data_well["head_column_additional"]._value):
-                diam_internal_ek = self.dict_data_well["column_diametr"]._value - 2 * self.dict_data_well["column_wall_thickness"]._value
+            if self.data_well.column_additional is False or (
+                    self.data_well.column_additional is True and depth <= self.data_well.head_column_additional._value):
+                diam_internal_ek = self.data_well.column_diameter._value - 2 * self.data_well.column_wall_thickness._value
             else:
-                diam_internal_ek = self.dict_data_well["column_additional_diametr"]._value - 2 * self.dict_data_well["column_additional_wall_thickness"]._value
+                diam_internal_ek = self.data_well.column_additional_diameter._value - 2 * self.data_well.column_additional_wall_thickness._value
     
             for diam, diam_internal_bit in raiding_Bit_dict.items():
                 if diam_internal_bit[0] <= diam_internal_ek <= diam_internal_bit[1]:
-                    bit_diametr = diam
-            return bit_diametr
+                    bit_diameter = diam
+            return bit_diameter
         except:
             pass
        
@@ -122,12 +121,10 @@ class TabWidget(TabWidgetUnion):
 
 
 class EmergencyPrintWork(WindowUnion):
-    def __init__(self, dict_data_well, table_widget, parent=None):
-        super().__init__()
-
-        self.dict_data_well = dict_data_well
-        self.ins_ind = dict_data_well['ins_ind']
-        self.tabWidget = TabWidget(self.dict_data_well)
+    def __init__(self, data_well, table_widget, parent=None):
+        super().__init__(data_well)
+        self.insert_index = data_well.insert_index
+        self.tabWidget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -143,11 +140,11 @@ class EmergencyPrintWork(WindowUnion):
 
     def closeEvent(self, event):
                 # Закрываем основное окно при закрытии окна входа
-        self.operation_window = None
+        self.data_well.operation_window = None
         event.accept()  # Принимаем событие закрытия
     def add_work(self):
         nkt_str_combo = self.tabWidget.currentWidget().nkt_str_combo.currentText()
-        print_diametr_line = self.tabWidget.currentWidget().print_diametr_line.text()
+        print_diameter_line = self.tabWidget.currentWidget().print_diameter_line.text()
         nkt_key = self.tabWidget.currentWidget().nkt_select_combo.currentText()
         print_type_combo = self.tabWidget.currentWidget().print_type_combo.currentText()
         emergency_bottom_line = self.tabWidget.currentWidget().emergency_bottom_line.text().replace(',', '')
@@ -155,7 +152,7 @@ class EmergencyPrintWork(WindowUnion):
         if emergency_bottom_line != '':
             emergency_bottom_line = int(float(emergency_bottom_line))
 
-            if emergency_bottom_line > self.dict_data_well["current_bottom"]:
+            if emergency_bottom_line > self.data_well.current_bottom:
                 QMessageBox.warning(self, 'Ошибка',
                                           'Забой ниже глубины текущего забоя')
                 return
@@ -164,32 +161,32 @@ class EmergencyPrintWork(WindowUnion):
                                       'ВВедите аварийный забой')
             return
 
-        if nkt_str_combo == 'печать в ЭК' and self.dict_data_well["column_additional"] and \
-                emergency_bottom_line > self.dict_data_well["head_column_additional"]._value:
+        if nkt_str_combo == 'печать в ЭК' and self.data_well.column_additional and \
+                emergency_bottom_line > self.data_well.head_column_additional._value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка печати для доп колонны')
             return
-        elif nkt_str_combo == 'печать в ДП' and self.dict_data_well["column_additional"] and \
-                emergency_bottom_line < self.dict_data_well["head_column_additional"]._value:
+        elif nkt_str_combo == 'печать в ДП' and self.data_well.column_additional and \
+                emergency_bottom_line < self.data_well.head_column_additional._value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для основной колонны')
             return
 
-        raid_list = self.emergencyNKT(print_diametr_line, nkt_str_combo, print_type_combo, nkt_key,
+        raid_list = self.emergencyNKT(print_diameter_line, nkt_str_combo, print_type_combo, nkt_key,
                                       emergency_bottom_line)
 
-        self.populate_row(self.ins_ind, raid_list, self.table_widget)
+        self.populate_row(self.insert_index, raid_list, self.table_widget)
         data_list.pause = False
         self.close()
 
 
 
-    def emergencyNKT(self, print_diametr_line, nkt_str_combo, print_type_combo, nkt_key,
+    def emergencyNKT(self, print_diameter_line, nkt_str_combo, print_type_combo, nkt_key,
                                       emergency_bottom_line):
         from work_py.emergencyWork import magnet_select
 
         emergencyNKT_list = [[f'СПо печати до Н={emergency_bottom_line}м', None,
-                              f'Спустить с замером {print_type_combo}-{print_diametr_line}мм на '
+                              f'Спустить с замером {print_type_combo}-{print_diameter_line}мм на '
                               f'{magnet_select(self, nkt_str_combo)}  на {nkt_str_combo} до '
                               f'Н={emergency_bottom_line}м '
                               f'(Аварийная голова) с замером.'
@@ -203,7 +200,7 @@ class EmergencyPrintWork(WindowUnion):
                               'мастер КРС', 2.5],
                              [None, None,
                               f'Поднять {magnet_select(self, nkt_str_combo)} с доливом тех жидкости в объеме '
-                              f'{round(self.dict_data_well["current_bottom"] * 1.25 / 1000, 1)}м3 удельным весом {self.dict_data_well["fluid_work"]}.',
+                              f'{round(self.data_well.current_bottom * 1.25 / 1000, 1)}м3 удельным весом {self.data_well.fluid_work}.',
                               None, None, None, None, None, None, None,
                               'Мастер', liftingNKT_norm(emergency_bottom_line, 1.2)],
                              [None, None,

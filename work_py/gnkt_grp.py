@@ -33,8 +33,8 @@ from work_py.parent_work import TabPageUnion, TabWidgetUnion
 
 class TabPageAll(TabPageUnion):
     def __init__(self, parent=None ):
-        super().__init__()
-        self.dict_data_well = parent
+        super().__init__(parent)
+        self.data_well = parent
 
         self.validator_int = QIntValidator(0, 8000)
         self.validator_float = QDoubleValidator(0, 8000, 2)
@@ -49,15 +49,15 @@ class TabPageAll(TabPageUnion):
 class TabPageDp(TabPageAll):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.dict_data_well = parent
+        self.data_well = parent
 
     def init_it(self):
 
         self.grid = QGridLayout(self)
         self.grid.addWidget(self.gnkt_number_label, 2, 2, 3, 1)
         self.grid.addWidget(self.gnkt_number_combo, 3, 2, 3, 1)
-        self.grid.addWidget(self.lenght_gnkt_label, 2, 3)
-        self.grid.addWidget(self.lenght_gnkt_edit, 3, 3)
+        self.grid.addWidget(self.length_gnkt_label, 2, 3)
+        self.grid.addWidget(self.length_gnkt_edit, 3, 3)
         self.grid.addWidget(self.iznos_gnkt_label, 2, 4)
         self.grid.addWidget(self.iznos_gnkt_edit, 3, 4)
         self.grid.addWidget(self.pvo_number_label, 2, 5)
@@ -87,7 +87,7 @@ class TabPageDp(TabPageAll):
 
             result_gnkt = cursor.fetchone()
 
-            self.lenght_gnkt_edit.setText(f'{result_gnkt[3]}')
+            self.length_gnkt_edit.setText(f'{result_gnkt[3]}')
             self.iznos_gnkt_edit.setText(f'{round(result_gnkt[5], 1)}')
             self.pipe_mileage_edit.setText(f'{result_gnkt[6]}')
             self.pvo_number_edit.setText(f'{result_gnkt[8]}')
@@ -109,15 +109,15 @@ class TabWidget(TabWidgetUnion):
 
 
 class GnktOsvWindow(GnktModel):
-    def __init__(self, sheet, table_title, table_schema, table_widget, dict_data_well):
-        super().__init__(dict_data_well)
+    def __init__(self, sheet, table_title, table_schema, table_widget, data_well):
+        super().__init__(data_well)
 
         self.wb_gnkt = Workbook()
 
         self.table_widget = table_widget
         self.table_title = table_title
         self.table_schema = table_schema
-        self.work_plan = self.dict_data_well['work_plan']
+        self.work_plan = self.data_well.work_plan
         self.sheet = sheet
         self.data_gnkt = None
 
@@ -161,7 +161,7 @@ class GnktOsvWindow(GnktModel):
     def select_work_plan_opz(self):
         if self.work_plan == 'gnkt_opz':
 
-            self.data_gnkt_opz = GnktOpz(self.table_widget, self.data_gnkt.fluid_edit, self.dict_data_well)
+            self.data_gnkt_opz = GnktOpz(self.table_widget, self.data_gnkt.fluid_edit, self.data_well)
             self.data_gnkt_opz.show()
             data_list.pause = True
             self.pause_app()
@@ -175,7 +175,7 @@ class GnktOsvWindow(GnktModel):
         elif self.work_plan == 'gnkt_bopz':
 
             self.data_gnkt_opz = GnktBopz(self.table_widget,
-                                          self.data_gnkt, self.dict_data_well)
+                                          self.data_gnkt, self.data_well)
             self.data_gnkt_opz.show()
             data_list.pause = True
             self.pause_app()
@@ -205,23 +205,23 @@ class GnktOsvWindow(GnktModel):
 
         self.create_title_list(self.ws_title)
         bvo_int = 0
-        # if self.dict_data_well["bvo"]:
+        # if self.data_well.bvo:
         #     bvo_int += 5
-        head = plan.head_ind(self.dict_data_well["cat_well_min"]._value - 1 + bvo_int, self.dict_data_well["cat_well_max"]._value - 1)
+        head = plan.head_ind(self.data_well.cat_well_min._value - 1 + bvo_int, self.data_well.cat_well_max._value - 1)
 
-        plan.copy_true_ws(self.dict_data_well, self.sheet, self.ws_title, head)
+        plan.copy_true_ws(self.data_well, self.sheet, self.ws_title, head)
 
     def gnkt_work(self, fluid_work_insert, current_bottom_edit):
         from cdng import events_gnvp_frez
         from work_py.alone_oreration import volume_vn_nkt, volume_jamming_well, volume_pod_nkt
 
-        self.dict_data_well["fluid_work"], self.dict_data_well["fluid_work_short"] = self.calc_work_fluid(fluid_work_insert)
+        self.data_well.fluid_work, self.data_well.fluid_work_short = self.calc_work_fluid(fluid_work_insert)
 
         block_gnvp_list = events_gnvp_frez(self, self.data_gnkt.distance_pntzh, float(fluid_work_insert))
 
 
-        if self.dict_data_well["depth_fond_paker_do"]["do"] != 0:
-            niz_nkt = self.dict_data_well["depth_fond_paker_do"]["do"]
+        if self.data_well.depth_fond_paker_before["do"] != 0:
+            niz_nkt = self.data_well.depth_fond_paker_before["do"]
             volume_str = f'Произвести перевод на тех жидкость расчетного удельного веса ' \
                          f'в объеме {self.calc_volume_jumping()}м3 (объем хвостовика + объем НКТ + 20 % запаса) ' \
                          f'с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ с выходом по малому затрубу. ' \
@@ -233,28 +233,28 @@ class GnktOsvWindow(GnktModel):
                           f'в устьевом оборудовании не более 0.5м/мин;\n' \
                           f'в интервале 2 -{niz_nkt - 20}м не более 10-15м/мин ' \
                           f'(первичный-последующий спуск);\n' \
-                          f'в интервале {niz_nkt - 20}-{self.dict_data_well["perforation_roof"] - 10}м не ' \
+                          f'в интервале {niz_nkt - 20}-{self.data_well.perforation_roof - 10}м не ' \
                           f'более 2м/мин;\n' \
-                          f'в интервале {self.dict_data_well["perforation_roof"] - 10}-{self.dict_data_well["perforation_roof"] + 10}м не более 10 м/мин;\n' \
-                          f'в интервале {self.dict_data_well["perforation_roof"] + 10}-{current_bottom_edit}м не более 2-5 м/мин;'
+                          f'в интервале {self.data_well.perforation_roof - 10}-{self.data_well.perforation_roof + 10}м не более 10 м/мин;\n' \
+                          f'в интервале {self.data_well.perforation_roof + 10}-{current_bottom_edit}м не более 2-5 м/мин;'
             down_gntk_str = f'Скорость подъёма по интервалам:\n' \
-                            f'в интервале забой-{self.dict_data_well["perforation_roof"] + 10}м не более 10 м/мин;\n' \
-                            f'в интервале {self.dict_data_well["perforation_roof"] + 10}-{self.dict_data_well["perforation_roof"] - 10} не более 2 м/мин;\n' \
+                            f'в интервале забой-{self.data_well.perforation_roof + 10}м не более 10 м/мин;\n' \
+                            f'в интервале {self.data_well.perforation_roof + 10}-{self.data_well.perforation_roof - 10} не более 2 м/мин;\n' \
                             f'в интервале {niz_nkt - 20}-2м не более 15-20 м/мин;\n' \
                             f'в устьевом оборудовании не более 0.5 м/мин.'
-        elif self.dict_data_well["dict_nkt"]:
+        elif self.data_well.dict_nkt_before:
 
-            niz_nkt = sum(self.dict_data_well["dict_nkt"].values())
+            niz_nkt = sum(self.data_well.dict_nkt_before.values())
 
-            volume_well_jumping = round(volume_jamming_well(self, self.dict_data_well["current_bottom"]) * 1.2, 1)
-            volume_vn_nkt = round(volume_vn_nkt(self.dict_data_well["dict_nkt"]) * 1.2, 1)
+            volume_well_jumping = round(volume_jamming_well(self, self.data_well.current_bottom) * 1.2, 1)
+            volume_vn_nkt = round(volume_vn_nkt(self.data_well.dict_nkt_before) * 1.2, 1)
             volume_well_at_shoe = round(volume_jamming_well(self, niz_nkt) * 1.2, 1) - volume_vn_nkt
             volume_current_shoe_nkt = round(volume_pod_nkt(self) * 1.2, 1) - volume_vn_nkt
 
             volume_str = 'Произвести замер избыточного давления в течении 2ч при условии заполнения ствола ствола ' \
-                         f'жидкостью уд.весом {self.dict_data_well["fluid_work"]}. Произвести перерасчет забойного давления, Согласовать с заказчиком ' \
+                         f'жидкостью уд.весом {self.data_well.fluid_work}. Произвести перерасчет забойного давления, Согласовать с заказчиком ' \
                          f'глушение скважин и необходимый удельный вес жидкости глушения, допустить КНК до ' \
-                         f'{self.dict_data_well["current_bottom"]}м. Произвести перевод на тех жидкость расчетного удельного веса ' \
+                         f'{self.data_well.current_bottom}м. Произвести перевод на тех жидкость расчетного удельного веса ' \
                          f' в объеме {volume_well_jumping}м3 ' \
                          '((объем ствола э/к + объем открытого ствола и минут объем НКТ  + 20 % запаса), вывести циркуляцию ' \
                          'с большого затруба  с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ  с выходом циркуляции по большому затрубу до башмака ' \
@@ -270,24 +270,24 @@ class GnktOsvWindow(GnktModel):
                           f'в устьевом оборудовании не более 0.5м/мин;\n' \
                           f'в интервале 2 -{niz_nkt - 20}м не более 10-15м/мин ' \
                           f'(первичный-последующий спуск);\n' \
-                          f'в интервале {niz_nkt - 20}-{self.dict_data_well["perforation_roof"] - 10}м не ' \
+                          f'в интервале {niz_nkt - 20}-{self.data_well.perforation_roof - 10}м не ' \
                           f'более 2м/мин;\n' \
-                          f'в интервале {self.dict_data_well["perforation_roof"] - 10}-{self.dict_data_well["current_bottom"]}м не более 2-5 м/мин;'
+                          f'в интервале {self.data_well.perforation_roof - 10}-{self.data_well.current_bottom}м не более 2-5 м/мин;'
 
             down_gntk_str = f'Скорость подъёма по интервалам:\n'
-            f'в интервале забой-{self.dict_data_well["perforation_roof"] - 10}м не более 10 м/мин;\n'
+            f'в интервале забой-{self.data_well.perforation_roof - 10}м не более 10 м/мин;\n'
             f'в интервале {niz_nkt - 20}-2м не более 15-20 м/мин;\n'
             f'в устьевом оборудовании не более 0.5 м/мин.'
 
         else:
-            niz_nkt = sum(self.dict_data_well["dict_nkt"].values())
+            niz_nkt = sum(self.data_well.dict_nkt_before.values())
 
-            volume_well_jumping = round(volume_jamming_well(self, self.dict_data_well["current_bottom"]) * 1.2, 1)
+            volume_well_jumping = round(volume_jamming_well(self, self.data_well.current_bottom) * 1.2, 1)
 
             volume_str = f'Произвести замер избыточного давления в течении 2ч при условии заполнения ствола ствола ' \
-                         f'жидкостью уд.весом {self.dict_data_well["fluid_work"]}. Произвести перерасчет забойного давления, Согласовать с заказчиком ' \
+                         f'жидкостью уд.весом {self.data_well.fluid_work}. Произвести перерасчет забойного давления, Согласовать с заказчиком ' \
                          f'глушение скважин и необходимый удельный вес жидкости глушения, допустить КНК до ' \
-                         f'{self.dict_data_well["current_bottom"]}м. Произвести перевод на тех жидкость расчетного удельного веса ' \
+                         f'{self.data_well.current_bottom}м. Произвести перевод на тех жидкость расчетного удельного веса ' \
                          f' в объеме {volume_well_jumping}м3 ' \
                          f'(объем ствола э/к  + 20 % запаса), вывести циркуляцию ' \
                          f'с большого затруба  с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ.  ' \
@@ -297,12 +297,12 @@ class GnktOsvWindow(GnktModel):
 
             up_gnkt_str = f'Скорость спуска по интервалам:\n' \
                           f'в устьевом оборудовании не более 0.5м/мин;\n' \
-                          f'в интервале 2 -{self.dict_data_well["perforation_roof"] - 10}-{self.dict_data_well["current_bottom"]}м не более 2-5 м/мин;' \
-                          f'в интервале {self.dict_data_well["perforation_roof"] - 10}-{self.dict_data_well["current_bottom"]}м не более 2м/мин;'
+                          f'в интервале 2 -{self.data_well.perforation_roof - 10}-{self.data_well.current_bottom}м не более 2-5 м/мин;' \
+                          f'в интервале {self.data_well.perforation_roof - 10}-{self.data_well.current_bottom}м не более 2м/мин;'
 
             down_gntk_str = f'Скорость подъёма по интервалам:\n' \
-                            f'в интервале забой-{self.dict_data_well["perforation_roof"] - 10}м не более 10 м/мин;\n' \
-                            f'в интервале {self.dict_data_well["perforation_roof"] - 10}-2м не более 15-20 м/мин;\n' \
+                            f'в интервале забой-{self.data_well.perforation_roof - 10}м не более 10 м/мин;\n' \
+                            f'в интервале {self.data_well.perforation_roof - 10}-2м не более 15-20 м/мин;\n' \
                             f'в устьевом оборудовании не более 0.5 м/мин.'
 
         gnkt_opz = [
@@ -323,7 +323,7 @@ class GnktOsvWindow(GnktModel):
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', None],
             [None, 3, 'Произвести завоз технологической жидкости в V не менее 10м3 '
-                      f'плотностью {self.dict_data_well["fluid_work"]}. Солевой раствор солевой раствор в объеме ГНКТ',
+                      f'плотностью {self.data_well.fluid_work}. Солевой раствор солевой раствор в объеме ГНКТ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады', None],
             [None, 4, 'При наличии, согласно плана заказа Н2S, добавить в завезенную промывочную '
@@ -370,10 +370,10 @@ class GnktOsvWindow(GnktModel):
              'Мастер ГНКТ', 2],
             [None, 13,
              f'При закрытой центральной задвижке фондовой арматуры опрессовать ГНКТ и все '
-             f'нагнетательные линии на {round(self.dict_data_well["max_admissible_pressure"]._value * 1.5, 1)}атм. '
+             f'нагнетательные линии на {round(self.data_well.max_admissible_pressure._value * 1.5, 1)}атм. '
              f'Опрессовать ПВО, обратные клапана и выкидную линию от '
              f'устья скважины до желобной ёмкости (надёжно закрепить, оборудовать дроссельными задвижками) '
-             f'опрессовать на {self.dict_data_well["max_admissible_pressure"]._value}атм с выдержкой 30мин. '
+             f'опрессовать на {self.data_well.max_admissible_pressure._value}атм с выдержкой 30мин. '
              f'Опрессовку ПВО зафиксировать в вахтовом журнале. Установить на малом и большом затрубе '
              f'технологический манометр. Провести УТЗ и инструктаж. Опрессовку проводить в присутствии мастера, '
              f'бурильщика, машиниста подъемника и представителя супервайзерской службы. Получить разрешение на '
@@ -542,7 +542,7 @@ class GnktOsvWindow(GnktModel):
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', None],
             [None, 29, f'Произвести замер избыточного давления в течении 2ч при условии заполнения '
-                       f'ствола ствола жидкостью уд.весом {self.dict_data_well["fluid_work"]}г/см3. Произвести перерасчет '
+                       f'ствола ствола жидкостью уд.весом {self.data_well.fluid_work}г/см3. Произвести перерасчет '
                        f'забойного давления, Согласовать с заказчиком глушение скважин и необходимый '
                        f'удельный вес жидкости глушения, допустить КНК до {current_bottom_edit}м ',
              None, None, None, None, None, None, None,
@@ -693,13 +693,13 @@ class GnktOsvWindow(GnktModel):
     def calc_volume_jumping(self):
         from work_py.alone_oreration import volume_vn_ek, volume_vn_nkt, volume_jamming_well
 
-        if self.dict_data_well["depth_fond_paker_do"]["do"] != '0':
+        if self.data_well.depth_fond_paker_before["do"] != '0':
 
-            volume = round((volume_vn_ek(self, self.dict_data_well["current_bottom"]) *
-                            (self.dict_data_well["current_bottom"] - self.dict_data_well["depth_fond_paker_do"]["do"]) / 1000 +
-                            volume_vn_nkt(self.dict_data_well["dict_nkt"]) ) * 1.2, 1)
+            volume = round((volume_vn_ek(self, self.data_well.current_bottom) *
+                            (self.data_well.current_bottom - self.data_well.depth_fond_paker_before["do"]) / 1000 +
+                            volume_vn_nkt(self.data_well.dict_nkt_before) ) * 1.2, 1)
         else:
-            volume = volume_jamming_well(self.dict_data_well["current_bottom"])
+            volume = volume_jamming_well(self.data_well.current_bottom)
         return volume
 
     def copy_pvr(self, ws, work_list):
@@ -731,9 +731,9 @@ class GnktOsvWindow(GnktModel):
         try:
 
             fluid_p = 0.83
-            for plast in self.dict_data_well['plast_work']:
-                if float(list(self.dict_data_well["dict_perforation"][plast]['рабочая жидкость'])[0]) > fluid_p:
-                    fluid_p = list(self.dict_data_well["dict_perforation"][plast]['рабочая жидкость'])[0]
+            for plast in self.data_well.plast_work:
+                if float(list(self.data_well.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
+                    fluid_p = list(self.data_well.dict_perforation[plast]['рабочая жидкость'])[0]
             fluid_list.append(fluid_p)
 
             fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость',

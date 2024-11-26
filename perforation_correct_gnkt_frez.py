@@ -15,7 +15,7 @@ class TabPageSo(TabPageUnion):
         self.grid = QGridLayout(self)
 
         self.labels_plast = {}
-        self.dict_perforation = self.dict_data_well["dict_perforation"]
+        self.dict_perforation = self.data_well.dict_perforation
         plast_all = list(self.dict_perforation.keys())[0]
 
         self.number_port_label = QLabel("номер порта")
@@ -23,8 +23,8 @@ class TabPageSo(TabPageUnion):
         self.sole_label = QLabel("Подошва")
         self.type_saddles_label = QLabel("Тип хвостовика")
 
-        self.diametr_saddles_label = QLabel("Диаметр седла")
-        self.diametr_ball_label = QLabel("Диаметр шара")
+        self.diameter_saddles_label = QLabel("Диаметр седла")
+        self.diameter_ball_label = QLabel("Диаметр шара")
         self.type_column_label = QLabel('Тип колонны')
         self.type_column_edit = QLineEdit(self)
 
@@ -36,8 +36,8 @@ class TabPageSo(TabPageUnion):
         self.grid.addWidget(self.roof_label, 0, 1)
         self.grid.addWidget(self.sole_label, 0, 2)
         self.grid.addWidget(self.type_saddles_label, 0, 3)
-        self.grid.addWidget(self.diametr_saddles_label, 0, 4)
-        self.grid.addWidget(self.diametr_ball_label, 0, 5)
+        self.grid.addWidget(self.diameter_saddles_label, 0, 4)
+        self.grid.addWidget(self.diameter_ball_label, 0, 5)
         self.grid.addWidget(self.manufacturer_label, 8, 3)
         self.grid.addWidget(self.manufacturer_combo, 9, 3)
         self.grid.addWidget(self.type_column_label, 10, 3)
@@ -60,25 +60,25 @@ class TabPageSo(TabPageUnion):
             self.type_saddles_ComboBox.currentIndexChanged.connect(
                 lambda i, idx=index: self.on_type_saddles_change(i, idx, self.type_saddles_ComboBox))
 
-            self.diametr_saddles_edit = QLineEdit(self)
-            self.diametr_ball_edit = QLineEdit(self)
+            self.diameter_saddles_edit = QLineEdit(self)
+            self.diameter_ball_edit = QLineEdit(self)
 
             self.grid.addWidget(self.number_port, index_interval, 0)
             self.grid.addWidget(self.roof_edit, index_interval, 1)
             self.grid.addWidget(self.sole_edit, index_interval, 2)
             self.grid.addWidget(self.type_saddles_ComboBox, index_interval, 3)
-            self.grid.addWidget(self.diametr_saddles_edit, index_interval, 4)
-            self.grid.addWidget(self.diametr_ball_edit, index_interval, 5)
+            self.grid.addWidget(self.diameter_saddles_edit, index_interval, 4)
+            self.grid.addWidget(self.diameter_ball_edit, index_interval, 5)
 
             setattr(self, f"plast_{index_interval}_edit", self.number_port)
             setattr(self, f"roof_{index_interval}_edit", self.roof_edit)
             setattr(self, f"sole_{index_interval}_edit", self.sole_edit)
             setattr(self, f"type_status_{index}_edit", self.type_saddles_ComboBox)
-            setattr(self, f"diametr_saddles_{index_interval}_edit", self.diametr_saddles_edit)
-            setattr(self, f"diametr_ball_{index_interval}_edit", self.diametr_ball_edit)
+            setattr(self, f"diameter_saddles_{index_interval}_edit", self.diameter_saddles_edit)
+            setattr(self, f"diameter_ball_{index_interval}_edit", self.diameter_ball_edit)
 
             self.labels_plast[index] = [self.number_port.text(), self.roof_edit.text(), self.sole_edit.text(),
-                                        self.type_saddles_ComboBox, self.diametr_saddles_edit, self.diametr_ball_edit]
+                                        self.type_saddles_ComboBox, self.diameter_saddles_edit, self.diameter_ball_edit]
             self.labels_plast_read = {}
 
             index_interval += 1
@@ -91,10 +91,8 @@ class TabPageSo(TabPageUnion):
 
         if self.manufacturer_combo.currentText() == 'НТЦ ЗЭРС':
             self.manufacturer = 'НТЦ ЗЭРС'
-            if (self.dict_data_well["column_additional"] and self.dict_data_well[
-                "column_additional_diametr"]._value < 110) \
-                    or self.dict_data_well["column_additional"] is False and self.dict_data_well[
-                "column_diametr"]._value < 110:
+            if (self.data_well.column_additional and self.data_well.column_additional_diameter._value < 110) \
+                    or self.data_well.column_additional is False and self.data_well.column_diameter._value < 110:
                 self.type_column = "ФПЗН.102"
 
             else:
@@ -142,23 +140,23 @@ class TabPageSo(TabPageUnion):
         # print(f'tyo работает {idx, index_interval, type_items[idx]}')
         # Получаем данные о шаре и седле для выбранного типа
 
-        self.diametr_saddles_edit = QLineEdit(self)
-        self.diametr_ball_edit = QLineEdit(self)
+        self.diameter_saddles_edit = QLineEdit(self)
+        self.diameter_ball_edit = QLineEdit(self)
 
-        diametr_saddles = dict_saddles[self.manufacturer][self.type_column][type_items[idx]].saddle
-        self.diametr_saddles_edit.setText(diametr_saddles)
-        diametr_ball = dict_saddles[self.manufacturer][self.type_column][type_items[idx]].ball
-        self.diametr_ball_edit.setText(diametr_ball)
+        diameter_saddles = dict_saddles[self.manufacturer][self.type_column][type_items[idx]].saddle
+        self.diameter_saddles_edit.setText(diameter_saddles)
+        diameter_ball = dict_saddles[self.manufacturer][self.type_column][type_items[idx]].ball
+        self.diameter_ball_edit.setText(diameter_ball)
 
-        self.grid.addWidget(self.diametr_saddles_edit, index_interval + 1, 4)
-        self.grid.addWidget(self.diametr_ball_edit, index_interval + 1, 5)
+        self.grid.addWidget(self.diameter_saddles_edit, index_interval + 1, 4)
+        self.grid.addWidget(self.diameter_ball_edit, index_interval + 1, 5)
 
-        setattr(self, f"diametr_saddles_{index_interval}_edit", diametr_saddles)
-        setattr(self, f"diametr_ball_{index_interval}_edit", diametr_ball)
+        setattr(self, f"diameter_saddles_{index_interval}_edit", diameter_saddles)
+        setattr(self, f"diameter_ball_{index_interval}_edit", diameter_ball)
 
         self.labels_plast[index_interval][3] = type_items[idx]
-        self.labels_plast[index_interval][4] = self.diametr_saddles_edit.text()
-        self.labels_plast[index_interval][5] = self.diametr_ball_edit.text()
+        self.labels_plast[index_interval][4] = self.diameter_saddles_edit.text()
+        self.labels_plast[index_interval][5] = self.diameter_ball_edit.text()
 
 
 class TabWidget(TabWidgetUnion):
@@ -176,7 +174,7 @@ class PerforationCorrectGnktFrez(WindowUnion):
         self.setCentralWidget(self.centralWidget)
         self.setWindowModality(QtCore.Qt.ApplicationModal)  # Устанавливаем модальность окна
 
-        self.tabWidget = TabWidget(self.dict_data_well)
+        self.tabWidget = TabWidget(self.data_well)
 
         self.buttonAdd = QPushButton('сохранить данные')
         self.buttonAdd.clicked.connect(self.add_row_table)
@@ -188,7 +186,7 @@ class PerforationCorrectGnktFrez(WindowUnion):
 
     def add_row_table(self):
         # Пересохранение данных по интервалам портам
-        self.dict_perforation = self.dict_data_well["dict_perforation"]
+        self.dict_perforation = self.data_well.dict_perforation
         plast_work = list(self.dict_perforation.keys())[0]
         manufacturer = self.tabWidget.currentWidget().manufacturer_combo.currentText()
         type_column = self.tabWidget.currentWidget().type_column_edit.text()

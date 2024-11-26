@@ -45,7 +45,7 @@ class SelectCurator(WindowUnion):
 
     def add_work(self):
         curator_combo = self.tabWidget.currentWidget().curator_combo.currentText()
-        self.dict_data_well["curator"] = curator_combo
+        self.data_well.curator = curator_combo
 
         data_list.pause = False
         self.close()

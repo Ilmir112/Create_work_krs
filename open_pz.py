@@ -43,11 +43,11 @@ class PzInDatabase(WorkWithPZ):
 
 
 class CreatePZ(MyMainWindow):
-    def __init__(self, dict_data_well, ws, parent=None):
+    def __init__(self, data_well, ws, parent=None):
         super(CreatePZ, self).__init__()
         self.wb = parent.wb
         self.ws = ws
-        self.dict_data_well = dict_data_well
+        self.data_well = data_well
 
     def open_excel_file(self, ws, work_plan):
 
@@ -60,27 +60,27 @@ class CreatePZ(MyMainWindow):
                     if 'ПЛАН РАБОТ' == row[1] \
                             and work_plan == 'dop_plan':
                         ws.cell(row=row_ind + 1, column=2).value = \
-                            f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {self.dict_data_well["number_dp"]}'
+                            f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {self.data_well.number_dp}'
 
                     elif 'План-заказ' == row[1]:
                         if work_plan != 'dop_plan':
                             ws.cell(row=row_ind + 1, column=2).value = 'ПЛАН РАБОТ'
                         else:
                             ws.cell(row=row_ind + 1, column=2).value = \
-                                f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {self.dict_data_well["number_dp"]}'
+                                f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {self.data_well.number_dp}'
 
-            if len(self.dict_data_well["check_data_in_pz"]) != 0:
+            if len(self.data_well.check_data_in_pz) != 0:
                 check_str = ''
-                for ind, check_data in enumerate(self.dict_data_well["check_data_in_pz"]):
+                for ind, check_data in enumerate(self.data_well.check_data_in_pz):
                     if check_data not in check_str:
                         check_str += f'{ind + 1}. {check_data} \n'
                 self.show_info_message(check_str)
 
-            if self.dict_data_well["work_plan"] not in ['gnkt_frez', 'application_pvr',
+            if self.data_well.work_plan not in ['gnkt_frez', 'application_pvr',
                                                         'application_gis', 'gnkt_after_grp', 'gnkt_opz', 'plan_change']:
-                # print(f'план работ {self.dict_data_well["work_plan"]}')
+                # print(f'план работ {self.data_well.work_plan}')
 
-                razdel = razdel_1(self, self.dict_data_well["region"], data_list.contractor)
+                razdel = razdel_1(self, self.data_well.region, data_list.contractor)
 
                 for i in range(1, len(razdel)):  # Добавлением подписантов на вверху
                     for j in range(1, 13):
@@ -91,7 +91,7 @@ class CreatePZ(MyMainWindow):
                     ws.row_dimensions[i].height = 20
                 ws.row_dimensions[i+1].height = 20
 
-                # print(f' индекс вставки ГНВП{self.dict_data_well["ins_ind"]}')
+                # print(f' индекс вставки ГНВП{self.data_well.insert_index}')
                 dict_events_gnvp = {}
                 dict_events_gnvp['krs'] = events_gnvp(self, data_list.contractor)
                 dict_events_gnvp['gnkt_opz'] = events_gnvp_gnkt(self)
@@ -112,11 +112,11 @@ class CreatePZ(MyMainWindow):
 
                 if work_plan != 'normir':
                     if 'Ойл' in data_list.contractor:
-                        for i in range(self.dict_data_well["ins_ind"],
-                                       self.dict_data_well["ins_ind"] + len(dict_events_gnvp[work_plan])):
+                        for i in range(self.data_well.insert_index,
+                                       self.data_well.insert_index + len(dict_events_gnvp[work_plan])):
                             ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
                             data = ws.cell(row=i, column=2)
-                            data.value = dict_events_gnvp[work_plan][i - self.dict_data_well["ins_ind"]][1]
+                            data.value = dict_events_gnvp[work_plan][i - self.data_well.insert_index][1]
 
                             if 'Мероприятия' in str(data.value) or \
                                     'Меры по предупреждению' in str(data.value) or \
@@ -147,12 +147,12 @@ class CreatePZ(MyMainWindow):
                     elif 'РН' in data_list.contractor:
                         # Устанавливаем красный цвет для текста
                         red_font = Font(name='Arial Cyr', size=13, color='FF0000', bold=True)
-                        for i in range(self.dict_data_well["ins_ind"],
-                                       self.dict_data_well["ins_ind"] + len(dict_events_gnvp[work_plan])):
+                        for i in range(self.data_well.insert_index,
+                                       self.data_well.insert_index + len(dict_events_gnvp[work_plan])):
                             for col in range(12):
                                 data = ws.cell(row=i, column=col + 1)
                                 data.border = thin_border
-                                data.value = dict_events_gnvp[work_plan][i - self.dict_data_well["ins_ind"]][col]
+                                data.value = dict_events_gnvp[work_plan][i - self.data_well.insert_index][col]
 
                                 data_2 = ws.cell(row=i, column=3).value
                                 data_1 = ws.cell(row=i, column=2).value
@@ -201,8 +201,8 @@ class CreatePZ(MyMainWindow):
                             if not data_2 is None:
                                 text = data_2
                                 for key, value in text_width_dict.items():
-                                    text_lenght = len(text)
-                                    if value[0] <= text_lenght <= value[1]:
+                                    text_length = len(text)
+                                    if value[0] <= text_length <= value[1]:
                                         if '\n' in text:
                                             row_dimension_value = int(len(text) / 4 + text.count('\n') * 5)
                                             ws.row_dimensions[i].height = row_dimension_value
@@ -210,40 +210,40 @@ class CreatePZ(MyMainWindow):
                                             row_dimension_value = int(len(text) / 4)
                                             ws.row_dimensions[i].height = int(len(text) / 4)
 
-                    self.dict_data_well["ins_ind"] += len(dict_events_gnvp[work_plan]) - 1
+                    self.data_well.insert_index += len(dict_events_gnvp[work_plan]) - 1
 
                     ws.row_dimensions[2].height = 30
 
-                    if len(self.dict_data_well["row_expected"]) != 0:
+                    if len(self.data_well.row_expected) != 0:
                         for i in range(1, len(
-                                self.dict_data_well["row_expected"]) + 1):  # Добавление показатели после ремонта
-                            ws.row_dimensions[self.dict_data_well["ins_ind"] + i - 1].height = None
+                                self.data_well.row_expected) + 1):  # Добавление показатели после ремонта
+                            ws.row_dimensions[self.data_well.insert_index + i - 1].height = None
                             for j in range(1, 12):
                                 if i == 1:
-                                    ws.cell(row=i + self.dict_data_well["ins_ind"], column=j).font = Font(
+                                    ws.cell(row=i + self.data_well.insert_index, column=j).font = Font(
                                         name='Arial Cyr', size=13,
                                         bold=False)
-                                    ws.cell(row=i + self.dict_data_well["ins_ind"], column=j).alignment = Alignment(
+                                    ws.cell(row=i + self.data_well.insert_index, column=j).alignment = Alignment(
                                         wrap_text=False,
                                         horizontal='center',
                                         vertical='center')
-                                    ws.cell(row=i + self.dict_data_well["ins_ind"], column=j).value = \
-                                    self.dict_data_well["row_expected"][i - 1][
+                                    ws.cell(row=i + self.data_well.insert_index, column=j).value = \
+                                    self.data_well.row_expected[i - 1][
                                         j - 1]
                                 else:
-                                    ws.cell(row=i + self.dict_data_well["ins_ind"], column=j).font = Font(
+                                    ws.cell(row=i + self.data_well.insert_index, column=j).font = Font(
                                         name='Arial Cyr', size=13,
                                         bold=False)
-                                    ws.cell(row=i + self.dict_data_well["ins_ind"], column=j).alignment = Alignment(
+                                    ws.cell(row=i + self.data_well.insert_index, column=j).alignment = Alignment(
                                         wrap_text=False,
                                         horizontal='left',
                                         vertical='center')
-                                    ws.cell(row=i + self.dict_data_well["ins_ind"], column=j).value = \
-                                    self.dict_data_well["row_expected"][i - 1][
+                                    ws.cell(row=i + self.data_well.insert_index, column=j).value = \
+                                    self.data_well.row_expected[i - 1][
                                         j - 1]
-                        ws.merge_cells(start_column=2, start_row=self.dict_data_well["ins_ind"] + 1, end_column=12,
-                                       end_row=self.dict_data_well["ins_ind"] + 1)
-                        self.dict_data_well["ins_ind"] += len(self.dict_data_well["row_expected"])
+                        ws.merge_cells(start_column=2, start_row=self.data_well.insert_index + 1, end_column=12,
+                                       end_row=self.data_well.insert_index + 1)
+                        self.data_well.insert_index += len(self.data_well.row_expected)
                     if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz',
                                          'plan_change']:
                         work_list = [
@@ -254,25 +254,25 @@ class CreatePZ(MyMainWindow):
 
                         for i in range(1, len(work_list) + 1):  # Добавление  показатели после ремонта
                             for j in range(1, 13):
-                                ws.cell(row=i + self.dict_data_well["ins_ind"], column=j).font = Font(name='Arial Cyr',
+                                ws.cell(row=i + self.data_well.insert_index, column=j).font = Font(name='Arial Cyr',
                                                                                                       size=13,
                                                                                                       bold=True)
-                                ws.cell(row=i + self.dict_data_well["ins_ind"], column=j).alignment = Alignment(
+                                ws.cell(row=i + self.data_well.insert_index, column=j).alignment = Alignment(
                                     wrap_text=False,
                                     horizontal='center',
                                     vertical='center')
-                                ws.cell(row=i + self.dict_data_well["ins_ind"], column=j).value = work_list[i - 1][
+                                ws.cell(row=i + self.data_well.insert_index, column=j).value = work_list[i - 1][
                                     j - 1]
                             if i == 1:
-                                ws.merge_cells(start_column=3, start_row=self.dict_data_well["ins_ind"] + i,
+                                ws.merge_cells(start_column=3, start_row=self.data_well.insert_index + i,
                                                end_column=12,
-                                               end_row=self.dict_data_well["ins_ind"] + i)
+                                               end_row=self.data_well.insert_index + i)
                             elif i == 2:
-                                ws.merge_cells(start_column=3, start_row=self.dict_data_well["ins_ind"] + i,
+                                ws.merge_cells(start_column=3, start_row=self.data_well.insert_index + i,
                                                end_column=10,
-                                               end_row=self.dict_data_well["ins_ind"] + i)
+                                               end_row=self.data_well.insert_index + i)
 
-                    self.ins_ind_border = self.dict_data_well["ins_ind"]
+                    self.insert_index_border = self.data_well.insert_index
 
             return ws
 
@@ -286,17 +286,17 @@ class CreatePZ(MyMainWindow):
                         if 'произвести контрольную' in str(col).lower():
                             index_row_pvr_cancel = row_ind
                             if index_row_pvr_begin < index_row_pvr_cancel:
-                                self.dict_data_well["index_row_pvr_list"].append(
+                                self.data_well.index_row_pvr_list.append(
                                     (index_row_pvr_begin, index_row_pvr_cancel, type_pvr))
                                 index_row_pvr_begin, index_row_pvr_cancel = 0, 0
-            for pvr in self.dict_data_well["index_row_pvr_list"]:
+            for pvr in self.data_well.index_row_pvr_list:
                 for row in range(pvr[0], pvr[1]):
                     row_list = []
                     for col in range(2, 9):
                         row_list.append(str(ws.cell(row=row + 1, column=col + 1).value))
-                    self.dict_data_well["pvr_row"].append(row_list)
+                    self.data_well.pvr_row_list.append(row_list)
 
-            # print(f'Индексы ПВР {self.dict_data_well["pvr_row"]}')
+            # print(f'Индексы ПВР {self.data_well.pvr_row_list}')
 
         elif work_plan in ['application_gis']:
             for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
@@ -307,7 +307,7 @@ class CreatePZ(MyMainWindow):
                                 'перфорация' not in str(col).lower() and 'привязка' not in str(col).lower() and \
                                 'отбивка' not in str(col).lower():
                             type_pvr = ws.cell(row=row_ind + 1, column=3).value
-                            self.dict_data_well["gis_list"].append(type_pvr)
+                            self.data_well.gis_list.append(type_pvr)
         else:
             return ws
 
@@ -316,11 +316,11 @@ class CreatePZ(MyMainWindow):
         dialog = CustomMessageBox(message)
         dialog.exec_()  # Открываем диалоговое окно в модальном режиме
 
-    def add_itog(self, ws, ins_ind, work_plan):
+    def add_itog(self, ws, insert_index, work_plan):
         if ws.merged_cells.ranges:
             merged_cells_copy = list(ws.merged_cells.ranges)  # Создаем копию множества объединенных ячеек
             for merged_cell in merged_cells_copy:
-                if merged_cell.min_row > ins_ind + 5:
+                if merged_cell.min_row > insert_index + 5:
                     try:
                         ws.unmerge_cells(str(merged_cell))
                     except:
@@ -328,10 +328,10 @@ class CreatePZ(MyMainWindow):
 
         if work_plan not in ['gnkt_frez', 'application_pvr', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
             itog_list = add_itog(self)
-            for i in range(ins_ind, len(itog_list) + ins_ind):  # Добавлением итогов
-                if i < ins_ind + 6:
+            for i in range(insert_index, len(itog_list) + insert_index):  # Добавлением итогов
+                if i < insert_index + 6:
                     for j in range(1, 13):
-                        ws.cell(row=i, column=j).value = itog_list[i - ins_ind][j - 1]
+                        ws.cell(row=i, column=j).value = itog_list[i - insert_index][j - 1]
                         if j != 1:
                             ws.cell(row=i, column=j).border = data_list.thin_border
                             ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
@@ -340,10 +340,10 @@ class CreatePZ(MyMainWindow):
                     ws.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                    vertical='center')
                 else:
-                    ws.row_dimensions[ins_ind + 6].height = 50
-                    ws.row_dimensions[ins_ind + 8].height = 50
+                    ws.row_dimensions[insert_index + 6].height = 50
+                    ws.row_dimensions[insert_index + 8].height = 50
                     for j in range(1, 13):
-                        ws.cell(row=i, column=j).value = itog_list[i - ins_ind][j - 1]
+                        ws.cell(row=i, column=j).value = itog_list[i - insert_index][j - 1]
                         ws.cell(row=i, column=j).border = data_list.thin_border
                         ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
                         ws.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='left',
@@ -353,34 +353,34 @@ class CreatePZ(MyMainWindow):
                     ws.cell(row=i, column=j).alignment = Alignment(wrap_text=False, horizontal='left',
                                                                    vertical='center')
 
-            ins_ind += len(add_itog(self)) + 2
+            insert_index += len(add_itog(self)) + 2
 
-        curator_s = curator_sel(self.dict_data_well["curator"], self.dict_data_well["region"])
-        # print(f'куратор {curator_sel, self.dict_data_well["curator"]}')
+        curator_s = curator_sel(self.data_well.curator, self.data_well.region)
+        # print(f'куратор {curator_sel, self.data_well.curator}')
         if curator_s is False:
             return
 
-        podp_down = pop_down(self, self.dict_data_well["region"], curator_s)
+        podp_down = pop_down(self, self.data_well.region, curator_s)
 
-        for i in range(1 + ins_ind, 1 + ins_ind + len(podp_down)):
+        for i in range(1 + insert_index, 1 + insert_index + len(podp_down)):
 
             # Добавлением подписантов внизу
             for j in range(1, 13):
-                ws.cell(row=i, column=j).value = podp_down[i - 1 - ins_ind][j - 1]
+                ws.cell(row=i, column=j).value = podp_down[i - 1 - insert_index][j - 1]
                 ws.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=False)
 
-            if i in range(ins_ind + 7, 1 + ins_ind + 15):
+            if i in range(insert_index + 7, 1 + insert_index + 15):
                 ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=6)
                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=False, vertical='center', horizontal='left')
             else:
                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=False, vertical='center', horizontal='left')
-        ws.row_dimensions[ins_ind + 7].height = 30
-        ws.row_dimensions[ins_ind + 9].height = 25
+        ws.row_dimensions[insert_index + 7].height = 30
+        ws.row_dimensions[insert_index + 9].height = 25
 
-        ins_ind += len(podp_down)
+        insert_index += len(podp_down)
         aaa = ws.max_row
 
-        ws.delete_rows(ins_ind, aaa - ins_ind)
+        ws.delete_rows(insert_index, aaa - insert_index)
 
     def is_valid_date(date):
         try:

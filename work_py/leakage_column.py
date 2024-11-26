@@ -50,7 +50,7 @@ class LeakageWindow(WindowUnion):
 
     def __init__(self, parent=None):
         super(LeakageWindow, self).__init__(parent)
-        self.dict_data_well = parent
+
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -70,28 +70,28 @@ class LeakageWindow(WindowUnion):
         self.buttonDel.clicked.connect(self.del_row_table)
         self.buttonadd_work = QPushButton('Добавить в план работ')
         self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
-        self.buttonAddString = QPushButton('Добавить строкой')
-        self.buttonAddString.clicked.connect(self.addString)
+        self.buttonadd_string = QPushButton('Добавить строкой')
+        self.buttonadd_string.clicked.connect(self.add_string)
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
         vbox.addWidget(self.buttonDel, 2, 1)
         vbox.addWidget(self.buttonadd_work, 3, 0)
-        vbox.addWidget(self.buttonAddString, 3, 1)
+        vbox.addWidget(self.buttonadd_string, 3, 1)
 
-        asd = self.dict_data_well["dict_leakiness"]
-        if len(self.dict_data_well["dict_leakiness"]) != 0:
+        asd = self.data_well.dict_leakiness
+        if len(self.data_well.dict_leakiness) != 0:
 
-            ffa = self.dict_data_well["dict_leakiness"]['НЭК']
-            for nek in self.dict_data_well["dict_leakiness"]['НЭК']['интервал']:
+            ffa = self.data_well.dict_leakiness['НЭК']
+            for nek in self.data_well.dict_leakiness['НЭК']['интервал']:
                 rows = self.tableWidget.rowCount()
 
                 roof_leakage, sole_leakage_line = nek.split('-')
                 self.tableWidget.insertRow(rows)
                 insulation_combo1 = QComboBox(self)
                 insulation_combo1.addItems(['не изолирован', 'изолирован'])
-                if self.dict_data_well["dict_leakiness"]['НЭК']['интервал'][nek]['отключение']:
+                if self.data_well.dict_leakiness['НЭК']['интервал'][nek]['отключение']:
                     insulation_combo1.setCurrentIndex(1)
                 self.tableWidget.setItem(rows, 0, QTableWidgetItem(roof_leakage))
                 self.tableWidget.setItem(rows, 1, QTableWidgetItem(sole_leakage_line))
@@ -115,8 +115,8 @@ class LeakageWindow(WindowUnion):
         if not roof_leakage or not sole_leakage_line:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        # ada = float(self.dict_data_well["bottomhole_artificial"]._value)
-        # if float(self.dict_data_well["bottomhole_artificial"]._value) <= float(sole_leakage_line):
+        # ada = float(self.data_well.bottom_hole_artificial._value)
+        # if float(self.data_well.bottom_hole_artificial._value) <= float(sole_leakage_line):
         #     QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
         #     return
 
@@ -129,7 +129,7 @@ class LeakageWindow(WindowUnion):
         self.tableWidget.setSortingEnabled(False)
         self.tableWidget.sortItems(0)
 
-    def addString(self):
+    def add_string(self):
        
         try:
             leakiness_column, ok = QInputDialog.getText(self, 'Нарушение колонны',
@@ -141,7 +141,7 @@ class LeakageWindow(WindowUnion):
             return dict_leakiness
         except:
             QMessageBox.warning(self, 'Ошибка', 'Данные введены не корректно')
-            LeakageWindow.addString(self)
+            LeakageWindow.add_string(self)
 
 
     def get_leakiness(self, leakiness_column):
@@ -188,7 +188,7 @@ class LeakageWindow(WindowUnion):
                 dict_leakiness.setdefault(
                     'НЭК', {}).setdefault('интервал', {}).setdefault((f"{roof}-{sole}"), {}).setdefault(
                     'отрайбировано', False)
-        self.dict_data_well["dict_leakiness"] = dict_leakiness
+        self.data_well.dict_leakiness = dict_leakiness
         # print(dict_leakiness)
 
         data_list.pause = False

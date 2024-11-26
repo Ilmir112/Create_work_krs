@@ -17,14 +17,14 @@ from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
 
 class TabPageDp(TabPageUnion):
-    def __init__(self, dict_data_well, tableWidget, old_index):
-        super().__init__()
+    def __init__(self, data_well, tableWidget, old_index):
+        super().__init__(data_well)
 
 
         self.tableWidget = tableWidget
         self.old_index = old_index
 
-        self.work_plan = dict_data_well['work_plan']
+        self.work_plan = data_well.work_plan
 
         self.well_number_label = QLabel('номер скважины')
         self.well_number_edit = QLineEdit(self)
@@ -46,14 +46,14 @@ class TabPageDp(TabPageUnion):
         self.grid.addWidget(self.well_area_label, 2, 3)
         self.grid.addWidget(self.well_area_edit, 3, 3)
 
-        # self.well_area_edit.setText(f'{self.dict_data_well["well_area"]._value}')
+        # self.well_area_edit.setText(f'{self.data_well.well_area._value}')
         # self.well_area_edit.textChanged.connect(self.update_well)
         self.well_number_edit.editingFinished.connect(self.update_well)
         # self.change_pvr_combo.currentTextChanged.connect(self.update_change_pvr)
         # self.change_pvr_combo.setCurrentIndex(1)
         # self.change_pvr_combo.setCurrentIndex(0)
         # if self.work_plan not in ['dop_plan_in_base']:
-        #     self.well_number_edit.setText(f'{self.dict_data_well["well_number"]._value}')
+        #     self.well_number_edit.setText(f'{self.data_well.well_number._value}')
 
         if data_list.data_in_base:
             self.well_data_label = QLabel('файл excel')
@@ -93,21 +93,21 @@ class TabWidget(TabWidgetUnion):
 
 
 class CorrectPlanWindow(WindowUnion):
-    def __init__(self, dict_data_well, table_widget,  parent=None):
-        super().__init__(dict_data_well)
+    def __init__(self, data_well, table_widget,  parent=None):
+        super().__init__(data_well)
 
 
-        self.dict_data_well['ins_ind'] = 0
-        self.tabWidget = TabWidget(self.dict_data_well)
+        self.data_well.insert_index = 0
+        self.tabWidget = TabWidget(self.data_well)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
         self.table_widget = table_widget
-        self.work_plan = self.dict_data_well['work_plan']
+        self.work_plan = self.data_well.work_plan
         self.dict_perforation = []
 
-        # self.ws = dict_data_well['ws']
+
         self.data, self.rowHeights, self.colWidth, self.boundaries_dict = None, None, None, None
         self.target_row_index = None
         self.target_row_index_cancel = None
@@ -141,36 +141,36 @@ class CorrectPlanWindow(WindowUnion):
                 data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-1]
                 well_data_in_base = well_data_in_base_combo.split(' ')[3]
                 if 'ДП' in well_data_in_base:
-                    self.dict_data_well["number_dp"] = ''.join(filter(str.isdigit, well_data_in_base))
-                    self.dict_data_well["work_plan_change"] = 'dop_plan'
+                    self.data_well.number_dp = ''.join(filter(str.isdigit, well_data_in_base))
+                    self.data_well.work_plan_change = 'dop_plan'
                 else:
-                    self.dict_data_well["work_plan_change"] = 'krs'
+                    self.data_well.work_plan_change = 'krs'
 
             db = connection_to_database(data_list.DB_WELL_DATA)
-            data_well_base = WorkDatabaseWell(db, self.dict_data_well)
+            data_well_base = WorkDatabaseWell(db, self.data_well)
 
             data_well = data_well_base.check_in_database_well_data(well_number, well_area,
                                                                    well_data_in_base, data_well_data_in_base_combo)
 
             if data_well:
-                self.dict_data_well["type_kr"] = data_well[2]
+                self.data_well.type_kr = data_well[2]
                 if data_well[3]:
-                    self.dict_data_well["dict_category"] = json.loads(data_well[3])
-                    self.dict_data_well["well_oilfield"] = ProtectedIsNonNone(data_well[4])
-                    self.dict_data_well["appointment"] =ProtectedIsNonNone(data_well[5])
-                    self.dict_data_well["inv_number"] = ProtectedIsNonNone(data_well[6])
-                    self.dict_data_well["wellhead_fittings"] = data_well[7]
-                    self.dict_data_well["emergency_well"] = False
+                    self.data_well.dict_category = json.loads(data_well[3])
+                    self.data_well.well_oilfield = ProtectedIsNonNone(data_well[4])
+                    self.data_well.appointment =ProtectedIsNonNone(data_well[5])
+                    self.data_well.inventory_number = ProtectedIsNonNone(data_well[6])
+                    self.data_well.wellhead_fittings = data_well[7]
+                    self.data_well.emergency_well = False
                 if data_well[8]:
-                    self.dict_data_well["angle_data"] = json.loads(data_well[8])
+                    self.data_well.angle_data = json.loads(data_well[8])
                 else:
-                    self.dict_data_well["angle_data"] = []
+                    self.data_well.angle_data = []
 
                 insert_data_well_dop_plan(self, data_well[0])
 
             DopPlanWindow.extraction_data(self, well_data_in_base_combo)
 
-            DopPlanWindow.work_with_excel(self, well_number, well_area, well_data_in_base, self.dict_data_well["type_kr"])
+            DopPlanWindow.work_with_excel(self, well_number, well_area, well_data_in_base, self.data_well.type_kr)
 
             data_list.data, data_list.rowHeights, data_list.colWidth, data_list.boundaries_dict = \
                 DopPlanWindow.change_pvr_in_bottom(self, self.data, self.rowHeights, self.colWidth,
@@ -178,7 +178,7 @@ class CorrectPlanWindow(WindowUnion):
 
 
             if well_number != '' and well_area != '':
-                self.dict_data_well["well_number"], self.dict_data_well["well_area"] = \
+                self.data_well.well_number, self.data_well.well_area = \
                     ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
 
 
@@ -215,8 +215,8 @@ class CorrectPlanWindow(WindowUnion):
 
                         if 'порядок работы' in str(cell.value).lower() or \
                                 'наименование работ' in str(cell.value).lower():
-                            self.dict_data_well["ins_ind2"] = i + 1
-                            self.dict_data_well["data_x_max"] = ProtectedIsDigit(i + 2)
+                            self.data_well.insert_index2 = i + 1
+                            self.data_well.data_x_max = ProtectedIsDigit(i + 2)
 
                             ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
                             ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',

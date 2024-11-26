@@ -23,6 +23,7 @@ from openpyxl.workbook import Workbook
 from openpyxl.styles import Alignment, Font
 from block_name import region_select
 from data_base.config_base import connect_to_database, CheckWellExistence, connection_to_database, WorkDatabaseWell
+
 from log_files.log import logger, QPlainTextEditLogger
 from openpyxl.drawing.image import Image
 from PyQt5.QtCore import QThread, pyqtSlot
@@ -39,18 +40,18 @@ class UncaughtExceptions(QObject):
     @pyqtSlot(object)
     def handleException(self, ex):
         try:
-            logger.critical(f'{self.dict_data_well["well_number"]._value}'
-                            f' {self.dict_data_well["well_area"]._value} Критическая ошибка: {ex}')
+            logger.critical(f'{self.data_well.well_number._value}'
+                            f' {self.data_well.well_area._value} Критическая ошибка: {ex}')
         except:
-            logger.critical(f'{self.well_number} {self.dict_data_well["well_area"]} Критическая ошибка: {ex}')
+            logger.critical(f'{self.well_number} {self.data_well.well_area} Критическая ошибка: {ex}')
 
 
 class ExcelWorker(QThread):
     finished = pyqtSignal()
 
-    def __init__(self, dict_data_well):
+    def __init__(self, data_well):
         super().__init__()
-        self.dict_data_well = dict_data_well
+        self.data_well = data_well
 
     def check_well_existence(self, well_number, deposit_area, region):
         check_true = True
@@ -70,17 +71,17 @@ class ExcelWorker(QThread):
         result = self.check_correct_well.check_category(well_number, deposit_area, region)
         return result
 
-    def insert_data_in_database(self, excel_data_dict, dict_data_well):
+    def insert_data_in_database(self, excel_data_dict, data_well):
         try:
             db = connection_to_database(data_list.DB_WELL_DATA)
             data_well_base = WorkDatabaseWell(db)
-            data_well_base.insert_in_database_well_data(self.dict_data_well,
+            data_well_base.insert_in_database_well_data(self.data_well,
                                                         data_list.contractor, data_list.costumer, excel_data_dict)
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f"Ошибка при вставке данных в базу: {type(e).__name__}\n\n{str(e)}")
 
         try:
-            data_well_base.insert_data_in_chemistry(dict_data_well)
+            data_well_base.insert_data_in_chemistry(data_well)
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f"Ошибка при вставке данных химии в базу"
                                                 f": {type(e).__name__}\n\n{str(e)}")
@@ -100,7 +101,7 @@ class MyMainWindow(QMainWindow):
         self.data_window = None
         self.perforation_correct_window2 = None
         self.work_plan = None
-        self.dict_data_well = {}
+
 
     def check_gpp_upa(self, table_widget):
         for row in range(table_widget.rowCount()):
@@ -127,7 +128,7 @@ class MyMainWindow(QMainWindow):
 
     def add_window(self, window):
         if self.operation_window is None:
-            self.operation_window = window(self.dict_data_well, self.table_widget)
+            self.operation_window = window(self.data_well, self.table_widget)
             # self.raid_window.setGeometry(200, 400, 300, 400)
             self.set_modal_window(self.operation_window)
 
@@ -164,28 +165,28 @@ class MyMainWindow(QMainWindow):
 
         self.dict_category = {}
         # Запуск основного класса и всех дочерних классов в одной строке
-        well_pz = FindIndexPZ(self.ws, self.work_plan, self)
-        well_pz.dict_data_well["work_plan"] = self.work_plan
+        self.data_well = FindIndexPZ(self.ws, self.work_plan, self)
+        self.data_well.work_plan = self.work_plan
         data_well_dict = {}
-        self.dict_data_well = WellName.read_well(
-            well_pz, well_pz.cat_well_max._value, well_pz.data_pvr_min._value)
+        self.data_well = WellName.read_well(
+            self.data_well, self.data_well.cat_well_max._value, self.data_well.data_pvr_min._value)
 
-        well_pz.dict_data_well['region'] = region_select(well_pz.dict_data_well['cdng']._value)
+        self.data_well.region = region_select(self.data_well.cdng._value)
 
         date_str2 = datetime.strptime('2024-09-19', '%Y-%m-%d')
 
         if self.work_plan == 'dop_plan':
             number_list = list(map(str, range(1, 50)))
-            self.dict_data_well["number_dp"], ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',
+            self.data_well.number_dp, ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',
                                                                         'Введите номер дополнительного плана работ',
                                                                         number_list, 0, False)
 
             db = connection_to_database(data_list.DB_WELL_DATA)
-            data_well_base = WorkDatabaseWell(db, self.dict_data_well)
+            data_well_base = WorkDatabaseWell(db, self.data_well)
 
-            data_well = data_well_base.check_in_database_dp_data(self.dict_data_well["well_number"]._value,
-                                                                 self.dict_data_well["well_area"]._value,
-                                                                 f'ДП№{self.dict_data_well["number_dp"]}')
+            data_well = data_well_base.check_in_database_dp_data(self.data_well.well_number._value,
+                                                                 self.data_well.well_area._value,
+                                                                 f'ДП№{self.data_well.number_dp}')
 
             if data_well:
                 date_str1 = datetime.strptime(f'{data_well[1]}', '%Y-%m-%d')
@@ -198,13 +199,13 @@ class MyMainWindow(QMainWindow):
                                                                  'загрузить с базы?')
 
                     if change_work_work_plan == QMessageBox.StandardButton.Yes:
-                        self.dict_data_well["type_kr"] = data_well[2]
-                        self.dict_data_well["work_plan"] = 'dop_plan_in_base'
-                        self.dict_data_well["work_plan"] = 'dop_plan_in_base'
+                        self.data_well.type_kr = data_well[2]
+                        self.data_well.work_plan = 'dop_plan_in_base'
+                        self.data_well.work_plan = 'dop_plan_in_base'
                         data_list.data_in_base = True
                         from work_py.dop_plan_py import DopPlanWindow
-                        self.rir_window = DopPlanWindow(self.dict_data_well["ins_ind"], None,
-                                                        self.dict_data_well["work_plan"])
+                        self.rir_window = DopPlanWindow(self.data_well.insert_index, None,
+                                                        self.data_well.work_plan)
                         # self.rir_window.setGeometry(200, 400, 100, 200)
                         self.rir_window.show()
                         self.pause_app()
@@ -214,99 +215,98 @@ class MyMainWindow(QMainWindow):
 
         if data_list.data_well_is_True is False:
             WellNkt.read_well(
-                well_pz, well_pz.pipes_ind._value, well_pz.condition_of_wells._value)
+                self.data_well, self.data_well.pipes_ind._value, self.data_well.condition_of_wells._value)
             WellHistoryData.read_well(
-                well_pz, well_pz.data_pvr_max._value, well_pz.data_fond_min._value)
+                self.data_well, self.data_well.data_pvr_max._value, self.data_well.data_fond_min._value)
             WellCondition.read_well(
-                well_pz, well_pz.condition_of_wells._value, well_pz.data_well_max._value)
+                self.data_well, self.data_well.condition_of_wells._value, self.data_well.data_well_max._value)
 
             WellExpectedPickUp.read_well(
-                well_pz, well_pz.data_x_min._value, well_pz.data_x_max._value)
+                self.data_well, self.data_well.data_x_min._value, self.data_well.data_x_max._value)
             if self.work_plan not in ['application_pvr', 'application_gis']:
                 WellSuckerRod.read_well(
-                    well_pz, well_pz.sucker_rod_ind._value, well_pz.pipes_ind._value)
+                    self.data_well, self.data_well.sucker_rod_ind._value, self.data_well.pipes_ind._value)
 
                 WellFondData.read_well(
-                    well_pz, well_pz.data_fond_min._value, well_pz.condition_of_wells._value)
-            WellData.read_well(well_pz, well_pz.cat_well_max._value, well_pz.data_pvr_min._value)
+                    self.data_well, self.data_well.data_fond_min._value, self.data_well.condition_of_wells._value)
+            WellData.read_well(self.data_well, self.data_well.cat_well_max._value, self.data_well.data_pvr_min._value)
 
-            WellPerforation.read_well(well_pz, well_pz.data_pvr_min._value, well_pz.data_pvr_max._value + 1)
+            WellPerforation.read_well(self.data_well, self.data_well.data_pvr_min._value, self.data_well.data_pvr_max._value + 1)
 
-            self.dict_data_well = \
-                WellCategory.read_well(well_pz, well_pz.cat_well_min._value, well_pz.data_well_min._value)
+            self.data_well = \
+                WellCategory.read_well(self.data_well, self.data_well.cat_well_min._value, self.data_well.data_well_min._value)
 
             # self.set_modal_window(self.data_list.pdata_window)
 
             # self.pause_app()
             # data_list.pause = True
 
-            if self.dict_data_well["leakiness"] is True:
+            if self.data_well.leakiness is True:
                 if WellCondition.leakage_window is None:
-                    WellCondition.leakage_window = LeakageWindow(self.dict_data_well)
+                    WellCondition.leakage_window = LeakageWindow(self.data_well)
                     WellCondition.leakage_window.setWindowTitle("Геофизические исследования")
                     # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
                     WellCondition.leakage_window.show()
-                    # self.dict_data_well["dict_leakiness"] = WellCondition.leakage_window.add_work()
+                    # self.data_well.dict_leakiness = WellCondition.leakage_window.add_work()
                     self.pause_app()
 
-                    # print(f'словарь нарушений {self.dict_data_well["dict_leakiness"]}')
-                    well_pz.pause = True
+                    # print(f'словарь нарушений {self.data_well.dict_leakiness}')
+                    self.data_well.pause = True
                     WellCondition.leakage_window = None  # Discard reference.
 
-            if self.dict_data_well["emergency_well"] is True:
+            if self.data_well.emergency_well is True:
                 emergency_quest = QMessageBox.question(self, 'Аварийные работы ',
                                                        'Программа определила что в скважине'
-                                                       f' авария - {self.dict_data_well["emergency_count"]}, верно ли?')
+                                                       f' авария - {self.data_well.emergency_count}, верно ли?')
                 if emergency_quest == QMessageBox.StandardButton.Yes:
-                    self.dict_data_well["emergency_well"] = True
-                    self.dict_data_well["emergency_bottom"], ok = QInputDialog.getInt(
+                    self.data_well.emergency_well = True
+                    self.data_well.emergency_bottom, ok = QInputDialog.getInt(
                         self, 'Аварийный забой',
                         'Введите глубину аварийного забоя', 0, 0,
-                        int(self.dict_data_well["bottomhole_artificial"]._value))
+                        int(self.data_well.bottom_hole_artificial._value))
                 else:
-                    self.dict_data_well["emergency_well"] = False
-            if self.dict_data_well["problem_with_ek"] is True:
+                    self.data_well.emergency_well = False
+            if self.data_well.problem_with_ek is True:
                 problem_with_ek_quest = QMessageBox.question(self, 'ВНИМАНИЕ НЕПРОХОД ',
                                                              f'Программа определила что в скважине '
                                                              f'ссужение в ЭК -, верно ли?')
                 if problem_with_ek_quest == QMessageBox.StandardButton.Yes:
-                    self.dict_data_well["problem_with_ek"] = True
-                    self.dict_data_well["problem_with_ek_depth"], ok = QInputDialog.getInt(self, 'Глубина сужения',
+                    self.data_well.problem_with_ek = True
+                    self.data_well.problem_with_ek_depth, ok = QInputDialog.getInt(self, 'Глубина сужения',
                                                                                            "Введите глубину cсужения",
                                                                                            0, 0,
-                                                                                           int(self.dict_data_well[
-                                                                                                   "current_bottom"]))
-                    self.dict_data_well["problem_with_ek_diametr"] = \
+                                                                                           int(self.data_well.current_bottom))
+                    self.data_well.problem_with_ek_diameter = \
                         QInputDialog.getInt(self, 'диаметр внутренний cсужения',
                                             "ВВедите внутренний диаметр cсужения", 0,
                                             0,
-                                            int(float(self.dict_data_well["current_bottom"])))[
+                                            int(float(self.data_well.current_bottom)))[
                             0]
                 else:
-                    self.dict_data_well["problem_with_ek"] = False
+                    self.data_well.problem_with_ek = False
 
-            if self.dict_data_well["gips_in_well"] is True:
+            if self.data_well.gips_in_well is True:
                 gips_true_quest = QMessageBox.question(self, 'Гипсовые отложения',
                                                        'Программа определила что скважина осложнена гипсовыми отложениями '
                                                        'и требуется предварительно определить забой на НКТ, верно ли это?')
 
                 if gips_true_quest == QMessageBox.StandardButton.Yes:
-                    self.dict_data_well["gips_in_well"] = True
+                    self.data_well.gips_in_well = True
                 else:
-                    self.dict_data_well["gips_in_well"] = False
+                    self.data_well.gips_in_well = False
 
-        if self.dict_data_well["inv_number"]._value == 'не корректно' or self.dict_data_well["inv_number"] is None:
+        if self.data_well.inventory_number._value == 'не корректно' or self.data_well.inventory_number is None:
             QMessageBox.warning(self, 'Инвентарный номер отсутствует',
                                 'Необходимо уточнить наличие инвентарного номера')
             return
 
-        return self.dict_data_well
+        return self.data_well
 
-    def determination_injection_pressuar(self):
-        if self.dict_data_well["region"] == 'ЧГМ' and self.dict_data_well["expected_P"] < 80:
+    def determination_injection_pressure(self):
+        if self.data_well.region == 'ЧГМ' and self.data_well.expected_P < 80:
             return 80
         else:
-            return self.dict_data_well["expected_P"]
+            return self.data_well.expected_P
 
     def privyazka_nkt(self):
         priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
@@ -325,6 +325,7 @@ class MyMainWindow(QMainWindow):
         from work_py.dop_plan_py import DopPlanWindow
         from work_py.gnkt_grp import GnktOsvWindow
         from work_py.gnkt_frez import WorkWithGnkt
+        from find import FindIndexPZ
 
         if self.work_plan in ['krs', 'dop_plan', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz', 'gnkt_frez']:
             QMessageBox.information(self, 'ВНИМАНИЕ', 'Для корректного прочтения план заказа, план заказ должен быть '
@@ -337,8 +338,8 @@ class MyMainWindow(QMainWindow):
                     self.read_pz(self.fname)
                     data_list.pause = True
 
-                    self.dict_data_well = self.read_excel_file()
-                    read_pz = CreatePZ(self.dict_data_well, self.ws, self)
+                    self.data_well = self.read_excel_file()
+                    read_pz = CreatePZ(self.data_well, self.ws, self)
                     self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
                 except FileNotFoundError as f:
                     QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
@@ -347,23 +348,28 @@ class MyMainWindow(QMainWindow):
             if self.work_plan in ['krs', 'dop_plan']:
                 self.copy_pz(self.ws, self.table_widget, self.work_plan)
                 if self.work_plan == 'dop_plan':
-                    self.rir_window = DopPlanWindow(self.dict_data_well, self.table_widget)
+                    self.rir_window = DopPlanWindow(self.data_well, self.table_widget)
                     self.set_modal_window(self.rir_window)
             elif self.work_plan in ['gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz']:
                 self.gnkt_data = GnktOsvWindow(self.ws,
                                                self.table_title, self.table_schema, self.table_widget,
-                                               self.dict_data_well)
+                                               self.data_well)
             elif self.work_plan == 'gnkt_frez':
                 self.gnkt_data = WorkWithGnkt(self.ws, self.table_title, self.table_schema, self.table_widget,
-                                              self.dict_data_well)
+                                              self.data_well)
 
 
         elif self.work_plan in ['plan_change', 'dop_plan_in_base']:
             data_list.data_in_base = True
+            self.data_well = FindIndexPZ
+
             if self.work_plan == 'plan_change':
-                self.rir_window = CorrectPlanWindow(self.dict_data_well, self.table_widget)
+                self.data_well.work_plan = self.work_plan
+                self.rir_window = CorrectPlanWindow(self.data_well, self.table_widget)
             elif self.work_plan == 'dop_plan_in_base':
-                self.rir_window = DopPlanWindow(self.dict_data_well, self.table_widget)
+                self.data_well.work_plan = self.work_plan
+                self.rir_window = DopPlanWindow(self.data_well, self.table_widget)
+
 
             self.rir_window.setGeometry(200, 400, 800, 200)
             self.set_modal_window(self.rir_window)
@@ -392,14 +398,14 @@ class MyMainWindow(QMainWindow):
             contractor = 'Ойл'
 
         if self.work_plan in ['dop_plan', 'dop_plan_in_base']:
-            string_work = f' ДП№ {self.dict_data_well["number_dp"]}'
+            string_work = f' ДП№ {self.data_well.number_dp}'
         elif self.work_plan == 'krs':
             string_work = 'ПР'
         elif self.work_plan == 'plan_change':
-            if self.dict_data_well["work_plan_change"] == 'krs':
+            if self.data_well.work_plan_change == 'krs':
                 string_work = 'ПР изм'
             else:
-                string_work = f'ДП№{self.dict_data_well["number_dp"]} изм '
+                string_work = f'ДП№{self.data_well.number_dp} изм '
 
         elif self.work_plan == 'gnkt_bopz':
             string_work = 'ГНКТ БОПЗ ВНС'
@@ -410,8 +416,8 @@ class MyMainWindow(QMainWindow):
         else:
             string_work = 'ГНКТ'
 
-        filenames = f'{self.dict_data_well["well_number"]._value} {self.dict_data_well["well_area"]._value} ' \
-                    f'{self.dict_data_well["type_kr"].split(" ")[0]} кат {self.dict_data_well["category_pressuar"]}' \
+        filenames = f'{self.data_well.well_number._value} {self.data_well.well_area._value} ' \
+                    f'{self.data_well.type_kr.split(" ")[0]} кат {self.data_well.category_pressure}' \
                     f' {string_work} {contractor}.xlsx'
         return filenames
 
@@ -428,7 +434,7 @@ class MyMainWindow(QMainWindow):
             work_list = []
             for row in range(table.rowCount()):
                 row_lst = []
-                # self.ins_ind_border += 1
+                # self.insert_index_border += 1
                 for column in range(table.columnCount()):
 
                     item = table.item(row, column)
@@ -459,14 +465,14 @@ class MyMainWindow(QMainWindow):
         gnkt_data = self.gnkt_data.data_gnkt
 
         insert_data_base_gnkt(self, data_list.contractor, filenames, gnkt_data.gnkt_number_combo,
-                              int(gnkt_data.lenght_gnkt_edit),
-                              float(gnkt_data.diametr_length),
+                              int(gnkt_data.length_gnkt_edit),
+                              float(gnkt_data.diameter_length),
                               float(gnkt_data.iznos_gnkt_edit) * 1.014,
                               int(gnkt_data.pipe_mileage_edit) + int(gnkt_data.current_bottom_edit * 1.1),
                               gnkt_data.pipe_fatigue, int(gnkt_data.pvo_number),
                               gnkt_data.previous_well_combo)
 
-        if self.dict_data_well["bvo"] is True:
+        if self.data_well.bvo is True:
             ws5 = self.gnkt_data.wb_gnkt.create_sheet('Sheet1')
             ws5.title = "Схемы ПВО"
             ws5 = self.gnkt_data.wb_gnkt["Схемы ПВО"]
@@ -534,7 +540,6 @@ class MyMainWindow(QMainWindow):
 
     @staticmethod
     def pause_app():
-
         while data_list.pause is True:
             QtCore.QCoreApplication.instance().processEvents()
 
@@ -586,63 +591,63 @@ class MyMainWindow(QMainWindow):
 
     def insert_data_in_database(self, row_number, row_max):
 
-        dict_perforation_json = json.dumps(self.dict_data_well["dict_perforation"], default=str, ensure_ascii=False,
+        dict_perforation_json = json.dumps(self.data_well.dict_perforation, default=str, ensure_ascii=False,
                                            indent=4)
-        # print(self.dict_data_well["dict_leakiness"])
-        leakage_json = json.dumps(self.dict_data_well["dict_leakiness"], default=str, ensure_ascii=False, indent=4)
-        plast_all_json = json.dumps(self.dict_data_well["plast_all"])
-        plast_work_json = json.dumps(self.dict_data_well['plast_work'])
-        skm_list_json = json.dumps(self.dict_data_well["skm_interval"])
-        raiding_list_json = json.dumps(self.dict_data_well["ribbing_interval"])
-        head_column = self.dict_data_well["head_column"]._value
+        # print(self.data_well.dict_leakiness)
+        leakage_json = json.dumps(self.data_well.dict_leakiness, default=str, ensure_ascii=False, indent=4)
+        plast_all_json = json.dumps(self.data_well.plast_all)
+        plast_work_json = json.dumps(self.data_well.plast_work)
+        skm_list_json = json.dumps(self.data_well.skm_interval)
+        raiding_list_json = json.dumps(self.data_well.ribbing_interval)
+        head_column = self.data_well.head_column._value
 
         template_ek = json.dumps(
-            [self.dict_data_well["template_depth"], self.dict_data_well["template_lenght"],
-             self.dict_data_well["template_depth_addition"],
-             self.dict_data_well["template_lenght_addition"]])
+            [self.data_well.template_depth, self.data_well.template_length,
+             self.data_well.template_depth_addition,
+             self.data_well.template_length_addition])
 
         # Подготовленные данные для вставки (пример)
-        data_values = [row_max, self.dict_data_well["current_bottom"], dict_perforation_json, plast_all_json,
+        data_values = [row_max, self.data_well.current_bottom, dict_perforation_json, plast_all_json,
                        plast_work_json,
-                       leakage_json, self.dict_data_well["column_additional"], self.dict_data_well["fluid_work"],
-                       self.dict_data_well["category_pressuar"], self.dict_data_well["category_h2s"],
-                       self.dict_data_well["category_gf"],
+                       leakage_json, self.data_well.column_additional, self.data_well.fluid_work,
+                       self.data_well.category_pressure, self.data_well.category_h2s,
+                       self.data_well.category_gas_factor,
                        template_ek, skm_list_json,
-                       self.dict_data_well["problem_with_ek_depth"], self.dict_data_well["problem_with_ek_diametr"],
+                       self.data_well.problem_with_ek_depth, self.data_well.problem_with_ek_diameter,
                        raiding_list_json, head_column]
 
-        if len(self.dict_data_well["data_list"]) == 0:
-            self.dict_data_well["data_list"].append(data_values)
+        if len(self.data_well.data_list) == 0:
+            self.data_well.data_list.append(data_values)
         else:
-            row_number = row_number - self.dict_data_well["count_row_well"]
-            self.dict_data_well["data_list"].insert(row_number, data_values)
+            row_number = row_number - self.data_well.count_row_well
+            self.data_well.data_list.insert(row_number, data_values)
 
     def check_depth_in_skm_interval(self, depth):
 
         check_true = False
         check_ribbing = False
 
-        for interval in self.dict_data_well["skm_interval"]:
+        for interval in  self.data_well.skm_interval:
             if float(interval[0]) <= float(depth) <= float(interval[1]):
                 check_true = True
                 return int(depth)
 
-        for interval in self.dict_data_well["ribbing_interval"]:
+        for interval in self.data_well.ribbing_interval:
             if float(interval[0]) <= float(depth) <= float(interval[1]):
                 check_ribbing = True
         if check_true is False and check_ribbing is False:
             QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
                                 f'Проверка посадки показала, что пакер сажается не '
-                                f'в интервал скреперования {self.dict_data_well["skm_interval"]}, и '
-                                f'райбирования {self.dict_data_well["ribbing_interval"]} \n'
+                                f'в интервал скреперования {self.data_well.skm_interval}, и '
+                                f'райбирования {self.data_well.ribbing_interval} \n'
                                 f'Нужно скорректировать интервалы скреперования ')
             return False
         if check_true is True and check_ribbing is False:
             false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
                                                   f'Проверка посадки показала, что пакер сажается не '
-                                                  f'в интервал скреперования {self.dict_data_well["skm_interval"]}, '
+                                                  f'в интервал скреперования {self.data_well.skm_interval}, '
                                                   f'но сажается в интервал райбирования '
-                                                  f'райбирования {self.dict_data_well["ribbing_interval"]} \n'
+                                                  f'райбирования {self.data_well.ribbing_interval} \n'
                                                   f'Продолжить?')
             if false_question == QMessageBox.StandardButton.No:
                 return False
@@ -651,14 +656,14 @@ class MyMainWindow(QMainWindow):
 
         check_true = False
 
-        for plast in self.dict_data_well["plast_all"]:
-            if len(self.dict_data_well["dict_perforation"][plast]['интервал']) >= 1:
-                for interval in self.dict_data_well["dict_perforation"][plast]['интервал']:
+        for plast in self.data_well.plast_all:
+            if len(self.data_well.dict_perforation[plast]['интервал']) >= 1:
+                for interval in self.data_well.dict_perforation[plast]['интервал']:
                     if float(interval[0]) < depth < float(interval[1]):
                         check_true = False
                     else:
                         check_true = True
-            elif len(self.dict_data_well["dict_perforation"][plast]['интервал']) == 0:
+            elif len(self.data_well.dict_perforation[plast]['интервал']) == 0:
                 check_true = True
 
         if check_true is False:
@@ -668,7 +673,7 @@ class MyMainWindow(QMainWindow):
 
         return check_true
 
-    def populate_row(self, ins_ind, work_list, table_widget, work_plan='krs'):
+    def populate_row(self, insert_index, work_list, table_widget, work_plan='krs'):
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700), 160: (701, 800), 180: (801, 900), 200: (901, 1500)}
         index_setSpan = 0
@@ -678,7 +683,7 @@ class MyMainWindow(QMainWindow):
         # print(f'ДОП {work_plan}')
 
         for i, row_data in enumerate(work_list):
-            row = ins_ind + i
+            row = insert_index + i
             if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_opz', 'gnkt_bopz', 'gnkt_after_grp',
                                  'application_gis']:
                 self.insert_data_in_database(row, row_max + i)
@@ -686,9 +691,9 @@ class MyMainWindow(QMainWindow):
             table_widget.insertRow(row)
 
             if len(str(row_data)[1]) > 3 and work_plan in 'gnkt_frez':
-                table_widget.setSpan(i + ins_ind, 1, 1, 12)
+                table_widget.setSpan(i + insert_index, 1, 1, 12)
             else:
-                table_widget.setSpan(i + ins_ind, 2, 1, 8 + index_setSpan)
+                table_widget.setSpan(i + insert_index, 2, 1, 8 + index_setSpan)
 
             for column, data in enumerate(row_data):
                 item = QtWidgets.QTableWidgetItem(str(data))
@@ -709,43 +714,43 @@ class MyMainWindow(QMainWindow):
         if 'gnkt' not in work_plan:
 
             for row in range(table_widget.rowCount()):
-                if row >= self.dict_data_well["ins_ind2"]:
+                if row >= self.data_well.insert_index2:
                     # Добавляем нумерацию в первую колонку
                     item_number = QtWidgets.QTableWidgetItem(
-                        str(row - self.dict_data_well["ins_ind2"] + 1))  # Номер строки + 1
+                        str(row - self.data_well.insert_index2 + 1))  # Номер строки + 1
                     table_widget.setItem(row, 1, item_number)
 
     def check_true_depth_template(self, depth):
         check = True
-        if self.dict_data_well["column_additional"]:
+        if self.data_well.column_additional:
 
-            if self.dict_data_well["template_depth_addition"] < depth and \
-                    depth > self.dict_data_well["head_column_additional"]._value:
+            if self.data_well.template_depth_addition < depth and \
+                    depth > self.data_well.head_column_additional._value:
                 check = False
                 check_question = QMessageBox.question(
                     self,
                     'Проверка глубины пакера',
                     f'Проверка показало что пакер с глубиной {depth}м спускается ниже'
-                    f' глубины  шаблонирования {self.dict_data_well["template_depth_addition"]}')
+                    f' глубины  шаблонирования {self.data_well.template_depth_addition}')
                 if check_question == QMessageBox.StandardButton.Yes:
                     check = True
-            if self.dict_data_well["template_depth"] < depth and \
-                    depth < self.dict_data_well["head_column_additional"]._value:
+            if self.data_well.template_depth < depth and \
+                    depth < self.data_well.head_column_additional._value:
                 check = False
                 check_question = QMessageBox.question(
                     self,
                     'Проверка глубины пакера',
                     f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
-                    f'глубины шаблонирования {self.dict_data_well["template_depth"]}')
+                    f'глубины шаблонирования {self.data_well.template_depth}')
                 if check_question == QMessageBox.StandardButton.Yes:
                     check = True
         else:
-            # print(f'глубина {self.dict_data_well["template_depth"], depth}')
-            if self.dict_data_well["template_depth"] < depth:
+            # print(f'глубина {self.data_well.template_depth, depth}')
+            if self.data_well.template_depth < depth:
                 check = False
                 check_question = QMessageBox.question(
                     self, 'Проверка глубины пакера', f'Проверка показало что пакер с глубиной {depth}м спускается ниже '
-                                                     f'глубины шаблонирования {self.dict_data_well["template_depth"]}')
+                                                     f'глубины шаблонирования {self.data_well.template_depth}')
                 if check_question == QMessageBox.StandardButton.Yes:
                     check = True
 
@@ -757,10 +762,10 @@ class MyMainWindow(QMainWindow):
             rows = sheet.max_row
             merged_cells = sheet.merged_cells
             table_widget.setRowCount(rows)
-            self.dict_data_well["count_row_well"] = table_widget.rowCount()
+            self.data_well.count_row_well = table_widget.rowCount()
 
             if work_plan == 'plan_change':
-                self.dict_data_well["count_row_well"] = self.dict_data_well["data_x_max"]._value
+                self.data_well.count_row_well = self.data_well.data_x_max._value
 
             border_styles = {}
             for row in sheet.iter_rows():
@@ -819,7 +824,7 @@ class MyMainWindow(QMainWindow):
                     table_widget.setRowHidden(row, False)
 
             if work_plan == 'krs':
-                self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.dict_data_well)
+                self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.data_well)
                 self.set_modal_window(self.work_window)
                 data_list.pause = True
                 self.pause_app()
@@ -875,11 +880,11 @@ class MyWindow(MyMainWindow):
 
         self.perforation_correct_window2 = None
         self.ws = None
-        self.ins_ind = None
+        self.insert_index = None
         self.perforation_list = []
         self.dict_perforation_project = {}
 
-        self.ins_ind_border = None
+        self.insert_index_border = None
         self.work_plan = 0
         self.table_widget = None
         self.table_pvr = None
@@ -902,33 +907,33 @@ class MyWindow(MyMainWindow):
 
     def insert_data_in_chemistry(self):
 
-        if self.dict_data_well["work_plan"] in ['dop_plan', 'dop_plan_in_base']:
-            string_work = f' ДП№ {self.dict_data_well["number_dp"]}'
-        elif self.dict_data_well["work_plan"] == 'krs':
+        if self.data_well.work_plan in ['dop_plan', 'dop_plan_in_base']:
+            string_work = f' ДП№ {self.data_well.number_dp}'
+        elif self.data_well.work_plan == 'krs':
             string_work = 'ПР'
-        elif self.dict_data_well["work_plan"] == 'plan_change':
-            if self.dict_data_well["work_plan_change"] == 'krs':
+        elif self.data_well.work_plan == 'plan_change':
+            if self.data_well.work_plan_change == 'krs':
                 string_work = 'ПР изм'
             else:
-                string_work = f'ДП№{self.dict_data_well["number_dp"]} изм '
+                string_work = f'ДП№{self.data_well.number_dp} изм '
 
-        elif self.dict_data_well["work_plan"] == 'gnkt_bopz':
+        elif self.data_well.work_plan == 'gnkt_bopz':
             string_work = 'ГНКТ БОПЗ ВНС'
-        elif self.dict_data_well["work_plan"] == 'gnkt_opz':
+        elif self.data_well.work_plan == 'gnkt_opz':
             string_work = 'ГНКТ ОПЗ'
-        elif self.dict_data_well["work_plan"] == 'gnkt_after_grp':
+        elif self.data_well.work_plan == 'gnkt_after_grp':
             string_work = 'ГНКТ ОСВ ГРП'
         else:
             string_work = 'ГНКТ'
 
         date_today = datetime.now()
-        data_work = (self.dict_data_well["well_number"]._value,
-                     self.dict_data_well["well_area"]._value,
-                     self.dict_data_well["region"],
+        data_work = (self.data_well.well_number._value,
+                     self.data_well.well_area._value,
+                     self.data_well.region,
                      data_list.costumer,
                      data_list.contractor,
                      string_work,
-                     self.dict_data_well["type_kr"].split(" ")[0],
+                     self.data_well.type_kr.split(" ")[0],
                      date_today,
                      data_list.DICT_VOLUME_CHEMISTRY['цемент'],
                      data_list.DICT_VOLUME_CHEMISTRY['HCl'],
@@ -945,8 +950,8 @@ class MyWindow(MyMainWindow):
                      data_list.DICT_VOLUME_CHEMISTRY["РИР 2С"],
                      data_list.DICT_VOLUME_CHEMISTRY["РИР ОВП"],
                      data_list.DICT_VOLUME_CHEMISTRY['гидрофабизатор'],
-                     round(self.dict_data_well["norm_of_time"], 1),
-                     self.dict_data_well["fluid"]
+                     round(self.data_well.norm_of_time, 1),
+                     self.data_well.fluid
                      )
 
         query = f"INSERT INTO chemistry " \
@@ -1124,18 +1129,17 @@ class MyWindow(MyMainWindow):
 
         elif action == self.create_KRS_DP and self.table_widget == None:
             self.work_plan = 'dop_plan'
-            self.dict_data_well["work_plan"] = 'dop_plan'
+
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
         elif action == self.create_KRS_DP_in_base and self.table_widget == None:
             self.work_plan = 'dop_plan_in_base'
-            self.dict_data_well["work_plan"] = 'dop_plan_in_base'
+
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
         elif action == self.create_KRS_change and self.table_widget == None:
             self.work_plan = 'plan_change'
-            self.dict_data_well["work_plan"] = 'plan_change'
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
@@ -1154,7 +1158,7 @@ class MyWindow(MyMainWindow):
 
         elif action == self.create_GNKT_BOPZ and self.table_widget == None:
             self.work_plan = 'gnkt_bopz'
-            self.dict_data_well["bvo"] = True
+            self.data_well.bvo = True
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
@@ -1305,10 +1309,10 @@ class MyWindow(MyMainWindow):
             # try:
             self.read_pz(fname)
             data_list.pause = True
-            self.dict_data_well = self.read_excel_file()
-            read_pz = CreatePZ(self.dict_data_well, self.ws, self)
+            self.data_well = self.read_excel_file()
+            read_pz = CreatePZ(self.data_well, self.ws, self)
             self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
-            self.rir_window = PvrApplication(self.table_pvr, self.dict_data_well)
+            self.rir_window = PvrApplication(self.table_pvr, self.data_well)
             self.set_modal_window(self.rir_window)
 
             self.pause_app()
@@ -1321,10 +1325,10 @@ class MyWindow(MyMainWindow):
             # try:
             self.read_pz(fname)
             data_list.pause = True
-            self.dict_data_well = self.read_excel_file()
-            read_pz = CreatePZ(self.dict_data_well, self.ws, self)
+            self.data_well = self.read_excel_file()
+            read_pz = CreatePZ(self.data_well, self.ws, self)
             self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
-            self.rir_window = GisApplication(self.table_pvr, self.dict_data_well)
+            self.rir_window = GisApplication(self.table_pvr, self.data_well)
             self.rir_window.show()
 
             self.pause_app()
@@ -1434,21 +1438,21 @@ class MyWindow(MyMainWindow):
             ws2 = wb2.get_sheet_by_name('Sheet')
             ws2.title = "План работ"
 
-            ins_ind = self.dict_data_well["ins_ind2"]
+            insert_index = self.data_well.insert_index2
 
             merged_cells = []  # Список индексов объединения ячеек
 
             work_list = []
             for row in range(self.table_widget.rowCount()):
                 row_lst = []
-                # self.ins_ind_border += 1
+                # self.insert_index_border += 1
                 for column in range(self.table_widget.columnCount()):
                     if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
                         merged_cells.append((row, column))
                     item = self.table_widget.item(row, column)
                     if not item is None:
                         if 'Нормы времени' in item.text():
-                            ins_ind = row
+                            insert_index = row
                         if self.check_str_isdigit(item.text()):
                             row_lst.append(item.text().replace(',', '.'))
                         else:
@@ -1459,24 +1463,24 @@ class MyWindow(MyMainWindow):
                 work_list.append(row_lst)
 
             merged_cells_dict = {}
-            # print(f' индекс объ {ins_ind}')
+            # print(f' индекс объ {insert_index}')
             for row in merged_cells:
-                if row[0] >= ins_ind - 1:
+                if row[0] >= insert_index - 1:
                     merged_cells_dict.setdefault(row[0], []).append(row[1])
             plan_short = ''
-            self.dict_data_well["norm_of_time"] = 0
+            self.data_well.norm_of_time = 0
 
             for i in range(1, len(work_list)):  # нумерация работ
-                if i >= ins_ind + 1:
+                if i >= insert_index + 1:
                     if is_number(work_list[i][11]) is True:
-                        self.dict_data_well["norm_of_time"] += round(float(str(work_list[i][11]).replace(',', '.')), 1)
+                        self.data_well.norm_of_time += round(float(str(work_list[i][11]).replace(',', '.')), 1)
                     if work_list[i][0]:
                         plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
 
-            count_row_height(self, wb2, self.ws, ws2, work_list, merged_cells_dict, ins_ind)
+            count_row_height(self, wb2, self.ws, ws2, work_list, merged_cells_dict, insert_index)
 
-            self.dict_data_well["itog_ind_min"] = ins_ind
-            self.dict_data_well["itog_ind_max"] = len(work_list)
+            self.data_well.itog_ind_min = insert_index
+            self.data_well.itog_ind_max = len(work_list)
             # print(f' длина {len(work_list)}')
             CreatePZ.add_itog(self, ws2, self.table_widget.rowCount() + 1, self.work_plan)
 
@@ -1516,8 +1520,8 @@ class MyWindow(MyMainWindow):
                 self.insert_image(ws2, f'{data_list.path_image}imageFiles/Шамигулов.png', 'H4')
 
             excel_data_dict = excel_in_json(self, ws2)
-            self.thread_excel_insert = ExcelWorker(self.dict_data_well)
-            self.thread_excel_insert.insert_data_in_database(excel_data_dict, self.dict_data_well)
+            self.thread_excel_insert = ExcelWorker(self.data_well)
+            self.thread_excel_insert.insert_data_in_database(excel_data_dict, self.data_well)
 
 
             ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
@@ -1541,12 +1545,12 @@ class MyWindow(MyMainWindow):
             filenames = self.definition_filenames()
             full_path = path + "/" + filenames
 
-            if self.dict_data_well["bvo"] and self.work_plan != 'dop_plan':
+            if self.data_well.bvo and self.work_plan != 'dop_plan':
                 ws5 = wb2.create_sheet('Sheet1')
                 ws5.title = "Схемы ПВО"
                 ws5 = wb2["Схемы ПВО"]
                 wb2.move_sheet(ws5, offset=-1)
-                schema_list = self.check_pvo_schema(ws5, ins_ind + 2)
+                schema_list = self.check_pvo_schema(ws5, insert_index + 2)
 
             # Перед сохранением установите режим расчета
             wb2.calculation.calcMode = "auto"
@@ -1594,9 +1598,9 @@ class MyWindow(MyMainWindow):
         geophysical.addAction(privyazka_action)
         privyazka_action.triggered.connect(self.privyazka_nkt)
 
-        definitionBottomGKLM_action = QAction("Отбивка забоя по ЭК", self)
-        geophysical.addAction(definitionBottomGKLM_action)
-        definitionBottomGKLM_action.triggered.connect(self.definitionBottomGKLM)
+        definition_bottom_gklm_action = QAction("Отбивка забоя по ЭК", self)
+        geophysical.addAction(definition_bottom_gklm_action)
+        definition_bottom_gklm_action.triggered.connect(self.definition_bottom_gklm)
 
         vp_action = QAction("Установка ВП", self)
         geophysical.addAction(vp_action)
@@ -1612,7 +1616,7 @@ class MyWindow(MyMainWindow):
 
         kompressVoronka_action = QAction("Замер Рпл", self)
         geophysical.addAction(kompressVoronka_action)
-        kompressVoronka_action.triggered.connect(self.pressuar_gis)
+        kompressVoronka_action.triggered.connect(self.pressure_gis)
 
         del_menu = context_menu.addMenu('удаление строки')
         empty_string_action = QAction("добавить пустую строку", self)
@@ -1774,10 +1778,10 @@ class MyWindow(MyMainWindow):
 
     def clickedRowColumn(self, r, c):
 
-        self.ins_ind = r + 1
-        self.dict_data_well["ins_ind"] = r + 1
-        # print(r, self.dict_data_well["count_row_well"])
-        if r > self.dict_data_well["count_row_well"] and 'gnkt' not in self.work_plan:
+        self.insert_index = r + 1
+        self.data_well.insert_index = r + 1
+        # print(r, self.data_well.count_row_well)
+        if r > self.data_well.count_row_well and 'gnkt' not in self.work_plan:
             data = self.read_clicked_mouse_data(r)
 
     def close_file(self):
@@ -1801,35 +1805,33 @@ class MyWindow(MyMainWindow):
             self.table_widget.resizeColumnsToContents()
             self.table_widget = None
             self.tabWidget = None
-            self.dict_data_well["stabilizator_true"] = False
-            self.dict_data_well["column_head_m"] = ''
-            self.dict_data_well["date_drilling_cancel"] = ''
-            self.dict_data_well["date_drilling_run"] = ''
-            self.dict_data_well["wellhead_fittings"] = ''
-            self.dict_data_well["dict_perforation_short"] = {}
-            self.dict_data_well['plast_work_short'] = []
+            self.data_well.stabilizator_need = False
+            self.data_well.column_head_m = ''
+            self.data_well.date_drilling_cancel = ''
+            self.data_well.date_drilling_run = ''
+            self.data_well.wellhead_fittings = ''
+            self.data_well.dict_perforation_short = {}
+            self.data_well.plast_work_short = []
             self.table_widget = None
-            self.dict_data_well["norm_of_time"] = 0
-            self.dict_data_well["gips_in_well"] = False
-            self.dict_data_well["grp_plan"] = False
-            self.dict_data_well["bottom"] = 0
-            data_list.nkt_opressTrue = False
-            self.dict_data_well["bottomhole_drill"] = ProtectedIsNonNone(0)
-            self.dict_data_well["open_trunk_well"] = False
-            self.dict_data_well["norm_of_time"] = 0
+            self.data_well.norm_of_time = 0
+            self.data_well.gips_in_well = False
+            self.data_well.grp_plan = False
+            self.data_well.bottom = 0
+            self.data_well.bottom_hole_drill = ProtectedIsNonNone(0)
+            self.data_well.open_trunk_well = False
+            self.data_well.norm_of_time = 0
             data_list.lift_ecn_can = False
             data_list.pause = True
-            self.dict_data_well["check_data_in_pz"] = []
-            data_list.sucker_rod_none = True
-            self.dict_data_well["curator"] = '0'
-            data_list.lift_ecn_can_addition = False
-            data_list.column_passability = False
-            self.dict_data_well["column_additional_passability"] = False
-            self.dict_data_well["template_depth"] = 0
+            self.data_well.check_data_in_pz = []
 
-            self.dict_data_well["gnkt_length"] = 0
-            data_list.diametr_length = 0
-            self.dict_data_well["iznos"] = 0
+            self.data_well.curator = '0'
+
+            self.data_well.column_additional_passability = False
+            self.data_well.template_depth = 0
+
+            self.data_well.gnkt_length = 0
+            data_list.diameter_length = 0
+            self.data_well.iznos = 0
             data_list.pipe_mileage = 0
             data_list.pipe_fatigue = 0
             data_list.pvo = 0
@@ -1837,124 +1839,123 @@ class MyWindow(MyMainWindow):
             data_list.b_plan = 0
             data_list.pipes_ind = ProtectedIsDigit(0)
             data_list.sucker_rod_ind = ProtectedIsDigit(0)
-            self.dict_data_well["expected_Q"] = 0
-            self.dict_data_well["expected_P"] = 0
+            self.data_well.expected_Q = 0
+            self.data_well.expected_P = 0
             data_list.plast_select = ''
-            self.dict_data_well["dict_perforation"] = {}
-            self.dict_data_well["dict_perforation_project"] = {}
-            self.dict_data_well["itog_ind_min"] = 0
-            self.dict_data_well["kat_pvo"] = 2
-            self.dict_data_well["gaz_f_pr"] = []
+            self.data_well.dict_perforation = {}
+            self.data_well.dict_perforation_project = {}
+            self.data_well.itog_ind_min = 0
+            self.data_well.category_pvo = 2
+            self.data_well.gaz_factor_procent = []
             data_list.paker_layout = 0
-            self.dict_data_well["cat_P_P"] = []
-            self.dict_data_well["ribbing_interval"] = []
-            self.dict_data_well["column_direction_diametr"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["column_direction_wall_thickness"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["column_direction_lenght"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["column_conductor_diametr"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["column_conductor_wall_thickness"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["column_conductor_lenght"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["column_additional_diametr"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["column_additional_wall_thickness"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["head_column_additional"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["shoe_column_additional"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["column_diametr"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["column_wall_thickness"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["shoe_column"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["bottomhole_artificial"] = ProtectedIsNonNone(5000)
-            self.dict_data_well["max_expected_pressure"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["head_column_additional"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["leakiness_count"] = 0
-            self.dict_data_well["bur_rastvor"] = ''
+            self.data_well.ribbing_interval = []
+            self.data_well.column_direction_diameter = ProtectedIsNonNone('не корректно')
+            self.data_well.column_direction_wall_thickness = ProtectedIsNonNone('не корректно')
+            self.data_well.column_direction_length = ProtectedIsNonNone('не корректно')
+            self.data_well.column_conductor_diameter = ProtectedIsNonNone('не корректно')
+            self.data_well.column_conductor_wall_thickness = ProtectedIsNonNone('не корректно')
+            self.data_well.column_conductor_length = ProtectedIsNonNone('не корректно')
+            self.data_well.column_additional_diameter = ProtectedIsNonNone('не корректно')
+            self.data_well.column_additional_wall_thickness = ProtectedIsNonNone('не корректно')
+            self.data_well.head_column_additional = ProtectedIsNonNone('не корректно')
+            self.data_well.shoe_column_additional = ProtectedIsNonNone('не корректно')
+            self.data_well.column_diameter = ProtectedIsNonNone('не корректно')
+            self.data_well.column_wall_thickness = ProtectedIsNonNone('не корректно')
+            self.data_well.shoe_column = ProtectedIsNonNone('не корректно')
+            self.data_well.bottom_hole_artificial = ProtectedIsNonNone(5000)
+            self.data_well.max_expected_pressure = ProtectedIsNonNone('не корректно')
+            self.data_well.head_column_additional = ProtectedIsNonNone('не корректно')
+            self.data_well.leakiness_count = 0
+            self.data_well.bur_rastvor = ''
             data_list.data, data_list.rowHeights, data_list.colWidth, data_list.boundaries_dict = '', '', '', ''
             data_list.data_in_base = False
-            self.dict_data_well["well_volume_in_pz"] = []
-            self.dict_data_well["expected_Pick_up"] = {}
-            self.dict_data_well["current_bottom"] = 0
-            self.dict_data_well["emergency_bottom"] = self.dict_data_well["current_bottom"]
-            self.dict_data_well["fluid_work"] = 0
-            self.dict_data_well["groove_diameter"] = ''
-            self.dict_data_well["static_level"] = ProtectedIsNonNone('не корректно')
-            self.dict_data_well["dinamic_level"] = ProtectedIsNonNone('не корректно')
+            self.data_well.well_volume_in_pz = []
+            self.data_well.expected_pick_up = {}
+            self.data_well.current_bottom = 0
+            self.data_well.emergency_bottom = self.data_well.current_bottom
+            self.data_well.fluid_work = 0
+            self.data_well.groove_diameter = ''
+            self.data_well.static_level = ProtectedIsNonNone('не корректно')
+            self.data_well.dinamic_level = ProtectedIsNonNone('не корректно')
             data_list.work_perforations_approved = False
-            self.dict_data_well["dict_leakiness"] = {}
-            self.dict_data_well["leakiness"] = False
-            self.dict_data_well["emergency_well"] = False
+            self.data_well.dict_leakiness = {}
+            self.data_well.leakiness = False
+            self.data_well.emergency_well = False
 
-            self.dict_data_well["emergency_count"] = 0
+            self.data_well.emergency_count = 0
             data_list.DICT_VOLUME_CHEMISTRY = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF': 0.0, 'NaOH': 0.0,
                                                'ВТ СКО': 0.0,
                                                'Глина': 0.0, 'растворитель': 0.0, 'уд.вес': 0.0,
                                                'песок': 0.0, 'РПК': 0.0, 'РПП': 0.0, "извлекаемый пакер": 0.0,
                                                "ЕЛАН": 0.0,
                                                'РИР 2С': 0.0, 'РИР ОВП': 0.0, 'гидрофабизатор': 0.0}
-            self.dict_data_well["skm_interval"] = []
+            self.data_well.skm_interval = []
             data_list.work_perforations = []
             data_list.work_perforations_dict = {}
-            self.dict_data_well["paker_do"] = {"do": 0, "posle": 0}
-            self.dict_data_well["column_additional"] = False
-            self.dict_data_well["well_number"] = ProtectedIsNonNone('')
-            self.dict_data_well["well_area"] = ProtectedIsNonNone('')
+            self.data_well.paker_before = {"do": 0, "posle": 0}
+            self.data_well.column_additional = False
+            self.data_well.well_number = ProtectedIsNonNone('')
+            self.data_well.well_area = ProtectedIsNonNone('')
             data_list.values = []
             data_list.dop_work_list = None
-            self.dict_data_well["depth_fond_paker_do"] = {"do": 0, "posle": 0}
-            self.dict_data_well["paker2_do"] = {"do": 0, "posle": 0}
-            self.dict_data_well["depth_fond_paker2_do"] = {"do": 0, "posle": 0}
-            self.dict_data_well["perforation_roof"] = 50000
-            self.dict_data_well["data_x_min"] = 0
-            self.dict_data_well["perforation_roof"] = 0
-            self.dict_data_well["dict_pump_SHGN"] = {"do": '0', "posle": '0'}
-            self.dict_data_well["dict_pump_ECN"] = {"do": '0', "posle": '0'}
-            self.dict_data_well["dict_pump_SHGN_h"] = {"do": '0', "posle": '0'}
-            self.dict_data_well["dict_pump_ECN_h"] = {"do": '0', "posle": '0'}
+            self.data_well.depth_fond_paker_before = {"do": 0, "posle": 0}
+            self.data_well.paker_second_before = {"do": 0, "posle": 0}
+            self.data_well.depth_fond_paker_second_before = {"do": 0, "posle": 0}
+            self.data_well.perforation_roof = 50000
+            self.data_well.data_x_min = 0
+            self.data_well.perforation_roof = 0
+            self.data_well.dict_pump_shgn = {"do": '0', "posle": '0'}
+            self.data_well.dict_pump_ecn = {"do": '0', "posle": '0'}
+            self.data_well.dict_pump_shgn_depth = {"do": '0', "posle": '0'}
+            self.data_well.dict_pump_ecn_depth = {"do": '0', "posle": '0'}
             data_list.dict_pump = {"do": '0', "posle": '0'}
-            self.dict_data_well["leakiness_interval"] = []
+            self.data_well.leakiness_interval = []
             data_list.dict_pump_h = {"do": 0, "posle": 0}
-            self.dict_data_well["ins_ind"] = 0
-            self.dict_data_well["ins_ind2"] = 0
-            self.dict_data_well["image_data"] = []
-            self.dict_data_well["current_bottom2"] = 5000
+            self.data_well.insert_index = 0
+            self.data_well.insert_index2 = 0
+            self.data_well.image_data = []
+            self.data_well.current_bottom_second = 5000
             data_list.len_razdel_1 = 0
-            self.dict_data_well["count_template"] = 0
+            self.data_well.count_template = 0
             data_list.data_well_is_True = False
-            self.dict_data_well["cat_P_1"] = []
+            self.data_well.category_pressure = []
             data_list.countAcid = 0
-            self.dict_data_well["first_pressure"] = ProtectedIsDigit(0)
+            self.data_well.first_pressure = ProtectedIsDigit(0)
             data_list.swab_type_comboIndex = 1
             data_list.swab_true_edit_type = 1
-            self.dict_data_well["data_x_max"] = ProtectedIsDigit(0)
-            self.dict_data_well["drilling_interval"] = []
-            self.dict_data_well["max_angle"] = 0
+            self.data_well.data_x_max = ProtectedIsDigit(0)
+            self.data_well.drilling_interval = []
+            self.data_well.max_angle = 0
             data_list.pakerTwoSKO = False
             data_list.privyazkaSKO = 0
-            self.dict_data_well["h2s_pr"] = []
-            self.dict_data_well["category_h2s_list"] = []
-            self.dict_data_well["dict_perforation_short"] = {}
-            self.dict_data_well["h2s_mg"] = []
+            self.data_well.value_h2s_procent = []
+            self.data_well.category_h2s_list = []
+            self.data_well.dict_perforation_short = {}
+            self.data_well.value_h2s_mg = []
             data_list.lift_key = 0
-            self.dict_data_well["max_admissible_pressure"] = ProtectedIsNonNone(0)
-            self.dict_data_well["region"] = ''
-            self.dict_data_well["for_paker_list"] = False
-            self.dict_data_well["dict_nkt"] = {}
-            self.dict_data_well["dict_nkt_po"] = {}
-            self.dict_data_well["data_well_max"] = ProtectedIsNonNone(0)
+            self.data_well.max_admissible_pressure = ProtectedIsNonNone(0)
+            self.data_well.region = ''
+            self.data_well.for_paker_list = False
+            self.data_well.dict_nkt_before = {}
+            self.data_well.dict_nkt_after = {}
+            self.data_well.data_well_max = ProtectedIsNonNone(0)
             data_list.data_pvr_max = ProtectedIsNonNone(0)
-            self.dict_data_well["dict_sucker_rod"] = {}
-            self.dict_data_well["dict_sucker_rod_po"] = {}
-            self.dict_data_well["row_expected"] = []
+            self.data_well.dict_sucker_rod = {}
+            self.data_well.dict_sucker_rod_after = {}
+            self.data_well.row_expected = []
             data_list.rowHeights = []
-            self.dict_data_well["plast_project"] = []
-            self.dict_data_well['plast_work'] = []
-            self.dict_data_well["leakiness_count"] = 0
-            self.dict_data_well['plast_all'] = []
+            self.data_well.plast_project = []
+            self.data_well.plast_work = []
+            self.data_well.leakiness_count = 0
+            self.data_well.plast_all = []
             data_list.condition_of_wells = ProtectedIsNonNone(0)
-            self.dict_data_well["cat_well_min"] = ProtectedIsNonNone(0)
-            self.dict_data_well["bvo"] = False
-            self.dict_data_well["old_version"] = False
-            self.dict_data_well["image_list"] = []
-            self.dict_data_well["problem_with_ek"] = False
-            self.dict_data_well["problem_with_ek_depth"] = self.dict_data_well["current_bottom"]
-            self.dict_data_well["problem_with_ek_diametr"] = 220
+            self.data_well.cat_well_min = ProtectedIsNonNone(0)
+            self.data_well.bvo = False
+            self.data_well.old_version = False
+            self.data_well.image_list = []
+            self.data_well.problem_with_ek = False
+            self.data_well.problem_with_ek_depth = self.data_well.current_bottom
+            self.data_well.problem_with_ek_diameter = 220
             path = f"{data_list.path_image}/imageFiles/image_work"[1:]
             try:
                 for file in os.listdir(path):
@@ -1971,53 +1972,52 @@ class MyWindow(MyMainWindow):
         print("Работа с файлом Excel завершена.")
 
     def tubing_pressure_testing(self):
-        from work_py.tubing_pressuar_testing import TubingPressuarWindow
-        self.add_window(TubingPressuarWindow)
+        from work_py.tubing_pressuar_testing import TubingPressureWindow
+        self.add_window(TubingPressureWindow)
 
     def read_clicked_mouse_data(self, row):
         from work_py.advanted_file import definition_plast_work
         from data_correct import DataWindow
 
-        row = row - self.dict_data_well["count_row_well"]
-        # print(self.dict_data_well["column_diametr"]._value)
-        data = self.dict_data_well["data_list"]
+        row = row - self.data_well.count_row_well
+        # print(self.data_well.column_diameter._value)
+        data = self.data_well.data_list
 
-        self.dict_data_well["current_bottom"] = data[row][1]
-        self.dict_data_well["dict_perforation"] = json.loads(data[row][2])
-        self.dict_data_well['plast_all'] = json.loads(data[row][3])
-        self.dict_data_well['plast_work'] = json.loads(data[row][4])
-        self.dict_data_well["dict_leakiness"] = json.loads(data[row][5])
-        aaaaaaa = self.dict_data_well["dict_leakiness"]
-        self.dict_data_well["column_additional"] = data[row][6]
+        self.data_well.current_bottom = data[row][1]
+        self.data_well.dict_perforation = json.loads(data[row][2])
+        self.data_well.plast_all = json.loads(data[row][3])
+        self.data_well.plast_work = json.loads(data[row][4])
+        self.data_well.dict_leakiness = json.loads(data[row][5])
+        aaaaaaa = self.data_well.dict_leakiness
+        self.data_well.column_additional = data[row][6]
 
-        self.dict_data_well["fluid_work"] = data[row][7]
-        self.dict_data_well["template_depth"], self.dict_data_well["template_lenght"], self.dict_data_well[
-            "template_depth_addition"], self.dict_data_well["template_lenght_addition"] = json.loads(
+        self.data_well.fluid_work = data[row][7]
+        self.data_well.template_depth, self.data_well.template_length, self.data_well.template_depth_addition, self.data_well.template_length_addition = json.loads(
             data[row][11])
-        self.dict_data_well["skm_interval"] = json.loads(data[row][12])
+        self.data_well.skm_interval = json.loads(data[row][12])
 
-        self.dict_data_well["problem_with_ek_depth"] = data[row][13]
-        self.dict_data_well["problem_with_ek_diametr"] = data[row][14]
+        self.data_well.problem_with_ek_depth = data[row][13]
+        self.data_well.problem_with_ek_diameter = data[row][14]
 
         DataWindow.definition_open_trunk_well(self)
 
         definition_plast_work(self)
         try:
-            self.dict_data_well["ribbing_interval"] = json.loads(data[row][15])
+            self.data_well.ribbing_interval = json.loads(data[row][15])
         except:
             pass
 
         try:
-            self.dict_data_well["head_column"] = data_list.ProtectedIsDigit(data[row][16])
+            self.data_well.head_column = data_list.ProtectedIsDigit(data[row][16])
         except:
             print('отсутствуют данные по голове хвостовика')
 
-        # print(self.dict_data_well["skm_interval"])
+        # print(self.data_well.skm_interval)
 
     def frezering_port_action(self):
         from work_py.drilling import Drill_window
         drilling_work_list = Drill_window.frezer_ports(self)
-        self.populate_row(self.ins_ind, drilling_work_list, self.table_widget)
+        self.populate_row(self.insert_index, drilling_work_list, self.table_widget)
 
     def drilling_action_nkt(self):
         from work_py.drilling import Drill_window
@@ -2029,17 +2029,17 @@ class MyWindow(MyMainWindow):
     def emergency_sticking_action(self):
         from work_py.emergencyWork import emergency_sticking
         emergency_sticking_list = emergency_sticking(self)
-        self.populate_row(self.ins_ind, emergency_sticking_list, self.table_widget)
+        self.populate_row(self.insert_index, emergency_sticking_list, self.table_widget)
 
     def hook_action(self):
         from work_py.emergencyWork import emergency_hook
         hook_work_list = emergency_hook(self)
-        self.populate_row(self.ins_ind, hook_work_list, self.table_widget)
+        self.populate_row(self.insert_index, hook_work_list, self.table_widget)
 
     def lapel_tubing_func(self):
         from work_py.emergencyWork import lapel_tubing
         emergency_sbt_list = lapel_tubing(self)
-        self.populate_row(self.ins_ind, emergency_sbt_list, self.table_widget)
+        self.populate_row(self.insert_index, emergency_sbt_list, self.table_widget)
 
     def lar_sbt_action(self):
         from work_py.emergency_lar import EmergencyLarWork
@@ -2056,54 +2056,54 @@ class MyWindow(MyMainWindow):
     def rgd_without_paker_action(self):
         from work_py.rgdVcht import rgd_without_paker
         rgd_without_paker_list = rgd_without_paker(self)
-        self.populate_row(self.ins_ind, rgd_without_paker_list, self.table_widget)
+        self.populate_row(self.insert_index, rgd_without_paker_list, self.table_widget)
 
     def rgd_with_paker_action(self):
         from work_py.rgdVcht import rgd_with_paker
         rgd_with_paker_list = rgd_with_paker(self)
-        self.populate_row(self.ins_ind, rgd_with_paker_list, self.table_widget)
+        self.populate_row(self.insert_index, rgd_with_paker_list, self.table_widget)
 
-    def pressuar_gis(self):
-        from work_py.alone_oreration import pressuar_gis
+    def pressure_gis(self):
+        from work_py.alone_oreration import pressure_gis
 
-        pressuar_gis_list = pressuar_gis(self)
-        self.populate_row(self.ins_ind, pressuar_gis_list, self.table_widget)
+        pressure_gis_list = pressure_gis(self)
+        self.populate_row(self.insert_index, pressure_gis_list, self.table_widget)
 
-    def definitionBottomGKLM(self):
-        from work_py.alone_oreration import definitionBottomGKLM
+    def definition_bottom_gklm(self):
+        from work_py.alone_oreration import definition_bottom_gklm
 
-        definitionBottomGKLM_list = definitionBottomGKLM(self)
-        self.populate_row(self.ins_ind, definitionBottomGKLM_list, self.table_widget)
+        definition_bottom_gklm_list = definition_bottom_gklm(self)
+        self.populate_row(self.insert_index, definition_bottom_gklm_list, self.table_widget)
 
     def privyazka_nkt(self):
         from work_py.alone_oreration import privyazka_nkt
         privyazka_nkt_list = privyazka_nkt(self)
-        self.populate_row(self.ins_ind, privyazka_nkt_list, self.table_widget)
+        self.populate_row(self.insert_index, privyazka_nkt_list, self.table_widget)
 
     def definition_q(self):
         from work_py.alone_oreration import definition_q
         definition_q_list = definition_q(self)
-        self.populate_row(self.ins_ind, definition_q_list, self.table_widget)
+        self.populate_row(self.insert_index, definition_q_list, self.table_widget)
 
     def definition_q_nek(self):
         from work_py.alone_oreration import definition_q_nek
         definition_q_list = definition_q_nek(self)
-        self.populate_row(self.ins_ind, definition_q_list, self.table_widget)
+        self.populate_row(self.insert_index, definition_q_list, self.table_widget)
 
     def kot_work(self):
         from work_py.alone_oreration import kot_work
         kot_work_list = kot_work(self)
-        self.populate_row(self.ins_ind, kot_work_list, self.table_widget)
+        self.populate_row(self.insert_index, kot_work_list, self.table_widget)
 
     def konte_action(self):
         from work_py.alone_oreration import konte
         konte_work_list = konte(self)
-        self.populate_row(self.ins_ind, konte_work_list, self.table_widget)
+        self.populate_row(self.insert_index, konte_work_list, self.table_widget)
 
     def mkp_revision(self):
         from work_py.mkp import mkp_revision
         mkp_work_list = mkp_revision(self)
-        self.populate_row(self.ins_ind, mkp_work_list, self.table_widget)
+        self.populate_row(self.insert_index, mkp_work_list, self.table_widget)
 
     def acid_action_gons(self):
         from work_py.acids import GonsWindow
@@ -2116,7 +2116,7 @@ class MyWindow(MyMainWindow):
     def pvo_cat1(self):
         from work_py.alone_oreration import pvo_cat1
         pvo_cat1_work_list = pvo_cat1(self)
-        self.populate_row(self.ins_ind, pvo_cat1_work_list, self.table_widget)
+        self.populate_row(self.insert_index, pvo_cat1_work_list, self.table_widget)
 
     def fluid_change_action(self):
         from work_py.change_fluid import Change_fluid_Window
@@ -2145,12 +2145,12 @@ class MyWindow(MyMainWindow):
     def washing_sand(self):
         from work_py.sand_filling import SandWindow
         washing_work_list = SandWindow.sandWashing(self)
-        self.populate_row(self.ins_ind, washing_work_list, self.table_widget)
+        self.populate_row(self.insert_index, washing_work_list, self.table_widget)
 
     def deleteString(self):
         selected_ranges = self.table_widget.selectedRanges()
         selected_rows = []
-        if self.ins_ind > self.dict_data_well["count_row_well"]:
+        if self.insert_index > self.data_well.count_row_well:
             # Получение индексов выбранных строк
             for selected_range in selected_ranges:
                 top_row = selected_range.topRow()
@@ -2165,12 +2165,12 @@ class MyWindow(MyMainWindow):
             # print(selected_rows)
             for row in selected_rows:
                 self.table_widget.removeRow(row)
-                self.dict_data_well["data_list"].pop(row - self.dict_data_well["count_row_well"])
+                self.data_well.data_list.pop(row - self.data_well.count_row_well)
 
     def empty_string(self):
-        if self.ins_ind > self.dict_data_well["count_row_well"]:
+        if self.insert_index > self.data_well.count_row_well:
             ryber_work_list = [[None, None, None, None, None, None, None, None, None, None, None, None]]
-            self.populate_row(self.ins_ind, ryber_work_list, self.table_widget)
+            self.populate_row(self.insert_index, ryber_work_list, self.table_widget)
 
     def vp_action(self):
         from work_py.vp_cm import VpWindow
@@ -2229,7 +2229,7 @@ class MyWindow(MyMainWindow):
         self.add_window(GeophysicWindow)
         # if self.operation_window is None:
         #     
-        #     self.operation_window = GeophysicWindow(self.dict_data_well, self.table_widget)
+        #     self.operation_window = GeophysicWindow(self.data_well, self.table_widget)
         #     self.operation_window.setWindowTitle("Геофизические исследования")
         #     self.set_modal_window(self.operation_window)
         #     self.pause_app()
@@ -2244,21 +2244,21 @@ class MyWindow(MyMainWindow):
     def correct_perforation(self):
         from perforation_correct import PerforationCorrect
 
-        self.dict_data_well["current_bottom"], ok = QInputDialog.getDouble(
+        self.data_well.current_bottom, ok = QInputDialog.getDouble(
             self, 'Необходимый забой', 'Введите забой до которого нужно нормализовать')
 
-        self.perforation_correct_window2 = PerforationCorrect(self.dict_data_well)
+        self.perforation_correct_window2 = PerforationCorrect(self.data_well)
         self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
         self.set_modal_window(self.perforation_correct_window2)
 
-        self.dict_data_well["data_list"][-1][1] = self.dict_data_well["current_bottom"]
+        self.data_well.data_list[-1][1] = self.data_well.current_bottom
 
-        self.dict_data_well["data_list"][-1][2] = json.dumps(self.dict_data_well["dict_perforation"], default=str,
+        self.data_well.data_list[-1][2] = json.dumps(self.data_well.dict_perforation, default=str,
                                                              ensure_ascii=False, indent=4)
 
     def correct_curator(self):
         from work_py.curators import SelectCurator
-        self.new_window = SelectCurator(self.dict_data_well)
+        self.new_window = SelectCurator(self.data_well)
         self.set_modal_window(self.new_window)
 
     def correct_nek(self):
@@ -2266,16 +2266,16 @@ class MyWindow(MyMainWindow):
         from work_py.leakage_column import LeakageWindow
 
         if WellCondition.leakage_window is None:
-            WellCondition.leakage_window = LeakageWindow(self.dict_data_well)
+            WellCondition.leakage_window = LeakageWindow(self.data_well)
             WellCondition.leakage_window.setWindowTitle("Корректировка негерметичности")
             # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
             self.set_modal_window(WellCondition.leakage_window)
-            self.dict_data_well["dict_leakiness"] = WellCondition.leakage_window.add_work()
-            # print(f'словарь нарушений {self.dict_data_well["dict_leakiness"]}')
+            self.data_well.dict_leakiness = WellCondition.leakage_window.add_work()
+            # print(f'словарь нарушений {self.data_well.dict_leakiness}')
         else:
             WellCondition.leakage_window.close()  # Close window.
             WellCondition.leakage_window = None  # Discard reference.
-        self.dict_data_well["data_list"][-1][5] = json.dumps(self.dict_data_well["dict_leakiness"], default=str,
+        self.data_well.data_list[-1][5] = json.dumps(self.data_well.dict_leakiness, default=str,
                                                              ensure_ascii=False, indent=4)
 
     def correctData(self):
@@ -2289,13 +2289,13 @@ class MyWindow(MyMainWindow):
     def po_new_window(self):
         from work_py.emergencyWork import emergencyECN
         template_pero_list = emergencyECN(self)
-        self.populate_row(self.ins_ind, template_pero_list, self.table_widget)
+        self.populate_row(self.insert_index, template_pero_list, self.table_widget)
 
     def perforation_new_window(self):
         from work_py.perforation import PerforationWindow
-        if len(self.dict_data_well["cat_P_1"]) > 1:
-            if self.dict_data_well["cat_P_1"][1] == 1 and self.dict_data_well["kat_pvo"] != 1:
-                msc = QMessageBox.information(self, 'Внимание', 'Не произведен монтаж первой категории')
+        if len(self.data_well.category_pressure_well) > 1:
+            if self.data_well.category_pressure_well[1] == 1 and self.data_well.category_pvo != 1:
+                QMessageBox.information(self, 'Внимание', 'Не произведен монтаж первой категории')
                 return
         self.add_window(PerforationWindow)
 
@@ -2308,131 +2308,131 @@ class MyWindow(MyMainWindow):
 
         for row in range(15):
             ws4.insert_rows(ws4.max_row)
-        ws4.cell(row=1, column=1).value = self.dict_data_well["well_number"]._value
-        ws4.cell(row=2, column=1).value = self.dict_data_well["well_area"]._value
+        ws4.cell(row=1, column=1).value = self.data_well.well_number._value
+        ws4.cell(row=2, column=1).value = self.data_well.well_area._value
 
-        if self.dict_data_well["dict_pump_SHGN"]["do"] != 0 and self.dict_data_well["dict_pump_ECN"]["do"] == 0 and \
-                self.dict_data_well["paker_do"]["do"] == 0:
+        if self.data_well.dict_pump_shgn["do"] != 0 and self.data_well.dict_pump_ecn["do"] == 0 and \
+                self.data_well.paker_before["do"] == 0:
             ws4.cell(row=3,
-                     column=1).value = f'{self.dict_data_well["dict_pump_SHGN"]["do"]} -на гл. ' \
-                                       f'{self.dict_data_well["dict_pump_SHGN_h"]["do"]}м'
-        elif self.dict_data_well["dict_pump_SHGN"]["do"] == 0 and self.dict_data_well["dict_pump_ECN"]["do"] != 0 and \
-                self.dict_data_well["paker_do"]["do"] == 0:
+                     column=1).value = f'{self.data_well.dict_pump_shgn["do"]} -на гл. ' \
+                                       f'{self.data_well.dict_pump_shgn_depth["do"]}м'
+        elif self.data_well.dict_pump_shgn["do"] == 0 and self.data_well.dict_pump_ecn["do"] != 0 and \
+                self.data_well.paker_before["do"] == 0:
             ws4.cell(row=3,
-                     column=1).value = f'{self.dict_data_well["dict_pump_ECN"]["do"]} -на гл. ' \
-                                       f'{self.dict_data_well["dict_pump_ECN_h"]["do"]}м'
-        elif self.dict_data_well["dict_pump_SHGN"]["do"] == 0 and self.dict_data_well["dict_pump_ECN"]["do"] != 0 and \
-                self.dict_data_well["paker_do"]["do"] != 0:
+                     column=1).value = f'{self.data_well.dict_pump_ecn["do"]} -на гл. ' \
+                                       f'{self.data_well.dict_pump_ecn_depth["do"]}м'
+        elif self.data_well.dict_pump_shgn["do"] == 0 and self.data_well.dict_pump_ecn["do"] != 0 and \
+                self.data_well.paker_before["do"] != 0:
             ws4.cell(row=3,
-                     column=1).value = f'{self.dict_data_well["dict_pump_ECN"]["do"]} -на гл.' \
-                                       f' {self.dict_data_well["dict_pump_ECN_h"]["do"]}м \n' \
-                                       f'{self.dict_data_well["paker_do"]["do"]} на ' \
-                                       f'{self.dict_data_well["depth_fond_paker_do"]["do"]}м'
-        elif self.dict_data_well["dict_pump_SHGN"]["do"] != 0 and self.dict_data_well["dict_pump_ECN"]["do"] == 0 and \
-                self.dict_data_well["paker_do"]["do"] != 0:
+                     column=1).value = f'{self.data_well.dict_pump_ecn["do"]} -на гл.' \
+                                       f' {self.data_well.dict_pump_ecn_depth["do"]}м \n' \
+                                       f'{self.data_well.paker_before["do"]} на ' \
+                                       f'{self.data_well.depth_fond_paker_before["do"]}м'
+        elif self.data_well.dict_pump_shgn["do"] != 0 and self.data_well.dict_pump_ecn["do"] == 0 and \
+                self.data_well.paker_before["do"] != 0:
             ws4.cell(row=3,
-                     column=1).value = f'{self.dict_data_well["dict_pump_SHGN"]["do"]} -на гл. ' \
-                                       f'{self.dict_data_well["dict_pump_SHGN_h"]["do"]}м \n' \
-                                       f'{self.dict_data_well["paker_do"]["do"]} на ' \
-                                       f'{self.dict_data_well["depth_fond_paker_do"]["do"]}м'
-        elif self.dict_data_well["dict_pump_SHGN"]["do"] == 0 and self.dict_data_well["dict_pump_ECN"]["do"] == 0 and \
-                self.dict_data_well["paker_do"]["do"] != 0:
-            ws4.cell(row=3, column=1).value = f'{self.dict_data_well["paker_do"]["do"]} на ' \
-                                              f'{self.dict_data_well["depth_fond_paker_do"]["do"]}м'
-        elif self.dict_data_well["dict_pump_SHGN"]["do"] == 0 and self.dict_data_well["dict_pump_ECN"]["do"] == 0 and \
-                self.dict_data_well["paker_do"]["do"] == 0:
+                     column=1).value = f'{self.data_well.dict_pump_shgn["do"]} -на гл. ' \
+                                       f'{self.data_well.dict_pump_shgn_depth["do"]}м \n' \
+                                       f'{self.data_well.paker_before["do"]} на ' \
+                                       f'{self.data_well.depth_fond_paker_before["do"]}м'
+        elif self.data_well.dict_pump_shgn["do"] == 0 and self.data_well.dict_pump_ecn["do"] == 0 and \
+                self.data_well.paker_before["do"] != 0:
+            ws4.cell(row=3, column=1).value = f'{self.data_well.paker_before["do"]} на ' \
+                                              f'{self.data_well.depth_fond_paker_before["do"]}м'
+        elif self.data_well.dict_pump_shgn["do"] == 0 and self.data_well.dict_pump_ecn["do"] == 0 and \
+                self.data_well.paker_before["do"] == 0:
             ws4.cell(row=3, column=1).value = " "
-        elif self.dict_data_well["dict_pump_SHGN"]["do"] != 0 and self.dict_data_well["dict_pump_ECN"]["do"] != 0 and \
-                self.dict_data_well["paker_do"]["do"] != 0:
+        elif self.data_well.dict_pump_shgn["do"] != 0 and self.data_well.dict_pump_ecn["do"] != 0 and \
+                self.data_well.paker_before["do"] != 0:
             ws4.cell(row=3,
-                     column=1).value = f'{self.dict_data_well["dict_pump_SHGN"]["do"]} -на гл.' \
-                                       f' {self.dict_data_well["dict_pump_SHGN_h"]["do"]}м \n' \
-                                       f'{self.dict_data_well["dict_pump_ECN"]["do"]} -на гл. ' \
-                                       f'{self.dict_data_well["dict_pump_ECN_h"]["do"]}м \n' \
-                                       f'{self.dict_data_well["paker_do"]["do"]} на ' \
-                                       f'{self.dict_data_well["depth_fond_paker_do"]["do"]}м '
+                     column=1).value = f'{self.data_well.dict_pump_shgn["do"]} -на гл.' \
+                                       f' {self.data_well.dict_pump_shgn_depth["do"]}м \n' \
+                                       f'{self.data_well.dict_pump_ecn["do"]} -на гл. ' \
+                                       f'{self.data_well.dict_pump_ecn_depth["do"]}м \n' \
+                                       f'{self.data_well.paker_before["do"]} на ' \
+                                       f'{self.data_well.depth_fond_paker_before["do"]}м '
         plast_str = ''
         pressur_set = set()
-        # print(f'После {self.dict_data_well["dict_perforation_short"]}')
-        for plast in list(self.dict_data_well["dict_perforation_short"].keys()):
-            if self.dict_data_well["dict_perforation_short"][plast]['отключение'] is False and \
-                    plast in self.dict_data_well["dict_perforation_short"]:
-                for interval in self.dict_data_well["dict_perforation_short"][plast]["интервал"]:
+        # print(f'После {self.data_well.dict_perforation_short}')
+        for plast in list(self.data_well.dict_perforation_short.keys()):
+            if self.data_well.dict_perforation_short[plast]['отключение'] is False and \
+                    plast in self.data_well.dict_perforation_short:
+                for interval in self.data_well.dict_perforation_short[plast]["интервал"]:
                     plast_str += f'{plast[:4]}: {interval[0]}- {interval[1]} \n'
-            elif self.dict_data_well["dict_perforation_short"][plast]['отключение'] and \
-                    plast in self.dict_data_well["dict_perforation_short"]:
-                for interval in self.dict_data_well["dict_perforation_short"][plast]["интервал"]:
+            elif self.data_well.dict_perforation_short[plast]['отключение'] and \
+                    plast in self.data_well.dict_perforation_short:
+                for interval in self.data_well.dict_perforation_short[plast]["интервал"]:
                     plast_str += f'{plast[:4]} :{interval[0]}- {interval[1]} (изол)\n'
             try:
-                a = self.dict_data_well["dict_perforation_short"]
-                filter_list_pressuar = list(
+                a = self.data_well.dict_perforation_short
+                filter_list_pressure = list(
                     filter(lambda x: type(x) in [int, float],
-                           list(self.dict_data_well["dict_perforation_short"][plast]["давление"])))
-                # print(f'фильтр -{filter_list_pressuar}')
-                if filter_list_pressuar:
-                    pressur_set.add(f'{plast[:4]} - {filter_list_pressuar}')
+                           list(self.data_well.dict_perforation_short[plast]["давление"])))
+                # print(f'фильтр -{filter_list_pressure}')
+                if filter_list_pressure:
+                    pressur_set.add(f'{plast[:4]} - {filter_list_pressure}')
             except Exception as e:
                 QMessageBox.warning(self, 'Ошибка', f'Ошибка вставки давления в краткое описание {e}')
 
-        ws4.cell(row=6, column=1).value = f'НКТ: \n {TabPageGno.gno_nkt_opening(self.dict_data_well["dict_nkt"])}'
+        ws4.cell(row=6, column=1).value = f'НКТ: \n {TabPageGno.gno_nkt_opening(self.data_well.dict_nkt_before)}'
         ws4.cell(row=7, column=1).value = f'Рпл: \n {" ".join(list(pressur_set))}атм'
-        # ws4.cell(row=8, column=1).value = f'ЖГС = {self.dict_data_well["fluid_work_short"]}г/см3'
+        # ws4.cell(row=8, column=1).value = f'ЖГС = {self.data_well.fluid_work_short}г/см3'
         ws4.cell(row=9,
-                 column=1).value = f'Нст- {self.dict_data_well["static_level"]._value}м / Ндин -' \
-                                   f' {self.dict_data_well["dinamic_level"]._value}м'
-        if self.dict_data_well["curator"] == 'ОР':
+                 column=1).value = f'Нст- {self.data_well.static_level._value}м / Ндин -' \
+                                   f' {self.data_well.dinamic_level._value}м'
+        if self.data_well.curator == 'ОР':
             ws4.cell(row=10,
-                     column=1).value = f'Ожид {self.dict_data_well["expected_Q"]}м3/сут при Р-{self.dict_data_well["expected_P"]}м3/сут'
+                     column=1).value = f'Ожид {self.data_well.expected_Q}м3/сут при Р-{self.data_well.expected_P}м3/сут'
         else:
             ws4.cell(row=10,
-                     column=1).value = f'Qн {self.dict_data_well["Qoil"]}т Qж- {self.dict_data_well["Qwater"]}м3/сут'
+                     column=1).value = f'Qн {self.data_well.Qoil}т Qж- {self.data_well.Qwater}м3/сут'
         ws4.cell(row=11,
-                 column=1).value = f'макс угол {self.dict_data_well["max_angle"]._value} на {self.dict_data_well["max_angle_depth"]._value}'
-        ws4.cell(row=1, column=2).value = self.dict_data_well["cdng"]._value
+                 column=1).value = f'макс угол {self.data_well.max_angle._value} на {self.data_well.max_angle_depth._value}'
+        ws4.cell(row=1, column=2).value = self.data_well.cdng._value
         try:
             try:
-                category_pressuar = self.dict_data_well["dict_category"][self.dict_data_well['plast_work_short'][0]][
+                category_pressure = self.data_well.dict_category[self.data_well.plast_work_short[0]][
                     "по давлению"].category
             except:
-                category_pressuar = self.dict_data_well["category_pressuar2"]
+                category_pressure = self.data_well.category_pressure_second
             try:
-                category_h2s = self.dict_data_well["dict_category"][self.dict_data_well['plast_work_short'][0]][
+                category_h2s = self.data_well.dict_category[self.data_well.plast_work_short[0]][
                     "по сероводороду"].category
             except:
-                category_h2s = self.dict_data_well["category_h2s_2"]
+                category_h2s = self.data_well.category_h2s_second
             try:
-                gaz_f_pr = self.dict_data_well["gaz_f_pr"][0]
+                gaz_f_pr = self.data_well.gaz_factor_procent[0]
             except:
-                gaz_f_pr = self.dict_data_well["gaz_f_pr_2"]
+                gaz_f_pr = self.data_well.gaz_factor_pr_second
 
             ws4.cell(row=2, column=3).value = \
-                f'Рпл - {category_pressuar},' \
+                f'Рпл - {category_pressure},' \
                 f' H2S -{category_h2s},' \
                 f' газ факт -{gaz_f_pr}т/м3'
         except Exception as e:
             QMessageBox.warning(self, 'ОШИБКА',
                                 f"Программа не смогла вставить данные в краткое содержание значения по "
                                 f"Рпл {type(e).__name__}\n\n{str(e)}")
-        column_well = f'{self.dict_data_well["column_diametr"]._value}х{self.dict_data_well["column_wall_thickness"]._value} в ' \
-                      f'инт 0 - {self.dict_data_well["shoe_column"]._value}м ' \
-            if self.dict_data_well["column_additional"] is False else \
-            f'{self.dict_data_well["column_diametr"]._value} х ' \
-            f'{self.dict_data_well["column_wall_thickness"]._value} \n' \
-            f'0 - {self.dict_data_well["shoe_column"]._value}м/\n{self.dict_data_well["column_additional_diametr"]._value}' \
-            f' х {self.dict_data_well["column_additional_wall_thickness"]._value} в инт ' \
-            f'{self.dict_data_well["head_column_additional"]._value}-{self.dict_data_well["head_column_additional"]._value}м'
+        column_well = f'{self.data_well.column_diameter._value}х{self.data_well.column_wall_thickness._value} в ' \
+                      f'инт 0 - {self.data_well.shoe_column._value}м ' \
+            if self.data_well.column_additional is False else \
+            f'{self.data_well.column_diameter._value} х ' \
+            f'{self.data_well.column_wall_thickness._value} \n' \
+            f'0 - {self.data_well.shoe_column._value}м/\n{self.data_well.column_additional_diameter._value}' \
+            f' х {self.data_well.column_additional_wall_thickness._value} в инт ' \
+            f'{self.data_well.head_column_additional._value}-{self.data_well.head_column_additional._value}м'
         ws4.cell(row=1, column=7).value = column_well
-        ws4.cell(row=4, column=7).value = f'Пробур забой {self.dict_data_well["bottomhole_drill"]._value}м'
-        ws4.cell(row=5, column=7).value = f'Исскус забой {self.dict_data_well["bottomhole_artificial"]._value}м'
-        ws4.cell(row=6, column=7).value = f'Тек забой {self.dict_data_well["bottom"]}м'
+        ws4.cell(row=4, column=7).value = f'Пробур забой {self.data_well.bottom_hole_drill._value}м'
+        ws4.cell(row=5, column=7).value = f'Исскус забой {self.data_well.bottom_hole_artificial._value}м'
+        ws4.cell(row=6, column=7).value = f'Тек забой {self.data_well.bottom}м'
 
         ws4.cell(row=7, column=7).value = plast_str
-        ws4.cell(row=11, column=7).value = f'Рмакс {self.dict_data_well["max_admissible_pressure"]._value}атм'
+        ws4.cell(row=11, column=7).value = f'Рмакс {self.data_well.max_admissible_pressure._value}атм'
         ws4.cell(row=3, column=2).value = plan_short
         nek_str = 'НЭК '
-        if len(self.dict_data_well["leakiness_interval"]) != 0:
+        if len(self.data_well.leakiness_interval) != 0:
 
-            for nek in self.dict_data_well["leakiness_interval"]:
+            for nek in self.data_well.leakiness_interval:
                 nek_str += f'{nek.split("-")[0]}-{nek.split("-")[1]} \n'
 
         ws4.cell(row=3, column=7).value = nek_str

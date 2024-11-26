@@ -25,7 +25,7 @@ class TabPageVp(TabPageUnion):
         self.vp_depth_label = QLabel("Глубина установки пакера", self)
         self.vp_depth_edit = QLineEdit(self)
         self.vp_depth_edit.setValidator(self.validator_int)
-        self.vp_depth_edit.setText(f'{int(float(self.dict_data_well["perforation_roof"] -20))}')
+        self.vp_depth_edit.setText(f'{int(float(self.data_well.perforation_roof -20))}')
 
         self.cement_vp_Label = QLabel("Глубина докрепления цементом", self)
         self.cement_vp_edit = QLineEdit(self)
@@ -74,7 +74,7 @@ class TabPageVp(TabPageUnion):
         elif index == "Нет":
             self.cement_vp_Label.setParent(None)
             self.cement_vp_edit.setParent(None)
-            self.cement_vp_edit.setText(f'{int(float(self.dict_data_well["current_bottom"])) - 3}')
+            self.cement_vp_edit.setText(f'{int(float(self.data_well.current_bottom)) - 3}')
         else:
             self.vp_type_Label.setParent(None)
             self.vp_type_QCombo.setParent(None)
@@ -93,12 +93,12 @@ class TabWidget(TabWidgetUnion):
 class VpWindow(WindowUnion):
     work_clay_window = None
 
-    def __init__(self, dict_data_well, table_widget, parent=None):
-        super().__init__()
+    def __init__(self, data_well, table_widget, parent=None):
+        super().__init__(data_well)
 
-        self.dict_data_well = dict_data_well
-        self.ins_ind = dict_data_well['ins_ind']
-        self.tabWidget = TabWidget(self.dict_data_well)
+
+        self.insert_index = data_well.insert_index
+        self.tabWidget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -141,17 +141,17 @@ class VpWindow(WindowUnion):
 
 
 
-        self.populate_row(self.ins_ind, work_list, self.table_widget)
+        self.populate_row(self.insert_index, work_list, self.table_widget)
         data_list.pause = False
         self.close()
 
     def closeEvent(self, event):
                 # Закрываем основное окно при закрытии окна входа
-        self.operation_window = None
+        self.data_well.operation_window = None
         event.accept()  # Принимаем событие закрытия
     def vp(self, vp_type_QCombo, vp_depth, cement_vp_edit, need_question_QCombo ):
 
-        if self.dict_data_well["perforation_roof"] > vp_depth:
+        if self.data_well.perforation_roof > vp_depth:
             vp_list = [
                 [None, None,
                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
@@ -164,8 +164,8 @@ class VpWindow(WindowUnion):
                  f'Произвести установку {vp_type_QCombo} (ЗАДАЧА 2.9.4.) на глубине  {vp_depth}м',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', 10],
-                [f'Опрессовать эксплуатационную колонну на Р={self.dict_data_well["max_admissible_pressure"]._value}атм', None,
-                 f'Опрессовать эксплуатационную колонну на Р={self.dict_data_well["max_admissible_pressure"]._value}атм '
+                [f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure._value}атм', None,
+                 f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure._value}атм '
                  f'в присутствии представителя заказчика '
                  f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением '
                  f'за 2 часа до начала работ) ',
@@ -192,8 +192,8 @@ class VpWindow(WindowUnion):
                  f'взрывные желонки).',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', None],
-                [f'Опрессовать эксплуатационную колонну на Р={self.dict_data_well["max_admissible_pressure"]._value}атм', None,
-                 f'Опрессовать эксплуатационную колонну на Р={self.dict_data_well["max_admissible_pressure"]._value}атм в '
+                [f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure._value}атм', None,
+                 f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure._value}атм в '
                  f'присутствии представителя заказчика '
                  f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с '
                  f'подтверждением за 2 часа до начала работ) ',
@@ -242,7 +242,7 @@ class VpWindow(WindowUnion):
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', None]
             ]
-        self.dict_data_well["current_bottom"] = cement_vp_edit
+        self.data_well.current_bottom = cement_vp_edit
 
         if need_question_QCombo == 'Нет':
             vp_list = [
@@ -257,8 +257,8 @@ class VpWindow(WindowUnion):
                  f'Произвести установку {vp_type_QCombo} (ЗАДАЧА 2.9.4.) на глубине  {vp_depth}м',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', 10],
-                [f'Опрессовать эксплуатационную колонну на Р={self.dict_data_well["max_admissible_pressure"]._value}атм', None,
-                 f'Опрессовать эксплуатационную колонну на Р={self.dict_data_well["max_admissible_pressure"]._value}атм в '
+                [f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure._value}атм', None,
+                 f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure._value}атм в '
                  f'присутствии представителя заказчика '
                  f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с '
                  f'подтверждением за 2 часа до начала работ) ',
@@ -271,11 +271,11 @@ class VpWindow(WindowUnion):
                  f'Определить приемистость НЭК.',
                  None, None, None, None, None, None, None,
                  'мастер КРС', None]]
-            self.dict_data_well["current_bottom"] = vp_depth
+            self.data_well.current_bottom = vp_depth
 
 
 
-        RirWindow.perf_new(self, self.dict_data_well["current_bottom"], vp_depth)
+        RirWindow.perf_new(self, self.data_well.current_bottom, vp_depth)
         return vp_list
 
 
@@ -310,9 +310,9 @@ class VpWindow(WindowUnion):
              f'взрывные желонки).',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', None],
-            [f'Опрессовать ЭК на Р={self.dict_data_well["max_admissible_pressure"]._value}атм',
+            [f'Опрессовать ЭК на Р={self.data_well.max_admissible_pressure._value}атм',
              None,
-             f'Опрессовать эксплуатационную колонну на Р={self.dict_data_well["max_admissible_pressure"]._value}атм в присутствии '
+             f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure._value}атм в присутствии '
              f'представителя заказчика Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
              f'с подтверждением за 2 часа до начала работ) ',
              None, None, None, None, None, None, None,
@@ -326,19 +326,19 @@ class VpWindow(WindowUnion):
              'мастер КРС', None],
         ]
         interval_list = []
-        for plast in self.dict_data_well['plast_work']:
-            for interval in self.dict_data_well["dict_perforation"][plast]['интервал']:
+        for plast in self.data_well.plast_work:
+            for interval in self.data_well.dict_perforation[plast]['интервал']:
                 interval_list.append(interval)
 
-        if self.dict_data_well["dict_leakiness"]:
-          # print(self.dict_data_well["dict_leakiness"])
-            for nek in self.dict_data_well["dict_leakiness"]['НЭК']['интервал']:
+        if self.data_well.dict_leakiness:
+          # print(self.data_well.dict_leakiness)
+            for nek in self.data_well.dict_leakiness['НЭК']['интервал']:
                 # print(nek)
-                if self.dict_data_well["dict_leakiness"]['НЭК']['интервал'][nek]['отключение'] is False:
+                if self.data_well.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False:
                     interval_list.append(nek)
 
         if any([float(interval[0]) < float(cement_vp) for interval in interval_list]):
             vp_list = vp_list[:3]
 
-        self.dict_data_well["current_bottom"] = cement_vp
+        self.data_well.current_bottom = cement_vp
         return vp_list

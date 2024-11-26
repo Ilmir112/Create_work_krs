@@ -9,9 +9,7 @@ from .advanted_file import definition_plast_work
 
 class TabPageSo(TabPageUnion):
     def __init__(self, parent=None):
-        super().__init__()
-
-        self.dict_data_well = parent
+        super().__init__(parent)
 
         self.labelType = QLabel("Кровля  перфорации", self)
         self.lineedit_type = QLineEdit(self)
@@ -62,13 +60,13 @@ class TabPageSo(TabPageUnion):
         self.grid.addWidget(TabPageSo.combobox_type_perforation, 1, 6)
 
     def select_type_perforation(self, sole):
-        if len(self.dict_data_well["angle_data"]) == 0 and self.dict_data_well["max_angle"]._value < 50:
+        if len(self.data_well.angle_data) == 0 and self.data_well.max_angle._value < 50:
             TabPageSo.combobox_type_perforation.setCurrentIndex(0)
-        elif len(self.dict_data_well["angle_data"]) == 0 and self.dict_data_well["max_angle"]._value >= 50:
+        elif len(self.data_well.angle_data) == 0 and self.data_well.max_angle._value >= 50:
             TabPageSo.combobox_type_perforation.setCurrentIndex(1)
-        elif len(self.dict_data_well["angle_data"]) != 0:
+        elif len(self.data_well.angle_data) != 0:
             if sole != '':
-                angle_list = [(depth, angle) for depth, angle, curvature in self.dict_data_well["angle_data"]
+                angle_list = [(depth, angle) for depth, angle, curvature in self.data_well.angle_data
                               if abs(float(depth) - float(sole)) <= 10]
                 depth_max = max([float(depth.replace(',', '.')) for depth, angle in angle_list])
                 angle_depth = max([float(angle.replace(',', '.')) for depth, angle in angle_list])
@@ -87,17 +85,17 @@ class TabWidget(TabWidgetUnion):
 
 
 class PerforationWindow(WindowUnion):
-    def __init__(self, dict_data_well, table_widget, parent=None):
-        super().__init__()
+    def __init__(self, data_well, table_widget, parent=None):
+        super().__init__(data_well)
 
-        self.dict_data_well = dict_data_well
-        self.ins_ind = dict_data_well['ins_ind']
-        self.tabWidget = TabWidget(self.dict_data_well)
+
+        self.insert_index = data_well.insert_index
+        self.tabWidget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
-        # self.dict_perforation = self.dict_data_well["dict_perforation"]
-        self.dict_perforation_project = self.dict_data_well["dict_perforation_project"]
+        # self.dict_perforation = self.data_well.dict_perforation
+        self.dict_perforation_project = self.data_well.dict_perforation_project
         self.tableWidget = QTableWidget(0, 7)
         self.tableWidget.setHorizontalHeaderLabels(
             ["Кровля перфорации", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.",
@@ -131,7 +129,7 @@ class PerforationWindow(WindowUnion):
         event.accept()  # Принимаем событие закрытия
     def addPerfProject(self):
 
-        if self.dict_data_well["grp_plan"]:
+        if self.data_well.grp_plan:
             chargePM_GP = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
                                               'кол-во отверстий на 1 п.м. зарядов ГП', 20, 5,
                                               50)[0]
@@ -146,13 +144,13 @@ class PerforationWindow(WindowUnion):
         self.tableWidget.setSortingEnabled(False)
         rows = self.tableWidget.rowCount()
 
-        if len(self.dict_data_well["dict_perforation_project"]) != 0:
-            aa = self.dict_data_well["dict_perforation_project"]
-            for plast, data in self.dict_data_well["dict_perforation_project"].items():
+        if len(self.data_well.dict_perforation_project) != 0:
+            aa = self.data_well.dict_perforation_project
+            for plast, data in self.data_well.dict_perforation_project.items():
                 a = data['интервал']
                 for i in data['интервал']:
                     TabPageSo.select_type_perforation(self, i[1])
-                    if self.dict_data_well["grp_plan"]:
+                    if self.data_well.grp_plan:
                         count_charge = int((max(i) - min(i)) * chargePM_GP)
                         # Вставка интервалов зарядов ГП
                         self.tableWidget.insertRow(rows)
@@ -198,13 +196,13 @@ class PerforationWindow(WindowUnion):
                         self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
 
         else:
-            for plast, data in self.dict_data_well["dict_perforation"].items():
+            for plast, data in self.data_well.dict_perforation.items():
 
-                if plast in self.dict_data_well['plast_work']:
+                if plast in self.data_well.plast_work:
                     for i in data['интервал']:
                         TabPageSo.select_type_perforation(self, i[1])
-                        if i[1] <= self.dict_data_well["current_bottom"]:
-                            if self.dict_data_well["grp_plan"]:
+                        if i[1] <= self.data_well.current_bottom:
+                            if self.data_well.grp_plan:
                                 # Вставка интервалов зарядов ГП
                                 count_charge = int((max(i) - min(i)) * chargePM_GP)
                                 if count_charge < 0 or count_charge > 500:
@@ -253,11 +251,11 @@ class PerforationWindow(WindowUnion):
 
         charge_diam_dict = {73: (0, 110), 89: (111, 135), 102: (136, 160), 114: (160, 250)}
 
-        if self.dict_data_well["column_additional"] is False or (
-                self.dict_data_well["column_additional"] is True and pvr < self.dict_data_well["head_column_additional"]._value):
-            diam_internal_ek = self.dict_data_well["column_diametr"]._value
+        if self.data_well.column_additional is False or (
+                self.data_well.column_additional is True and pvr < self.data_well.head_column_additional._value):
+            diam_internal_ek = self.data_well.column_diameter._value
         else:
-            diam_internal_ek = self.dict_data_well["column_additional_diametr"]._value
+            diam_internal_ek = self.data_well.column_additional_diameter._value
 
         for diam, diam_internal_paker in charge_diam_dict.items():
             if diam_internal_paker[0] <= diam_internal_ek <= diam_internal_paker[1]:
@@ -275,7 +273,7 @@ class PerforationWindow(WindowUnion):
         if not edit_type or not edit_type2 or not chargesx or not editIndexFormation:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        if float(edit_type2.replace(',', '.')) >= float(self.dict_data_well["current_bottom"]):
+        if float(edit_type2.replace(',', '.')) >= float(self.data_well.current_bottom):
             QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
             return
 
@@ -305,14 +303,14 @@ class PerforationWindow(WindowUnion):
 
         rows = self.tableWidget.rowCount()
         type_perforation = self.tabWidget.currentWidget().combobox_type_perforation.currentText()
-        if len(self.dict_data_well["cat_P_1"]) > 1:
-            self.dict_data_well["category_pressuar"] = self.dict_data_well["cat_P_1"][1]
-            self.dict_data_well["category_h2s"] = self.dict_data_well["category_h2s_list"][1]
-            self.dict_data_well["category_gf"] = self.dict_data_well["cat_gaz_f_pr"][1]
-            kateg2 = [1 if str(self.dict_data_well["cat_P_1"][1]) == '1' or str(self.dict_data_well["category_h2s_list"][1]) == '1' else 2][0]
+        if len(self.data_well.category_pressure_well) > 1:
+            self.data_well.category_pressure = self.data_well.category_pressure[1]
+            self.data_well.category_h2s = self.data_well.category_h2s_list[1]
+            self.data_well.category_gas_factor = self.data_well.category_gaz_factor_procent[1]
+            kateg2 = [1 if str(self.data_well.category_pressure[1]) == '1' or str(self.data_well.category_h2s_list[1]) == '1' else 2][0]
 
-            if self.dict_data_well["kat_pvo"] < kateg2:
-                self.dict_data_well["kat_pvo"] = kateg2
+            if self.data_well.category_pvo < kateg2:
+                self.data_well.category_pvo = kateg2
         if 'Ойл' in data_list.contractor:
             shema_str = 'a'
         elif 'РН' in data_list.contractor:
@@ -330,10 +328,10 @@ class PerforationWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер КРС', None, None, None],
             [None, None,
-             f'Долить скважину до устья тех жидкостью уд.весом {self.dict_data_well["fluid_work"]}. '
+             f'Долить скважину до устья тех жидкостью уд.весом {self.data_well.fluid_work}. '
              f'Опрессовать плашки ПВО (на давление опрессовки ЭК, но '
              f'не ниже максимального ожидаемого давления на устье) '
-             f'{self.dict_data_well["max_admissible_pressure"]._value}атм, по невозможности на давление поглощения, но '
+             f'{self.data_well.max_admissible_pressure._value}атм, по невозможности на давление поглощения, но '
              f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). '
              f'Передать по сводке уровня жидкости до перфорации и после перфорации.'
              f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения '
@@ -353,7 +351,7 @@ class PerforationWindow(WindowUnion):
             if item:
                 value = item.text()
                 # print(f'dff{value}')
-                if float(value) >= self.dict_data_well["current_bottom"]:
+                if float(value) >= self.data_well.current_bottom:
                     QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
                     return
             perf_list = []
@@ -383,22 +381,22 @@ class PerforationWindow(WindowUnion):
                 [pvr_str, None, roof, '-', sool, type_charge, count_otv, count_charge, plast, dop_information,
                  'подрядчик по ГИС', round(float(sool) - float(roof)) * 1.5, 1])
 
-            self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('интервал', []).append(
+            self.data_well.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append(
                 (float(perf_list[2]), float(perf_list[4])))
-            self.dict_data_well["dict_perforation"][plast]['отрайбировано'] = False
-            self.dict_data_well["dict_perforation"][plast]['отключение'] = False
-            self.dict_data_well["dict_perforation"][plast]['Прошаблонировано'] = False
-            self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('отключение', False)
-            self.dict_data_well["dict_perforation"].setdefault(plast, {}).setdefault('отрайбировано', False)
-            # print(f' перфорация после добавления {self.dict_data_well["dict_perforation"]}')
-            self.dict_data_well["dict_perforation"][plast]['интервал'] = list(
-                set(map(tuple, self.dict_data_well["dict_perforation"][plast]['интервал'])))
+            self.data_well.dict_perforation[plast]['отрайбировано'] = False
+            self.data_well.dict_perforation[plast]['отключение'] = False
+            self.data_well.dict_perforation[plast]['Прошаблонировано'] = False
+            self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
+            self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
+            # print(f' перфорация после добавления {self.data_well.dict_perforation}')
+            self.data_well.dict_perforation[plast]['интервал'] = list(
+                set(map(tuple, self.data_well.dict_perforation[plast]['интервал'])))
 
             perforation.append(perf_list)
 
         end_list = "Произвести контрольную запись ЛМ;ТМ. Составить АКТ на перфорацию." \
             if type_perforation != 'Трубная перфорация' \
-            else f'Подъем последних 5-ти НКТ{self.dict_data_well["nkt_diam"]}мм и демонтаж перфоратора ' \
+            else f'Подъем последних 5-ти НКТ{self.data_well.nkt_diam}мм и демонтаж перфоратора ' \
                  f'производить в присутствии ответственного ' \
                  f'представителя подрядчика по ГИС» (руководителя взрывных' \
                  f' работ или взрывника).'
@@ -406,12 +404,12 @@ class PerforationWindow(WindowUnion):
         perforation.append([None, None, end_list,
                             None, None, None, None, None, None, None,
                             'Подрядчик по ГИС', 2])
-        # print([self.dict_data_well["dict_perforation"][plast] for plast in self.dict_data_well['plast_work']])
+        # print([self.data_well.dict_perforation[plast] for plast in self.data_well.plast_work])
         pipe_perforation = [
             [f'монтаж трубного перфоратора', None,
              f'Произвести монтаж трубного перфоратора + 2шт/20м НКТ + реперный '
              f'патрубок L=2м до намеченного интервала перфорации '
-             f'(с шаблонировкой НКТ{self.dict_data_well["nkt_diam"]}мм шаблоном {self.dict_data_well["nkt_template"]}мм. '
+             f'(с шаблонировкой НКТ{self.data_well.nkt_diam}мм шаблоном {self.data_well.nkt_template}мм. '
              f'Спуск компоновки производить  со скоростью не более 0,30 м/с, не допуская резких ударов и вращения.'
              f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации, '
              f'фотографии предоставить в ЦИТС {data_list.contractor}, передать по сводке уровня '
@@ -438,7 +436,7 @@ class PerforationWindow(WindowUnion):
         else:
 
             for i, row_data in enumerate(perforation):
-                row = self.ins_ind + i
+                row = self.insert_index + i
                 self.table_widget.insertRow(row)
                 if type_perforation == 'ПВР на кабеле':
                     lst = [0, 1, 2, len(perforation) - 1]
@@ -449,7 +447,7 @@ class PerforationWindow(WindowUnion):
                 self.insert_data_in_database(row, row_max)
 
                 if i in lst:  # Объединение ячеек по вертикале в столбце "отвественные и норма"
-                    self.table_widget.setSpan(i + self.ins_ind, 2, 1, 8)
+                    self.table_widget.setSpan(i + self.insert_index, 2, 1, 8)
                 for column, data in enumerate(row_data):
                     self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
 
@@ -462,8 +460,8 @@ class PerforationWindow(WindowUnion):
                     else:
                         self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
 
-            self.table_widget.setRowHeight(self.ins_ind, 60)
-            self.table_widget.setRowHeight(self.ins_ind + 1, 60)
+            self.table_widget.setRowHeight(self.insert_index, 60)
+            self.table_widget.setRowHeight(self.insert_index + 1, 60)
 
             self.close()
 

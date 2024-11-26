@@ -14,24 +14,22 @@ from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 
 class TabPageSoTorpedo(TabPageUnion):
     def __init__(self, parent=None):
-        super().__init__()
-
-        self.dict_data_well = parent
+        super().__init__(parent)
 
         self.roof_torpedo_label = QLabel("Глубина торпедирования", self)
         self.roof_torpedo_edit = QLineEdit(self)
         self.roof_torpedo_edit.setValidator(self.validator_float)
 
-        self.diametr_doloto_ek_label = QLabel('Диаметр долото при строительстве скважины')
-        self.diametr_doloto_ek_line = QLineEdit(self)
-        self.diametr_doloto_ek_line.setValidator(self.validator_float)
+        self.diameter_doloto_ek_label = QLabel('Диаметр долото при строительстве скважины')
+        self.diameter_doloto_ek_line = QLineEdit(self)
+        self.diameter_doloto_ek_line.setValidator(self.validator_float)
 
         self.grid = QGridLayout(self)
 
         self.grid.addWidget(self.roof_torpedo_label, 4, 4)
         self.grid.addWidget(self.roof_torpedo_edit, 5, 4)
-        self.grid.addWidget(self.diametr_doloto_ek_label, 4, 5)
-        self.grid.addWidget(self.diametr_doloto_ek_line, 5, 5)
+        self.grid.addWidget(self.diameter_doloto_ek_label, 4, 5)
+        self.grid.addWidget(self.diameter_doloto_ek_line, 5, 5)
 
 
 class TabWidget(TabWidgetUnion):
@@ -41,14 +39,14 @@ class TabWidget(TabWidgetUnion):
 
 
 class TorpedoWindow(WindowUnion):
-    def __init__(self, dict_data_well, table_widget, parent=None):
-        super().__init__()
+    def __init__(self, data_well, table_widget, parent=None):
+        super().__init__(data_well)
 
-        self.diametr_doloto_ek = None
+        self.diameter_doloto_ek = None
         self.roof_torpedo = None
-        self.dict_data_well = dict_data_well
-        self.ins_ind = dict_data_well['ins_ind']
-        self.tabWidget = TabWidget(self.dict_data_well)
+
+        self.insert_index = data_well.insert_index
+        self.tabWidget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -61,29 +59,29 @@ class TorpedoWindow(WindowUnion):
 
     def add_work(self):
         self.roof_torpedo = self.tabWidget.currentWidget().roof_torpedo_edit.text()
-        self.diametr_doloto_ek = self.tabWidget.currentWidget().diametr_doloto_ek_line.text()
-        if '' in [self.roof_torpedo, self.diametr_doloto_ek]:
+        self.diameter_doloto_ek = self.tabWidget.currentWidget().diameter_doloto_ek_line.text()
+        if '' in [self.roof_torpedo, self.diameter_doloto_ek]:
             QMessageBox.warning(self, 'Ошибка', 'Не введены все значения')
             return
         self.roof_torpedo = int(float(self.roof_torpedo))
-        self.diametr_doloto_ek = float(self.diametr_doloto_ek)
+        self.diameter_doloto_ek = float(self.diameter_doloto_ek)
 
         work_list = self.torpedo_work()
         if work_list:
-            self.populate_row(self.ins_ind, work_list, self.table_widget)
-            self.dict_data_well["head_column"] = data_list.ProtectedIsDigit(self.roof_torpedo)
+            self.populate_row(self.insert_index, work_list, self.table_widget)
+            self.data_well.head_column = data_list.ProtectedIsDigit(self.roof_torpedo)
 
-            self.dict_data_well["max_admissible_pressure"] = data_list.ProtectedIsDigit(50)
-            self.dict_data_well["data_well_dict"]['данные']['диаметр долото при бурении'] = \
-                self.diametr_doloto_ek
-            self.dict_data_well["data_well_dict"]['данные']['максимальное допустимое давление'] = 50
-            self.dict_data_well["diametr_doloto_ek"] = data_list.ProtectedIsDigit(self.diametr_doloto_ek)
+            self.data_well.max_admissible_pressure = data_list.ProtectedIsDigit(50)
+            self.data_well.data_well_dict['данные']['диаметр долото при бурении'] = \
+                self.diameter_doloto_ek
+            self.data_well.data_well_dict['данные']['максимальное допустимое давление'] = 50
+            self.data_well.diameter_doloto_ek = data_list.ProtectedIsDigit(self.diameter_doloto_ek)
             data_list.pause = False
             self.close()
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        self.operation_window = None
+        self.data_well.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
     def torpedo_work(self):

@@ -7,12 +7,12 @@ from krs import GnoWindow
 
 def gnkt_work(self, volume_gntk, fluid_work_insert):
 
-    fluid_work, self.dict_data_well["fluid_work_short"] = self.calc_work_fluid(fluid_work_insert)
-    aaa = self.dict_data_well["depth_fond_paker_do"]["do"]
-    if self.dict_data_well["depth_fond_paker_do"]["do"] != '0':
-        niz_nkt = self.dict_data_well["depth_fond_paker_do"]["do"]
+    fluid_work, self.data_well.fluid_work_short = self.calc_work_fluid(fluid_work_insert)
+    aaa = self.data_well.depth_fond_paker_before["do"]
+    if self.data_well.depth_fond_paker_before["do"] != '0':
+        niz_nkt = self.data_well.depth_fond_paker_before["do"]
     else:
-        niz_nkt = sum(self.dict_data_well["dict_nkt"].values())
+        niz_nkt = sum(self.data_well.dict_nkt_before.values())
 
     gnkt_opz = [
         [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
@@ -75,10 +75,10 @@ def gnkt_work(self, volume_gntk, fluid_work_insert):
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', 2],
         [None, 13, f'При закрытой центральной задвижке фондовой арматуры опрессовать ГНКТ и все '
-                   f'нагнетательные линии на {round(self.dict_data_well["max_admissible_pressure"] * 1.5, 1)}атм. '
+                   f'нагнетательные линии на {round(self.data_well.max_admissible_pressure * 1.5, 1)}атм. '
                    f'Опрессовать ПВО, обратные клапана и выкидную линию от '
                    f'устья скважины до желобной ёмкости (надёжно закрепить, оборудовать дроссельными задвижками) '
-                   f'опрессовать на {self.dict_data_well["max_admissible_pressure"]._value}атм с выдержкой 30мин. '
+                   f'опрессовать на {self.data_well.max_admissible_pressure._value}атм с выдержкой 30мин. '
                    f'Опрессовку ПВО зафиксировать в вахтовом журнале. Установить на малом и большом затрубе '
                    f'технологический манометр. Провести УТЗ и инструктаж. Опрессовку проводить в присутствии мастера, '
                    f'бурильщика, машиниста подъемника и представителя супервайзерской службы. Получить разрешение на '
@@ -142,11 +142,11 @@ def gnkt_work(self, volume_gntk, fluid_work_insert):
          'Мастер ГНКТ', None],
         [None, 28, 'Произвести допуск компоновки с промывкой со скоростью 2 м/мин, с проверкой веса '
                    f'на подъём со скоростью не более 3 м/мин через каждые 10-20м интервала промывки '
-                   f'до глубины {self.dict_data_well["current_bottom"]}м. В случае отсутствия проходки, '
+                   f'до глубины {self.data_well.current_bottom}м. В случае отсутствия проходки, '
                    f'согласовать максимально достигнутый забой с Заказчиком.',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ, состав бригады', 0.7],
-        [None, 29, f'При достижении глубины {self.dict_data_well["current_bottom"]}м произвести прокачку гелевой пачки в V=2-3м3, '
+        [None, 29, f'При достижении глубины {self.data_well.current_bottom}м произвести прокачку гелевой пачки в V=2-3м3, '
                    f'промыть скважину в течении 120мин до выхода чистой, без посторонних примесей, '
                    f'промывочной жидкости.',
          None, None, None, None, None, None, None,
@@ -165,9 +165,9 @@ def gnkt_work(self, volume_gntk, fluid_work_insert):
          'Мастер ГНКТ', 2],
         [None, 29,
          f'По истечении 2х часов, произвести допуск КНК-1 на г/трубе в скважину '
-           f'«без циркуляции» до гл. {self.dict_data_well["current_bottom"]}м. '
+           f'«без циркуляции» до гл. {self.data_well.current_bottom}м. '
            f'Забой должен соответствовать ранее нормализованному. Составить АКТ на забой совмесно '
-           f'с представителем Заказчика. При отсутствии нормализованного забоя на гл.{self.dict_data_well["current_bottom"]}м, '
+           f'с представителем Заказчика. При отсутствии нормализованного забоя на гл.{self.data_well.current_bottom}м, '
            f'по согласованию с Заказчиком, провести работы по нормализации забоя.',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', 0.5],
@@ -178,7 +178,7 @@ def gnkt_work(self, volume_gntk, fluid_work_insert):
                    f'режим мобильного азотного комплекса. Дождаться выхода пузыря азота. '
                    f'В случае отсутствия выхода пузыря азота более 1-1.5 часа - начать постепенный приподъём ГНКТ, не '
                    f'прекращая отдувки, до выхода пузыря азота. После получения прорыва азота и выхода пузыря - '
-                   f'произвести допуск ГНКТ с одновременной отдувкой азотом до гл. {self.dict_data_well["current_bottom"]}м',
+                   f'произвести допуск ГНКТ с одновременной отдувкой азотом до гл. {self.data_well.current_bottom}м',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', 1],
         [None, 29,
@@ -209,14 +209,14 @@ def gnkt_work(self, volume_gntk, fluid_work_insert):
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', 2],
         [None, 29, f'По истечении 2х часов, произвести допуск КНК-1 на г/трубе в скважину '
-                   f'«без циркуляции» до гл. {self.dict_data_well["current_bottom"]}м.'
-                   f' Забой должен соответствовать – {self.dict_data_well["current_bottom"]}м. '
+                   f'«без циркуляции» до гл. {self.data_well.current_bottom}м.'
+                   f' Забой должен соответствовать – {self.data_well.current_bottom}м. '
                    f'Составить АКТ на забой совмесно с представителем Заказчика. '
-                   f'При отсутствии нормализованного забоя на гл. {self.dict_data_well["current_bottom"]}м '
+                   f'При отсутствии нормализованного забоя на гл. {self.data_well.current_bottom}м '
                    f'(по согласованию с Заказчиком) - провести работы по нормализации забоя.',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', 0.5],
-        [None, 29, f'При наличии забоя на гл.{self.dict_data_well["current_bottom"]}м, '
+        [None, 29, f'При наличии забоя на гл.{self.data_well.current_bottom}м, '
                    f'по согласованию с Заказчиком: ',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
@@ -230,7 +230,7 @@ def gnkt_work(self, volume_gntk, fluid_work_insert):
         [None, 29, f'Произвести замер избыточного давления в течении 2ч при условии заполнения '
                    f'ствола ствола жидкостью уд.весом {fluid_work}г/см3. Произвести перерасчет '
                    f'забойного давления, Согласовать с заказчиком глушение скважин и необходимый '
-                   f'удельный вес жидкости глушения, допустить КНК до {self.dict_data_well["current_bottom"]}м ',
+                   f'удельный вес жидкости глушения, допустить КНК до {self.data_well.current_bottom}м ',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', 2.5],
         [None, 29, f'ГЛУШЕНИЕ СКВАЖИНЫ',
@@ -340,21 +340,21 @@ def gnkt_work(self, volume_gntk, fluid_work_insert):
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
         [None, 29,
-         f'Максимальный расчётный вес ГНКТ при подъёме с забоя – {round(self.dict_data_well["current_bottom"] * 2.2 * 1.1, 0)}кг; '
-         f'при спуске – {round(self.dict_data_well["current_bottom"] * 2.2 * 0.9, 0)}кг.; в неподвижном состоянии - {round(self.dict_data_well["current_bottom"] * 2.2, 0)}кг.',
+         f'Максимальный расчётный вес ГНКТ при подъёме с забоя – {round(self.data_well.current_bottom * 2.2 * 1.1, 0)}кг; '
+         f'при спуске – {round(self.data_well.current_bottom * 2.2 * 0.9, 0)}кг.; в неподвижном состоянии - {round(self.data_well.current_bottom * 2.2, 0)}кг.',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
         [None, 29, f'Скорость спуска по интервалам:\n'
                    f'в устьевом оборудовании не более 0.5м/мин;\n'
                    f'в интервале 2 -{niz_nkt - 20}м не более 10-15м/мин (первичный-последующий спуск);\n'
-                   f'в интервале {niz_nkt - 20}-{self.dict_data_well["perforation_roof"] - 10}м не более 2м/мин;\n'
-                   f'в интервале {self.dict_data_well["perforation_roof"] - 10}-{self.dict_data_well["perforation_roof"] + 10}м не более 10 м/мин;\n'
-                   f'в интервале {self.dict_data_well["perforation_roof"] + 10}-{self.dict_data_well["current_bottom"]}м не более 2-5 м/мин;',
+                   f'в интервале {niz_nkt - 20}-{self.data_well.perforation_roof - 10}м не более 2м/мин;\n'
+                   f'в интервале {self.data_well.perforation_roof - 10}-{self.data_well.perforation_roof + 10}м не более 10 м/мин;\n'
+                   f'в интервале {self.data_well.perforation_roof + 10}-{self.data_well.current_bottom}м не более 2-5 м/мин;',
          None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
         [None, 29, f'Скорость подъёма по интервалам:\n'
-                   f'в интервале забой-{self.dict_data_well["perforation_roof"] + 10}м не более 10 м/мин;\n'
-                   f'в интервале {self.dict_data_well["perforation_roof"] + 10}-{self.dict_data_well["perforation_roof"] - 10} не более 2 м/мин;\n'
+                   f'в интервале забой-{self.data_well.perforation_roof + 10}м не более 10 м/мин;\n'
+                   f'в интервале {self.data_well.perforation_roof + 10}-{self.data_well.perforation_roof - 10} не более 2 м/мин;\n'
                    f'в интервале {niz_nkt - 20}-2м не более 15-20 м/мин;\n'
                    f'в устьевом оборудовании не более 0.5 м/мин.',
          None, None, None, None, None, None, None,
@@ -384,11 +384,11 @@ def gnkt_work(self, volume_gntk, fluid_work_insert):
 
 def calc_volume_jumping(self):
     from work_py.alone_oreration import volume_vn_ek, volume_vn_nkt
-    if self.dict_data_well["depth_fond_paker_do"]["do"] != '0':
-        volume = round((volume_vn_ek(self, self.dict_data_well["current_bottom"]) *
-                        (self.dict_data_well["current_bottom"] - self.dict_data_well["depth_fond_paker_do"]["do"]) / 1000 +
-                        volume_vn_nkt(self.dict_data_well["dict_nkt"]) *
-                        self.dict_data_well["depth_fond_paker_do"]["do"] / 1000) * 1.2, 1)
+    if self.data_well.depth_fond_paker_before["do"] != '0':
+        volume = round((volume_vn_ek(self, self.data_well.current_bottom) *
+                        (self.data_well.current_bottom - self.data_well.depth_fond_paker_before["do"]) / 1000 +
+                        volume_vn_nkt(self.data_well.dict_nkt_before) *
+                        self.data_well.depth_fond_paker_before["do"] / 1000) * 1.2, 1)
     else:
-        volume = work_py.alone_oreration.volume_jamming_well(self.dict_data_well["current_bottom"])
+        volume = work_py.alone_oreration.volume_jamming_well(self.data_well.current_bottom)
     return volume

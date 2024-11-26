@@ -11,9 +11,8 @@ class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
 
+        self.register_window = None
         self.setWindowTitle('окно входа')
-
-
 
         self.label_username = QLabel("Пользователь:", self)
         self.username = QComboBox(self)
@@ -58,6 +57,7 @@ class LoginWindow(QWidget):
             # Закрываем основное окно при закрытии окна входа
             # self.main_window.close()
             event.accept()  # Принимаем событие закрытия
+
     def login(self):
 
         username = self.username.currentText()
@@ -87,8 +87,8 @@ class LoginWindow(QWidget):
 
         if 'РН' in data_list.contractor:
             data_list.connect_in_base = False
-
-    def get_list_users(self):
+    @staticmethod
+    def get_list_users():
         db = connection_to_database(data_list.DB_NAME_USER)
         user_service = UserService(db)
         users_list = user_service.get_users_list()
@@ -206,4 +206,3 @@ class RegisterWindow(QWidget):
                 self.close()
             else:
                 QMessageBox.information(self, 'пароль', 'Пароли не совпадают')
-

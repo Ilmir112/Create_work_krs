@@ -12,12 +12,11 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, 
 
 class TabPageGno(TabPageUnion):
     def __init__(self, parent=None):
-        super().__init__()
-        self.dict_data_well = parent
+        super().__init__(parent)
 
         self.nkt_label = QLabel('компоновка НКТ')
         self.nkt_edit = QLineEdit(self)
-        self.nkt_edit.setText(f'{self.gno_nkt_opening(self.dict_data_well["dict_nkt_po"])}')
+        self.nkt_edit.setText(f'{self.gno_nkt_opening(self.data_well.dict_nkt_after)}')
 
         self.gno_label = QLabel("вид спускаемого ГНО", self)
         self.gno_combo = QComboBox(self)
@@ -30,7 +29,7 @@ class TabPageGno(TabPageUnion):
 
         self.sucker_label = QLabel('компоновка штанг')
         self.sucker_edit = QLineEdit(self)
-        self.sucker_edit.setText(f'{self.gno_nkt_opening(self.dict_data_well["dict_sucker_rod_po"])}')
+        self.sucker_edit.setText(f'{self.gno_nkt_opening(self.data_well.dict_sucker_rod_after)}')
 
         self.distance_between_nkt_label = QLabel('Расстояние между НКТ')
         self.distance_between_nkt_edit = QLineEdit(self)
@@ -57,7 +56,7 @@ class TabPageGno(TabPageUnion):
         self.grid.addWidget(self.need_juming_after_sko_label, 4, 7)
         self.grid.addWidget(self.need_juming_after_sko_combo, 5, 7)
 
-        if self.dict_data_well["region"] != 'КГМ':
+        if self.data_well.region != 'КГМ':
             self.need_juming_after_sko_label.setParent(None)
             self.need_juming_after_sko_combo.setParent(None)
             self.need_juming_after_sko_combo.setCurrentIndex(1)
@@ -96,42 +95,42 @@ class TabPageGno(TabPageUnion):
 
     def select_gno(self):
 
-        if self.check_if_none(self.dict_data_well["dict_pump_ECN"]["posle"]) != 'отсут' and \
-                self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]) != 'отсут':
+        if self.check_if_none(self.data_well.dict_pump_ecn["posle"]) != 'отсут' and \
+                self.check_if_none(self.data_well.dict_pump_shgn["posle"]) != 'отсут':
             lift_key = 'ОРД'
-        elif self.check_if_none(self.dict_data_well["dict_pump_ECN"]["posle"]) != 'отсут' and \
-                self.check_if_none(self.dict_data_well["paker_do"]["posle"]) == 'отсут':
+        elif self.check_if_none(self.data_well.dict_pump_ecn["posle"]) != 'отсут' and \
+                self.check_if_none(self.data_well.paker_before["posle"]) == 'отсут':
             lift_key = 'ЭЦН'
-        elif self.check_if_none(self.dict_data_well["dict_pump_ECN"]["posle"]) != 'отсут' and \
-                self.check_if_none(self.dict_data_well["paker_do"]["posle"]) != 'отсут':
+        elif self.check_if_none(self.data_well.dict_pump_ecn["posle"]) != 'отсут' and \
+                self.check_if_none(self.data_well.paker_before["posle"]) != 'отсут':
             lift_key = 'ЭЦН с пакером'
-        elif self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]) != 'отсут' and \
-                self.dict_data_well["dict_pump_SHGN"]["posle"].upper() != 'НН' \
-                and self.check_if_none(self.dict_data_well["paker_do"]["posle"]) == 'отсут':
+        elif self.check_if_none(self.data_well.dict_pump_shgn["posle"]) != 'отсут' and \
+                self.data_well.dict_pump_shgn["posle"].upper() != 'НН' \
+                and self.check_if_none(self.data_well.paker_before["posle"]) == 'отсут':
             lift_key = 'НВ'
-        elif self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]) != 'отсут' and \
-                self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]).upper() != 'НН' \
-                and self.check_if_none(self.dict_data_well["paker_do"]["posle"]) != 'отсут':
+        elif self.check_if_none(self.data_well.dict_pump_shgn["posle"]) != 'отсут' and \
+                self.check_if_none(self.data_well.dict_pump_shgn["posle"]).upper() != 'НН' \
+                and self.check_if_none(self.data_well.paker_before["posle"]) != 'отсут':
             lift_key = 'НВ с пакером'
-        elif 'НН' in self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]).upper() \
-                and self.check_if_none(self.dict_data_well["paker_do"]["posle"]) == 'отсут':
+        elif 'НН' in self.check_if_none(self.data_well.dict_pump_shgn["posle"]).upper() \
+                and self.check_if_none(self.data_well.paker_before["posle"]) == 'отсут':
             lift_key = 'НН'
-        elif 'НН' in self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]).upper() and \
-                self.check_if_none(self.check_if_none(self.dict_data_well["paker_do"]["posle"])) != 'отсут':
+        elif 'НН' in self.check_if_none(self.data_well.dict_pump_shgn["posle"]).upper() and \
+                self.check_if_none(self.check_if_none(self.data_well.paker_before["posle"])) != 'отсут':
             lift_key = 'НН с пакером'
-        elif self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]) == 'отсут' and \
-                self.check_if_none(self.dict_data_well["paker_do"]["posle"]) == 'отсут' \
-                and self.check_if_none(self.dict_data_well["dict_pump_ECN"]["posle"]) == 'отсут':
+        elif self.check_if_none(self.data_well.dict_pump_shgn["posle"]) == 'отсут' and \
+                self.check_if_none(self.data_well.paker_before["posle"]) == 'отсут' \
+                and self.check_if_none(self.data_well.dict_pump_ecn["posle"]) == 'отсут':
             lift_key = 'воронка'
-        elif '89' in self.dict_data_well["dict_nkt"].keys() and '48' in self.dict_data_well["dict_nkt"].keys() and \
+        elif '89' in self.data_well.dict_nkt_before.keys() and '48' in self.data_well.dict_nkt_before.keys() and \
                 self.check_if_none(
-                    self.dict_data_well["paker_do"]["posle"]) != 'отсут':
+                    self.data_well.paker_before["posle"]) != 'отсут':
             lift_key = 'ОРЗ'
-        elif self.check_if_none(self.dict_data_well["dict_pump_SHGN"]["posle"]) == 'отсут' and \
-                self.check_if_none(self.dict_data_well["paker_do"]["posle"]) != 'отсут' \
-                and self.check_if_none(self.dict_data_well["dict_pump_ECN"]["posle"]) == 'отсут':
+        elif self.check_if_none(self.data_well.dict_pump_shgn["posle"]) == 'отсут' and \
+                self.check_if_none(self.data_well.paker_before["posle"]) != 'отсут' \
+                and self.check_if_none(self.data_well.dict_pump_ecn["posle"]) == 'отсут':
             lift_key = 'пакер'
-        if 'КР11' in self.dict_data_well["type_kr"]:
+        if 'КР11' in self.data_well.type_kr:
             lift_key = 'консервация'
 
         return lift_key
@@ -144,12 +143,12 @@ class TabWidget(TabWidgetUnion):
 
 
 class GnoDescentWindow(WindowUnion):
-    def __init__(self, dict_data_well, table_widget, parent=None):
-        super().__init__()
+    def __init__(self, data_well, table_widget, parent=None):
+        super().__init__(data_well)
 
-        self.dict_data_well = dict_data_well
-        self.ins_ind = dict_data_well['ins_ind']
-        self.tabWidget = TabWidget(self.dict_data_well)
+        self.data_well = data_well
+        self.insert_index = data_well.insert_index
+        self.tabWidget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -163,63 +162,63 @@ class GnoDescentWindow(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        self.operation_window = None
+        self.data_well.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
     def check_descent_paker(self):
         if self.lift_key == 'пакер':
-            if self.dict_data_well["depth_fond_paker_do"]["posle"] > self.dict_data_well["template_depth"] and \
-                    (self.dict_data_well["column_additional"] is False or
-                     (self.dict_data_well["column_additional"] and
-                      self.dict_data_well["current_bottom"] < self.dict_data_well["head_column_additional"]._value)):
+            if self.data_well.depth_fond_paker_before["posle"] > self.data_well.template_depth and \
+                    (self.data_well.column_additional is False or
+                     (self.data_well.column_additional and
+                      self.data_well.current_bottom < self.data_well.head_column_additional._value)):
 
                 QMessageBox.critical(self, 'Ошибка',
-                                     f'Нельзя спускать пакер {self.dict_data_well["depth_fond_paker_do"]["posle"]}м'
-                                     f'ниже глубины шаблонирования ЭК {self.dict_data_well["template_depth"]}м')
+                                     f'Нельзя спускать пакер {self.data_well.depth_fond_paker_before["posle"]}м'
+                                     f'ниже глубины шаблонирования ЭК {self.data_well.template_depth}м')
                 return
 
-            elif self.dict_data_well["depth_fond_paker_do"]["posle"] < self.dict_data_well["head_column_additional"]._value and \
-                    self.dict_data_well["depth_fond_paker_do"]["posle"] > self.dict_data_well["template_depth"] and \
-                    self.dict_data_well["column_additional"]:
+            elif self.data_well.depth_fond_paker_before["posle"] < self.data_well.head_column_additional._value and \
+                    self.data_well.depth_fond_paker_before["posle"] > self.data_well.template_depth and \
+                    self.data_well.column_additional:
                 QMessageBox.critical(self, 'Ошибка',
-                                     f'Нельзя спускать пакер {self.dict_data_well["depth_fond_paker_do"]["posle"]}м'
-                                     f'ниже глубины шаблонирования ЭК {self.dict_data_well["template_depth"]}м')
+                                     f'Нельзя спускать пакер {self.data_well.depth_fond_paker_before["posle"]}м'
+                                     f'ниже глубины шаблонирования ЭК {self.data_well.template_depth}м')
                 return
 
-            elif self.dict_data_well["depth_fond_paker_do"]["posle"] > self.dict_data_well["head_column_additional"]._value and \
-                    self.dict_data_well["depth_fond_paker_do"]["posle"] > \
-                    self.dict_data_well["template_depth_addition"] \
-                    and self.dict_data_well["column_additional"]:
+            elif self.data_well.depth_fond_paker_before["posle"] > self.data_well.head_column_additional._value and \
+                    self.data_well.depth_fond_paker_before["posle"] > \
+                    self.data_well.template_depth_addition \
+                    and self.data_well.column_additional:
                 QMessageBox.critical(self, 'Ошибка',
-                                     f'Нельзя спускать пакер {self.dict_data_well["depth_fond_paker_do"]["posle"]}м'
+                                     f'Нельзя спускать пакер {self.data_well.depth_fond_paker_before["posle"]}м'
                                      f'ниже глубины шаблонирования ЭК '
-                                     f'{self.dict_data_well["template_depth_addition"]}м')
+                                     f'{self.data_well.template_depth_addition}м')
                 return
         else:
             if self.lift_key in ['ОРД', 'ЭЦН с пакером', 'ЭЦН']:
-                if self.dict_data_well["dict_pump_ECN_h"]["posle"] > self.dict_data_well["template_depth"] and \
-                        (self.dict_data_well["column_additional"] is False or
-                         (self.dict_data_well["column_additional"] and
-                          self.dict_data_well["current_bottom"] > self.dict_data_well["head_column_additional"]._value and
-                          self.dict_data_well["dict_pump_ECN_h"]["posle"] < self.dict_data_well["head_column_additional"]._value)):
+                if self.data_well.dict_pump_ecn_depth["posle"] > self.data_well.template_depth and \
+                        (self.data_well.column_additional is False or
+                         (self.data_well.column_additional and
+                          self.data_well.current_bottom > self.data_well.head_column_additional._value and
+                          self.data_well.dict_pump_ecn_depth["posle"] < self.data_well.head_column_additional._value)):
                     QMessageBox.critical(self, 'Ошибка',
-                                         f'Нельзя спускать ЭЦН {self.dict_data_well["paker_do"]["posle"]}м'
-                                         f'ниже глубины шаблонирования ЭК {self.dict_data_well["template_depth"]}м')
+                                         f'Нельзя спускать ЭЦН {self.data_well.paker_before["posle"]}м'
+                                         f'ниже глубины шаблонирования ЭК {self.data_well.template_depth}м')
                     return
-                elif self.dict_data_well["dict_pump_ECN_h"]["posle"] < self.dict_data_well["head_column_additional"]._value and \
-                        self.dict_data_well["dict_pump_ECN_h"]["posle"] > self.dict_data_well["template_depth"] and \
-                        self.dict_data_well["column_additional"]:
+                elif self.data_well.dict_pump_ecn_depth["posle"] < self.data_well.head_column_additional._value and \
+                        self.data_well.dict_pump_ecn_depth["posle"] > self.data_well.template_depth and \
+                        self.data_well.column_additional:
                     QMessageBox.critical(self, 'Ошибка',
-                                         f'Нельзя спускать ЭЦН {self.dict_data_well["paker_do"]["posle"]}м'
-                                         f'ниже глубины шаблонирования ЭК {self.dict_data_well["template_depth"]}м')
+                                         f'Нельзя спускать ЭЦН {self.data_well.paker_before["posle"]}м'
+                                         f'ниже глубины шаблонирования ЭК {self.data_well.template_depth}м')
                     return
-                elif self.dict_data_well["dict_pump_ECN_h"]["posle"] > self.dict_data_well["head_column_additional"]._value and \
-                        self.dict_data_well["dict_pump_ECN_h"]["posle"] > self.dict_data_well["template_depth_addition"] \
-                        and self.dict_data_well["column_additional"]:
+                elif self.data_well.dict_pump_ecn_depth["posle"] > self.data_well.head_column_additional._value and \
+                        self.data_well.dict_pump_ecn_depth["posle"] > self.data_well.template_depth_addition \
+                        and self.data_well.column_additional:
                     QMessageBox.critical(self, 'Ошибка',
-                                         f'Нельзя спускать ЭЦН {self.dict_data_well["paker_do"]["posle"]}м'
+                                         f'Нельзя спускать ЭЦН {self.data_well.paker_before["posle"]}м'
                                          f'ниже глубины шаблонирования ЭК '
-                                         f'{self.dict_data_well["template_depth_addition"]}м')
+                                         f'{self.data_well.template_depth_addition}м')
                     return
         return True
 
@@ -246,7 +245,7 @@ class GnoDescentWindow(WindowUnion):
         }
         work_list = self.on_execute_strategy(self.lift_key)
         if work_list:
-            self.populate_row(self.ins_ind, work_list, self.table_widget)
+            self.populate_row(self.insert_index, work_list, self.table_widget)
             data_list.pause = False
             self.close()
 
@@ -261,7 +260,7 @@ class DescentParent(ABC):
     def __init__(self, parent=None):
         super().__init__()
         self.current_widget = parent.current_widget
-        self.dict_data_well = parent.dict_data_well
+        self.data_well = parent.data_well
 
         self.nkt_edit = self.current_widget.nkt_edit.text()
         self.sucker_edit = self.current_widget.sucker_edit.text()
@@ -271,12 +270,12 @@ class DescentParent(ABC):
         if self.distance_between_nkt != '':
             self.distance_between_nkt = int(float(self.distance_between_nkt))
 
-        if self.dict_data_well["region"] == 'КГМ':
+        if self.data_well.region == 'КГМ':
             self.need_juming_after_sko_combo = self.current_widget.need_juming_after_sko_combo.currentText()
         else:
             self.need_juming_after_sko_combo = 'Нет'
 
-        self.len_nkt = sum(list(self.dict_data_well["dict_nkt_po"].values()))
+        self.len_nkt = sum(list(self.data_well.dict_nkt_after.values()))
         self.privyazka_nkt = parent.privyazka_nkt
         self.calc_fond_nkt_str = self.calc_fond_nkt(self.len_nkt, self.distance_between_nkt)
 
@@ -287,15 +286,15 @@ class DescentParent(ABC):
     def jumping_after_sko(self):
         jumping_sko_list = []
         if self.lift_key in ['ЭЦН', 'НВ', 'НН', 'НН с пакером', 'ЭЦН с пакером', 'НВ с пакером', 'ОРД'] and \
-                self.dict_data_well["region"] == 'КГМ' and self.need_juming_after_sko_combo == 'Да':
+                self.data_well.region == 'КГМ' and self.need_juming_after_sko_combo == 'Да':
 
             if self.lift_key in ['НВ', 'НН']:
                 jumping_sko_list = [
                     [None, None,
                      f'ПРИ НАЛИЧИИ ЦИРКУЛЯЦИИ ДОПУСТИТЬ КОМПОНОВКУ НА ТНКТ ДО ТЕКУЩЕГО ЗАБОЯ. '
                      f'ПРОИЗВЕСТИ ВЫМЫВ ПРОДУКТОВ '
-                     f'РЕАКЦИИ С ТЕКУЩЕГО ЗАБОЯ ОБРАТНОЙ ПРОМЫВКОЙ УД.ВЕСОМ {self.dict_data_well["fluid_work"]}. '
-                     f'ПОДНЯТЬ тНКТ ДО ПЛАНОВОЙ ГЛУБИНЫ {self.dict_data_well["dict_pump_SHGN_h"]["posle"]}м',
+                     f'РЕАКЦИИ С ТЕКУЩЕГО ЗАБОЯ ОБРАТНОЙ ПРОМЫВКОЙ УД.ВЕСОМ {self.data_well.fluid_work}. '
+                     f'ПОДНЯТЬ тНКТ ДО ПЛАНОВОЙ ГЛУБИНЫ {self.data_well.dict_pump_shgn_depth["posle"]}м',
                      None, None, None, None, None, None, None,
                      'мастер КРС', float(8.5)]]
                 # gno_list.insert(-4, jumping_sko_list)
@@ -312,10 +311,10 @@ class DescentParent(ABC):
         return jumping_sko_list
 
     def need_privyazka_nkt(self):
-        for plast in list(self.dict_data_well["dict_perforation"].keys()):
-            for interval in self.dict_data_well["dict_perforation"][plast]['интервал']:
-                if abs(float(interval[1] - float(self.dict_data_well["depth_fond_paker_do"]["posle"]))) < 10 or abs(
-                        float(interval[0] - float(self.dict_data_well["depth_fond_paker_do"]["posle"]))) < 10:
+        for plast in list(self.data_well.dict_perforation.keys()):
+            for interval in self.data_well.dict_perforation[plast]['интервал']:
+                if abs(float(interval[1] - float(self.data_well.depth_fond_paker_before["posle"]))) < 10 or abs(
+                        float(interval[0] - float(self.data_well.depth_fond_paker_before["posle"]))) < 10:
                     return True
 
     def begin_text(self) -> List:
@@ -330,16 +329,16 @@ class DescentParent(ABC):
     def calc_fond_nkt(self, len_nkt: str, distance_between_nkt: str) -> List:
 
         # расчет необходимого давления опрессовки НКТ при спуске
-        static_level = self.dict_data_well["static_level"]._value
-        fluid = float(self.dict_data_well["fluid_work"][:4].replace(',', '.').replace('г', ''))
+        static_level = self.data_well.static_level._value
+        fluid = float(self.data_well.fluid_work[:4].replace(',', '.').replace('г', ''))
 
-        pressuar = 40
+        pressure = 40
 
-        if self.dict_data_well["dict_pump_ECN"]["posle"] != "0":
-            pressuar = 50
+        if self.data_well.dict_pump_ecn["posle"] != "0":
+            pressure = 50
 
-        calc = CalcFond(static_level, len_nkt, fluid, pressuar, distance_between_nkt)
-        calc_fond_dict = calc.calc_pressuar_list()
+        calc = CalcFond(static_level, len_nkt, fluid, pressure, distance_between_nkt)
+        calc_fond_dict = calc.calc_pressure_list()
         press_str = f'В случае не завоза новых или завоза не опрессованных НКТ, согласовать алгоритм ' \
                     f'опрессовки с ЦДНГ,' \
                     f' произвести спуск  фондовых НКТ с поинтервальной опрессовкой через ' \
@@ -347,8 +346,8 @@ class DescentParent(ABC):
                     f'с учетом статического уровня уровня на на глубине {static_level}м  по телефонограмме заказчика ' \
                     f'в следующей последовательности:\n'
         n = 0
-        for nkt, pressuar in calc_fond_dict.items():
-            press_str += f'Опрессовать НКТ в интервале {n} - {int(nkt)} на давление {pressuar}атм \n'
+        for nkt, pressure in calc_fond_dict.items():
+            press_str += f'Опрессовать НКТ в интервале {n} - {int(nkt)} на давление {pressure}атм \n'
             n = nkt
 
         return press_str
@@ -364,7 +363,7 @@ class DescentParent(ABC):
              f'смонтировать тройник с задвижкой с БРС под СУСГ\n'
              f'3. Смонтировать ЦA-320 к ВУС на УА (центральная задвижка); обвязываем затрубное пространство с ЕДК;\n'
              f'4. Закачка растворителя в объеме не менее V= 1 м3, произвести доводку тех.жидкостью'
-             f' y={self.dict_data_well["fluid_work"]};'
+             f' y={self.data_well.fluid_work};'
              f'При доведении растворителя во время закачки тех. жидкости одновременно производим расхаживание насоса с'
              f'помощью ПА ,на длину L= Lпш-1м;\n'
              f'5. После завершения закачки, центральную задвижку закрыть, продолжить поступательные движения для '
@@ -433,18 +432,18 @@ class DescentNnWithPaker(DescentParent):
              self.calc_fond_nkt_str,
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', None],
-            [f'СПО {self.dict_data_well["dict_pump_SHGN"]["posle"]} на глубину'
-             f' {float(self.dict_data_well["dict_pump_SHGN_h"]["posle"])}м. пакер - '
-             f'{self.dict_data_well["paker_do"]["posle"]} на глубину '
-             f'{self.dict_data_well["depth_fond_paker_do"]["posle"]}м ',
+            [f'СПО {self.data_well.dict_pump_shgn["posle"]} на глубину'
+             f' {float(self.data_well.dict_pump_shgn_depth["posle"])}м. пакер - '
+             f'{self.data_well.paker_before["posle"]} на глубину '
+             f'{self.data_well.depth_fond_paker_before["posle"]}м ',
              None,
              f'Заявить  комплект подгоночных штанг,полированный шток (вывоз согласовать с ТС ЦДНГ). В ЦДНГ заявить '
              f'сальниковые '
              f'уплотнения, подвесной патрубок, штанговые переводники, ЯГ-73мм. \n'
-             f'Предварительно, по согласованию с ЦДНГ, спустить {self.dict_data_well["dict_pump_SHGN"]["posle"]} на '
-             f'гл {float(self.dict_data_well["dict_pump_SHGN_h"]["posle"])}м. '
-             f'пакер - {self.dict_data_well["paker_do"]["posle"]} на глубину '
-             f'{self.dict_data_well["depth_fond_paker_do"]["posle"]}м '
+             f'Предварительно, по согласованию с ЦДНГ, спустить {self.data_well.dict_pump_shgn["posle"]} на '
+             f'гл {float(self.data_well.dict_pump_shgn_depth["posle"])}м. '
+             f'пакер - {self.data_well.paker_before["posle"]} на глубину '
+             f'{self.data_well.depth_fond_paker_before["posle"]}м '
              f'(в компоновке предусмотреть установку '
              f'противополетных узлов (з.о. меньшего диаметра или заглушка с щелевым фильтром)) '
              f'компоновка НКТ: {self.nkt_edit} (завоз с УСО ГНО, ремонтные/новые).\n'
@@ -452,19 +451,19 @@ class DescentNnWithPaker(DescentParent):
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
              descentNKT_norm(self.len_nkt, 1)],
-            [f'Посадить пакер на глубине {self.dict_data_well["paker_do"]["posle"]}м.', None,
-             f'Демонтировать превентор. Посадить пакер на глубине {self.dict_data_well["paker_do"]["posle"]}м. '
+            [f'Посадить пакер на глубине {self.data_well.paker_before["posle"]}м.', None,
+             f'Демонтировать превентор. Посадить пакер на глубине {self.data_well.paker_before["posle"]}м. '
              f'Монтаж  устьевой арматуры. При монтаже использовать только сертифицированное'
              f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 1.77],
-            [OpressovkaEK.testing_pressure(self, self.dict_data_well["depth_fond_paker_do"]["posle"])[1], None,
-             f'{OpressovkaEK.testing_pressure(self, self.dict_data_well["depth_fond_paker_do"]["posle"])[0]}',
+            [OpressovkaEK.testing_pressure(self, self.data_well.depth_fond_paker_before["posle"])[1], None,
+             f'{OpressovkaEK.testing_pressure(self, self.data_well.depth_fond_paker_before["posle"])[0]}',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 0.67],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.dict_data_well["max_admissible_pressure"]._value}атм в присутствии '
+             f'на давление {self.data_well.max_admissible_pressure._value}атм в присутствии '
              f'представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), в случае '
              f'поглощения при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ '
@@ -476,14 +475,14 @@ class DescentNnWithPaker(DescentParent):
              f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
-             f'{self.dict_data_well["max_admissible_pressure"]._value}атм.'
+             f'{self.data_well.max_admissible_pressure._value}атм.'
              f'Спустить плунжер на компоновке штанг: {self.sucker_edit} '
              f'Окончательный компоновку штанг производить по расчету '
              f'ГНО после утверждения заказчиком. ПРИ НЕОБХОДИМОСТИ ПОИНТЕРВАЛЬНОЙ ОПРЕССОВКИ: АВТОСЦЕП УСТАНАВЛИВАТЬ '
              f'НЕ МЕНЕЕ ЧЕМ ЧЕРЕЗ ОДНУ ШТАНГУ ОТ ПЛУНЖЕРА ИЛИ ПЕРЕВОДНИКА ШТОКА НАСОСА!',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
-             descent_sucker_pod(float(self.dict_data_well["dict_pump_SHGN_h"]["posle"]))],
+             descent_sucker_pod(float(self.data_well.dict_pump_shgn_depth["posle"]))],
             [None, None,
              f'Перед пуском  произвести подгонку штанг и '
              f'опрессовать ГНО на давление 40атм в течении 30 минут в присутствии представителя заказчика',
@@ -521,26 +520,26 @@ class Conservation(DescentParent):
         elif '48' in str(nkt_edit):
             volume_nkt_metal = 0.55 * 1.0 / 1000
 
-        lenght_nkt = volume_well_30 / volume_nkt_metal
+        length_nkt = volume_well_30 / volume_nkt_metal
 
         descent_voronka = [
             [f'Не замерзающая жидкость 0,3м3', None,
              f'С целью вытеснения тех. жидкости из скважины и заполнения скважины не замерзающей жидкостью: '
              f'Допустить компоновку на технологических НКТ на глубину '
-             f'{sum(list(self.dict_data_well["dict_nkt_po"].values())) + lenght_nkt:.1f}м. ',
+             f'{sum(list(self.data_well.dict_nkt_after.values())) + length_nkt:.1f}м. ',
              None, None, None, None, None, None, None,
-             'Мастер КРС, предст. заказчика', descentNKT_norm(lenght_nkt, 1)],
+             'Мастер КРС, предст. заказчика', descentNKT_norm(length_nkt, 1)],
             [None, None,
-             f'Поднять тНКТ до глубины {sum(list(self.dict_data_well["dict_nkt_po"].values())):.1f}м '
+             f'Поднять тНКТ до глубины {sum(list(self.data_well.dict_nkt_after.values())):.1f}м '
              f'с доливом незамерзающей'
              f' жидкостью (растворитель РКД 0,3м3) до устья',
              None, None, None, None, None, None, None,
-             'Мастер КРС, предст. заказчика', descentNKT_norm(lenght_nkt, 1)],
+             'Мастер КРС, предст. заказчика', descentNKT_norm(length_nkt, 1)],
             [None, None,
              f'Заполнить полость НКТ в интервале 0-30м незамерзающей жидкостью полость НКТ (растворитель РКД 0,09м3)',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
-             descentNKT_norm(sum(list(self.dict_data_well["dict_nkt_po"].values())), 1)]]
+             descentNKT_norm(sum(list(self.data_well.dict_nkt_after.values())), 1)]]
         return descent_voronka
 
     def Conservation_well(self, nkt_edit: str):
@@ -550,15 +549,15 @@ class Conservation(DescentParent):
              f'сертифицированный.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', None],
-            [f'СПО воронки {sum(list(self.dict_data_well["dict_nkt_po"].values()))}м', None,
+            [f'СПО воронки {sum(list(self.data_well.dict_nkt_after.values()))}м', None,
              f'Спустить предварительно воронку на НКТ{nkt_edit} (завоз с УСО ГНО, '
              f'ремонтные/новые) на '
-             f'гл. {sum(list(self.dict_data_well["dict_nkt_po"].values()))}м. Спуск НКТ '
+             f'гл. {sum(list(self.data_well.dict_nkt_after.values()))}м. Спуск НКТ '
              f'производить с шаблонированием и '
              f'смазкой резьбовых соединений.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
-             descentNKT_norm(sum(list(self.dict_data_well["dict_nkt_po"].values())), 1)],
+             descentNKT_norm(sum(list(self.data_well.dict_nkt_after.values())), 1)],
 
             [None, None,
              'Демонтировать превентор. Монтаж устьевой арматуры. При монтаже использовать только '
@@ -571,7 +570,7 @@ class Conservation(DescentParent):
              'Мастер КРС, предст. заказчика', 1.27],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.dict_data_well["max_admissible_pressure"]._value}атм в присутствии '
+             f'на давление {self.data_well.max_admissible_pressure._value}атм в присутствии '
              f'представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), в случае поглощения '
              f'при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ  о невозможности проведения '
@@ -581,7 +580,7 @@ class Conservation(DescentParent):
             [None, None,
              f'Устье скважины оборудовать площадкой размером 2х2м. На устье законсервированных скважин установить '
              f'металлическую табличку с обозначением'
-             f'скв.№ {self.dict_data_well["well_number"]._value} {self.dict_data_well["well_area"]._value}'
+             f'скв.№ {self.data_well.well_number._value} {self.data_well.well_area._value}'
              f' месторождение, ПАО АНК Башнефть, '
              f'дата начала и окончания консервации силами ЦДНГ после съезда бригады.',
              None, None, None, None, None, None, None,
@@ -620,27 +619,27 @@ class DescentPaker(DescentParent):
              f'(согласно паспорта клапана А-КСШ-89-48-30)',
              None, None, None, None, None, None, None,
              'мастер КРС', 1.2],
-            [f'Спуск с пакером {self.dict_data_well["paker_do"]["posle"]} '
-             f'на глубину {self.dict_data_well["depth_fond_paker_do"]["posle"]}м,'
-             f' воронку на {int(float(sum(self.dict_data_well["dict_nkt_po"].values())))}м.',
+            [f'Спуск с пакером {self.data_well.paker_before["posle"]} '
+             f'на глубину {self.data_well.depth_fond_paker_before["posle"]}м,'
+             f' воронку на {int(float(sum(self.data_well.dict_nkt_after.values())))}м.',
              None,
              f'Спустить подземное оборудование  согласно расчету и карте спуска ЦДНГ '
-             f'НКТ с пакером {self.dict_data_well["paker_do"]["posle"]} '
-             f'на глубину {self.dict_data_well["depth_fond_paker_do"]["posle"]}м, воронку на глубину '
-             f'{round(sum(self.dict_data_well["dict_nkt_po"].values()), 1)}м. '
+             f'НКТ с пакером {self.data_well.paker_before["posle"]} '
+             f'на глубину {self.data_well.depth_fond_paker_before["posle"]}м, воронку на глубину '
+             f'{round(sum(self.data_well.dict_nkt_after.values()), 1)}м. '
              f'(Компоновку НКТ{self.nkt_edit}м) '
              f'прошаблонировать для проведения ГИС.',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(sum(self.dict_data_well["dict_nkt_po"].values()), 1.2)],
-            [f'Посадить пакер на глубине {self.dict_data_well["depth_fond_paker_do"]["posle"]}м', None,
+             'мастер КРС', descentNKT_norm(sum(self.data_well.dict_nkt_after.values()), 1.2)],
+            [f'Посадить пакер на глубине {self.data_well.depth_fond_paker_before["posle"]}м', None,
              f'Демонтировать превентор. Посадить пакер на глубине '
-             f'{self.dict_data_well["depth_fond_paker_do"]["posle"]}м. '
+             f'{self.data_well.depth_fond_paker_before["posle"]}м. '
              f'Отревизировать и ориентировать планшайбу для проведения ГИС. '
              f'Заменить и установить устьевую арматуру для ППД. Обвязать с нагнетательной линией.',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.25 + 0.5 + 0.5],
-            [f'{OpressovkaEK.testing_pressure(self, self.dict_data_well["depth_fond_paker_do"]["posle"])[1]}', None,
-             f'{OpressovkaEK.testing_pressure(self, self.dict_data_well["depth_fond_paker_do"]["posle"])[0]}',
+            [f'{OpressovkaEK.testing_pressure(self, self.data_well.depth_fond_paker_before["posle"])[1]}', None,
+             f'{OpressovkaEK.testing_pressure(self, self.data_well.depth_fond_paker_before["posle"])[0]}',
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', 0.67],
         ]
@@ -650,8 +649,8 @@ class DescentPaker(DescentParent):
                 paker_descent.insert(2, privyazka_nkt(self)[0])
 
         if self.rgd_question_combo == 'Да':
-            if self.dict_data_well["column_additional"] and self.dict_data_well["depth_fond_paker_do"][
-                'posle'] >= self.dict_data_well["head_column_additional"]._value:
+            if self.data_well.column_additional and self.data_well.depth_fond_paker_before[
+                'posle'] >= self.data_well.head_column_additional._value:
                 # print(rgd_without_paker(self))
                 for row in rgd_without_paker(self)[::-1]:
                     paker_descent.insert(0, row)
@@ -701,7 +700,7 @@ class DescentVoronka(DescentParent):
              'Мастер КРС, предст. заказчика', 1.27],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.dict_data_well["max_admissible_pressure"]._value}атм в присутствии '
+             f'на давление {self.data_well.max_admissible_pressure._value}атм в присутствии '
              f'представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), в случае '
              f'поглощения при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ  о невозможности '
@@ -739,13 +738,13 @@ class DescentOrz(DescentParent):
              f'Спустить двух пакерную компоновку ОРЗ на НКТ89  '
              f'(завоз с УСО ГНО, '
              f'ремонтные/новые) '
-             f'на гл. {self.dict_data_well["depth_fond_paker_do"]["posle"]}/'
-             f'{float(self.dict_data_well["depth_fond_paker2_do"]["posle"])}м. '
+             f'на гл. {self.data_well.depth_fond_paker_before["posle"]}/'
+             f'{float(self.data_well.depth_fond_paker_second_before["posle"])}м. '
              f'Спуск НКТ производить с шаблонированием и '
              f'смазкой резьбовых соединений.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
-             descentNKT_norm(self.dict_data_well["depth_fond_paker_do"]["posle"], 1.2)],
+             descentNKT_norm(self.data_well.depth_fond_paker_before["posle"], 1.2)],
             [f'Привязка', None,
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
              f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
@@ -762,14 +761,14 @@ class DescentOrz(DescentParent):
              'Мастер КРС, предст. заказчика', 1.77],
             [None, None,
              f'Опрессовать пакер и ЭК и арматуру ППД на Р= '
-             f'{self.dict_data_well["max_admissible_pressure"]._value}атм с открытым '
+             f'{self.data_well.max_admissible_pressure._value}атм с открытым '
              f'трубном пространством '
              f'в присутствии представителя заказчика на наличие перетоков.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 0.67],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.dict_data_well["max_admissible_pressure"]._value}атм в присутствии'
+             f'на давление {self.data_well.max_admissible_pressure._value}атм в присутствии'
              f' представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), '
              f'в случае поглощения при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ '
@@ -778,15 +777,15 @@ class DescentOrz(DescentParent):
              'Мастер КРС, предст. заказчика', 0.7],
             [None, None,
              f'Спустить стыковочное устройство на НКТ48мм до глубины '
-             f'{float(self.dict_data_well["depth_fond_paker2_do"]["posle"])}м '
+             f'{float(self.data_well.depth_fond_paker_second_before["posle"])}м '
              f'с замером и шаблонированием. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
-             descentNKT_norm(float(self.dict_data_well["depth_fond_paker2_do"]["posle"]), 1)],
+             descentNKT_norm(float(self.data_well.depth_fond_paker_second_before["posle"]), 1)],
             [None, None,
              f'Произвести стыковку. Смонтировать арматуру ОРЗ. Опрессовать пакер и арматуру ОРЗ в '
              f'меж трубное пространство'
-             f' на Р= {self.dict_data_well["max_admissible_pressure"]._value}атм с открытым трубном пространством '
+             f' на Р= {self.data_well.max_admissible_pressure._value}атм с открытым трубном пространством '
              f'в присутствии представителя заказчика на наличие перетоков.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 0.67],
@@ -850,52 +849,52 @@ class DescentORD(DescentParent):
              f'уплотнения, подвесной патрубок, штанговые переводники, ЯГ-73мм. \n',
              None, None, None, None, None, None, None,
              'Мастер КРС', None],
-            [f'СПО {self.dict_data_well["dict_pump_ECN"]["posle"]} на НКТ{self.nkt_edit} c пакером '
-             f'{self.dict_data_well["paker_do"]["posle"]}',
+            [f'СПО {self.data_well.dict_pump_ecn["posle"]} на НКТ{self.nkt_edit} c пакером '
+             f'{self.data_well.paker_before["posle"]}',
              None,
-             f'Спустить предварительно {self.dict_data_well["dict_pump_ECN"]["posle"]} на НКТ{self.nkt_edit} '
-             f'c пакером {self.dict_data_well["paker_do"]["posle"]} на'
-             f' глубину {self.dict_data_well["depth_fond_paker_do"]["posle"]}м'
-             f'(завоз с УСО ГНО, ремонтные/новые) на гл. {self.dict_data_well["dict_pump_ECN_h"]["posle"]}м. '
+             f'Спустить предварительно {self.data_well.dict_pump_ecn["posle"]} на НКТ{self.nkt_edit} '
+             f'c пакером {self.data_well.paker_before["posle"]} на'
+             f' глубину {self.data_well.depth_fond_paker_before["posle"]}м'
+             f'(завоз с УСО ГНО, ремонтные/новые) на гл. {self.data_well.dict_pump_ecn_depth["posle"]}м. '
              f'Спуск НКТ производить с '
              f'шаблонированием и '
              f'смазкой резьбовых соединений, замером изоляции каждые 100м.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
-             descentNKT_norm(sum(list(self.dict_data_well["dict_nkt_po"].values())), 1.2)],
-            [OpressovkaEK.testing_pressure(self, self.dict_data_well["depth_fond_paker_do"]["posle"])[0], None,
+             descentNKT_norm(sum(list(self.data_well.dict_nkt_after.values())), 1.2)],
+            [OpressovkaEK.testing_pressure(self, self.data_well.depth_fond_paker_before["posle"])[0], None,
              f'Демонтировать превентор. Посадить пакер на глубине '
-             f'{self.dict_data_well["depth_fond_paker_do"]["posle"]}м. Монтаж '
+             f'{self.data_well.depth_fond_paker_before["posle"]}м. Монтаж '
              f'устьевой арматуры. При монтаже использовать только сертифицированное '
              f'оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН.'
              f' произвести '
              f'разделку'
              f' кабеля под устьевой сальник '
              f'произвести герметизацию устья. '
-             f'\n{OpressovkaEK.testing_pressure(self, self.dict_data_well["depth_fond_paker_do"]["posle"])[1]}',
+             f'\n{OpressovkaEK.testing_pressure(self, self.data_well.depth_fond_paker_before["posle"])[1]}',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 1.77],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.dict_data_well["max_admissible_pressure"]._value}атм в присутствии '
+             f'на давление {self.data_well.max_admissible_pressure._value}атм в присутствии '
              f'представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), в случае '
              f'поглощения при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ '
              f'о невозможности проведения опрессовки ФА',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 0.7],
-            [f'СПО {self.dict_data_well["dict_pump_SHGN"]["posle"]} на компоновке штанг', None,
+            [f'СПО {self.data_well.dict_pump_shgn["posle"]} на компоновке штанг', None,
              f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг'
              f' (ПМШ 62х21 либо аналог). Опрессовать ПВО на'
-             f' {self.dict_data_well["max_admissible_pressure"]._value}атм.'
-             f'Спустить {self.dict_data_well["dict_pump_SHGN"]["posle"]} на компоновке штанг: '
+             f' {self.data_well.max_admissible_pressure._value}атм.'
+             f'Спустить {self.data_well.dict_pump_shgn["posle"]} на компоновке штанг: '
              f'{self.sucker_edit}  Окончательный компоновку штанг производить по расчету '
              f'ГНО после утверждения заказчиком. ПРИ НЕОБХОДИМОСТИ ПОИНТЕРВАЛЬНОЙ ОПРЕССОВКИ: АВТОСЦЕП УСТАНАВЛИВАТЬ '
              f'НЕ МЕНЕЕ ЧЕМ ЧЕРЕЗ ОДНУ ШТАНГУ ОТ ПЛУНЖЕРА ИЛИ ПЕРЕВОДНИКА ШТОКА НАСОСА!',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
-             descent_sucker_pod(float(self.dict_data_well["dict_pump_ECN_h"]["posle"]))],
+             descent_sucker_pod(float(self.data_well.dict_pump_ecn_depth["posle"]))],
             [None, None,
              f'Перед пуском  произвести подгонку штанг и '
              f'опрессовать ГНО на давление 40атм в течении 30 минут в присутствии представителя заказчика с'
@@ -934,18 +933,18 @@ class DescentNv(DescentParent):
              self.calc_fond_nkt_str,
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', None],
-            [f'спустить замковую опору на гл {self.dict_data_well["dict_pump_SHGN_h"]["posle"]}м', None,
+            [f'спустить замковую опору на гл {self.data_well.dict_pump_shgn_depth["posle"]}м', None,
              f'Заявить  комплект подгоночных штанг, полированный шток (вывоз согласовать с ТС ЦДНГ). '
              f'В ЦДНГ заявить сальниковые '
              f'уплотнения, подвесной патрубок, штанговые переводники, ЯГ-73мм. \n'
              f'Предварительно, по согласованию с ЦДНГ, спустить замковую опору на '
-             f'гл {self.dict_data_well["dict_pump_SHGN_h"]["posle"]}м. (в компоновке предусмотреть установку '
+             f'гл {self.data_well.dict_pump_shgn_depth["posle"]}м. (в компоновке предусмотреть установку '
              f'противополетных узлов (з.о. меньшего диаметра или заглушка с щелевым фильтром)) '
              f'компоновка НКТ: {self.nkt_edit} (завоз с УСО ГНО, ремонтные/новые).\n'
              f' спуск ФНКТ произвести с шаблонированием с отбраковкой с калибровкой резьб. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
-             descentNKT_norm(sum(list(self.dict_data_well["dict_nkt_po"].values())), 1)],
+             descentNKT_norm(sum(list(self.data_well.dict_nkt_after.values())), 1)],
             [None, None,
              f'Демонтировать превентор. Монтаж устьевой арматуры. При монтаже использовать '
              f'только сертифицированное'
@@ -954,28 +953,28 @@ class DescentNv(DescentParent):
              'Мастер КРС, предст. заказчика', 0.67 + 0.5],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.dict_data_well["max_admissible_pressure"]._value}атм в'
+             f'на давление {self.data_well.max_admissible_pressure._value}атм в'
              f' присутствии представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), '
              f'в случае поглощения при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ о '
              f'невозможности проведения опрессовки ФА',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 0.7],
-            [f'Спустить {self.dict_data_well["dict_pump_SHGN"]["posle"]} на'
+            [f'Спустить {self.data_well.dict_pump_shgn["posle"]} на'
              f' {self.sucker_edit}'
                 , None,
              f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
-             f'{self.dict_data_well["max_admissible_pressure"]._value}атм.'
-             f'Спустить {self.dict_data_well["dict_pump_SHGN"]["posle"]} на компоновке штанг: '
+             f'{self.data_well.max_admissible_pressure._value}атм.'
+             f'Спустить {self.data_well.dict_pump_shgn["posle"]} на компоновке штанг: '
              f'{self.sucker_edit}  '
              f'Окончательный компоновку штанг производить по расчету '
              f'ГНО после утверждения заказчиком. ПРИ НЕОБХОДИМОСТИ ПОИНТЕРВАЛЬНОЙ ОПРЕССОВКИ: АВТОСЦЕП УСТАНАВЛИВАТЬ '
              f'НЕ МЕНЕЕ ЧЕМ ЧЕРЕЗ ОДНУ ШТАНГУ ОТ ПЛУНЖЕРА ИЛИ ПЕРЕВОДНИКА ШТОКА НАСОСА!',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
-             descent_sucker_pod(float(self.dict_data_well["dict_pump_SHGN_h"]["posle"]))],
+             descent_sucker_pod(float(self.data_well.dict_pump_shgn_depth["posle"]))],
             [None, None,
              f'Перед пуском произвести подгонку штанг и '
              f'опрессовать ГНО на давление 40атм в течении 30 минут в присутствии представителя заказчика',
@@ -1016,19 +1015,19 @@ class DescentEcnWithPaker(DescentParent):
              'клапанов. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 0.3],
-            [f'СПО {self.dict_data_well["dict_pump_ECN"]["posle"]} на НКТ{self.nkt_edit}, '
-             f'пакер - {self.dict_data_well["paker_do"]["posle"]} на глубину '
-             f'{self.dict_data_well["depth_fond_paker_do"]["posle"]}м',
+            [f'СПО {self.data_well.dict_pump_ecn["posle"]} на НКТ{self.nkt_edit}, '
+             f'пакер - {self.data_well.paker_before["posle"]} на глубину '
+             f'{self.data_well.depth_fond_paker_before["posle"]}м',
              None,
-             f'Спустить предварительно {self.dict_data_well["dict_pump_ECN"]["posle"]} на НКТ{self.nkt_edit}, '
-             f'пакер - {self.dict_data_well["paker_do"]["posle"]} на глубину '
-             f'{self.dict_data_well["depth_fond_paker_do"]["posle"]}м. (завоз с УСО ГНО,'
+             f'Спустить предварительно {self.data_well.dict_pump_ecn["posle"]} на НКТ{self.nkt_edit}, '
+             f'пакер - {self.data_well.paker_before["posle"]} на глубину '
+             f'{self.data_well.depth_fond_paker_before["posle"]}м. (завоз с УСО ГНО,'
              f' ремонтные/новые) '
-             f'на гл. {self.dict_data_well["dict_pump_ECN"]["posle"]}м. Спуск НКТ производить с шаблонированием и '
+             f'на гл. {self.data_well.dict_pump_ecn["posle"]}м. Спуск НКТ производить с шаблонированием и '
              f'смазкой резьбовых соединений, замером изоляции каждые 100м. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
-             descentNKT_norm(float(self.dict_data_well["dict_pump_ECN_h"]["posle"]), 1.2)],
+             descentNKT_norm(float(self.data_well.dict_pump_ecn_depth["posle"]), 1.2)],
             [None, None,
              f'Демонтировать превентор. Монтаж устьевой арматуры. При монтаже использовать только сертифицированное'
              f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. '
@@ -1039,15 +1038,15 @@ class DescentEcnWithPaker(DescentParent):
              'Мастер КРС, предст. заказчика', 1.77],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.dict_data_well["max_admissible_pressure"]._value}атм в '
+             f'на давление {self.data_well.max_admissible_pressure._value}атм в '
              f'присутствии представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), в случае поглощения '
              f'при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ  о невозможности проведения '
              f'опрессовки ФА',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 0.7],
-            [OpressovkaEK.testing_pressure(self, self.dict_data_well["depth_fond_paker_do"]["posle"])[1], None,
-             f'{OpressovkaEK.testing_pressure(self, self.dict_data_well["depth_fond_paker_do"]["posle"])[0]} '
+            [OpressovkaEK.testing_pressure(self, self.data_well.depth_fond_paker_before["posle"])[1], None,
+             f'{OpressovkaEK.testing_pressure(self, self.data_well.depth_fond_paker_before["posle"])[0]} '
              f'Опрессовать кабельный '
              f'ввод устьевой арматуры',
              None, None, None, None, None, None, None,
@@ -1092,15 +1091,15 @@ class DescentEcn(DescentParent):
              'При монтаже УЭЦН провести калибровку резьбы: ловильной головки ЭЦН, обратного и сбивного клапанов. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 0.3],
-            [f'СПО {self.dict_data_well["dict_pump_ECN"]["posle"]} на НКТ{self.nkt_edit} на '
-             f'гл. {self.dict_data_well["dict_pump_ECN_h"]["posle"]}м', None,
-             f'Спустить предварительно {self.dict_data_well["dict_pump_ECN"]["posle"]} на НКТ{self.nkt_edit} '
+            [f'СПО {self.data_well.dict_pump_ecn["posle"]} на НКТ{self.nkt_edit} на '
+             f'гл. {self.data_well.dict_pump_ecn_depth["posle"]}м', None,
+             f'Спустить предварительно {self.data_well.dict_pump_ecn["posle"]} на НКТ{self.nkt_edit} '
              f'(завоз с УСО ГНО, ремонтные/новые) на '
-             f'гл. {self.dict_data_well["dict_pump_ECN_h"]["posle"]}м. Спуск НКТ производить с шаблонированием и '
+             f'гл. {self.data_well.dict_pump_ecn_depth["posle"]}м. Спуск НКТ производить с шаблонированием и '
              f'смазкой резьбовых соединений, замером изоляции каждые 100м. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
-             descentNKT_norm(float(self.dict_data_well["dict_pump_ECN_h"]["posle"]), 1.2)],
+             descentNKT_norm(float(self.data_well.dict_pump_ecn_depth["posle"]), 1.2)],
             [None, None,
              f'Демонтировать превентор. Монтаж устьевой арматуры. При монтаже использовать только сертифицированное'
              f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. '
@@ -1111,7 +1110,7 @@ class DescentEcn(DescentParent):
              'Мастер КРС, предст. заказчика', 1.27],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.dict_data_well["max_admissible_pressure"]._value}атм в присутствии '
+             f'на давление {self.data_well.max_admissible_pressure._value}атм в присутствии '
              f'представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), '
              f'в случае поглощения при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ '
@@ -1155,51 +1154,51 @@ class DescentNvWithPaker(DescentParent):
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', None],
 
-            [f'СПО з.о. на гл {float(self.dict_data_well["dict_pump_SHGN_h"]["posle"])}м. пакер - '
-             f'{self.dict_data_well["paker_do"]["posle"]} на глубину '
-             f'{self.dict_data_well["depth_fond_paker_do"]["posle"]}м ',
+            [f'СПО з.о. на гл {float(self.data_well.dict_pump_shgn_depth["posle"])}м. пакер - '
+             f'{self.data_well.paker_before["posle"]} на глубину '
+             f'{self.data_well.depth_fond_paker_before["posle"]}м ',
              None,
              f'Заявить  комплект подгоночных штанг,полированный шток (вывоз согласовать с ТС ЦДНГ). '
              f'В ЦДНГ заявить сальниковые '
              f'уплотнения, подвесной патрубок, штанговые переводники, ЯГ-73мм. \n'
              f'Предварительно, по согласованию с ЦДНГ, спустить замковую опору на гл '
-             f'{float(self.dict_data_well["dict_pump_SHGN_h"]["posle"])}м. (в компоновке предусмотреть установку '
+             f'{float(self.data_well.dict_pump_shgn_depth["posle"])}м. (в компоновке предусмотреть установку '
              f'противополетных узлов (з.о. меньшего диаметра или заглушка с щелевым фильтром)) '
-             f'компоновка НКТ: {self.nkt_edit} пакер - {self.dict_data_well["paker_do"]["posle"]} на глубину '
-             f'{self.dict_data_well["depth_fond_paker_do"]["posle"]}м  (завоз с УСО ГНО, ремонтные/новые).\n'
+             f'компоновка НКТ: {self.nkt_edit} пакер - {self.data_well.paker_before["posle"]} на глубину '
+             f'{self.data_well.depth_fond_paker_before["posle"]}м  (завоз с УСО ГНО, ремонтные/новые).\n'
              f' спуск ФНКТ произвести с шаблонированием  с отбраковкой с калибровкой резьб. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
-             descentNKT_norm(sum(list(self.dict_data_well["dict_nkt_po"].values())), 1.2)],
+             descentNKT_norm(sum(list(self.data_well.dict_nkt_after.values())), 1.2)],
 
             [None, None,
              f'Демонтировать превентор. Посадить пакер на глубине '
-             f'{self.dict_data_well["depth_fond_paker_do"]["posle"]}м. '
+             f'{self.data_well.depth_fond_paker_before["posle"]}м. '
              f'Монтаж устьевой арматуры. При монтаже использовать только сертифицированное'
              f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО '
              f'ПАТРУБКА ЗАПРЕЩЕН. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 1.27],
-            [OpressovkaEK.testing_pressure(self, self.dict_data_well["depth_fond_paker_do"]["posle"])[0], None,
-             f'{OpressovkaEK.testing_pressure(self, self.dict_data_well["depth_fond_paker_do"]["posle"])[1]}',
+            [OpressovkaEK.testing_pressure(self, self.data_well.depth_fond_paker_before["posle"])[0], None,
+             f'{OpressovkaEK.testing_pressure(self, self.data_well.depth_fond_paker_before["posle"])[1]}',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 0.67],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.dict_data_well["max_admissible_pressure"]._value}атм в '
+             f'на давление {self.data_well.max_admissible_pressure._value}атм в '
              f'присутствии представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), в случае поглощения '
              f' при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ  о невозможности проведения '
              f'опрессовки ФА',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 0.7],
-            [f'Спустить {self.dict_data_well["dict_pump_SHGN"]["posle"]} на компоновке штанг:'
+            [f'Спустить {self.data_well.dict_pump_shgn["posle"]} на компоновке штанг:'
              f' {self.sucker_edit}', None,
              f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при'
              f' СПО штанг (ПМШ 62х21 либо аналог). '
-             f'Опрессовать ПВО на {self.dict_data_well["max_admissible_pressure"]._value}атм.'
-             f'Спустить {self.dict_data_well["dict_pump_SHGN"]["posle"]} на компоновке штанг: '
+             f'Опрессовать ПВО на {self.data_well.max_admissible_pressure._value}атм.'
+             f'Спустить {self.data_well.dict_pump_shgn["posle"]} на компоновке штанг: '
              f'{self.sucker_edit}  Окончательный компоновку штанг '
              f'производить по расчету '
              f'ГНО после утверждения заказчиком. ПРИ НЕОБХОДИМОСТИ ПОИНТЕРВАЛЬНОЙ ОПРЕССОВКИ: '
@@ -1207,7 +1206,7 @@ class DescentNvWithPaker(DescentParent):
              f'НЕ МЕНЕЕ ЧЕМ ЧЕРЕЗ ОДНУ ШТАНГУ ОТ ПЛУНЖЕРА ИЛИ ПЕРЕВОДНИКА ШТОКА НАСОСА!',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
-             descent_sucker_pod(float(self.dict_data_well["dict_pump_SHGN_h"]["posle"]))],
+             descent_sucker_pod(float(self.data_well.dict_pump_shgn_depth["posle"]))],
             [None, None,
              f'Перед пуском  произвести подгонку штанг и '
              f'опрессовать ГНО на давление 40атм в течении 30 минут в присутствии представителя заказчика',
@@ -1247,21 +1246,21 @@ class DescentNn(DescentParent):
              'Мастер КРС, предст. заказчика', None],
 
             [
-                f'спустить {self.dict_data_well["dict_pump_SHGN"]["posle"]} на глубина'
-                f' {float(self.dict_data_well["dict_pump_SHGN_h"]["posle"])}м',
+                f'спустить {self.data_well.dict_pump_shgn["posle"]} на глубина'
+                f' {float(self.data_well.dict_pump_shgn_depth["posle"])}м',
                 None,
                 f'Заявить комплект подгоночных штанг, полированный шток (вывоз согласовать с ТС ЦДНГ). В ЦДНГ заявить '
                 f'сальниковые '
                 f'уплотнения, подвесной патрубок, штанговые переводники, ЯГ-73мм. \n'
                 f'Предварительно, по согласованию с ЦДНГ, спустить '
-                f'{self.dict_data_well["dict_pump_SHGN"]["posle"]} на гл '
-                f'{float(self.dict_data_well["dict_pump_SHGN_h"]["posle"])}м. (в компоновке предусмотреть установку '
+                f'{self.data_well.dict_pump_shgn["posle"]} на гл '
+                f'{float(self.data_well.dict_pump_shgn_depth["posle"])}м. (в компоновке предусмотреть установку '
                 f'противополетных узлов (з.о. меньшего диаметра или заглушка с щелевым фильтром)) '
                 f'компоновка НКТ: {self.nkt_edit} (завоз с УСО ГНО, ремонтные/новые).\n'
                 f' спуск ФНКТ произвести с шаблонированием  с отбраковкой с калибровкой резьб. ',
                 None, None, None, None, None, None, None,
                 'Мастер КРС, предст. заказчика',
-                descentNKT_norm(sum(list(self.dict_data_well["dict_nkt_po"].values())), 1)],
+                descentNKT_norm(sum(list(self.data_well.dict_nkt_after.values())), 1)],
             [None, None,
              f'Демонтировать превентор. Монтаж  устьевой арматуры. При монтаже использовать только сертифицированное'
              f' оборудование (переводники, муфты, переходные катушки). МОНТАЖ БЕЗ ПОДВЕСНОГО ПАТРУБКА ЗАПРЕЩЕН. ',
@@ -1269,7 +1268,7 @@ class DescentNn(DescentParent):
              'Мастер КРС, предст. заказчика', 1.27],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.dict_data_well["max_admissible_pressure"]._value}атм в присутствии '
+             f'на давление {self.data_well.max_admissible_pressure._value}атм в присутствии '
              f'представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), в случае поглощения'
              f' при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ  о невозможности '
@@ -1281,14 +1280,14 @@ class DescentNn(DescentParent):
              f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
-             f'{self.dict_data_well["max_admissible_pressure"]._value}атм.'
+             f'{self.data_well.max_admissible_pressure._value}атм.'
              f'Спустить плунжер на компоновке штанг: {self.sucker_edit} '
              f'Окончательный компоновку штанг производить по расчету '
              f'ГНО после утверждения заказчиком. ПРИ НЕОБХОДИМОСТИ ПОИНТЕРВАЛЬНОЙ ОПРЕССОВКИ: АВТОСЦЕП УСТАНАВЛИВАТЬ '
              f'НЕ МЕНЕЕ ЧЕМ ЧЕРЕЗ ОДНУ ШТАНГУ ОТ ПЛУНЖЕРА ИЛИ ПЕРЕВОДНИКА ШТОКА НАСОСА!',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
-             descent_sucker_pod(float(self.dict_data_well["dict_pump_SHGN_h"]["posle"]))],
+             descent_sucker_pod(float(self.data_well.dict_pump_shgn_depth["posle"]))],
             [None, None,
              f'Перед пуском  произвести подгонку штанг и '
              f'опрессовать ГНО на давление 40атм в течении 30 минут в присутствии представителя заказчика',
@@ -1301,7 +1300,7 @@ class DescentNn(DescentParent):
              f'смонтировать тройник с задвижкой с БРС под СУСГ\n'
              f'3. Смонтировать ЦA-320 к ВУС на УА (центральная задвижка); обвязываем затрубное пространство с ЕДК;\n'
              f'4. Закачка растворителя в объеме не менее V= 1 м3, произвести доводку тех.жидкостью '
-             f'y={self.dict_data_well["fluid_work"]};'
+             f'y={self.data_well.fluid_work};'
              f'При доведении растворителя во время закачки тех. жидкости одновременно производим расхаживание насоса с'
              f'помощью ПА ,на длину L= Lпш-1м;\n'
              f'5. После завершения закачки, центральную задвижку закрыть, продолжить поступательные движения для '

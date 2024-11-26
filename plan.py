@@ -20,7 +20,7 @@ def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
                              end_column=value[2], end_row=value[3])
         except:
             pass
-    # print(f'индекс удаления {1, self.dict_data_well["cat_well_min"] - 1} , {data_well_max + 2, ws.max_row - data_well_max}')
+    # print(f'индекс удаления {1, self.cat_well_min - 1} , {data_well_max + 2, ws.max_row - data_well_max}')
 
     ws.delete_rows(data_x_max._value, ws.max_row - data_x_max._value)
 
@@ -46,7 +46,7 @@ def head_ind(start, finish):
 
 
 
-def copy_true_ws(dict_data_well, ws, ws2, head):
+def copy_true_ws(data_well, ws, ws2, head):
     for row_number, row in enumerate(ws[head]):
         for col_number, cell in enumerate(row):
             if row_number == 0:
@@ -55,7 +55,7 @@ def copy_true_ws(dict_data_well, ws, ws2, head):
                 ws2.cell(row_number + 1, col_number + 1, cell.value)
 
             if 'катег' in str(cell.value).lower():
-                if dict_data_well["work_plan"] not in ['krs', 'dop_plan', 'dop_plan_in_base', 'plan_change']:
+                if data_well.work_plan not in ['krs', 'dop_plan', 'dop_plan_in_base', 'plan_change']:
                     ws2.cell(row=row_number + 1, column=col_number + 1).alignment = Alignment(wrap_text=True,
                                                                                               horizontal='left',
                                                                                               vertical='center')

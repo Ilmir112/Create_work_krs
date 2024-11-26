@@ -8,33 +8,33 @@ def magnet_select(self, nkt_str):
 
 
 
-    if self.dict_data_well["column_additional"] is False or (self.dict_data_well["column_additional"] is True and\
-            self.dict_data_well["current_bottom"] <= self.dict_data_well["head_column_additional"]._value):
-        magnet_select = f'{nkt_str} {self.dict_data_well["nkt_diam"]}мм 20м + репер'
+    if self.data_well.column_additional is False or (self.data_well.column_additional is True and\
+            self.data_well.current_bottom <= self.data_well.head_column_additional._value):
+        magnet_select = f'{nkt_str} {self.data_well.nkt_diam}мм 20м + репер'
 
-    elif self.dict_data_well["column_additional"] is True and self.dict_data_well["column_additional_diametr"]._value < 110 and \
-            self.dict_data_well["current_bottom"] >= self.dict_data_well["head_column_additional"]._value:
+    elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 and \
+            self.data_well.current_bottom >= self.data_well.head_column_additional._value:
         magnet_select = f'{nkt_str}60мм 20м + репер + {nkt_str}60мм L- ' \
-                        f'{round(self.dict_data_well["current_bottom"] - self.dict_data_well["head_column_additional"]._value, 1)}м'
-    elif self.dict_data_well["column_additional"] is True and self.dict_data_well["column_additional_diametr"]._value > 110 and\
-            self.dict_data_well["current_bottom"] >= self.dict_data_well["head_column_additional"]._value:
-        magnet_select = f'{nkt_str}{self.dict_data_well["nkt_diam"]}мм со снятыми фасками 20м +' \
-                        f' {nkt_str}{self.dict_data_well["nkt_diam"]}мм со снятыми фасками' \
-                        f' L- {round(self.dict_data_well["current_bottom"] - self.dict_data_well["head_column_additional"]._value, 1)}м'
+                        f'{round(self.data_well.current_bottom - self.data_well.head_column_additional._value, 1)}м'
+    elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value > 110 and\
+            self.data_well.current_bottom >= self.data_well.head_column_additional._value:
+        magnet_select = f'{nkt_str}{self.data_well.nkt_diam}мм со снятыми фасками 20м +' \
+                        f' {nkt_str}{self.data_well.nkt_diam}мм со снятыми фасками' \
+                        f' L- {round(self.data_well.current_bottom - self.data_well.head_column_additional._value, 1)}м'
     return magnet_select
 
 
 def sbt_select(self, nkt_str_combo):
 
-    if self.dict_data_well["column_additional"] is False and self.dict_data_well["column_additional_diametr"]._value < 127:
+    if self.data_well.column_additional is False and self.data_well.column_additional_diameter._value < 127:
         sbt_select = 'СБТ 2 3/8"'
 
-    elif self.dict_data_well["column_additional"] is False or self.dict_data_well["column_additional"] is True and \
-            self.dict_data_well["current_bottom"] <= self.dict_data_well["head_column_additional"]._value:
+    elif self.data_well.column_additional is False or self.data_well.column_additional is True and \
+            self.data_well.current_bottom <= self.data_well.head_column_additional._value:
         sbt_select = 'СБТ 2 7/8"'
 
-    elif self.dict_data_well["column_additional"] is True and self.dict_data_well["column_additional_diametr"]._value < 127:
-        sbt_select = f'СБТ 2 3/8 L- {round(self.dict_data_well["current_bottom"] - self.dict_data_well["head_column_additional"]._value,0)}м ' \
+    elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 127:
+        sbt_select = f'СБТ 2 3/8 L- {round(self.data_well.current_bottom - self.data_well.head_column_additional._value,0)}м ' \
                      f'на СБТ 2 7/8"'
 
 
@@ -78,7 +78,7 @@ def emergency_hook(self):
                        f' на спайдере '
                        f'дополнительно устанавливать элеватор ЭХЛ) ',
                        None, None, None, None, None, None, None,
-                       'мастер КРС', descentNKT_norm(self.dict_data_well["current_bottom"], 1)],
+                       'мастер КРС', descentNKT_norm(self.data_well.current_bottom, 1)],
                       [None, None,
                        f'Произвести ловильные работы на "голове" аварийной компоновки. Количество подходов и оборотов '
                        f'инструмента  согласовать с аварийной службой супервайзинга.',
@@ -86,10 +86,10 @@ def emergency_hook(self):
                        'мастер КРС, УСРСиСТ', 4.5],
                       [None, None,
                        f'Поднять компоновку с доливом тех жидкости в объеме'
-                       f' {round(self.dict_data_well["current_bottom"] * 1.25 / 1000, 1)}м3'
-                       f' удельным весом {self.dict_data_well["fluid_work"]}.',
+                       f' {round(self.data_well.current_bottom * 1.25 / 1000, 1)}м3'
+                       f' удельным весом {self.data_well.fluid_work}.',
                        None, None, None, None, None, None, None,
-                       'Мастер, подрядчик по ГИС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1)],
+                       'Мастер, подрядчик по ГИС', liftingNKT_norm(self.data_well.current_bottom, 1)],
                       [None, None,
                        f'При результатам ревизии поднятого количества аварийного оборудования произвести, по согласованию с аварийной '
                        f'службой супервайзинга, повторить цикл работ - до полного извлечения из скважины '
@@ -103,7 +103,7 @@ def emergency_hook(self):
 
 
 
-def emergency_sticking(self, lar_diametr_line, nkt_key, lar_type_combo,
+def emergency_sticking(self, lar_diameter_line, nkt_key, lar_type_combo,
                       emergency_bottom_line, bottom_line):
     from EmergencyLarWork import EmergencyLarWork
 
@@ -138,7 +138,7 @@ def emergency_sticking(self, lar_diametr_line, nkt_key, lar_type_combo,
          f'Поднять аварийные НКТ до устья. \nПри выявлении отложений солей и гипса, отобрать шлам. '
          f'Сдать в лабораторию для проведения хим. анализа.',
          None, None, None, None, None, None, None,
-         'Мастер КРС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1.2)],
+         'Мастер КРС', liftingNKT_norm(self.data_well.current_bottom, 1.2)],
         [f'Завоз на скважину СБТ', None,
          f'Завоз на скважину СБТ – Укладка труб на стеллажи.',
          None, None, None, None, None, None, None,
@@ -159,17 +159,17 @@ def emergency_sticking(self, lar_diametr_line, nkt_key, lar_type_combo,
           f'Спустить с замером торцевую печать {magnet_select(self, "НКТ")} до аварийная головы с замером.'
           f' (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
           None, None, None, None, None, None, None,
-          'мастер КРС', descentNKT_norm(self.dict_data_well["current_bottom"], 1.2)],
+          'мастер КРС', descentNKT_norm(self.data_well.current_bottom, 1.2)],
          [None, None,
           f'Произвести работу печатью  с обратной промывкой с разгрузкой до 5т.',
           None, None, None, None, None, None, None,
           'мастер КРС, УСРСиСТ', 2.5],
          [None, None,
           f'Поднять {magnet_select(self, "НКТ")} с доливом тех жидкости в '
-          f'объеме{round(self.dict_data_well["current_bottom"] * 1.25 / 1000, 1)}м3'
-          f' удельным весом {self.dict_data_well["fluid_work"]}.',
+          f'объеме{round(self.data_well.current_bottom * 1.25 / 1000, 1)}м3'
+          f' удельным весом {self.data_well.fluid_work}.',
           None, None, None, None, None, None, None,
-          'Мастер КРС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1.2)],
+          'Мастер КРС', liftingNKT_norm(self.data_well.current_bottom, 1.2)],
          [None, None,
           f'По результату ревизии печати, согласовать с ПТО  и УСРСиСТ и '
           f'подобрать ловильный инструмент',
@@ -203,11 +203,11 @@ def lapel_tubing(self):
                f'на СБТ 2 7/8 (левое) до глубины нахождения аварийной головы. \n '
                f'Включение в компоновку ударной компоновки дополнительно согласовать с УСРСиСТ',
                None, None, None, None, None, None, None,
-               'мастер КРС', descentNKT_norm(self.dict_data_well["current_bottom"], 1)],
+               'мастер КРС', descentNKT_norm(self.data_well.current_bottom, 1)],
               [f'монтаж ведущей трубы и мех.ротора', None,
                f'Произвести монтаж ведущей трубы и мех.ротора.\n '
                f'За 2-5 метров до верхнего конца аварийного объекта рекомендуется восстановить циркуляцию и '
-               f'промыть скважину тех водой {self.dict_data_well["fluid_work"]}. При прокачке промывочной жидкости спустить '
+               f'промыть скважину тех водой {self.data_well.fluid_work}. При прокачке промывочной жидкости спустить '
                f'труболовку до верхнего конца аварийной колонны.'
                f'Произвести ловильные работы на "голове" аварийной компоновки. Количество подходов и оборотов '
                f'инструмента  согласовать с аварийной службой супервайзинга.',
@@ -223,10 +223,10 @@ def lapel_tubing(self):
               [None, None,
                f'При положительных результатах расхаживания - демонтаж ведущей трубы и мех.ротора. '
                f'Поднять компоновку с доливом тех жидкости в '
-               f'объеме {round(self.dict_data_well["current_bottom"] * 1.25 / 1000, 1)}м3'
-               f' удельным весом {self.dict_data_well["fluid_work"]}.',
+               f'объеме {round(self.data_well.current_bottom * 1.25 / 1000, 1)}м3'
+               f' удельным весом {self.data_well.fluid_work}.',
                None, None, None, None, None, None, None,
-               'Мастер', liftingNKT_norm(self.dict_data_well["current_bottom"], 1)],
+               'Мастер', liftingNKT_norm(self.data_well.current_bottom, 1)],
               [None, None,
                f'При необходимости по согласованию с УСРСиСТ работы повторить',
                None, None, None, None, None, None, None,

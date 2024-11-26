@@ -159,7 +159,7 @@ class TabWidget(TabWidgetUnion):
         self.addTab(TabPageSO(self), 'Изменение данных')
 
 
-class CorrectSignaturesWindow(WindowUnion):
+class CorrectSignaturesWindow(QMainWindow):
 
     def __init__(self):
         super(CorrectSignaturesWindow, self).__init__()

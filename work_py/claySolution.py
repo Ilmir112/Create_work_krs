@@ -14,9 +14,7 @@ from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_n
 
 class TabPageSoClay(TabPageUnion):
     def __init__(self, parent=None):
-        super().__init__()
-        self.dict_data_well = parent
-
+        super().__init__(parent)
         self.validator = QIntValidator(0, 80000)
 
         self.purpose_of_clay_label = QLabel("цель закачки глинистого раствора", self)
@@ -26,18 +24,18 @@ class TabPageSoClay(TabPageUnion):
         self.current_bottom_label = QLabel("забой", self)
         self.current_bottom_edit = QLineEdit(self)
         self.current_bottom_edit.setValidator(self.validator)
-        self.current_bottom_edit.setText(f'{self.dict_data_well["current_bottom"]}')
+        self.current_bottom_edit.setText(f'{self.data_well.current_bottom}')
 
         self.roof_clay_label = QLabel("кровля ГР", self)
         self.roof_clay_edit = QLineEdit(self)
         self.roof_clay_edit.setValidator(self.validator)
 
-        self.roof_clay_edit.setText(f'{self.dict_data_well["perforation_roof"] + 70}')
+        self.roof_clay_edit.setText(f'{self.data_well.perforation_roof + 70}')
         self.roof_clay_edit.setClearButtonEnabled(True)
 
         self.sole_clay_LabelType = QLabel("Подошва ГР", self)
         self.sole_clay_edit = QLineEdit(self)
-        self.sole_clay_edit.setText(f'{self.dict_data_well["current_bottom"]}')
+        self.sole_clay_edit.setText(f'{self.data_well.current_bottom}')
         self.sole_clay_edit.setValidator(self.validator)
 
         self.volume_clay_label = QLabel("Объем глинистого раствора", self)
@@ -94,7 +92,7 @@ class TabPageSoClay(TabPageUnion):
         roof_clay = self.roof_clay_edit.text()
         sole_clay = self.sole_clay_edit.text()
         if roof_clay != '' and sole_clay != '':
-            volume_calculate = volume_calculate_roof_of_sole(self.dict_data_well, roof_clay, sole_clay)
+            volume_calculate = volume_calculate_roof_of_sole(self.data_well, roof_clay, sole_clay)
             self.volume_clay_edit.setText(str(volume_calculate))
 
         if self.rir_question_combo.currentText() == 'Да':
@@ -114,14 +112,14 @@ class TabPageSoClay(TabPageUnion):
             self.roof_rir_edit = QLineEdit(self)
 
 
-            self.roof_rir_edit.setText(f'{self.dict_data_well["current_bottom"] - 50}')
+            self.roof_rir_edit.setText(f'{self.data_well.current_bottom - 50}')
             self.roof_rir_edit.setClearButtonEnabled(True)
 
             self.sole_rir_LabelType = QLabel("Подошва РИР", self)
             self.sole_rir_edit = QLineEdit(self)
             self.sole_rir_edit.editingFinished.connect(self.update_volume_cement)
             self.roof_rir_edit.editingFinished.connect(self.update_volume_cement)
-            self.sole_rir_edit.setText(f'{self.dict_data_well["current_bottom"]}')
+            self.sole_rir_edit.setText(f'{self.data_well.current_bottom}')
             self.sole_rir_edit.setClearButtonEnabled(True)
             self.cement_volume_label = QLabel('Объем цемента')
             self.cement_volume_line = QLineEdit(self)
@@ -144,7 +142,7 @@ class TabPageSoClay(TabPageUnion):
         sole_rir = self.sole_rir_edit.text()
         if roof_rir != '' and sole_rir != '':
             self.cement_volume_line.setText(
-                f'{round(volume_calculate_roof_of_sole(self.dict_data_well, roof_rir, sole_rir), 1)}')
+                f'{round(volume_calculate_roof_of_sole(self.data_well, roof_rir, sole_rir), 1)}')
 
 
 class TabWidget(TabWidgetUnion):
@@ -154,12 +152,10 @@ class TabWidget(TabWidgetUnion):
 
 
 class ClayWindow(WindowUnion):
-    def __init__(self, dict_data_well, table_widget, parent=None):
-        super().__init__()
-
-        self.dict_data_well = dict_data_well
-        self.ins_ind = dict_data_well['ins_ind']
-        self.tabWidget = TabWidget(self.dict_data_well)
+    def __init__(self, data_well, table_widget, parent=None):
+        super().__init__(data_well)
+        self.insert_index = data_well.insert_index
+        self.tabWidget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -183,24 +179,24 @@ class ClayWindow(WindowUnion):
         strategy = self.strategies.get(self.purpose_of_clay)
         if strategy:
             work_list = strategy.add_work_clay()
-            self.populate_row(self.ins_ind, work_list, self.table_widget)
+            self.populate_row(self.insert_index, work_list, self.table_widget)
             data_list.pause = False
             self.close()
 
     def clay_solution_q(self, current_bottom_edit, volume_clay_edit):
-        if self.dict_data_well["column_additional"] is True and \
-                self.dict_data_well["column_additional_diametr"]._value < 110 and \
-                current_bottom_edit > self.dict_data_well["head_column_additional"]._value:
-            dict_nkt = {73: self.dict_data_well["head_column_additional"]._value,
-                        60: current_bottom_edit - self.dict_data_well["head_column_additional"]._value}
+        if self.data_well.column_additional is True and \
+                self.data_well.column_additional_diameter._value < 110 and \
+                current_bottom_edit > self.data_well.head_column_additional._value:
+            dict_nkt = {73: self.data_well.head_column_additional._value,
+                        60: current_bottom_edit - self.data_well.head_column_additional._value}
         else:
             dict_nkt = {73: current_bottom_edit}
         glin_list = [
             [f'СПО пера до глубины {current_bottom_edit}м. Опрессовать НКТ на 200атм', None,
-             f'Спустить {RirWindow.pero_select(self, current_bottom_edit)} на тНКТ{self.dict_data_well["nkt_diam"]}мм '
+             f'Спустить {RirWindow.pero_select(self, current_bottom_edit)} на тНКТ{self.data_well.nkt_diam}мм '
              f'до '
              f'глубины {current_bottom_edit}м с замером, шаблонированием '
-             f'шаблоном {self.dict_data_well["nkt_template"]}мм. \n'
+             f'шаблоном {self.data_well.nkt_template}мм. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(current_bottom_edit, 1)],
@@ -223,7 +219,7 @@ class ClayWindow(WindowUnion):
              f'{volume_clay_edit}м3 + тех. воду '
              f'в объёме {round(volume_vn_nkt(dict_nkt) - volume_clay_edit, 1)}м3. Закрыть затруб. '
              f'Продавить в НКТ тех. воду  в объёме {volume_vn_nkt(dict_nkt)}м3 при давлении не более '
-             f'{self.dict_data_well["max_admissible_pressure"]._value}атм.',
+             f'{self.data_well.max_admissible_pressure._value}атм.',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
             [f'Коагуляция 4 часа', None,
@@ -247,11 +243,11 @@ class ClayWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', well_volume_norm(24)],
             [None, None,
-             f'Опрессовать НКТ на 200атм. Вымыть шар. Поднять перо на тНКТ{self.dict_data_well["nkt_diam"]}мм '
+             f'Опрессовать НКТ на 200атм. Вымыть шар. Поднять перо на тНКТ{self.data_well.nkt_diam}мм '
              f'с глубины '
              f'{current_bottom_edit}м с доливом скважины в объеме '
              f'{round(current_bottom_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
-             f'уд.весом {self.dict_data_well["fluid_work"]}',
+             f'уд.весом {self.data_well.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(current_bottom_edit, 1)]
         ]
@@ -264,7 +260,7 @@ class ClayWindow(WindowUnion):
                 f'Продавить в НКТ остаток глинистого раствора в объеме '
                 f'{round(volume_clay_edit - volume_vn_nkt(dict_nkt), 1)} и тех. воду  в объёме '
                 f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более '
-                f'{self.dict_data_well["max_admissible_pressure"]._value}атм.',
+                f'{self.data_well.max_admissible_pressure._value}атм.',
                 None, None, None, None, None, None, None,
                 'мастер КРС', 0.5]
         self.calculate_chemistry('глина', volume_clay_edit)
@@ -273,14 +269,13 @@ class ClayWindow(WindowUnion):
     def clay_solution_def(self, rir_roof, rir_sole, rir_question_combo,
                           roof_rir_edit=0, sole_rir_edit=0, volume_cement=0):
 
-        nkt_diam = ''.join(['73' if self.dict_data_well["column_diametr"]._value > 110 else '60'])
+        nkt_diam = ''.join(['73' if self.data_well.column_diameter._value > 110 else '60'])
         volume_clay = round(volume_vn_ek(self, rir_sole) * (rir_sole - rir_roof) / 1000, 1)
 
-        if self.dict_data_well["column_additional"] is True and self.dict_data_well[
-            "column_additional_diametr"]._value < 110 and \
-                rir_sole > self.dict_data_well["head_column_additional"]._value:
-            dict_nkt = {73: self.dict_data_well["head_column_additional"]._value,
-                        60: self.dict_data_well["head_column_additional"]._value - rir_sole}
+        if self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 and \
+                rir_sole > self.data_well.head_column_additional._value:
+            dict_nkt = {73: self.data_well.head_column_additional._value,
+                        60: self.data_well.head_column_additional._value - rir_sole}
         else:
             dict_nkt = {73: rir_sole}
 
@@ -288,7 +283,7 @@ class ClayWindow(WindowUnion):
             [f'СПО {RirWindow.pero_select(self, rir_sole)}  на тНКТ{nkt_diam}мм до {rir_sole}м', None,
              f'Спустить {RirWindow.pero_select(self, rir_sole)} на тНКТ{nkt_diam}мм до глубины {rir_sole}м с '
              f'замером, шаблонированием '
-             f'шаблоном {self.dict_data_well["nkt_template"]}мм. \n'
+             f'шаблоном {self.data_well.nkt_template}мм. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(rir_sole, 1)],
@@ -307,23 +302,23 @@ class ClayWindow(WindowUnion):
 
         self.calculate_chemistry('глина', volume_clay * 0.45)
 
-        self.dict_data_well["current_bottom"] = rir_roof
+        self.data_well.current_bottom = rir_roof
 
         if rir_question_combo == 'Нет':
             pero_list.append([None, None,
                               f'Поднять перо на тНКТ{nkt_diam}мм с глубины {rir_sole}м с доливом скважины в объеме '
                               f'{round(rir_sole * 1.3 / 1000, 1)}м3 тех. жидкостью '
-                              f'уд.весом {self.dict_data_well["fluid_work"]}',
+                              f'уд.весом {self.data_well.fluid_work}',
                               None, None, None, None, None, None, None,
                               'мастер КРС', descentNKT_norm(rir_roof, 1)])
         else:
             pero_list.append([None, None,
                               f'Поднять перо на тНКТ{nkt_diam}мм до глубины {rir_roof}м с доливом скважины в объеме'
                               f' {round((rir_sole - self.roof_clay) * 1.3 / 1000, 1)}м3 тех. жидкостью '
-                              f'уд.весом {self.dict_data_well["fluid_work"]}',
+                              f'уд.весом {self.data_well.fluid_work}',
                               None, None, None, None, None, None, None,
                               'мастер КРС', descentNKT_norm(float(rir_sole) - float(self.roof_clay), 1)])
-            if (self.dict_data_well['plast_work']) != 0 or rir_sole > self.dict_data_well["perforation_roof"]:
+            if (self.data_well.plast_work) != 0 or rir_sole > self.data_well.perforation_roof:
                 rir_work_list = RirWindow.rir_with_pero_gl(self, 'Не нужно', '', roof_rir_edit, sole_rir_edit,
                                                            volume_cement)
                 pero_list.extend(rir_work_list[1:])
@@ -336,7 +331,7 @@ class ClayWindow(WindowUnion):
 
 class ClayWork:
     def __init__(self, parent=None):
-        self.dict_data_well = parent.dict_data_well
+        self.data_well = parent.data_well
         self.calculate_chemistry = parent.calculate_chemistry
         self.sole_rir = None
         self.roof_rir = None
@@ -365,19 +360,19 @@ class ClaySolutionForRir(ClayWork):
         return work_list
 
     def clay_solution_q(self):
-        if (self.dict_data_well["column_additional"] is True and
-                self.dict_data_well["column_additional_diametr"]._value < 110 and \
-                self.current_bottom > self.dict_data_well["head_column_additional"]._value):
-            dict_nkt = {73: self.dict_data_well["head_column_additional"]._value,
-                        60: self.current_bottom - self.dict_data_well["head_column_additional"]._value}
+        if (self.data_well.column_additional is True and
+                self.data_well.column_additional_diameter._value < 110 and \
+                self.current_bottom > self.data_well.head_column_additional._value):
+            dict_nkt = {73: self.data_well.head_column_additional._value,
+                        60: self.current_bottom - self.data_well.head_column_additional._value}
         else:
             dict_nkt = {73: self.current_bottom}
         glin_list = [
             # [f'СПО пера до глубины {self.current_bottom}м. Опрессовать НКТ на 200атм', None,
             #  f'Спустить {RirWindow.pero_select(self, self.current_bottom)} на '
-            #  f'тНКТ{self.dict_data_well["nkt_diam"]}мм до '
+            #  f'тНКТ{self.data_well.nkt_diam}мм до '
             #  f'глубины {self.current_bottom}м с замером, шаблонированием '
-            #  f'шаблоном {self.dict_data_well["nkt_template"]}мм. \n'
+            #  f'шаблоном {self.data_well.nkt_template}мм. \n'
             #  f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
             #  None, None, None, None, None, None, None,
             #  'мастер КРС', descentNKT_norm(self.current_bottom, 1)],
@@ -400,7 +395,7 @@ class ClaySolutionForRir(ClayWork):
              f'{self.volume_clay}м3 + тех. воду '
              f'в объёме {round(volume_vn_nkt(dict_nkt) - self.volume_clay, 1)}м3. Закрыть затруб. '
              f'Продавить в НКТ тех. воду  в объёме {volume_vn_nkt(dict_nkt)}м3 при давлении не более '
-             f'{self.dict_data_well["max_admissible_pressure"]._value}атм.',
+             f'{self.data_well.max_admissible_pressure._value}атм.',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
             [f'Коагуляция 4 часа', None,
@@ -424,10 +419,10 @@ class ClaySolutionForRir(ClayWork):
              None, None, None, None, None, None, None,
              'мастер КРС', well_volume_norm(24)],
             # [None, None,
-            #  f'Опрессовать НКТ на 200атм. Вымыть шар. Поднять перо на тНКТ{self.dict_data_well["nkt_diam"]}мм '
+            #  f'Опрессовать НКТ на 200атм. Вымыть шар. Поднять перо на тНКТ{self.data_well.nkt_diam}мм '
             #  f'с глубины {self.current_bottom}м с доливом скважины в объеме '
             #  f'{round(self.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью '
-            #  f'уд.весом {self.dict_data_well["fluid_work"]}',
+            #  f'уд.весом {self.data_well.fluid_work}',
             #  None, None, None, None, None, None, None,
             #  'мастер КРС', liftingNKT_norm(self.current_bottom, 1)]
         ]
@@ -440,7 +435,7 @@ class ClaySolutionForRir(ClayWork):
                 f'Продавить в НКТ остаток глинистого раствора в объеме '
                 f'{round(self.volume_clay - volume_vn_nkt(dict_nkt), 1)} и тех. воду  в объёме '
                 f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более '
-                f'{self.dict_data_well["max_admissible_pressure"]._value}атм.',
+                f'{self.data_well.max_admissible_pressure._value}атм.',
                 None, None, None, None, None, None, None,
                 'мастер КРС', 0.5]
         self.calculate_chemistry('глина', self.volume_clay)
@@ -476,15 +471,14 @@ class ClaySolutionForEk(ClayWork):
         return work_list
 
     def clay_solution_def(self):
-        nkt_diam = ''.join(['73' if self.dict_data_well["column_diametr"]._value > 110 else '60'])
+        nkt_diam = ''.join(['73' if self.data_well.column_diameter._value > 110 else '60'])
 
-        volume_clay = round(volume_calculate_roof_of_sole(self.dict_data_well, self.roof_clay, self.sole_clay), 1)
+        volume_clay = round(volume_calculate_roof_of_sole(self.data_well, self.roof_clay, self.sole_clay), 1)
 
-        if self.dict_data_well["column_additional"] is True and self.dict_data_well[
-            "column_additional_diametr"]._value < 110 and \
-                self.sole_clay > self.dict_data_well["head_column_additional"]._value:
-            dict_nkt = {73: self.dict_data_well["head_column_additional"]._value,
-                        60: self.dict_data_well["head_column_additional"]._value - self.sole_clay}
+        if self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 and \
+                self.sole_clay > self.data_well.head_column_additional._value:
+            dict_nkt = {73: self.data_well.head_column_additional._value,
+                        60: self.data_well.head_column_additional._value - self.sole_clay}
         else:
             dict_nkt = {73: self.sole_clay}
 
@@ -492,7 +486,7 @@ class ClaySolutionForEk(ClayWork):
             [f'СПО {RirWindow.pero_select(self, self.sole_clay)}  на тНКТ{nkt_diam}мм до {self.sole_clay}м', None,
              f'Спустить {RirWindow.pero_select(self, self.sole_clay)} на тНКТ{nkt_diam}мм до глубины {self.sole_clay}м '
              f'с замером, шаблонированием '
-             f'шаблоном {self.dict_data_well["nkt_template"]}мм. \n'
+             f'шаблоном {self.data_well.nkt_template}мм. \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(self.sole_clay, 1)],
@@ -511,14 +505,14 @@ class ClaySolutionForEk(ClayWork):
 
         self.parent.calculate_chemistry('глина', volume_clay * 0.45)
 
-        self.dict_data_well["current_bottom"] = self.roof_clay
+        self.data_well.current_bottom = self.roof_clay
 
         if self.rir_question == 'Нет':
             pero_list.append([None, None,
                               f'Поднять перо на тНКТ{nkt_diam}мм с глубины {self.sole_clay}м с доливом'
                               f' скважины в объеме '
                               f'{round(self.sole_clay * 1.3 / 1000, 1)}м3 тех. жидкостью '
-                              f'уд.весом {self.dict_data_well["fluid_work"]}',
+                              f'уд.весом {self.data_well.fluid_work}',
                               None, None, None, None, None, None, None,
                               'мастер КРС', descentNKT_norm(self.roof_clay, 1)])
         else:
@@ -526,12 +520,12 @@ class ClaySolutionForEk(ClayWork):
                               f'Поднять перо на тНКТ{nkt_diam}мм до глубины {self.roof_clay}м с доливом '
                               f'скважины в объеме'
                               f' {round((self.sole_clay - self.roof_clay) * 1.3 / 1000, 1)}м3 тех. жидкостью '
-                              f'уд.весом {self.dict_data_well["fluid_work"]}',
+                              f'уд.весом {self.data_well.fluid_work}',
                               None, None, None, None, None, None, None,
                               'мастер КРС', descentNKT_norm(float(self.sole_clay) - float(self.roof_clay), 1)])
             rir_work_list = RirWindow.rir_with_pero_gl(self, 'Не нужно', '', self.roof_rir, self.sole_rir,
                                                        self.volume_cement, self.info_rir_edit)
-            if (self.dict_data_well['plast_work']) != 0 or self.sole_clay > self.dict_data_well["perforation_roof"]:
+            if (self.data_well.plast_work) != 0 or self.sole_clay > self.data_well.perforation_roof:
 
                 pero_list.extend(rir_work_list[1:])
             else:

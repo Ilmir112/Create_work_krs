@@ -10,16 +10,15 @@ from .rationingKRS import descentNKT_norm, liftingNKT_norm
 
 class TabPageSoLar(TabPageUnion):
     def __init__(self, parent=None):
-        super().__init__()
+        super().__init__(parent)
 
-        self.dict_data_well = parent
         self.po_type_label = QLabel("Прихваченное оборудование", self)
         self.po_type_combo = QComboBox(self)
         raid_type_list = ['ЭЦН', 'пакер', 'НКТ']
         self.po_type_combo.addItems(raid_type_list)
 
-        self.lar_diametr_label = QLabel("Диаметр ловителя", self)
-        self.lar_diametr_line = QLineEdit(self)
+        self.lar_diameter_label = QLabel("Диаметр ловителя", self)
+        self.lar_diameter_line = QLineEdit(self)
 
         self.lar_type_label = QLabel("Тип ловителя", self)
         self.lar_type_combo = QComboBox(self)
@@ -30,8 +29,8 @@ class TabPageSoLar(TabPageUnion):
         self.nkt_select_combo = QComboBox(self)
         self.nkt_select_combo.addItems(['оборудование в ЭК', 'оборудование в ДП'])
 
-        if self.dict_data_well["column_additional"] is False or (self.dict_data_well["column_additional"] and
-                                                    self.dict_data_well["head_column_additional"]._value < self.dict_data_well["current_bottom"]):
+        if self.data_well.column_additional is False or (self.data_well.column_additional and
+                                                    self.data_well.head_column_additional._value < self.data_well.current_bottom):
             self.nkt_select_combo.setCurrentIndex(0)
         else:
             self.nkt_select_combo.setCurrentIndex(1)
@@ -59,8 +58,8 @@ class TabPageSoLar(TabPageUnion):
         self.grid.addWidget(self.lar_type_label, 2, 1)
         self.grid.addWidget(self.lar_type_combo, 3, 1)
 
-        self.grid.addWidget(self.lar_diametr_label, 2, 2)
-        self.grid.addWidget(self.lar_diametr_line, 3, 2)
+        self.grid.addWidget(self.lar_diameter_label, 2, 2)
+        self.grid.addWidget(self.lar_diameter_line, 3, 2)
 
         self.grid.addWidget(self.nkt_str_label, 2, 3)
         self.grid.addWidget(self.nkt_str_combo, 3, 3)
@@ -77,17 +76,17 @@ class TabPageSoLar(TabPageUnion):
         # self.nkt_select_combo.currentTextChanged.connect(self.update_raid_edit)
 
         self.nkt_select_combo.setCurrentIndex(1)
-        self.bottom_line.setText(f'{self.dict_data_well["current_bottom"]}')
+        self.bottom_line.setText(f'{self.data_well.current_bottom}')
 
-        if self.dict_data_well["column_additional"] is False or \
-                (self.dict_data_well["column_additional"] and self.dict_data_well["current_bottom"] < self.dict_data_well["head_column_additional"]._value):
+        if self.data_well.column_additional is False or \
+                (self.data_well.column_additional and self.data_well.current_bottom < self.data_well.head_column_additional._value):
             self.nkt_select_combo.setCurrentIndex(1)
             self.nkt_select_combo.setCurrentIndex(0)
         else:
             self.nkt_select_combo.setCurrentIndex(1)
 
-        if self.dict_data_well["emergency_well"] is True:
-            self.emergency_bottom_line.setText(f'{self.dict_data_well["emergency_bottom"]}')
+        if self.data_well.emergency_well is True:
+            self.emergency_bottom_line.setText(f'{self.data_well.emergency_bottom}')
 
 
 
@@ -101,12 +100,12 @@ class TabWidget(TabWidgetUnion):
 
 class EmergencyPo(WindowUnion):
 
-    def __init__(self, dict_data_well, table_widget, parent=None):
-        super().__init__()
+    def __init__(self, data_well, table_widget, parent=None):
+        super().__init__(data_well)
 
-        self.dict_data_well = dict_data_well
-        self.ins_ind = dict_data_well['ins_ind']
-        self.tabWidget = TabWidget(self.dict_data_well)
+
+        self.insert_index = data_well.insert_index
+        self.tabWidget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -122,12 +121,12 @@ class EmergencyPo(WindowUnion):
 
     def closeEvent(self, event):
                 # Закрываем основное окно при закрытии окна входа
-        self.operation_window = None
+        self.data_well.operation_window = None
         event.accept()  # Принимаем событие закрытия
     def add_work(self):
         po_str_combo = self.tabWidget.currentWidget().po_type_combo.currentText()
         nkt_str_combo = self.tabWidget.currentWidget().nkt_str_combo.currentText()
-        lar_diametr_line = self.tabWidget.currentWidget().lar_diametr_line.text()
+        lar_diameter_line = self.tabWidget.currentWidget().lar_diameter_line.text()
         nkt_key = self.tabWidget.currentWidget().nkt_select_combo.currentText()
         lar_type_combo = self.tabWidget.currentWidget().lar_type_combo.currentText()
         emergency_bottom_line = self.tabWidget.currentWidget().emergency_bottom_line.text().replace(',', '')
@@ -138,7 +137,7 @@ class EmergencyPo(WindowUnion):
         if emergency_bottom_line != '':
             emergency_bottom_line = int(float(emergency_bottom_line))
 
-            if emergency_bottom_line > self.dict_data_well["current_bottom"]:
+            if emergency_bottom_line > self.data_well.current_bottom:
                 QMessageBox.warning(self, 'Ошибка',
                                           'Забой ниже глубины текущего забоя')
                 return
@@ -147,27 +146,27 @@ class EmergencyPo(WindowUnion):
                                       'ВВедите аварийный забой')
             return
 
-        if nkt_key == 'оборудование в ЭК' and self.dict_data_well["column_additional"] and \
-                emergency_bottom_line > self.dict_data_well["head_column_additional"]._value:
+        if nkt_key == 'оборудование в ЭК' and self.data_well.column_additional and \
+                emergency_bottom_line > self.data_well.head_column_additional._value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для доп колонны')
             return
-        elif nkt_key == 'оборудование в ДП' and self.dict_data_well["column_additional"] and \
-                emergency_bottom_line < self.dict_data_well["head_column_additional"]._value:
+        elif nkt_key == 'оборудование в ДП' and self.data_well.column_additional and \
+                emergency_bottom_line < self.data_well.head_column_additional._value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для основной колонны')
             return
 
-        raid_list = self.emergency_sticking(po_str_combo, lar_diametr_line, nkt_key, lar_type_combo,
+        raid_list = self.emergency_sticking(po_str_combo, lar_diameter_line, nkt_key, lar_type_combo,
                                            emergency_bottom_line, bottom_line)
-        self.dict_data_well["current_bottom"] = bottom_line
+        self.data_well.current_bottom = bottom_line
 
-        self.populate_row(self.ins_ind, raid_list, self.table_widget)
+        self.populate_row(self.insert_index, raid_list, self.table_widget)
         data_list.pause = False
         self.close()
 
 
-    def emergency_sticking(self, emergence_type, lar_diametr_line, nkt_key, lar_type_combo,
+    def emergency_sticking(self, emergence_type, lar_diameter_line, nkt_key, lar_type_combo,
                       emergency_bottom_line, bottom_line):
         from work_py.emergency_lar import EmergencyLarWork
         from work_py.emergencyWork import emergency_hook, magnet_select
@@ -197,7 +196,7 @@ class EmergencyPo(WindowUnion):
              f'Поднять аварийные НКТ до устья. \nПри выявлении отложений солей и гипса, отобрать шлам. '
              f'Сдать в лабораторию для проведения хим. анализа.',
              None, None, None, None, None, None, None,
-             'Мастер КРС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1.2)],
+             'Мастер КРС', liftingNKT_norm(self.data_well.current_bottom, 1.2)],
             [f'Завоз на скважину СБТ', None,
              f'Завоз на скважину СБТ – Укладка труб на стеллажи.',
              None, None, None, None, None, None, None,
@@ -218,17 +217,17 @@ class EmergencyPo(WindowUnion):
               f'Спустить с замером торцевую печать {magnet_select(self, "НКТ")} до аварийная головы с замером.'
               f' (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
               None, None, None, None, None, None, None,
-              'мастер КРС', descentNKT_norm(self.dict_data_well["current_bottom"], 1.2)],
+              'мастер КРС', descentNKT_norm(self.data_well.current_bottom, 1.2)],
              [None, None,
               f'Произвести работу печатью  с обратной промывкой с разгрузкой до 5т.',
               None, None, None, None, None, None, None,
               'мастер КРС, УСРСиСТ', 2.5],
              [None, None,
               f'Поднять {magnet_select(self, "НКТ")} с доливом тех жидкости в '
-              f'объеме {round(self.dict_data_well["current_bottom"] * 1.25 / 1000, 1)}м3'
-              f' удельным весом {self.dict_data_well["fluid_work"]}.',
+              f'объеме {round(self.data_well.current_bottom * 1.25 / 1000, 1)}м3'
+              f' удельным весом {self.data_well.fluid_work}.',
               None, None, None, None, None, None, None,
-              'Мастер КРС', liftingNKT_norm(self.dict_data_well["current_bottom"], 1.2)],
+              'Мастер КРС', liftingNKT_norm(self.data_well.current_bottom, 1.2)],
              [None, None,
               f'По результату ревизии печати, согласовать с ПТО  и УСРСиСТ и '
               f'подобрать ловильный инструмент',

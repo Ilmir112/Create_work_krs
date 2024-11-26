@@ -9,7 +9,7 @@ from data_base.config_base import connect_to_database, GnktDatabaseWell, connect
 
 Saddles = namedtuple('Saddles', ['saddle', 'ball'])
 
-Gnkt_data = namedtuple("Gnkt_data", ["gnkt_length", "diametr_length", "iznos", "pipe_mileage", 'pipe_fatigue', "pvo"])
+Gnkt_data = namedtuple("Gnkt_data", ["gnkt_length", "diameter_length", "iznos", "pipe_mileage", 'pipe_fatigue', "pvo"])
 
 
 
@@ -103,7 +103,7 @@ def read_database_gnkt(contractor, gnkt_number):
     return well_previus_list
 
 
-def insert_data_base_gnkt(self, contractor, well_name, gnkt_number, gnkt_length, diametr_length,
+def insert_data_base_gnkt(self, contractor, well_name, gnkt_number, gnkt_length, diameter_length,
                      iznos, pipe_mileage, pipe_fatigue, pvo, previous_well):
 
     try:
@@ -113,12 +113,12 @@ def insert_data_base_gnkt(self, contractor, well_name, gnkt_number, gnkt_length,
         if 'ойл-сервис' in contractor.lower():
             contractor = 'oil_service'
 
-        result = data_gnkt.check_data_base_gnkt(contractor, self.dict_data_well["well_number"]._value, self.dict_data_well["well_area"]._value)
+        result = data_gnkt.check_data_base_gnkt(contractor, self.data_well.well_number._value, self.data_well.well_area._value)
 
         if len(result) == 0:
             current_datetime = datetime.today().strftime('%d.%m.%Y')
 
-            data_gnkt.insert_data_base_gnkt(contractor, gnkt_number, well_name, gnkt_length, diametr_length, iznos,
+            data_gnkt.insert_data_base_gnkt(contractor, gnkt_number, well_name, gnkt_length, diameter_length, iznos,
                            pipe_mileage, pipe_fatigue, previous_well, current_datetime, pvo)
             QMessageBox.information(None, 'база данных', f'Скважина добавлена в базу данных')
     except Exception as e:
