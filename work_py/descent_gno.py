@@ -170,14 +170,14 @@ class GnoDescentWindow(WindowUnion):
             if self.data_well.depth_fond_paker_before["posle"] > self.data_well.template_depth and \
                     (self.data_well.column_additional is False or
                      (self.data_well.column_additional and
-                      self.data_well.current_bottom < self.data_well.head_column_additional._value)):
+                      self.data_well.current_bottom < self.data_well.head_column_additional.get_value)):
 
                 QMessageBox.critical(self, 'Ошибка',
                                      f'Нельзя спускать пакер {self.data_well.depth_fond_paker_before["posle"]}м'
                                      f'ниже глубины шаблонирования ЭК {self.data_well.template_depth}м')
                 return
 
-            elif self.data_well.depth_fond_paker_before["posle"] < self.data_well.head_column_additional._value and \
+            elif self.data_well.depth_fond_paker_before["posle"] < self.data_well.head_column_additional.get_value and \
                     self.data_well.depth_fond_paker_before["posle"] > self.data_well.template_depth and \
                     self.data_well.column_additional:
                 QMessageBox.critical(self, 'Ошибка',
@@ -185,7 +185,7 @@ class GnoDescentWindow(WindowUnion):
                                      f'ниже глубины шаблонирования ЭК {self.data_well.template_depth}м')
                 return
 
-            elif self.data_well.depth_fond_paker_before["posle"] > self.data_well.head_column_additional._value and \
+            elif self.data_well.depth_fond_paker_before["posle"] > self.data_well.head_column_additional.get_value and \
                     self.data_well.depth_fond_paker_before["posle"] > \
                     self.data_well.template_depth_addition \
                     and self.data_well.column_additional:
@@ -199,20 +199,20 @@ class GnoDescentWindow(WindowUnion):
                 if self.data_well.dict_pump_ecn_depth["posle"] > self.data_well.template_depth and \
                         (self.data_well.column_additional is False or
                          (self.data_well.column_additional and
-                          self.data_well.current_bottom > self.data_well.head_column_additional._value and
-                          self.data_well.dict_pump_ecn_depth["posle"] < self.data_well.head_column_additional._value)):
+                          self.data_well.current_bottom > self.data_well.head_column_additional.get_value and
+                          self.data_well.dict_pump_ecn_depth["posle"] < self.data_well.head_column_additional.get_value)):
                     QMessageBox.critical(self, 'Ошибка',
                                          f'Нельзя спускать ЭЦН {self.data_well.paker_before["posle"]}м'
                                          f'ниже глубины шаблонирования ЭК {self.data_well.template_depth}м')
                     return
-                elif self.data_well.dict_pump_ecn_depth["posle"] < self.data_well.head_column_additional._value and \
+                elif self.data_well.dict_pump_ecn_depth["posle"] < self.data_well.head_column_additional.get_value and \
                         self.data_well.dict_pump_ecn_depth["posle"] > self.data_well.template_depth and \
                         self.data_well.column_additional:
                     QMessageBox.critical(self, 'Ошибка',
                                          f'Нельзя спускать ЭЦН {self.data_well.paker_before["posle"]}м'
                                          f'ниже глубины шаблонирования ЭК {self.data_well.template_depth}м')
                     return
-                elif self.data_well.dict_pump_ecn_depth["posle"] > self.data_well.head_column_additional._value and \
+                elif self.data_well.dict_pump_ecn_depth["posle"] > self.data_well.head_column_additional.get_value and \
                         self.data_well.dict_pump_ecn_depth["posle"] > self.data_well.template_depth_addition \
                         and self.data_well.column_additional:
                     QMessageBox.critical(self, 'Ошибка',
@@ -329,7 +329,7 @@ class DescentParent(ABC):
     def calc_fond_nkt(self, len_nkt: str, distance_between_nkt: str) -> List:
 
         # расчет необходимого давления опрессовки НКТ при спуске
-        static_level = self.data_well.static_level._value
+        static_level = self.data_well.static_level.get_value
         fluid = float(self.data_well.fluid_work[:4].replace(',', '.').replace('г', ''))
 
         pressure = 40
@@ -463,7 +463,7 @@ class DescentNnWithPaker(DescentParent):
              'Мастер КРС, предст. заказчика', 0.67],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.data_well.max_admissible_pressure._value}атм в присутствии '
+             f'на давление {self.data_well.max_admissible_pressure.get_value}атм в присутствии '
              f'представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), в случае '
              f'поглощения при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ '
@@ -475,7 +475,7 @@ class DescentNnWithPaker(DescentParent):
              f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
-             f'{self.data_well.max_admissible_pressure._value}атм.'
+             f'{self.data_well.max_admissible_pressure.get_value}атм.'
              f'Спустить плунжер на компоновке штанг: {self.sucker_edit} '
              f'Окончательный компоновку штанг производить по расчету '
              f'ГНО после утверждения заказчиком. ПРИ НЕОБХОДИМОСТИ ПОИНТЕРВАЛЬНОЙ ОПРЕССОВКИ: АВТОСЦЕП УСТАНАВЛИВАТЬ '
@@ -570,7 +570,7 @@ class Conservation(DescentParent):
              'Мастер КРС, предст. заказчика', 1.27],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.data_well.max_admissible_pressure._value}атм в присутствии '
+             f'на давление {self.data_well.max_admissible_pressure.get_value}атм в присутствии '
              f'представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), в случае поглощения '
              f'при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ  о невозможности проведения '
@@ -580,7 +580,7 @@ class Conservation(DescentParent):
             [None, None,
              f'Устье скважины оборудовать площадкой размером 2х2м. На устье законсервированных скважин установить '
              f'металлическую табличку с обозначением'
-             f'скв.№ {self.data_well.well_number._value} {self.data_well.well_area._value}'
+             f'скв.№ {self.data_well.well_number.get_value} {self.data_well.well_area.get_value}'
              f' месторождение, ПАО АНК Башнефть, '
              f'дата начала и окончания консервации силами ЦДНГ после съезда бригады.',
              None, None, None, None, None, None, None,
@@ -650,7 +650,7 @@ class DescentPaker(DescentParent):
 
         if self.rgd_question_combo == 'Да':
             if self.data_well.column_additional and self.data_well.depth_fond_paker_before[
-                'posle'] >= self.data_well.head_column_additional._value:
+                'posle'] >= self.data_well.head_column_additional.get_value:
                 # print(rgd_without_paker(self))
                 for row in rgd_without_paker(self)[::-1]:
                     paker_descent.insert(0, row)
@@ -700,7 +700,7 @@ class DescentVoronka(DescentParent):
              'Мастер КРС, предст. заказчика', 1.27],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.data_well.max_admissible_pressure._value}атм в присутствии '
+             f'на давление {self.data_well.max_admissible_pressure.get_value}атм в присутствии '
              f'представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), в случае '
              f'поглощения при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ  о невозможности '
@@ -761,14 +761,14 @@ class DescentOrz(DescentParent):
              'Мастер КРС, предст. заказчика', 1.77],
             [None, None,
              f'Опрессовать пакер и ЭК и арматуру ППД на Р= '
-             f'{self.data_well.max_admissible_pressure._value}атм с открытым '
+             f'{self.data_well.max_admissible_pressure.get_value}атм с открытым '
              f'трубном пространством '
              f'в присутствии представителя заказчика на наличие перетоков.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 0.67],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.data_well.max_admissible_pressure._value}атм в присутствии'
+             f'на давление {self.data_well.max_admissible_pressure.get_value}атм в присутствии'
              f' представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), '
              f'в случае поглощения при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ '
@@ -785,7 +785,7 @@ class DescentOrz(DescentParent):
             [None, None,
              f'Произвести стыковку. Смонтировать арматуру ОРЗ. Опрессовать пакер и арматуру ОРЗ в '
              f'меж трубное пространство'
-             f' на Р= {self.data_well.max_admissible_pressure._value}атм с открытым трубном пространством '
+             f' на Р= {self.data_well.max_admissible_pressure.get_value}атм с открытым трубном пространством '
              f'в присутствии представителя заказчика на наличие перетоков.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 0.67],
@@ -876,7 +876,7 @@ class DescentORD(DescentParent):
              'Мастер КРС, предст. заказчика', 1.77],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.data_well.max_admissible_pressure._value}атм в присутствии '
+             f'на давление {self.data_well.max_admissible_pressure.get_value}атм в присутствии '
              f'представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), в случае '
              f'поглощения при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ '
@@ -887,7 +887,7 @@ class DescentORD(DescentParent):
              f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг'
              f' (ПМШ 62х21 либо аналог). Опрессовать ПВО на'
-             f' {self.data_well.max_admissible_pressure._value}атм.'
+             f' {self.data_well.max_admissible_pressure.get_value}атм.'
              f'Спустить {self.data_well.dict_pump_shgn["posle"]} на компоновке штанг: '
              f'{self.sucker_edit}  Окончательный компоновку штанг производить по расчету '
              f'ГНО после утверждения заказчиком. ПРИ НЕОБХОДИМОСТИ ПОИНТЕРВАЛЬНОЙ ОПРЕССОВКИ: АВТОСЦЕП УСТАНАВЛИВАТЬ '
@@ -953,7 +953,7 @@ class DescentNv(DescentParent):
              'Мастер КРС, предст. заказчика', 0.67 + 0.5],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.data_well.max_admissible_pressure._value}атм в'
+             f'на давление {self.data_well.max_admissible_pressure.get_value}атм в'
              f' присутствии представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), '
              f'в случае поглощения при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ о '
@@ -966,7 +966,7 @@ class DescentNv(DescentParent):
              f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
-             f'{self.data_well.max_admissible_pressure._value}атм.'
+             f'{self.data_well.max_admissible_pressure.get_value}атм.'
              f'Спустить {self.data_well.dict_pump_shgn["posle"]} на компоновке штанг: '
              f'{self.sucker_edit}  '
              f'Окончательный компоновку штанг производить по расчету '
@@ -1038,7 +1038,7 @@ class DescentEcnWithPaker(DescentParent):
              'Мастер КРС, предст. заказчика', 1.77],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.data_well.max_admissible_pressure._value}атм в '
+             f'на давление {self.data_well.max_admissible_pressure.get_value}атм в '
              f'присутствии представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), в случае поглощения '
              f'при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ  о невозможности проведения '
@@ -1110,7 +1110,7 @@ class DescentEcn(DescentParent):
              'Мастер КРС, предст. заказчика', 1.27],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.data_well.max_admissible_pressure._value}атм в присутствии '
+             f'на давление {self.data_well.max_admissible_pressure.get_value}атм в присутствии '
              f'представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), '
              f'в случае поглощения при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ '
@@ -1185,7 +1185,7 @@ class DescentNvWithPaker(DescentParent):
              'Мастер КРС, предст. заказчика', 0.67],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.data_well.max_admissible_pressure._value}атм в '
+             f'на давление {self.data_well.max_admissible_pressure.get_value}атм в '
              f'присутствии представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), в случае поглощения '
              f' при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ  о невозможности проведения '
@@ -1197,7 +1197,7 @@ class DescentNvWithPaker(DescentParent):
              f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при'
              f' СПО штанг (ПМШ 62х21 либо аналог). '
-             f'Опрессовать ПВО на {self.data_well.max_admissible_pressure._value}атм.'
+             f'Опрессовать ПВО на {self.data_well.max_admissible_pressure.get_value}атм.'
              f'Спустить {self.data_well.dict_pump_shgn["posle"]} на компоновке штанг: '
              f'{self.sucker_edit}  Окончательный компоновку штанг '
              f'производить по расчету '
@@ -1268,7 +1268,7 @@ class DescentNn(DescentParent):
              'Мастер КРС, предст. заказчика', 1.27],
             [None, None,
              f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
-             f'на давление {self.data_well.max_admissible_pressure._value}атм в присутствии '
+             f'на давление {self.data_well.max_admissible_pressure.get_value}атм в присутствии '
              f'представителя заказчика'
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), в случае поглощения'
              f' при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ  о невозможности '
@@ -1280,7 +1280,7 @@ class DescentNn(DescentParent):
              f'Обвязать устье скважины согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
-             f'{self.data_well.max_admissible_pressure._value}атм.'
+             f'{self.data_well.max_admissible_pressure.get_value}атм.'
              f'Спустить плунжер на компоновке штанг: {self.sucker_edit} '
              f'Окончательный компоновку штанг производить по расчету '
              f'ГНО после утверждения заказчиком. ПРИ НЕОБХОДИМОСТИ ПОИНТЕРВАЛЬНОЙ ОПРЕССОВКИ: АВТОСЦЕП УСТАНАВЛИВАТЬ '

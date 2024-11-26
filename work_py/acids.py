@@ -53,7 +53,7 @@ class TabPageDp(TabPageUnion):
         self.pressure_Label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
         self.pressure_edit.setClearButtonEnabled(True)
-        self.pressure_edit.setText(str(self.data_well.max_admissible_pressure._value))
+        self.pressure_edit.setText(str(self.data_well.max_admissible_pressure.get_value))
 
         self.grid = QGridLayout(self)
 
@@ -171,7 +171,7 @@ class GonsWindow(WindowUnion):
         else:
             iron_str = ""
 
-        nkt_combo = f' + НКТ60мм {round(self.data_well.current_bottom -self.data_well.head_column_additional._value, 0)}' \
+        nkt_combo = f' + НКТ60мм {round(self.data_well.current_bottom -self.data_well.head_column_additional.get_value, 0)}' \
             if self.data_well.column_additional is True else ''
         gons_list = [[f'Спуск гидромониторную насадку yf {nkt_combo} до глубины нижней точки до {bottom_point}', None,
          f'Спустить  гидромониторную насадку {nkt_combo}'         

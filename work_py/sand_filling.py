@@ -256,27 +256,27 @@ class SandWindow(WindowUnion):
 
         if self.data_well.column_additional is False or (self.data_well.column_additional is True and \
                                                                  self.data_well.current_bottom <=
-                                                                 self.data_well.head_column_additional._value):
+                                                                 self.data_well.head_column_additional.get_value):
             sand_select = f'перо + НКТ{self.data_well.nkt_diam}мм 20м + реперный патрубок'
 
         elif self.data_well.column_additional is True and \
-                self.data_well.column_additional_diameter._value < 110 and \
-                self.data_well.current_bottom >= self.data_well.head_column_additional._value:
+                self.data_well.column_additional_diameter.get_value < 110 and \
+                self.data_well.current_bottom >= self.data_well.head_column_additional.get_value:
             sand_select = f'обточную муфту + НКТ{60}мм 20м + реперный патрубок + НКТ60мм ' \
-                          f'{round(self.data_well.current_bottom - self.data_well.head_column_additional._value, 0)}м '
+                          f'{round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value, 0)}м '
         elif self.data_well.column_additional is True and \
-                self.data_well.column_additional_diameter._value > 110 and \
-                self.data_well.current_bottom >= self.data_well.head_column_additional._value:
+                self.data_well.column_additional_diameter.get_value > 110 and \
+                self.data_well.current_bottom >= self.data_well.head_column_additional.get_value:
             sand_select = f'обточную муфту + НКТ{self.data_well.nkt_diam}мм со снятыми фасками {20}м + реперный патрубок + ' \
                           f'НКТ{self.data_well.nkt_diam}мм со снятыми фасками ' \
-                          f'{round(self.data_well.current_bottom - self.data_well.head_column_additional._value, 0)}м'
+                          f'{round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value, 0)}м'
         return sand_select
 
     def sandFilling(self, filling_depth, sole_sand_edit, privyazka_question_QCombo):
 
         from work_py.alone_oreration import well_volume, volume_vn_ek
 
-        nkt_diam = ''.join(['73' if self.data_well.column_diameter._value > 110 else '60'])
+        nkt_diam = ''.join(['73' if self.data_well.column_diameter.get_value > 110 else '60'])
 
         sand_volume = round(volume_vn_ek(self, filling_depth) * (sole_sand_edit - filling_depth), 1)
 
@@ -325,9 +325,9 @@ class SandWindow(WindowUnion):
         if OpressovkaEK.testing_pressure(self, filling_depth) is False:
             filling_list.insert(-1,
                                 [
-                                    f'Опрессовать в инт{filling_depth}-0м на Р={self.data_well.max_admissible_pressure._value}атм',
+                                    f'Опрессовать в инт{filling_depth}-0м на Р={self.data_well.max_admissible_pressure.get_value}атм',
                                     None, f'Опрессовать эксплуатационную колонну в интервале {filling_depth}-0м на'
-                                          f'Р={self.data_well.max_admissible_pressure._value}атм'
+                                          f'Р={self.data_well.max_admissible_pressure.get_value}атм'
                                           f' в течение 30 минут в присутствии представителя заказчика, составить акт. '
                                           f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа'
                                           f' до начала работ)',
@@ -363,7 +363,7 @@ class SandWindow(WindowUnion):
 
     def sandWashing(self):
 
-        nkt_diam = ''.join(['73' if self.data_well.column_diameter._value > 110 else '60'])
+        nkt_diam = ''.join(['73' if self.data_well.column_diameter.get_value > 110 else '60'])
 
         washingDepth, ok = QInputDialog.getDouble(None, 'вымыв песка',
                                                   'Введите глубину вымыва песчанного моста',

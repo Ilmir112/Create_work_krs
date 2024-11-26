@@ -42,7 +42,7 @@ class TabPageSo(TabPageUnion):
                                        for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()])
         try:
             self.paker_depth_edit.setText(str(int(paker_depth)))
-        except:
+        except Exception:
             pass
 
 
@@ -118,8 +118,6 @@ class TabPageSo(TabPageUnion):
                 self.need_privyazka_q_combo.setCurrentIndex(0)
             else:
                 self.need_privyazka_q_combo.setCurrentIndex(1)
-
-
     def paker_diameter_select(self, depth_landing):
         paker_diam_dict = {
             82: (84, 92),
@@ -142,16 +140,16 @@ class TabPageSo(TabPageUnion):
         paker_diameter = 0
         try:
             if self.data_well.column_additional is False or (
-                    self.data_well.column_additional is True and int(depth_landing) <= self.data_well.head_column_additional._value):
-                diam_internal_ek = self.data_well.column_diameter._value - 2 * self.data_well.column_wall_thickness._value
+                    self.data_well.column_additional is True and int(depth_landing) <= self.data_well.head_column_additional.get_value):
+                diam_internal_ek = self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value
             else:
-                diam_internal_ek = self.data_well.column_additional_diameter._value - \
-                                   2 * self.data_well.column_additional_wall_thickness._value
+                diam_internal_ek = self.data_well.column_additional_diameter.get_value - \
+                                   2 * self.data_well.column_additional_wall_thickness.get_value
             paker_diameter = 0
             for diam, diam_internal_paker in paker_diam_dict.items():
                 if diam_internal_paker[0] <= diam_internal_ek <= diam_internal_paker[1]:
                     paker_diameter = diam
-        except:
+        except Exception as e:
             print('ошибка проверки диаметра пакера')
 
         return paker_diameter
@@ -295,39 +293,39 @@ class OpressovkaEK(WindowUnion):
     # Добавление строк с опрессовкой ЭК
     def select_combo_paker(self, paker_khost, paker_depth, paker_diameter):
         if self.data_well.column_additional is False or self.data_well.column_additional is True \
-                and paker_depth < self.data_well.head_column_additional._value:
+                and paker_depth < self.data_well.head_column_additional.get_value:
 
             paker_select = f'воронку + НКТ{self.data_well.nkt_diam}мм {paker_khost}м +' \
                            f' пакер ПРО-ЯМО-{paker_diameter}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_diameter._value}мм х {self.data_well.column_wall_thickness._value}мм +' \
+                           f'для ЭК {self.data_well.column_diameter.get_value}мм х {self.data_well.column_wall_thickness.get_value}мм +' \
                            f' {OpressovkaEK.nkt_opress(self)[0]}'
             paker_short = f'в-у + НКТ{self.data_well.nkt_diam}мм {paker_khost}м +' \
                           f' пакер ПРО-ЯМО-{paker_diameter}мм  +' \
                           f' {OpressovkaEK.nkt_opress(self)[0]}'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 and \
-                paker_depth > self.data_well.head_column_additional._value:
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
+                paker_depth > self.data_well.head_column_additional.get_value:
             paker_select = f'воронку + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                            f'{paker_diameter}мм ' \
                            f'(либо аналог)  ' \
-                           f'для ЭК {self.data_well.column_additional_diameter._value}мм х ' \
-                           f'{self.data_well.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nkt_opress(self)[0]} ' \
-                           f'+ НКТ60мм L- {round(paker_depth - self.data_well.head_column_additional._value, 0)}м'
+                           f'для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_additional_wall_thickness.get_value}мм  + {OpressovkaEK.nkt_opress(self)[0]} ' \
+                           f'+ НКТ60мм L- {round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
             paker_short = f'в-у + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                           f'{paker_diameter}мм ' \
                           f' + {OpressovkaEK.nkt_opress(self)[0]} ' \
-                          f'+ НКТ60мм L- {round(paker_depth - self.data_well.head_column_additional._value, 0)}м'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value > 110 and \
-                paker_depth > self.data_well.head_column_additional._value:
+                          f'+ НКТ60мм L- {round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110 and \
+                paker_depth > self.data_well.head_column_additional.get_value:
             paker_select = f'воронку + НКТ{self.data_well.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
                            f'пакер ПРО-ЯМО-{paker_diameter}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_additional_diameter._value}мм х ' \
-                           f'{self.data_well.column_additional_wall_thickness._value}мм  + {OpressovkaEK.nkt_opress(self)[0]}' \
+                           f'для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_additional_wall_thickness.get_value}мм  + {OpressovkaEK.nkt_opress(self)[0]}' \
                            f'+ НКТ{self.data_well.nkt_diam}мм со снятыми фасками L- ' \
-                           f'{round(paker_depth - self.data_well.head_column_additional._value, 0)}м'
+                           f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
             paker_short = f'в-у + НКТ{self.data_well.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
                           f'пакер ПРО-ЯМО-{paker_diameter}мм + {OpressovkaEK.nkt_opress(self)[0]}' \
                           f'+ НКТ{self.data_well.nkt_diam}мм со снятыми фасками L- ' \
-                          f'{round(paker_depth - self.data_well.head_column_additional._value, 0)}м'
+                          f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
 
         nkt_opress_list = OpressovkaEK.nkt_opress(self)
         return paker_select, paker_short, nkt_opress_list
@@ -348,9 +346,9 @@ class OpressovkaEK(WindowUnion):
                  None, None, None, None, None, None, None,
                  'мастер КРС', descentNKT_norm(paker_depth_zumpf, 1.2)],
                 [f'Опрессовать ЗУМПФ в инт {paker_depth_zumpf} - {self.data_well.current_bottom}м на '
-                 f'Р={self.data_well.max_admissible_pressure._value}атм', None,
+                 f'Р={self.data_well.max_admissible_pressure.get_value}атм', None,
                  f'Посадить пакер. Опрессовать ЗУМПФ в интервале {paker_depth_zumpf} - {self.data_well.current_bottom}м на '
-                 f'Р={self.data_well.max_admissible_pressure._value}атм в течение 30 минут в присутствии представителя заказчика, '
+                 f'Р={self.data_well.max_admissible_pressure.get_value}атм в течение 30 минут в присутствии представителя заказчика, '
                  f'составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
                  f'с подтверждением за 2 часа до начала работ)',
                  None, None, None, None, None, None, None,
@@ -514,16 +512,16 @@ class OpressovkaEK(WindowUnion):
                  f'При герметичности колонны:  Допустить пакер до глубины {pakerNEK}м',
                  None, None, None, None, None, None, None,
                  'мастер КРС', descentNKT_norm(pakerNEK -paker_depth, 1.2)],
-                [f'Опрессовать в инт 0-{pakerNEK}м на Р={self.data_well.max_admissible_pressure._value}атм', None,
+                [f'Опрессовать в инт 0-{pakerNEK}м на Р={self.data_well.max_admissible_pressure.get_value}атм', None,
                  f'{nkt_opress_list[1]}. Посадить пакер. Опрессовать эксплуатационную колонну в '
-                 f'интервале {pakerNEK}-0м на Р={self.data_well.max_admissible_pressure._value}атм'
+                 f'интервале {pakerNEK}-0м на Р={self.data_well.max_admissible_pressure.get_value}атм'
                  f' в течение 30 минут в присутствии представителя заказчика, составить акт.',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.77],
-                [f'Насыщение 5м3. Определение Q при Р-{self.data_well.max_admissible_pressure._value}', None,
+                [f'Насыщение 5м3. Определение Q при Р-{self.data_well.max_admissible_pressure.get_value}', None,
                  f'ПРИ НЕГЕРМЕТИЧНОСТИ: \nПроизвести насыщение скважины в объеме 5м3 по '
                  f'затрубному пространству. Определить приемистость '
-                 f'НЭК {nek_count[:-2]} при Р-{self.data_well.max_admissible_pressure._value}'
+                 f'НЭК {nek_count[:-2]} при Р-{self.data_well.max_admissible_pressure.get_value}'
                  f'атм по затрубному пространству'
                  f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль '
                  f'за отдачей жидкости '
@@ -548,9 +546,9 @@ class OpressovkaEK(WindowUnion):
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.77],
                 [f'Опрессовать ЗУМПФ в инт {paker_depth_zumpf} - {self.data_well.current_bottom}м на '
-                 f'Р={self.data_well.max_admissible_pressure._value}атм', None,
+                 f'Р={self.data_well.max_admissible_pressure.get_value}атм', None,
                  f'Посадить пакер. Опрессовать ЗУМПФ в интервале {paker_depth_zumpf} - {self.data_well.current_bottom}м на '
-                 f'Р={self.data_well.max_admissible_pressure._value}атм в течение 30 минут в присутствии представителя заказчика, '
+                 f'Р={self.data_well.max_admissible_pressure.get_value}атм в течение 30 минут в присутствии представителя заказчика, '
                  f'составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
                  f'с подтверждением за 2 часа до начала работ)',
                  None, None, None, None, None, None, None,
@@ -604,10 +602,10 @@ class OpressovkaEK(WindowUnion):
         # print(f' глубина шаблона {self.data_well.template_depth}, посадка пакера {depth}')
         while check_true is False:
             if depth < float(
-                    self.data_well.head_column_additional._value) and depth <= self.data_well.template_depth and self.data_well.column_additional:
+                    self.data_well.head_column_additional.get_value) and depth <= self.data_well.template_depth and self.data_well.column_additional:
                 check_true = True
             elif depth > float(
-                    self.data_well.head_column_additional._value) and depth <= self.data_well.template_depth_addition and self.data_well.column_additional:
+                    self.data_well.head_column_additional.get_value) and depth <= self.data_well.template_depth_addition and self.data_well.column_additional:
                 check_true = True
             elif depth <= self.data_well.template_depth and self.data_well.column_additional is False:
                 check_true = True
@@ -641,21 +639,21 @@ class OpressovkaEK(WindowUnion):
         if any([float(interval[1]) < float(depth) for interval in interval_list]):
             check_true = True
             testing_pressure_str = f'Закачкой тех жидкости в затрубное пространство при Р=' \
-                                   f'{self.data_well.max_admissible_pressure._value}атм' \
+                                   f'{self.data_well.max_admissible_pressure.get_value}атм' \
                                    f' удостоверить в отсутствии выхода тех жидкости и герметичности пакера, составить акт. ' \
                                    f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа ' \
                                    f'до начала работ)'
             testing_pressure_short = f'Закачкой в затруб при Р=' \
-                                     f'{self.data_well.max_admissible_pressure._value}атм' \
+                                     f'{self.data_well.max_admissible_pressure.get_value}атм' \
                                      f' удостоверить в герметичности пакера'
         else:
             check_true = False
             testing_pressure_str = f'Опрессовать эксплуатационную колонну в интервале {depth}-0м на ' \
-                                   f'Р={self.data_well.max_admissible_pressure._value}атм' \
+                                   f'Р={self.data_well.max_admissible_pressure.get_value}атм' \
                                    f' в течение 30 минут в присутствии представителя заказчика, составить акт. ' \
                                    f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа ' \
                                    f'до начала работ)'
-            testing_pressure_short = f'Опрессовать в {depth}-0м на Р={self.data_well.max_admissible_pressure._value}атм'
+            testing_pressure_short = f'Опрессовать в {depth}-0м на Р={self.data_well.max_admissible_pressure.get_value}атм'
 
         return testing_pressure_str, testing_pressure_short, check_true
 

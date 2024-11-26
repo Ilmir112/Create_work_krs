@@ -313,7 +313,7 @@ class PvrApplication(WindowUnion):
         self.close()
         self.ws_pvr.print_area = f'B1:AP{114}'
 
-        filenames = f'{self.data_well.well_number._value} {self.data_well.well_area._value} ПВР {data_list.current_date}.xlsx'
+        filenames = f'{self.data_well.well_number.get_value} {self.data_well.well_area.get_value} ПВР {data_list.current_date}.xlsx'
         path = 'D:\Documents\Desktop\ГТМ\заявки ГИС'
         full_path = path + "/" + filenames
         if wb:
@@ -336,12 +336,12 @@ class PvrApplication(WindowUnion):
     def application_pvr_def(self, number_brigada, number_telephone, date_new_edit, time_new_edit, work_edit, nkt_edit, nkt_shoe_edit,
                             nkt_com_edit, paker_type, paker_depth, fluid):
 
-        column_data = f'{self.data_well.column_diameter._value}мм x {self.data_well.column_wall_thickness._value} в инт ' \
-                      f'0-{self.data_well.shoe_column._value}м'
+        column_data = f'{self.data_well.column_diameter.get_value}мм x {self.data_well.column_wall_thickness.get_value} в инт ' \
+                      f'0-{self.data_well.shoe_column.get_value}м'
         if self.data_well.column_additional:
-            column_data_add = f'{self.data_well.column_additional_diameter._value}мм x ' \
-                              f'{self.data_well.column_additional_wall_thickness._value} в инт ' \
-                          f'{self.data_well.head_column_additional._value}-{self.data_well.shoe_column_additional._value}м'
+            column_data_add = f'{self.data_well.column_additional_diameter.get_value}мм x ' \
+                              f'{self.data_well.column_additional_wall_thickness.get_value} в инт ' \
+                          f'{self.data_well.head_column_additional.get_value}-{self.data_well.shoe_column_additional.get_value}м'
         else:
             column_data_add = ''
         pressure = self.data_well.dict_category[list(self.data_well.dict_category.keys())[0]]['по давлению'].data_pressure
@@ -376,7 +376,7 @@ class PvrApplication(WindowUnion):
              None, None, None, None, None, None, None, None, None],
             [None, 'Заказчик', None, None, None, f'{data_list.contractor}', None, None, None, None, None, None, None, None, None,
              None,
-             None, None, None, 'Цех', None, None, self.data_well.cdng._value, None, None, None, None, None, None, None, None,
+             None, None, None, 'Цех', None, None, self.data_well.cdng.get_value, None, None, None, None, None, None, None, None,
              None,
              None,
              None, None, None, None, None, None, None, None, None, None],
@@ -385,14 +385,14 @@ class PvrApplication(WindowUnion):
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None, None],
-            [None, '№ скважины', None, None, None, None, self.data_well.well_number._value, None, None, None, None, None, None,
+            [None, '№ скважины', None, None, None, None, self.data_well.well_number.get_value, None, None, None, None, None, None,
              'куст', None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None,
              None, None, None, None, None, None, None, None, None],
             [None, 'Регион', None, None, None, self.data_well.region, None, None, None, None, None, None, None,
              'Месторождение',
-             None, None, None, None, None, self.data_well.well_area._value, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None, self.data_well.well_area.get_value, None, None, None, None, None, None, None, None, None,
              None,
              None,
              None, None, None, None, None, None, None, None, None, None, None, None],
@@ -509,17 +509,17 @@ class PvrApplication(WindowUnion):
              None, None, None, None, None, 'H2S:', None, self.data_well.category_h2s, None, None, None, None, None, None,
              'Газовый фактор:',
              None, None, None, None, None, None,self.data_well.category_gas_factor, None, None, None, None, None, None, None],
-            [None, 'Пробуренный забой', None, None, None, None, None, None, self.data_well.bottom_hole_drill._value, None, None, None,
+            [None, 'Пробуренный забой', None, None, None, None, None, None, self.data_well.bottom_hole_drill.get_value, None, None, None,
              None,
-             'м.', None, 'Искусственный забой', None, None, None, None, None, None, None, self.data_well.bottom_hole_artificial._value, None,
+             'м.', None, 'Искусственный забой', None, None, None, None, None, None, None, self.data_well.bottom_hole_artificial.get_value, None,
              None,
              'м.', None, 'Текущий забой', None, None, None, None, None, self.data_well.current_bottom, None, None, None, 'м.',
              None,
              None, None, None],
-            [None, 'Максимальный угол', None, None, None, None, None, None, self.data_well.max_angle._value, None, None, None, None,
-             None, None, 'гр.', None, 'на глубине', None, None, None, self.data_well.max_angle_depth._value, None, None, None, None, 'м.',
+            [None, 'Максимальный угол', None, None, None, None, None, None, self.data_well.max_angle.get_value, None, None, None, None,
+             None, None, 'гр.', None, 'на глубине', None, None, None, self.data_well.max_angle_depth.get_value, None, None, None, None, 'м.',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, 'Расстояние муфта-ротор', None, None, None, None, None, None, None, None, self.data_well.stol_rotor._value, None,
+            [None, 'Расстояние муфта-ротор', None, None, None, None, None, None, None, None, self.data_well.stol_rotor.get_value, None,
              None, None, 'м.', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'диаметр обсадной колонны, мм.', None, None, None, None, None, None, None, None, None, None, None,
@@ -549,16 +549,16 @@ class PvrApplication(WindowUnion):
              None,
              None, None, None, None, None, 'Высота подъема цемента за колонной, м.', None, None, None, None, None, None,
              None,
-             None, None, None, None, None, None, self.data_well.level_cement_column._value, None, None, None, None, None, None, None, None],
+             None, None, None, None, None, None, self.data_well.level_cement_column.get_value, None, None, None, None, None, None, None, None],
             [None, 'Устьевое оборудование скважины', None, None, None, None, None, None, None, None, None, None, None,
-             f'ПШП-{self.data_well.column_diameter._value}',
+             f'ПШП-{self.data_well.column_diameter.get_value}',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None, None, None],
             [None, 'Скважина заполнена:', None, None, None, None, None, None, None, 'Тип:', None, 'тех.вода ', None,
              None, None,
              None, None, None, None, None, None, None, None, None, 'Уровень, м', None, None, None,
-             self.data_well.static_level._value, None, None,
+             self.data_well.static_level.get_value, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Плотность, г./см3', None, None, None, None, None, fluid, None, None, None, None, None,
              'Вязкость, сек.', None, None, None, None, None, None, None, None, None, None, None, 'УЭС, Омм', None, None,
@@ -573,7 +573,7 @@ class PvrApplication(WindowUnion):
              None, None,
              f'{pressure}атм', None, None, None, None, None, None, None, 'Газовый фактор, м3/т', None, None, None,
              None, None,
-             None, None, self.data_well.gaz_factor_procent[0], None, None, None, None, None, None, None, None, None, None, None, None],
+             None, None, self.data_well.gaz_factor_percent[0], None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Температура в интервале ПВР, С', None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -864,7 +864,7 @@ class PvrApplication(WindowUnion):
              None, None, None, None, None],
             [None, 'Максимально ожидаемое давление на устье скважины', None, None, None, None, None, None, None, None,
              None,
-             None, None, None, None, None, None, None, None, f'{self.data_well.max_admissible_pressure._value}', None, None, None, None, None, None,
+             None, None, None, None, None, None, None, None, f'{self.data_well.max_admissible_pressure.get_value}', None, None, None, None, None, None,
              'атм.',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Расстояние до скважины', None, None, None, None, None, None, None, None, None, None, None, None,

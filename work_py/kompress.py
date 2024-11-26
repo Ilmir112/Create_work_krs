@@ -140,7 +140,7 @@ class KompressWindow(WindowUnion):
         plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
         depth_gauge_combo = str(self.tabWidget.currentWidget().depth_gauge_combo.currentText())
 
-        if int(khvost_edit) - (count_muft * int(dictance_without_murt)) - 100 < self.data_well.static_level._value:
+        if int(khvost_edit) - (count_muft * int(dictance_without_murt)) - 100 < self.data_well.static_level.get_value:
             QMessageBox.warning(self, 'Некорректные данные',
                                 f'Статический уровень в скважине {self.data_well.static_level} ниже глубины '
                                 f'вверхней муфты {int(khvost_edit) - (count_muft * int(dictance_without_murt))}'
@@ -181,7 +181,7 @@ class KompressWindow(WindowUnion):
         nkt_diam = self.data_well.nkt_diam
 
         if self.data_well.column_additional is False or self.data_well.column_additional is True and \
-                khvost_edit < self.data_well.head_column_additional._value:
+                khvost_edit < self.data_well.head_column_additional.get_value:
             paker_select = f'воронку + c/о {gauge} + НКТ{nkt_diam} '
             paker_short = f'в-ку + c/о {gauge} + НКТ{nkt_diam} '
             for ind in range(count_muft, 1, -1):
@@ -191,8 +191,8 @@ class KompressWindow(WindowUnion):
             paker_select += f' {dictance_without_murt}м ПМ - 1мм '
             paker_short += f' {dictance_without_murt}м ПМ - 1мм '
             dict_nkt = {73: khvost_edit}
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 and \
-                khvost_edit > self.data_well.head_column_additional._value:
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
+                khvost_edit > self.data_well.head_column_additional.get_value:
             paker_select = f'воронку + НКТ{60} '
             paker_short = f'в-ку + НКТ{60} '
             for ind in range(count_muft):
@@ -200,12 +200,12 @@ class KompressWindow(WindowUnion):
                 paker_short += f' {dictance_without_murt}м + ПМ - {ind}мм + НКТ{60}'
 
             paker_select += f' ПМ - 1мм  + НКТ{60} ' \
-                            f'{int(khvost_edit - (count_muft * dictance_without_murt) - self.data_well.head_column_additional._value)}м'
+                            f'{int(khvost_edit - (count_muft * dictance_without_murt) - self.data_well.head_column_additional.get_value)}м'
             paker_short += f' ПМ - 1мм + НКТ{60} ' \
-                           f'{int(khvost_edit - (count_muft * dictance_without_murt) - self.data_well.head_column_additional._value)}м'
+                           f'{int(khvost_edit - (count_muft * dictance_without_murt) - self.data_well.head_column_additional.get_value)}м'
 
-            dict_nkt = {73: self.data_well.head_column_additional._value,
-                        60: int(khvost_edit - self.data_well.head_column_additional._value)}
+            dict_nkt = {73: self.data_well.head_column_additional.get_value,
+                        60: int(khvost_edit - self.data_well.head_column_additional.get_value)}
 
         paker_list = [
             [f'СПО {paker_short} на НКТ{nkt_diam}м до глубины {khvost_edit}м.', None,
@@ -224,7 +224,7 @@ class KompressWindow(WindowUnion):
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое '
              f'давление опрессовки э/колонны на устье '
-             f'{self.data_well.max_admissible_pressure._value}атм,'
+             f'{self.data_well.max_admissible_pressure.get_value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести '
              f'практическое обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',

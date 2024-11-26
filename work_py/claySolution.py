@@ -185,10 +185,10 @@ class ClayWindow(WindowUnion):
 
     def clay_solution_q(self, current_bottom_edit, volume_clay_edit):
         if self.data_well.column_additional is True and \
-                self.data_well.column_additional_diameter._value < 110 and \
-                current_bottom_edit > self.data_well.head_column_additional._value:
-            dict_nkt = {73: self.data_well.head_column_additional._value,
-                        60: current_bottom_edit - self.data_well.head_column_additional._value}
+                self.data_well.column_additional_diameter.get_value < 110 and \
+                current_bottom_edit > self.data_well.head_column_additional.get_value:
+            dict_nkt = {73: self.data_well.head_column_additional.get_value,
+                        60: current_bottom_edit - self.data_well.head_column_additional.get_value}
         else:
             dict_nkt = {73: current_bottom_edit}
         glin_list = [
@@ -219,7 +219,7 @@ class ClayWindow(WindowUnion):
              f'{volume_clay_edit}м3 + тех. воду '
              f'в объёме {round(volume_vn_nkt(dict_nkt) - volume_clay_edit, 1)}м3. Закрыть затруб. '
              f'Продавить в НКТ тех. воду  в объёме {volume_vn_nkt(dict_nkt)}м3 при давлении не более '
-             f'{self.data_well.max_admissible_pressure._value}атм.',
+             f'{self.data_well.max_admissible_pressure.get_value}атм.',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
             [f'Коагуляция 4 часа', None,
@@ -260,7 +260,7 @@ class ClayWindow(WindowUnion):
                 f'Продавить в НКТ остаток глинистого раствора в объеме '
                 f'{round(volume_clay_edit - volume_vn_nkt(dict_nkt), 1)} и тех. воду  в объёме '
                 f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более '
-                f'{self.data_well.max_admissible_pressure._value}атм.',
+                f'{self.data_well.max_admissible_pressure.get_value}атм.',
                 None, None, None, None, None, None, None,
                 'мастер КРС', 0.5]
         self.calculate_chemistry('глина', volume_clay_edit)
@@ -269,13 +269,13 @@ class ClayWindow(WindowUnion):
     def clay_solution_def(self, rir_roof, rir_sole, rir_question_combo,
                           roof_rir_edit=0, sole_rir_edit=0, volume_cement=0):
 
-        nkt_diam = ''.join(['73' if self.data_well.column_diameter._value > 110 else '60'])
+        nkt_diam = ''.join(['73' if self.data_well.column_diameter.get_value > 110 else '60'])
         volume_clay = round(volume_vn_ek(self, rir_sole) * (rir_sole - rir_roof) / 1000, 1)
 
-        if self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 and \
-                rir_sole > self.data_well.head_column_additional._value:
-            dict_nkt = {73: self.data_well.head_column_additional._value,
-                        60: self.data_well.head_column_additional._value - rir_sole}
+        if self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
+                rir_sole > self.data_well.head_column_additional.get_value:
+            dict_nkt = {73: self.data_well.head_column_additional.get_value,
+                        60: self.data_well.head_column_additional.get_value - rir_sole}
         else:
             dict_nkt = {73: rir_sole}
 
@@ -361,10 +361,10 @@ class ClaySolutionForRir(ClayWork):
 
     def clay_solution_q(self):
         if (self.data_well.column_additional is True and
-                self.data_well.column_additional_diameter._value < 110 and \
-                self.current_bottom > self.data_well.head_column_additional._value):
-            dict_nkt = {73: self.data_well.head_column_additional._value,
-                        60: self.current_bottom - self.data_well.head_column_additional._value}
+                self.data_well.column_additional_diameter.get_value < 110 and \
+                self.current_bottom > self.data_well.head_column_additional.get_value):
+            dict_nkt = {73: self.data_well.head_column_additional.get_value,
+                        60: self.current_bottom - self.data_well.head_column_additional.get_value}
         else:
             dict_nkt = {73: self.current_bottom}
         glin_list = [
@@ -395,7 +395,7 @@ class ClaySolutionForRir(ClayWork):
              f'{self.volume_clay}м3 + тех. воду '
              f'в объёме {round(volume_vn_nkt(dict_nkt) - self.volume_clay, 1)}м3. Закрыть затруб. '
              f'Продавить в НКТ тех. воду  в объёме {volume_vn_nkt(dict_nkt)}м3 при давлении не более '
-             f'{self.data_well.max_admissible_pressure._value}атм.',
+             f'{self.data_well.max_admissible_pressure.get_value}атм.',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
             [f'Коагуляция 4 часа', None,
@@ -435,7 +435,7 @@ class ClaySolutionForRir(ClayWork):
                 f'Продавить в НКТ остаток глинистого раствора в объеме '
                 f'{round(self.volume_clay - volume_vn_nkt(dict_nkt), 1)} и тех. воду  в объёме '
                 f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более '
-                f'{self.data_well.max_admissible_pressure._value}атм.',
+                f'{self.data_well.max_admissible_pressure.get_value}атм.',
                 None, None, None, None, None, None, None,
                 'мастер КРС', 0.5]
         self.calculate_chemistry('глина', self.volume_clay)
@@ -471,14 +471,14 @@ class ClaySolutionForEk(ClayWork):
         return work_list
 
     def clay_solution_def(self):
-        nkt_diam = ''.join(['73' if self.data_well.column_diameter._value > 110 else '60'])
+        nkt_diam = ''.join(['73' if self.data_well.column_diameter.get_value > 110 else '60'])
 
         volume_clay = round(volume_calculate_roof_of_sole(self.data_well, self.roof_clay, self.sole_clay), 1)
 
-        if self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 and \
-                self.sole_clay > self.data_well.head_column_additional._value:
-            dict_nkt = {73: self.data_well.head_column_additional._value,
-                        60: self.data_well.head_column_additional._value - self.sole_clay}
+        if self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
+                self.sole_clay > self.data_well.head_column_additional.get_value:
+            dict_nkt = {73: self.data_well.head_column_additional.get_value,
+                        60: self.data_well.head_column_additional.get_value - self.sole_clay}
         else:
             dict_nkt = {73: self.sole_clay}
 

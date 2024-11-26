@@ -22,7 +22,7 @@ class TabPageSoBlock(TabPageUnion):
         self.pero_combo_QCombo = QComboBox(self)
         self.pero_combo_QCombo.addItems(['перо', 'обточную муфту', 'перо-110мм', 'пило-муфту', 'по затрубу'])
 
-        if self.data_well.column_additional or self.data_well.column_diameter._value < 120:
+        if self.data_well.column_additional or self.data_well.column_diameter.get_value < 120:
             self.pero_combo_QCombo.setCurrentIndex(1)
 
         plast_work = ['']
@@ -89,7 +89,7 @@ class TabPageSoBlock(TabPageUnion):
     def calculate_volume_block_pack(self):
         from work_py.alone_oreration import well_volume
         k = 0.05
-        if float(self.data_well.max_angle._value) > 85:
+        if float(self.data_well.max_angle.get_value) > 85:
             k = 0.01
         if self.type_of_block_processing_combo.currentText() == 'для глушения':
             volume_udel = 1
@@ -144,10 +144,10 @@ class BlockPackWindow(WindowUnion):
         try:
             pero_combo_QCombo = self.tabWidget.currentWidget().pero_combo_QCombo.currentText()
             current_edit = int(float(self.tabWidget.currentWidget().current_edit.text().replace(',', '.')))
-            if current_edit >= self.data_well.bottom_hole_artificial._value:
+            if current_edit >= self.data_well.bottom_hole_artificial.get_value:
                 QMessageBox.warning(self, 'Ошибка',
                                     f'Необходимый забой-{current_edit}м ниже исскуственного '
-                                    f'{self.data_well.bottom_hole_artificial._value}м')
+                                    f'{self.data_well.bottom_hole_artificial.get_value}м')
                 return
             plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
             type_of_block_processing_combo = str(

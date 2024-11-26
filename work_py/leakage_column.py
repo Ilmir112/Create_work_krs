@@ -115,8 +115,8 @@ class LeakageWindow(WindowUnion):
         if not roof_leakage or not sole_leakage_line:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-        # ada = float(self.data_well.bottom_hole_artificial._value)
-        # if float(self.data_well.bottom_hole_artificial._value) <= float(sole_leakage_line):
+        # ada = float(self.data_well.bottom_hole_artificial.get_value)
+        # if float(self.data_well.bottom_hole_artificial.get_value) <= float(sole_leakage_line):
         #     QMessageBox.information(self, 'Внимание', 'глубина НЭК ниже искусственного забоя')
         #     return
 
@@ -139,7 +139,7 @@ class LeakageWindow(WindowUnion):
 
 
             return dict_leakiness
-        except:
+        except Exception:
             QMessageBox.warning(self, 'Ошибка', 'Данные введены не корректно')
             LeakageWindow.add_string(self)
 

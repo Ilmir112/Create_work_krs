@@ -118,37 +118,37 @@ class PakerAspo(WindowUnion):
     # Добавление строк с опрессовкой ЭК
     def paker_list(self, paker_diameter, paker_khost, paker_depth):
         if self.data_well.column_additional is False or self.data_well.column_additional is True \
-                and paker_depth < self.data_well.head_column_additional._value:
+                and paker_depth < self.data_well.head_column_additional.get_value:
 
             paker_select = f'Заглушка сбивной клапан с ввертышем + НКТ{self.data_well.nkt_diam}мм {paker_khost}м +' \
                            f' пакер ПРО-ЯМО-{paker_diameter}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_diameter._value}мм х {self.data_well.column_wall_thickness._value}мм + щелевой фильтр' \
+                           f'для ЭК {self.data_well.column_diameter.get_value}мм х {self.data_well.column_wall_thickness.get_value}мм + щелевой фильтр' \
                            f' {OpressovkaEK.nkt_opress(self)[0]}'
             paker_short = f'Заглушка сбивной клапан с ввертышем + + НКТ{self.data_well.nkt_diam}мм {paker_khost}м +' \
                           f' пакер ПРО-ЯМО-{paker_diameter}мм  + ' \
                           f'  + щелевой фильтр'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 and \
-                paker_depth > self.data_well.head_column_additional._value:
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
+                paker_depth > self.data_well.head_column_additional.get_value:
             paker_select = f'Заглушка сбивной клапан с ввертышем + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                            f'{paker_diameter}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_additional_diameter._value}мм х ' \
-                           f'{self.data_well.column_additional_wall_thickness._value}мм ' \
-                           f'+ НКТ60мм L- {round(paker_depth - self.data_well.head_column_additional._value, 0)}м'
+                           f'для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_additional_wall_thickness.get_value}мм ' \
+                           f'+ НКТ60мм L- {round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
             paker_short = f'Заглушка сбивной клапан с ввертышем + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                           f'{paker_diameter}мм + щелевой фильтр' \
-                          f'+ НКТ60мм L- {round(paker_depth - self.data_well.head_column_additional._value, 0)}м'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value > 110 and \
-                paker_depth > self.data_well.head_column_additional._value:
+                          f'+ НКТ60мм L- {round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110 and \
+                paker_depth > self.data_well.head_column_additional.get_value:
             paker_select = f'Заглушка сбивной клапан с ввертышем + НКТ{self.data_well.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
                            f'пакер ПРО-ЯМО-{paker_diameter}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_additional_diameter._value}мм х ' \
-                           f'{self.data_well.column_additional_wall_thickness._value}мм + щелевой фильтр' \
+                           f'для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_additional_wall_thickness.get_value}мм + щелевой фильтр' \
                            f'+ НКТ{self.data_well.nkt_diam}мм со снятыми фасками L- ' \
-                           f'{round(paker_depth - self.data_well.head_column_additional._value, 0)}м'
+                           f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
             paker_short = f'Заглушка сбивной клапан с ввертышем + НКТ{self.data_well.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
                           f'пакер ПРО-ЯМО-{paker_diameter}мм + щелевой фильтр' \
                           f'+ НКТ{self.data_well.nkt_diam}мм со снятыми фасками L- ' \
-                          f'{round(paker_depth - self.data_well.head_column_additional._value, 0)}м'
+                          f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
 
         nkt_opress_list = OpressovkaEK.nkt_opress(self)
 

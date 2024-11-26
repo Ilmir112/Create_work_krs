@@ -164,7 +164,7 @@ class TabPageGnkt(TabPageUnion):
             self.acid_proc_edit.setValidator(self.validator_int)
             self.pressure_Label = QLabel("Давление закачки", self)
             self.pressure_edit = QLineEdit(self)
-            self.pressure_edit.setText(f'{self.data_well.max_admissible_pressure._value}')
+            self.pressure_edit.setText(f'{self.data_well.max_admissible_pressure.get_value}')
             self.pressure_edit.setValidator(self.validator_int)
 
             self.roof_label = QLabel("кровля пласта", self)
@@ -525,9 +525,9 @@ class GnktModel(WindowUnion):
             return
         else:
             self.current_bottom_edit = float(self.current_bottom_edit.replace(',', '.'))
-            if self.current_bottom_edit > float(self.data_well.bottom_hole_drill._value):
+            if self.current_bottom_edit > float(self.data_well.bottom_hole_drill.get_value):
                 QMessageBox.warning(self, 'Некорректные данные',
-                                    f'Текущий забой ниже пробуренного забоя {self.data_well.bottom_hole_drill._value}')
+                                    f'Текущий забой ниже пробуренного забоя {self.data_well.bottom_hole_drill.get_value}')
                 return
 
         self.fluid_edit = self.current_widget.fluid_edit.text()
@@ -593,7 +593,7 @@ class GnktModel(WindowUnion):
                        f' Крезол НС с протяжкой БДТ вдоль интервалов перфорации {roof}-{sole}м ' \
                        f'(снизу вверх) в ' \
                        f'присутствии представителя заказчика с составлением акта, не превышая давления' \
-                       f' закачки не более Р={self.data_well.max_admissible_pressure._value}атм.\n' \
+                       f' закачки не более Р={self.data_well.max_admissible_pressure.get_value}атм.\n' \
                        f' (для приготовления соляной кислоты в объеме {acid_volume_edit}м3 - ' \
                        f'{acid_proc_edit}% необходимо замешать {acid_24}т HCL 24% и пресной воды ' \
                        f'{round(acid_volume_edit - acid_24, 1)}м3)'
@@ -604,7 +604,7 @@ class GnktModel(WindowUnion):
                        f'НС с протяжкой БДТ вдоль интервалов перфорации {roof}-{sole}м (снизу вверх) в присутствии ' \
                        f'представителя ' \
                        f'Заказчика с составлением акта, не превышая давления закачки не более ' \
-                       f'Р = {self.data_well.max_admissible_pressure._value}атм.'
+                       f'Р = {self.data_well.max_admissible_pressure.get_value}атм.'
             acid_sel_short = f'{acid_edit} пласта {plast_combo}  в объеме ' \
                              f'{acid_volume_edit}м3  ({acid_edit} - {acid_proc_edit} %)'
         elif acid_edit == 'HF':
@@ -614,7 +614,7 @@ class GnktModel(WindowUnion):
                        f'НС с протяжкой БДТ вдоль интервалов перфорации {roof}-{sole}м (снизу вверх) в' \
                        f' присутствии представителя ' \
                        f'Заказчика с составлением акта, не превышая давления закачки не более ' \
-                       f'Р={self.data_well.max_admissible_pressure._value}атм.'
+                       f'Р={self.data_well.max_admissible_pressure.get_value}атм.'
             acid_sel_short = f'ГКО пласта {plast_combo}  в объеме  {acid_volume_edit}м3'
         elif acid_edit == 'Лимонная кислота':
             acid_sel = f'Произвести лимонной кислотой пласта {plast_combo} в объеме ' \
@@ -622,7 +622,7 @@ class GnktModel(WindowUnion):
                        f'с протяжкой БДТ вдоль интервалов перфорации {roof}-{sole}м (снизу вверх) в присутствии' \
                        f' представителя ' \
                        f'Заказчика с составлением акта, не превышая давления закачки не более ' \
-                       f'Р={self.data_well.max_admissible_pressure._value}атм.'
+                       f'Р={self.data_well.max_admissible_pressure.get_value}атм.'
             acid_sel_short = f'КО лимонной кислотой пласта {plast_combo} в объеме {acid_volume_edit}м3'
 
         return acid_sel, acid_sel_short
@@ -678,7 +678,7 @@ class GnktModel(WindowUnion):
                                 f'в объёме '
                                 f'{round(self.volume_gntk + 3, 1)}м3 при '
                                 f'давлении не более '
-                                f'{self.data_well.max_admissible_pressure._value}атм. Составить Акт',
+                                f'{self.data_well.max_admissible_pressure.get_value}атм. Составить Акт',
                       None, None, None, None, None, None, None,
                       'Мастер ГНКТ, состав бригады', 1.11],
                      [None, 20,
@@ -706,7 +706,7 @@ class GnktModel(WindowUnion):
                       f'Допустить БДТ до забоя. Промыть скважину  мин.водой уд.веса {self.data_well.fluid_work}  с составлением '
                       f'соответствующего акта. При отсутствии циркуляции дальнейшие промывки исключить. Определить '
                       f'приемистость пласта в трубное пространство при давлении не более '
-                      f'{self.data_well.max_admissible_pressure._value}атм'
+                      f'{self.data_well.max_admissible_pressure.get_value}атм'
                       f'  (перед определением приемистости произвести закачку тех.воды не менее 6м3 или при установившемся '
                       f'давлении закачки, но не более 1 часа). Установить БДТ на гл.{self.data_well.current_bottom}м.',
                       None, None, None, None, None, None, None,
@@ -717,7 +717,7 @@ class GnktModel(WindowUnion):
 
     def check_volume_well(self, data_well):
         if data_well.column_additional:
-            well_volume_ek = well_volume(self, data_well.head_column_additional._value)
+            well_volume_ek = well_volume(self, data_well.head_column_additional.get_value)
         else:
             well_volume_ek = well_volume(self, data_well.current_bottom)
         if abs(float(data_well.well_volume_in_pz[0]) - well_volume_ek) > 0.2:
@@ -822,18 +822,18 @@ class GnktModel(WindowUnion):
         length_nkt = '\n'.join(length_str)
 
         volume_pm_ek = round(
-            3.14 * (self.data_well.column_diameter._value - 2 * self.data_well.column_wall_thickness._value) ** 2 / 4 / 1000, 2)
-        volume_pm_dp = round(3.14 * (self.data_well.column_additional_diameter._value - 2 *
-                                     self.data_well.column_additional_wall_thickness._value) ** 2 / 4 / 1000, 2)
+            3.14 * (self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value) ** 2 / 4 / 1000, 2)
+        volume_pm_dp = round(3.14 * (self.data_well.column_additional_diameter.get_value - 2 *
+                                     self.data_well.column_additional_wall_thickness.get_value) ** 2 / 4 / 1000, 2)
 
         if self.data_well.column_additional:
-            column_data_add_diam = self.data_well.column_additional_diameter._value
-            column_data_add_wall_thickness = self.data_well.column_additional_wall_thickness._value
+            column_data_add_diam = self.data_well.column_additional_diameter.get_value
+            column_data_add_wall_thickness = self.data_well.column_additional_wall_thickness.get_value
 
             column_data_add_vn_volume = round(
-                self.data_well.column_additional_diameter._value - 2 * self.data_well.column_additional_wall_thickness._value, 1)
-            column_add_head = self.data_well.head_column_additional._value
-            column_add_shoe = self.data_well.shoe_column_additional._value
+                self.data_well.column_additional_diameter.get_value - 2 * self.data_well.column_additional_wall_thickness.get_value, 1)
+            column_add_head = self.data_well.head_column_additional.get_value
+            column_add_shoe = self.data_well.shoe_column_additional.get_value
 
         else:
             column_data_add_diam = ''
@@ -851,7 +851,7 @@ class GnktModel(WindowUnion):
             expected_title = 'Ожидаемый дебит скважины'
             Qoil = f'{self.data_well.Qoil}т/сут'
             Qwater = f'{self.data_well.Qwater}м3/сут'
-            proc_water = f'{self.data_well.procent_water}%'
+            proc_water = f'{self.data_well.percent_water}%'
 
         nkt = list(self.data_well.dict_nkt_before.keys())
         if len(nkt) != 0:
@@ -863,8 +863,8 @@ class GnktModel(WindowUnion):
             if 'грп' in str(self.data_well.wellhead_fittings).lower():
                 wellhead_fittings = self.data_well.wellhead_fittings
             else:
-                wellhead_fittings = f'АУШГН-{self.data_well.column_diameter._value}/' \
-                                    f'АУГРП {self.data_well.column_diameter._value}*14'
+                wellhead_fittings = f'АУШГН-{self.data_well.column_diameter.get_value}/' \
+                                    f'АУГРП {self.data_well.column_diameter.get_value}*14'
 
         elif self.data_well.work_plan == 'gnkt_bopz':
 
@@ -902,11 +902,11 @@ class GnktModel(WindowUnion):
              self.data_well.column_head_m, None,
              None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None,
-             f'ЭК {self.data_well.column_diameter._value}мм', None,
+             f'ЭК {self.data_well.column_diameter.get_value}мм', None,
              None,
-             'Стол ротора', None, f'{self.data_well.stol_rotor._value}м',
+             'Стол ротора', None, f'{self.data_well.stol_rotor.get_value}м',
              'Øнаруж мм', 'толщ, мм', 'Øвнут, мм', 'Интервал спуска, м', None, 'ВПЦ.\nДлина', 'Объем', None],
-            [None, None, None, None, None, None, None, None, None, f'0-{self.data_well.shoe_column._value}м',
+            [None, None, None, None, None, None, None, None, None, f'0-{self.data_well.shoe_column.get_value}м',
              None, None,
              'Ø канавки', None, f'{self.data_well.groove_diameter}', None, None,
              None, None, None, None, 'л/п.м.', 'м3'],
@@ -914,25 +914,25 @@ class GnktModel(WindowUnion):
              "", None, None, "", "", '', None, None],
             [None, None, None, None, None, None, None, None, None, f'НКТ {nkt_str}мм', None, None, 'Направление', None,
              None,
-             f'{self.data_well.column_direction_diameter._value}',
-             self.data_well.column_direction_wall_thickness._value,
-             round(self.data_well.column_direction_diameter._value - 2 * self.data_well.column_direction_wall_thickness._value, 1),
-             f'0-', self.data_well.column_direction_length._value,
-             f'{self.data_well.level_cement_direction._value}-{self.data_well.column_direction_length._value}',
+             f'{self.data_well.column_direction_diameter.get_value}',
+             self.data_well.column_direction_wall_thickness.get_value,
+             round(self.data_well.column_direction_diameter.get_value - 2 * self.data_well.column_direction_wall_thickness.get_value, 1),
+             f'0-', self.data_well.column_direction_length.get_value,
+             f'{self.data_well.level_cement_direction.get_value}-{self.data_well.column_direction_length.get_value}',
              None,
              None],
             [None, None, None, None, None, None, None, None, None, f'{length_nkt}м', None, None, 'Кондуктор',
-             None, None, self.data_well.column_conductor_diameter._value,
-             self.data_well.column_conductor_wall_thickness._value,
-             f'{round(self.data_well.column_conductor_diameter._value - 2 * self.data_well.column_conductor_wall_thickness._value)}',
-             f'0-', self.data_well.column_conductor_length._value,
-             f'{self.data_well.level_cement_conductor._value}-{self.data_well.column_conductor_length._value}',
+             None, None, self.data_well.column_conductor_diameter.get_value,
+             self.data_well.column_conductor_wall_thickness.get_value,
+             f'{round(self.data_well.column_conductor_diameter.get_value - 2 * self.data_well.column_conductor_wall_thickness.get_value)}',
+             f'0-', self.data_well.column_conductor_length.get_value,
+             f'{self.data_well.level_cement_conductor.get_value}-{self.data_well.column_conductor_length.get_value}',
              None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Экспл. колонна', None, None,
-             f'{self.data_well.column_diameter._value}',
-             f'{self.data_well.column_wall_thickness._value}',
-             f'{round(float(self.data_well.column_diameter._value - 2 * self.data_well.column_wall_thickness._value), 1)}',
-             f'0-', self.data_well.shoe_column._value, f'{self.data_well.level_cement_column._value}',
+             f'{self.data_well.column_diameter.get_value}',
+             f'{self.data_well.column_wall_thickness.get_value}',
+             f'{round(float(self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value), 1)}',
+             f'0-', self.data_well.shoe_column.get_value, f'{self.data_well.level_cement_column.get_value}',
              volume_pm_ek,
              self.well_volume_ek],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -1008,7 +1008,7 @@ class GnktModel(WindowUnion):
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'необходимый текущий забой ', None, None, None, None, None, None, None, None, current_bottom_edit, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Искусственный забой  ', None,
-             None, None, None, None, None, None, None, self.data_well.bottom_hole_artificial._value, None],
+             None, None, None, None, None, None, None, self.data_well.bottom_hole_artificial.get_value, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Дополнительная информация', None,
              None, None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -1021,7 +1021,7 @@ class GnktModel(WindowUnion):
              None, None, None, None],
             [None, None, None, None, None, None, None, None,
              None, None, None, None, 'Газовый фактор', None, None, None,
-             None, self.data_well.gaz_factor_procent[0], None, None, None, None, None],
+             None, self.data_well.gaz_factor_percent[0], None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Коэффициент аномальности', None,
              None, None, None, koef_anomal, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Плотность жидкость глушения',
@@ -1029,12 +1029,12 @@ class GnktModel(WindowUnion):
             [None, None, None, None, None, None, None, None, None, None, None, None, expected_title, None,
              None, None, None, Qoil, None, Qwater, None, proc_water, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Максимальный угол наклона', None,
-             None, None, None, self.data_well.max_angle._value, None, 'на глубине', None,
-             self.data_well.max_angle_depth._value,
+             None, None, None, self.data_well.max_angle.get_value, None, 'на глубине', None,
+             self.data_well.max_angle_depth.get_value,
              None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
              'Интервалы темпа набора кривизны более 1,5°  на 10 м', None,
-             None, None, None, self.data_well.interval_temp._value, None, None, None, None, None],
+             None, None, None, self.data_well.interval_temp.get_value, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Дата начало / окончания бурения',
              None, None, None, None, self.date_dmy(self.data_well.date_drilling_run), None,
              self.date_dmy(self.data_well.date_drilling_cancel),
@@ -1042,21 +1042,21 @@ class GnktModel(WindowUnion):
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Дата ввода в эксплуатацию', None,
              None, None, None, f'{self.data_well.сommissioning_date}', None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Р в межколонном пространстве',
-             None, None, None, None, self.data_well.pressure_mkp._value, None, ' ', None, None, None],
+             None, None, None, None, self.data_well.pressure_mkp.get_value, None, ' ', None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Первоначальное Р опр-ки ЭК', None,
-             None, None, None, self.data_well.first_pressure._value, None, None, None, None, None],
+             None, None, None, self.data_well.first_pressure.get_value, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Результат предыдущей опрес-и ЭК',
-             None, None, None, None, self.data_well.result_pressure._value, None, '', None, 'гермет.', None],
+             None, None, None, None, self.data_well.result_pressure.get_value, None, '', None, 'гермет.', None],
             [None, None, None, None, None, None, None, None,
              'Тек.забой' if self.data_well.work_plan != 'gnkt_bopz' else '',
              None, None, None,
              'Макс.допустимое Р опр-ки ЭК', None, None, None, None,
-             self.data_well.max_admissible_pressure._value,
+             self.data_well.max_admissible_pressure.get_value,
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None,
              current_bottom_edit if self.data_well.work_plan != 'gnkt_bopz' else '', None, None, None,
              'Макс. ожидаемое Р на устье ',
-             None, None, None, None, self.data_well.max_expected_pressure._value, None, None, None, None, None],
+             None, None, None, None, self.data_well.max_expected_pressure.get_value, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, f'флот {gnkt_number_combo}',
@@ -1153,8 +1153,8 @@ class GnktModel(WindowUnion):
 
     def create_title_list(self, ws2):
 
-        # print(f'цднг {self.data_well.cdng._value}')
-        self.data_well.region = block_name.region_select(self.data_well.cdng._value)
+        # print(f'цднг {self.data_well.cdng.get_value}')
+        self.data_well.region = block_name.region_select(self.data_well.cdng.get_value)
 
         self.region = self.data_well.region
 
@@ -1169,14 +1169,14 @@ class GnktModel(WindowUnion):
              None, None, None, None, None, None, None],
 
             [None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, None, '№ скважины:', f'{self.data_well.well_number._value}', 'куст:', None, 
+            [None, None, '№ скважины:', f'{self.data_well.well_number.get_value}', 'куст:', None,
              'Месторождение:', None, None,
-             self.data_well.well_oilfield._value, None, None],
-            [None, None, 'инв. №:', self.data_well.inventory_number._value, None, None, None, None, 'Площадь: ',
-             self.data_well.well_area._value,
+             self.data_well.well_oilfield.get_value, None, None],
+            [None, None, 'инв. №:', self.data_well.inventory_number.get_value, None, None, None, None, 'Площадь: ',
+             self.data_well.well_area.get_value,
              None,
              1],
-            [None, None, None, None, None, None, None, 'цех:', f'{self.data_well.cdng._value}',
+            [None, None, None, None, None, None, None, 'цех:', f'{self.data_well.cdng.get_value}',
              None, None, None]]
 
         razdel = razdel_1(self, self.data_well.region, data_list.contractor)
@@ -1204,7 +1204,7 @@ class GnktModel(WindowUnion):
                 ws2.column_dimensions[get_column_letter(col)].width = 15
                 cell = ws2.cell(row=row + index_insert, column=col)
                 # print(f' Х {title_list[i ][col - 1]}')
-                if title_list[row - 1][col - 1] != None:
+                if title_list[row - 1][col - 1] is not None:
                     ws2.cell(row=row + index_insert, column=col).value = str(title_list[row - 1][col - 1])
                 ws2.cell(row=row + index_insert, column=col).font = Font(name='Arial', size=11, bold=False)
                 ws2.cell(row=row + index_insert, column=col).alignment = Alignment(wrap_text=False, horizontal='left',

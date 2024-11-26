@@ -161,7 +161,7 @@ class TabPageSoChange(TabPageUnion):
 
                 self.pressure_new_label.setParent(None)
                 self.pressure_new_edit.setParent(None)
-            except:
+            except Exception:
                 pass
 
     def update_calculate_h2s(self):
@@ -253,7 +253,7 @@ class Change_fluid_Window(WindowUnion):
                     asdwd = self.data_well.dict_category
 
                     pressure = namedtuple("pressure", "category data_pressure")
-                    Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
+                    Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
                     Data_gaz = namedtuple("Data_gaz", "category data")
 
                     category_pressure_line_combo = self.tabWidget.currentWidget().category_pressure_line_combo.currentText()
@@ -280,7 +280,7 @@ class Change_fluid_Window(WindowUnion):
                             float(gf_edit)))
                     try:
                         self.data_well.dict_category[plast_new_combo]['отключение'] = 'планируемый'
-                    except:
+                    except Exception:
                         self.data_well.dict_category.setdefault(plast_new_combo, {}).setdefault(
                             'отключение', 'планируемый')
                 else:

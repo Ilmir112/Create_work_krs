@@ -326,7 +326,7 @@ class GnoParent(ABC):
             [None, None,
              f'Опрессовать глухие плашки превентора (после подъема инструмента, согласно ТИ № И2-05.01 '
              f'И-01447 ЮЛ-111.13 версия 1.00  п. 5.34) на  '
-             f'{self.data_well.max_admissible_pressure._value}атм на '
+             f'{self.data_well.max_admissible_pressure.get_value}атм на '
              f'максимально допустимое давление опрессовки эксплуатационной колонны с'
              f' выдержкой в течении 30 '
              f'минут,в случае невозможности '
@@ -523,7 +523,7 @@ class GnoParent(ABC):
                                f'{self.data_well.fluid_work_short} в ' \
                                f'объеме {round(well_volume - well_volume(self, self.data_well.depth_fond_paker_before["do"]), 1)}м3 ' \
                                f'на поглощение при давлении не более ' \
-                               f'{self.data_well.max_admissible_pressure._value}атм. Закрыть ' \
+                               f'{self.data_well.max_admissible_pressure.get_value}атм. Закрыть ' \
                                f'затрубное пространство. Закрыть скважину на стабилизацию не менее 2 часов. ' \
                                f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)'
             well_jamming_short = f'Глушение в затруб уд.весом {self.data_well.fluid_work_short} в ' \
@@ -536,7 +536,7 @@ class GnoParent(ABC):
                                f' затрубное пространство тех жидкости в объеме {volume_nkt_ustie}м3 на ' \
                                f'циркуляцию. Закрыть трубное пространство. ' \
                                f'Произвести закачку на поглощение не более ' \
-                               f'{self.data_well.max_admissible_pressure._value}атм ' \
+                               f'{self.data_well.max_admissible_pressure.get_value}атм ' \
                                f'тех жидкости в ' \
                                f'объеме {volume_pod_nkt_str:.1f}м3. ' \
                                f'Закрыть скважину на ' \
@@ -553,7 +553,7 @@ class GnoParent(ABC):
                                f'объеме {volume_nkt_ustie}м3 на ' \
                                f'циркуляцию. Закрыть трубное пространство. ' \
                                f'Произвести закачку на поглощение не более ' \
-                               f'{self.data_well.max_admissible_pressure._value}атм ' \
+                               f'{self.data_well.max_admissible_pressure.get_value}атм ' \
                                f'тех жидкости в ' \
                                f'объеме {round((volume_pod_nkt_str + volume_nkt_str) * 1.1, 1)}м3. ' \
                                f'Закрыть скважину на ' \
@@ -574,7 +574,7 @@ class GnoParent(ABC):
         if len(self.data_well.plast_work) == 0 and self.data_well.dict_leakiness:
             well_jamming_str = f'Опрессовать эксплуатационную колонну в интервале 0-' \
                                f'{self.data_well.current_bottom}м на ' \
-                               f'Р={self.data_well.max_admissible_pressure._value}атм' \
+                               f'Р={self.data_well.max_admissible_pressure.get_value}атм' \
                                f' в течение 30 минут в присутствии представителя заказчика, составить акт. ' \
                                f'(Вызов представителя осуществлять телефонограммой за 12 часов, ' \
                                f'с подтверждением за 2 часа ' \
@@ -598,7 +598,7 @@ class LiftPaker(GnoParent):
                  f'заполнение трубного пространства и скважины в подпакерной зоне в объеме ' \
                  f'{volume_well_pod_nkt_calculate(self.data_well) + volume_nkt(self.data_well):.1f} м3 ' \
                  f'жидкостью уд.веса {self.data_well.fluid_work} при давлении не более ' \
-                 f'{self.data_well.max_admissible_pressure._value}атм. ' \
+                 f'{self.data_well.max_admissible_pressure.get_value}атм. ' \
                  f'Тех отстой 1-2 часа. Произвести замер избыточного давления в скважине.'
 
     def add_work_lift(self):
@@ -615,10 +615,10 @@ class LiftPaker(GnoParent):
 
         lift_paker = [
             [f'Опрессовать эксплуатационную колонну и пакер на Р='
-             f'{self.data_well.max_admissible_pressure._value}атм',
+             f'{self.data_well.max_admissible_pressure.get_value}атм',
              None,
              f'Опрессовать эксплуатационную колонну и пакер на Р='
-             f'{self.data_well.max_admissible_pressure._value}атм в '
+             f'{self.data_well.max_admissible_pressure.get_value}атм в '
              f'присутствии представителя ЦДНГ. '
              f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением '
              f'за 2 часа до начала работ)',
@@ -628,7 +628,7 @@ class LiftPaker(GnoParent):
              f'Произвести определение приемистости скважины', None,
              f'При наличии Избыточного давления не позволяющее сорвать пакера:\n '
              f'Произвести определение приемистости скважины при давлении не более '
-             f'{self.data_well.max_admissible_pressure._value}атм. '
+             f'{self.data_well.max_admissible_pressure.get_value}атм. '
              f'{self.well_jamming_str_in_nkt}',
              None, None,
              None, None, None, None, None,
@@ -734,7 +734,7 @@ class LiftOrz(GnoParent):
                  f'пространства в объеме {round(1.3 * self.data_well.dict_nkt_before["48"] / 1000, 1)}м3 '
                  f'жидкостью уд.веса '
                  f'{self.data_well.fluid_work}на давление поглощения до'
-                 f' {self.data_well.max_admissible_pressure._value}атм. '
+                 f' {self.data_well.max_admissible_pressure.get_value}атм. '
                  f'Произвести глушение скважины в '
                  f'НКТ89мм тех.жидкостью на поглощение в объеме обеспечивающим заполнение '
                  f'межтрубного и подпакерного пространства '
@@ -860,7 +860,7 @@ class LiftOrd(GnoParent):
              f' Обвязать устье скважины согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
-             f'{self.data_well.max_admissible_pressure._value}атм. '
+             f'{self.data_well.max_admissible_pressure.get_value}атм. '
              f'{self.sucker_pod_jaming}'
              f'Поднять на штангах насос с гл. {self.data_well.dict_pump_shgn_depth["do"]}м с доливом тех жидкости '
              f'уд.весом {self.data_well.fluid_work} '
@@ -1082,7 +1082,7 @@ class LiftPumpNnWithPaker(GnoParent):
              f'схемы №3 утвержденной главным '
              f'инженером {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
-             f'{self.data_well.max_admissible_pressure._value}атм. Спуском одной штанги заловить конус. '
+             f'{self.data_well.max_admissible_pressure.get_value}атм. Спуском одной штанги заловить конус. '
              f'{sucker_jaming}м3. Техостой 2ч. '
              f'Поднять на штангах плунжер с гл. {int(self.data_well.dict_pump_shgn_depth["do"])}м с доливом тех '
              f'жидкости уд.весом {self.data_well.fluid_work} '
@@ -1212,7 +1212,7 @@ class LiftPumpNvWithPaker(GnoParent):
              f'согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). '
-             f'Опрессовать ПВО на {self.data_well.max_admissible_pressure._value}атм. '
+             f'Опрессовать ПВО на {self.data_well.max_admissible_pressure.get_value}атм. '
              f'{"".join([" " if self.without_damping_true is True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_nkt(self)}м3. Техостой 2ч."])}'
              f' Поднять на штангах насос с гл. {float(self.data_well.dict_pump_shgn_depth["do"])}м с '
              f'доливом тех жидкости уд.весом {self.data_well.fluid_work} '
@@ -1557,7 +1557,7 @@ class LiftPumpNv(GnoParent):
              f'согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
-             f'{self.data_well.max_admissible_pressure._value}атм. Поднять на штангах насос '
+             f'{self.data_well.max_admissible_pressure.get_value}атм. Поднять на штангах насос '
              f'с гл. {int(self.data_well.dict_pump_shgn_depth["do"])}м с доливом тех жидкости уд.весом '
              f'{self.data_well.fluid_work} '
              f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  насосов (не более 8 тн), '
@@ -1675,7 +1675,7 @@ class LiftPumpNn(GnoParent):
              f'утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
-             f'{self.data_well.max_admissible_pressure._value}атм. Заловить конус спуском одной '
+             f'{self.data_well.max_admissible_pressure.get_value}атм. Заловить конус спуском одной '
              f'штанги. Поднять на штангах плунжер с гл. '
              f'{float(self.data_well.dict_pump_shgn_depth["do"])}м с доливом тех '
              f'жидкости уд.весом {self.data_well.fluid_work} '

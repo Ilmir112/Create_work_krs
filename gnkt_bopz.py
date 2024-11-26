@@ -75,7 +75,7 @@ class TabPageGnkt(TabPageUnion):
 
         self.pressure_Label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
-        self.pressure_edit.setText(f'{self.data_well.max_admissible_pressure._value}')
+        self.pressure_edit.setText(f'{self.data_well.max_admissible_pressure.get_value}')
         self.pressure_edit.setValidator(self.validator_int)
 
         self.fluid_project_label = QLabel('Рассчетная ЖГС', self)
@@ -135,7 +135,7 @@ class TabPageGnkt(TabPageUnion):
             try:
                 self.mud_label.setParent(None)
                 self.mud_edit.setParent(None)
-            except:
+            except Exception:
                 pass
 
 
@@ -228,7 +228,7 @@ class GnktBopz(GnktModel):
                 QMessageBox.critical(self, "Ошибка", "Нужно указать подрядчика по бурению")
                 return
 
-        except:
+        except Exception:
             QMessageBox.information(self, 'Ошибка', 'Введите корректные данные')
 
         if self.acid_edit == 'ВТ':
@@ -330,10 +330,10 @@ class GnktBopz(GnktModel):
              None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
             [None, 12,
              f'При закрытой центральной задвижке фондовой арматуры опрессовать ГНКТ и все нагнетательные '
-             f'линии на {round(self.data_well.max_expected_pressure._value*1.5, 1)}атм. Опрессовать ПВО, '
+             f'линии на {round(self.data_well.max_expected_pressure.get_value*1.5, 1)}атм. Опрессовать ПВО, '
              f'обратные клапана и выкидную линию от устья скважины до '
              f'желобной ёмкости (надёжно закрепить, оборудовать дроссельными задвижками) опрессовать на '
-             f'{self.data_well.max_expected_pressure._value} '
+             f'{self.data_well.max_expected_pressure.get_value} '
              f'атм с выдержкой 30мин. Опрессовку ПВО зафиксировать в вахтовом журнале. Установить на малом и большом '
              f'затрубе технологический манометр. Провести УТЗ и инструктаж. Опрессовку проводить в присутствии мастера, '
              f'бурильщика, машиниста подъемника и представителя супервайзерской службы. Получить разрешение на '

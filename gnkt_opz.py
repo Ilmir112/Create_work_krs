@@ -98,7 +98,7 @@ class TabPageGnkt(QWidget):
 
         self.pressure_Label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
-        self.pressure_edit.setText(f'{self.data_well.max_admissible_pressure._value}')
+        self.pressure_edit.setText(f'{self.data_well.max_admissible_pressure.get_value}')
         self.pressure_edit.setValidator(self.validator_int)
 
         self.grid = QGridLayout(self)
@@ -431,17 +431,17 @@ class GnktOpz(GnktModel):
              f'безопосности.'
              f' Запустить систему регистрации СОРП. Оповестить всех людей на кустовой площадке о проведении '
              f'опрессовки.'
-             f' Опрессовать все нагнетательные линии на {min(225, self.data_well.max_admissible_pressure._value * 1.5)}атм. '
+             f' Опрессовать все нагнетательные линии на {min(225, self.data_well.max_admissible_pressure.get_value * 1.5)}атм. '
              f'Опрессовать  выкидную линию '
              f'от устья скважины до желобной ёмкости на '
-             f'{min(225, round(self.data_well.max_admissible_pressure._value * 1.5, 1))}атм c выдержкой 30мин'
+             f'{min(225, round(self.data_well.max_admissible_pressure.get_value * 1.5, 1))}атм c выдержкой 30мин'
              f'(надёжно закрепить, оборудовать дроссельными задвижками)',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, представ.БВО (вызов по телефонограмме при необходимости)', 'факт'],
             [None, 11,
              f'При закрытой центральной задвижке фондовой арматуры. Опрессовать превентор, глухие и трубные  '
              f'плашки на '
-             f'устье скважины на Р={self.data_well.max_admissible_pressure._value}атм с выдержкой 30 мин '
+             f'устье скважины на Р={self.data_well.max_admissible_pressure.get_value}атм с выдержкой 30 мин '
              f'(опрессовку ПВО '
              f'зафиксировать'
              f' в вахтовом журнале). Оформить соответствующий акт в присутствии представителя Башкирского '
@@ -481,7 +481,7 @@ class GnktOpz(GnktModel):
                  f' малом затрубном пространстве на циркуляции. Произвести продавку растворителя АСПО до '
                  f'башмака ГНКТ '
                  f'мин.водой уд.вес {self.data_well.fluid_work} в объёме 2,2м3 не превышая давления закачки не более  '
-                 f'Р={self.data_well.max_admissible_pressure._value}атм. ',
+                 f'Р={self.data_well.max_admissible_pressure.get_value}атм. ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады, представитель Заказчика', 1.92],
             [None, 15,
@@ -493,10 +493,10 @@ class GnktOpz(GnktModel):
              None, None, None, None, None, None, None, None, None,
              'Мастер ГНКТ, представитель Заказчика', None],
             [
-                f'гидросвабирование в инт {interval_sko}м при Рзак={self.data_well.max_admissible_pressure._value}атм',
+                f'гидросвабирование в инт {interval_sko}м при Рзак={self.data_well.max_admissible_pressure.get_value}атм',
                 23, f'Произвести гидросвабирование пласта в интервале {interval_sko[:-2]}м (закрыть затруб, произвести '
                     f'задавку в пласт '
-                    f'жидкости при не более Рзак={self.data_well.max_admissible_pressure._value}атм при установленном '
+                    f'жидкости при не более Рзак={self.data_well.max_admissible_pressure.get_value}атм при установленном '
                     f'герметичном пакере. '
                     f'Операции по задавке и изливу произвести 3-4 раза в зависимости от приёмистости). ',
                 None, None, None, None, None, None, None,
@@ -542,9 +542,9 @@ class GnktOpz(GnktModel):
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, представитель Заказчика', None],
         ]
-        paker_opr = [f'Опрессовать пакер на {self.data_well.max_admissible_pressure._value}атм',
+        paker_opr = [f'Опрессовать пакер на {self.data_well.max_admissible_pressure.get_value}атм',
                      5,
-                     f'Опрессовать пакер на {self.data_well.max_admissible_pressure._value}атм с выдержкой 30 мин с '
+                     f'Опрессовать пакер на {self.data_well.max_admissible_pressure.get_value}атм с выдержкой 30 мин с '
                      f'оформлением соответствующего акта в присутствии  представителя ЦДНГ',
                      None, None, None, None, None, None, None,
                      'Мастер ГНКТ, предст. Заказчика', 1]

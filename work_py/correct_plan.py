@@ -46,14 +46,14 @@ class TabPageDp(TabPageUnion):
         self.grid.addWidget(self.well_area_label, 2, 3)
         self.grid.addWidget(self.well_area_edit, 3, 3)
 
-        # self.well_area_edit.setText(f'{self.data_well.well_area._value}')
+        # self.well_area_edit.setText(f'{self.data_well.well_area.value}')
         # self.well_area_edit.textChanged.connect(self.update_well)
         self.well_number_edit.editingFinished.connect(self.update_well)
         # self.change_pvr_combo.currentTextChanged.connect(self.update_change_pvr)
         # self.change_pvr_combo.setCurrentIndex(1)
         # self.change_pvr_combo.setCurrentIndex(0)
         # if self.work_plan not in ['dop_plan_in_base']:
-        #     self.well_number_edit.setText(f'{self.data_well.well_number._value}')
+        #     self.well_number_edit.setText(f'{self.data_well.well_number.value}')
 
         if data_list.data_in_base:
             self.well_data_label = QLabel('файл excel')

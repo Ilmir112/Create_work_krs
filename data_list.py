@@ -1,5 +1,4 @@
 import keyring
-import socket
 from datetime import datetime
 from openpyxl.styles import Border, Side, PatternFill
 
@@ -11,7 +10,7 @@ class ProtectedIsDigit:
 
     def __get__(self, instance, owner):
         if not instance:
-            # print(f'значение {self._name} ра3вно {self._value}')
+            # print(f'значение {self._name} ра3вно {self.get_value}')
             return self
         return instance.__dict__[self._name]
 
@@ -28,6 +27,10 @@ class ProtectedIsDigit:
             self._value = float(value)  # Преобразуем целое число в число с плавающей точкой
         else:
             print(f'Ошибка: Недопустимое значение {value}')
+
+    @property
+    def get_value(self):
+        return self._value
 
 
 class ProtectedIsNonNone:
@@ -47,6 +50,10 @@ class ProtectedIsNonNone:
         else:
             print(f'Ошибка: {value} - не корректное строковое значение')
             raise ValueError("Значение должно быть строкой")
+
+    @property
+    def get_value(self):
+        return self._value
 
 
 #
@@ -114,7 +121,6 @@ current_date = datetime.now().date()
 
 colWidth = ''
 boundaries_dict = ''
-
 
 plast_project = []
 plast_work = []

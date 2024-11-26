@@ -35,7 +35,7 @@ class TabPageSoPakerIzv(TabPageUnion):
         self.nkt_select_combo.addItems(['пакер в ЭК', 'пакер в ДП'])
 
         if self.data_well.column_additional is False or (self.data_well.column_additional and
-                                                    self.data_well.head_column_additional._value < self.data_well.current_bottom):
+                                                    self.data_well.head_column_additional.get_value < self.data_well.current_bottom):
             self.nkt_select_combo.setCurrentIndex(0)
         else:
 
@@ -95,7 +95,7 @@ class TabPageSoPakerIzv(TabPageUnion):
         self.type_work_combo.setCurrentIndex(1)
 
         if self.data_well.column_additional is False or \
-                (self.data_well.column_additional and self.data_well.current_bottom < self.data_well.head_column_additional._value):
+                (self.data_well.column_additional and self.data_well.current_bottom < self.data_well.head_column_additional.get_value):
             self.nkt_select_combo.setCurrentIndex(1)
             self.nkt_select_combo.setCurrentIndex(0)
         else:
@@ -143,7 +143,7 @@ class TabPageSoPakerIzv(TabPageUnion):
             self.grid.addWidget(self.current_bottom_edit, 8, 3)
             self.pero_diameter_label.setText('диаметр пера')
             if self.data_well.column_additional or self.data_well.column_additional is False and \
-                    self.data_well.column_diameter._value < 130:
+                    self.data_well.column_diameter.get_value < 130:
                 self.pero_diameter_line.setText(f'{self.data_well.nkt_diam}')
             else:
                 self.pero_diameter_line.setText(f'110')
@@ -219,12 +219,12 @@ class PakerIzvlek(WindowUnion):
             paker_depth_line = int(float(paker_depth_line))
 
         if nkt_select_combo == 'пакер в ЭК' and self.data_well.column_additional and \
-                paker_depth_line > self.data_well.head_column_additional._value:
+                paker_depth_line > self.data_well.head_column_additional.get_value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка печати для доп колонны')
             return
         elif nkt_select_combo == 'пакер в ДП' and self.data_well.column_additional and \
-                paker_depth_line < self.data_well.head_column_additional._value:
+                paker_depth_line < self.data_well.head_column_additional.get_value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для основной колонны')
             return
@@ -242,11 +242,11 @@ class PakerIzvlek(WindowUnion):
             elif paker_depth_line == '' or pero_diameter_line == '':
                 QMessageBox.warning(self, 'ПРОВЕРКА', 'Необходимо добавить глубину посадки пакера')
                 return
-            if self.data_well.column_additional and int(paker_depth_line) > self.data_well.head_column_additional._value and \
+            if self.data_well.column_additional and int(paker_depth_line) > self.data_well.head_column_additional.get_value and \
                     nkt_key == 'пакер в ЭК':
                 QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
                 return
-            if self.data_well.column_additional and int(paker_depth_line) < self.data_well.head_column_additional._value \
+            if self.data_well.column_additional and int(paker_depth_line) < self.data_well.head_column_additional.get_value \
                     and nkt_key == 'пакер в ДП':
                 QMessageBox.information(self, 'Внимание', 'Компоновка подобрана не корректно')
                 return

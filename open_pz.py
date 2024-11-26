@@ -3,17 +3,13 @@ from abc import ABC, abstractmethod
 
 import data_list
 from datetime import datetime
-from PyQt5.QtWidgets import QInputDialog, QMessageBox
-from openpyxl_image_loader import SheetImageLoader
-from openpyxl.utils.cell import get_column_letter
+
 from openpyxl.styles import Font, Alignment, Border, Side
 
 from cdng import events_gnvp, add_itog, events_gnvp_gnkt
-from data_base.config_base import connection_to_database, WorkDatabaseWell
-from find import ProtectedIsNonNone
 from main import MyMainWindow
-from plan import delete_rows_pz
-from block_name import region_select, razdel_1, curator_sel, pop_down
+
+from block_name import razdel_1, curator_sel, pop_down
 from work_py.dop_plan_py import DopPlanWindow
 from work_py.check_in_pz import CustomMessageBox
 
@@ -36,9 +32,9 @@ class PzInDatabase(WorkWithPZ):
             contractor = 'РН'
 
         if self.data_well.work_plan == 'plan_change':
-            DopPlanWindow.extraction_data(self, str(self.data_well.well_number._value) + " " +
-                                          self.data_well.well_area._value + " " + 'krs' + " " + contractor, 1)
-            self.ws.delete_rows(data_list.plan_correct_index._value, self.ws.max_row)
+            DopPlanWindow.extraction_data(self, str(self.data_well.well_number.get_value) + " " +
+                                          self.data_well.well_area.get_value + " " + 'krs' + " " + contractor, 1)
+            self.ws.delete_rows(data_list.plan_correct_index.get_value, self.ws.max_row)
             return self.ws
 
 
@@ -77,7 +73,7 @@ class CreatePZ(MyMainWindow):
                 self.show_info_message(check_str)
 
             if self.data_well.work_plan not in ['gnkt_frez', 'application_pvr',
-                                                        'application_gis', 'gnkt_after_grp', 'gnkt_opz', 'plan_change']:
+                                                'application_gis', 'gnkt_after_grp', 'gnkt_opz', 'plan_change']:
                 # print(f'план работ {self.data_well.work_plan}')
 
                 razdel = razdel_1(self, self.data_well.region, data_list.contractor)
@@ -89,7 +85,7 @@ class CreatePZ(MyMainWindow):
                     ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=7)
                     ws.merge_cells(start_row=i, start_column=8, end_row=i, end_column=12)
                     ws.row_dimensions[i].height = 20
-                ws.row_dimensions[i+1].height = 20
+                ws.row_dimensions[i + 1].height = 20
 
                 # print(f' индекс вставки ГНВП{self.data_well.insert_index}')
                 dict_events_gnvp = {}
@@ -158,8 +154,8 @@ class CreatePZ(MyMainWindow):
                                 data_1 = ws.cell(row=i, column=2).value
                                 ws.cell(row=i, column=col + 1).font = Font(name='Arial Cyr', size=13, bold=False)
 
-                            if 'IX.I. Мероприятия по предотвращению технологических аварий при ремонте скважин:' in str(
-                                    data_1):
+                            if 'IX.I. Мероприятия по предотвращению технологических аварий при ремонте скважин:' in \
+                                    str(data_1):
                                 ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
                                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                                vertical='center')
@@ -228,8 +224,8 @@ class CreatePZ(MyMainWindow):
                                         horizontal='center',
                                         vertical='center')
                                     ws.cell(row=i + self.data_well.insert_index, column=j).value = \
-                                    self.data_well.row_expected[i - 1][
-                                        j - 1]
+                                        self.data_well.row_expected[i - 1][
+                                            j - 1]
                                 else:
                                     ws.cell(row=i + self.data_well.insert_index, column=j).font = Font(
                                         name='Arial Cyr', size=13,
@@ -239,8 +235,8 @@ class CreatePZ(MyMainWindow):
                                         horizontal='left',
                                         vertical='center')
                                     ws.cell(row=i + self.data_well.insert_index, column=j).value = \
-                                    self.data_well.row_expected[i - 1][
-                                        j - 1]
+                                        self.data_well.row_expected[i - 1][
+                                            j - 1]
                         ws.merge_cells(start_column=2, start_row=self.data_well.insert_index + 1, end_column=12,
                                        end_row=self.data_well.insert_index + 1)
                         self.data_well.insert_index += len(self.data_well.row_expected)
@@ -255,8 +251,8 @@ class CreatePZ(MyMainWindow):
                         for i in range(1, len(work_list) + 1):  # Добавление  показатели после ремонта
                             for j in range(1, 13):
                                 ws.cell(row=i + self.data_well.insert_index, column=j).font = Font(name='Arial Cyr',
-                                                                                                      size=13,
-                                                                                                      bold=True)
+                                                                                                   size=13,
+                                                                                                   bold=True)
                                 ws.cell(row=i + self.data_well.insert_index, column=j).alignment = Alignment(
                                     wrap_text=False,
                                     horizontal='center',

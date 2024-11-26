@@ -113,7 +113,7 @@ def insert_data_base_gnkt(self, contractor, well_name, gnkt_number, gnkt_length,
         if 'ойл-сервис' in contractor.lower():
             contractor = 'oil_service'
 
-        result = data_gnkt.check_data_base_gnkt(contractor, self.data_well.well_number._value, self.data_well.well_area._value)
+        result = data_gnkt.check_data_base_gnkt(contractor, self.data_well.well_number.get_value, self.data_well.well_area.get_value)
 
         if len(result) == 0:
             current_datetime = datetime.today().strftime('%d.%m.%Y')

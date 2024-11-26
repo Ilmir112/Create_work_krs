@@ -129,7 +129,7 @@ class TabPageSoWith(TabPageUnion):
         self.grid.addWidget(self.skm_teml_str_Edit, 14, 1, 1, 8)
 
         if self.data_well.column_additional is False or (self.data_well.column_additional and
-                                                                 self.data_well.head_column_additional._value >=
+                                                                 self.data_well.head_column_additional.get_value >=
                                                                  self.data_well.current_bottom):
             first_template, template_second = self.template_diam_ek()
         else:
@@ -159,7 +159,7 @@ class TabPageSoWith(TabPageUnion):
 
     def definition_template_work(self, current_bottom):
         if self.data_well.column_additional is False or \
-                (self.data_well.column_additional and current_bottom < self.data_well.head_column_additional._value):
+                (self.data_well.column_additional and current_bottom < self.data_well.head_column_additional.get_value):
             self.template_select_list = ['', 'ПСШ ЭК', 'ПСШ открытый ствол', 'ПСШ без хвоста']
 
             self.template_Combo.addItems(self.template_select_list)
@@ -229,12 +229,12 @@ class TabPageSoWith(TabPageUnion):
                 (self.data_well.column_additional is True and self.data_well.open_trunk_well is False and all(
                     [self.data_well.dict_perforation[plast]['отрайбировано'] for plast in
                      self.data_well.plast_work]) is False and \
-                 current_bottom <= self.data_well.head_column_additional._value):
+                 current_bottom <= self.data_well.head_column_additional.get_value):
             template_key = 'ПСШ ЭК'
 
         elif self.data_well.column_additional is False and self.data_well.open_trunk_well is True or \
                 (self.data_well.column_additional is True and self.data_well.open_trunk_well is True and \
-                 current_bottom <= self.data_well.head_column_additional._value and self.data_well.open_trunk_well):
+                 current_bottom <= self.data_well.head_column_additional.get_value and self.data_well.open_trunk_well):
             template_key = 'ПСШ открытый ствол'
 
         elif self.data_well.column_additional is False and self.data_well.open_trunk_well is False and all(
@@ -243,7 +243,7 @@ class TabPageSoWith(TabPageUnion):
                 (self.data_well.column_additional is True and self.data_well.open_trunk_well is False and all(
                     [self.data_well.dict_perforation[plast]['отрайбировано'] for plast in
                      self.data_well.plast_work]) is True and \
-                 current_bottom <= self.data_well.head_column_additional._value):
+                 current_bottom <= self.data_well.head_column_additional.get_value):
             template_key = 'ПСШ без хвоста'
 
         elif self.data_well.column_additional is True and self.data_well.open_trunk_well is False and all(
@@ -298,8 +298,8 @@ class TabPageSoWith(TabPageUnion):
         if 'Ойл' in data_list.contractor:
             kot_str = '+ КОТ-50'
         if self.data_well.column_additional or \
-                (self.data_well.head_column_additional._value >= current_bottom and self.data_well.column_additional is False):
-            nkt_pod = '60мм' if self.data_well.column_additional_diameter._value < 110 else '73мм со снятыми фасками'
+                (self.data_well.head_column_additional.get_value >= current_bottom and self.data_well.column_additional is False):
+            nkt_pod = '60мм' if self.data_well.column_additional_diameter.get_value < 110 else '73мм со снятыми фасками'
 
         if first_template != '' and length_template_first != '' and \
                 template_second != '' and length_template_second != '' and \
@@ -331,7 +331,7 @@ class TabPageSoWith(TabPageUnion):
                 if self.data_well.current_bottom - self.data_well.perforation_roof < 15:
                     self.dictance_template_second_Edit.setText('1')
                     dictance_template_second = self.dictance_template_second_Edit.text()
-                # if dictance_template_second != None:
+                # if dictance_template_second is not None:
                 template_str = f'перо {kot_str}+ {SKM_type}-{skm} + НКТ{nkt_diam}мм {dictance_template_second}м ' \
                                f' + шаблон-{template_second}мм L-{length_template_second}м '
                 self.data_well.template_depth = math.ceil(current_bottom - int(dictance_template_second))
@@ -339,7 +339,7 @@ class TabPageSoWith(TabPageUnion):
                 skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
             elif self.template_Combo.currentText() == 'ПСШ открытый ствол':
-                # if dictance_template_second != None:
+                # if dictance_template_second is not None:
                 self.template_first_Edit.setText('фильтр направление')
                 template_str = f'фильтр-направление L {length_template_first}м {kot_str} + НКТ{nkt_diam}мм ' \
                                f'{dictance_template_first}м ' \
@@ -459,9 +459,9 @@ class TabPageSoWith(TabPageUnion):
             SKM_type = self.SKM_type_Combo.currentText()
 
             nkt_diam = self.data_well.nkt_diam
-            # print(self.data_well.column_additional, self.data_well.head_column_additional._value, current_bottom)
+            # print(self.data_well.column_additional, self.data_well.head_column_additional.get_value, current_bottom)
             if self.data_well.column_additional is False or (self.data_well.column_additional and
-                                                                     self.data_well.head_column_additional._value >= current_bottom):
+                                                                     self.data_well.head_column_additional.get_value >= current_bottom):
                 first_template, template_second = self.template_diam_ek()
                 # print(f'диаметры шаблонов {first_template, template_second}')
             else:
@@ -474,7 +474,7 @@ class TabPageSoWith(TabPageUnion):
 
             self.template_first_Edit.setText(str(first_template))
             self.template_second_Edit.setText(str(template_second))
-            self.skm_Edit.setText(str(self.data_well.column_diameter._value))
+            self.skm_Edit.setText(str(self.data_well.column_diameter.get_value))
             self.dictance_template_second_Edit.setText(str(10))
 
             roof_plast, roof_add_column_plast = self.definition_roof_not_raiding(current_bottom)
@@ -508,9 +508,9 @@ class TabPageSoWith(TabPageUnion):
             self.dictance_three_Edit.setParent(None)
 
             if self.data_well.column_additional or \
-                    (self.data_well.head_column_additional._value >= current_bottom and \
+                    (self.data_well.head_column_additional.get_value >= current_bottom and \
                      self.data_well.column_additional is False):
-                nkt_pod = '60мм' if self.data_well.column_additional_diameter._value < 110 else '73мм со снятыми фасками'
+                nkt_pod = '60мм' if self.data_well.column_additional_diameter.get_value < 110 else '73мм со снятыми фасками'
 
             if index == 'ПСШ ЭК':
                 template_str = f'перо {kot_str} + шаблон-{first_template}мм L-{length_template_first}м + ' \
@@ -576,11 +576,11 @@ class TabPageSoWith(TabPageUnion):
                 dictance_template_first1 = int(current_bottom - roof_add_column_plast + 5)
 
                 # print(f'дистанци {dictance_template_first }')
-                self.skm_Edit.setText(str(self.data_well.column_diameter._value))
+                self.skm_Edit.setText(str(self.data_well.column_diameter.get_value))
                 self.dictance_template_first_Edit.setText(str(dictance_template_first1))
                 dictance_template_first = int(self.dictance_template_first_Edit.text())
                 dictance_template_second = int(current_bottom - dictance_template_first1 - \
-                                               length_template_first - self.data_well.head_column_additional._value + 5)
+                                               length_template_first - self.data_well.head_column_additional.get_value + 5)
                 self.dictance_template_second_Edit.setText(str(dictance_template_second))
 
                 self.length_template_second_Edit.setText(str(length_template_second))
@@ -620,7 +620,7 @@ class TabPageSoWith(TabPageUnion):
 
             elif index == 'ПСШ СКМ в доп колонне c хвостом':
 
-                skm = str(self.data_well.column_additional_diameter._value)
+                skm = str(self.data_well.column_additional_diameter.get_value)
                 self.skm_Edit.setText(skm)
 
                 dictance_template_first = int(current_bottom - roof_add_column_plast + 5)
@@ -668,7 +668,7 @@ class TabPageSoWith(TabPageUnion):
                 dictance_template_first = 0
                 self.dictance_template_first_Edit.setText(str(dictance_template_first))
 
-                skm = str(self.data_well.column_additional_diameter._value)
+                skm = str(self.data_well.column_additional_diameter.get_value)
                 self.skm_Edit.setText(skm)
                 dictance_template_second = 10
                 self.dictance_template_second_Edit.setText(str(dictance_template_second))
@@ -705,7 +705,7 @@ class TabPageSoWith(TabPageUnion):
 
             elif index == 'ПСШ СКМ в доп колонне + открытый ствол':
 
-                skm = str(self.data_well.column_additional_diameter._value)
+                skm = str(self.data_well.column_additional_diameter.get_value)
                 self.skm_Edit.setText(skm)
 
                 dictance_template_first = int(current_bottom - roof_add_column_plast + 5)
@@ -751,27 +751,27 @@ class TabPageSoWith(TabPageUnion):
     def definition_ecn_true(self, depth_ecn):
 
         if self.data_well.column_additional is False and self.data_well.dict_pump_ecn["posle"] != 0 and \
-                self.data_well.column_diameter._value > 168:
+                self.data_well.column_diameter.get_value > 168:
             return "4", "4"
         elif self.data_well.column_additional is False and self.data_well.dict_pump_ecn["posle"] != 0:
             return "4", "30"
-        elif self.data_well.column_additional is False and self.data_well.max_angle._value > 45:
+        elif self.data_well.column_additional is False and self.data_well.max_angle.get_value > 45:
             return "4", "10"
         elif self.data_well.column_additional is True and self.data_well.dict_pump_ecn["posle"] != 0 \
-                and self.data_well.column_additional_diameter._value < 170:
-            if self.data_well.dict_pump_ecn["posle"] != 0 and float(depth_ecn) < self.data_well.head_column_additional._value and \
-                    self.data_well.column_diameter._value > 168:
+                and self.data_well.column_additional_diameter.get_value < 170:
+            if self.data_well.dict_pump_ecn["posle"] != 0 and float(depth_ecn) < self.data_well.head_column_additional.get_value and \
+                    self.data_well.column_diameter.get_value > 168:
                 return "4", "4"
-            elif self.data_well.dict_pump_ecn["posle"] != 0 and float(depth_ecn) < self.data_well.head_column_additional._value:
+            elif self.data_well.dict_pump_ecn["posle"] != 0 and float(depth_ecn) < self.data_well.head_column_additional.get_value:
                 return "4", "30"
-            elif self.data_well.dict_pump_ecn["posle"] != 0 and float(depth_ecn) >= self.data_well.head_column_additional._value:
+            elif self.data_well.dict_pump_ecn["posle"] != 0 and float(depth_ecn) >= self.data_well.head_column_additional.get_value:
                 return "30", "4"
 
-        elif self.data_well.max_angle._value > 45 and self.data_well.current_bottom > \
-                self.data_well.head_column_additional._value:
+        elif self.data_well.max_angle.get_value > 45 and self.data_well.current_bottom > \
+                self.data_well.head_column_additional.get_value:
             return "10", "4"
-        elif self.data_well.max_angle._value > 45 and self.data_well.current_bottom < \
-                self.data_well.head_column_additional._value:
+        elif self.data_well.max_angle.get_value > 45 and self.data_well.current_bottom < \
+                self.data_well.head_column_additional.get_value:
             return "4", "10"
         else:
             return "4", "4"
@@ -785,7 +785,7 @@ class TabPageSoWith(TabPageUnion):
         roof_plast = current_bottom
         roof_add_column_plast = current_bottom
         if self.data_well.column_additional is False or (
-                self.data_well.column_additional and self.data_well.head_column_additional._value >= current_bottom):
+                self.data_well.column_additional and self.data_well.head_column_additional.get_value >= current_bottom):
             for plast in plast_all:
                 roof = min(list(map(lambda x: float(x[0]), list(dict_perforation[plast]['интервал']))))
 
@@ -793,7 +793,7 @@ class TabPageSoWith(TabPageUnion):
                     if dict_perforation[plast]['отрайбировано'] and self.data_well.open_trunk_well is False:
                         roof_add_column_plast = roof_plast
                     elif self.data_well.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:
-                        roof_plast = self.data_well.shoe_column._value
+                        roof_plast = self.data_well.shoe_column.get_value
                         roof_add_column_plast = current_bottom
 
                     else:
@@ -809,7 +809,7 @@ class TabPageSoWith(TabPageUnion):
             for plast in plast_all:
                 roof_plast_in = dict_perforation[plast]['кровля']
 
-                if self.data_well.head_column_additional._value <= roof_plast_in and roof_plast_in < current_bottom:
+                if self.data_well.head_column_additional.get_value <= roof_plast_in and roof_plast_in < current_bottom:
                     if dict_perforation[plast]['отрайбировано'] and self.data_well.open_trunk_well is False:
                         roof_add_column_plast = current_bottom
                     elif self.data_well.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:
@@ -819,12 +819,12 @@ class TabPageSoWith(TabPageUnion):
                         break
             for plast in plast_all:
                 roof_plast_in = dict_perforation[plast]['кровля']
-                roof_plast = self.data_well.head_column_additional._value
-                if self.data_well.head_column_additional._value > roof_plast_in and roof_plast_in < current_bottom:
+                roof_plast = self.data_well.head_column_additional.get_value
+                if self.data_well.head_column_additional.get_value > roof_plast_in and roof_plast_in < current_bottom:
                     if dict_perforation[plast]['отрайбировано'] and self.data_well.open_trunk_well is False:
-                        roof_plast = self.data_well.head_column_additional._value
+                        roof_plast = self.data_well.head_column_additional.get_value
                     elif self.data_well.open_trunk_well is True and dict_perforation[plast]['отрайбировано']:
-                        roof_plast = self.data_well.shoe_column._value
+                        roof_plast = self.data_well.shoe_column.get_value
                     else:
                         roof_plast = roof_plast_in
                         break
@@ -833,7 +833,7 @@ class TabPageSoWith(TabPageUnion):
 
     def template_diam_ek(self):
 
-        diam_internal_ek = self.data_well.column_diameter._value - 2 * self.data_well.column_wall_thickness._value
+        diam_internal_ek = self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value
 
         template_first_diam_dict = {
             80: (88, 97),
@@ -875,9 +875,9 @@ class TabPageSoWith(TabPageUnion):
 
     def template_diam_additional_ek(self):  # Выбор диаметра шаблонов при наличии в скважине дополнительной колонны
 
-        diam_internal_ek = self.data_well.column_diameter._value - 2 * self.data_well.column_wall_thickness._value
-        diam_internal_ek_addition = float(self.data_well.column_additional_diameter._value) - 2 * float(
-            self.data_well.column_additional_wall_thickness._value)
+        diam_internal_ek = self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value
+        diam_internal_ek_addition = float(self.data_well.column_additional_diameter.get_value) - 2 * float(
+            self.data_well.column_additional_wall_thickness.get_value)
 
         template_second_diam_dict = {
             82: (84, 88),
@@ -988,19 +988,19 @@ class TemplateKrs(WindowUnion):
 
         if template_key in ['ПСШ СКМ в доп колонне c хвостом',
                             'ПСШ СКМ в доп колонне + открытый ствол', 'ПСШ СКМ в доп колонне без хвоста'] \
-                and (roof_skm < self.data_well.head_column_additional._value or
-                     sole_skm < self.data_well.head_column_additional._value):
+                and (roof_skm < self.data_well.head_column_additional.get_value or
+                     sole_skm < self.data_well.head_column_additional.get_value):
             QMessageBox.warning(self, 'Ошибка',
                                 f'кровля скреперования выше головы '
-                                f'хвостовика {self.data_well.head_column_additional._value}')
+                                f'хвостовика {self.data_well.head_column_additional.get_value}')
             return
 
         elif template_key == 'ПСШ Доп колонна СКМ в основной колонне' and \
-                (sole_skm > self.data_well.head_column_additional._value or
-                 roof_skm > self.data_well.head_column_additional._value):
+                (sole_skm > self.data_well.head_column_additional.get_value or
+                 roof_skm > self.data_well.head_column_additional.get_value):
             QMessageBox.warning(self, 'Ошибка',
                                 f'подошва скреперования ниже головы '
-                                f'хвостовика {self.data_well.head_column_additional._value}')
+                                f'хвостовика {self.data_well.head_column_additional.get_value}')
             return
 
         self.tableWidget.setSortingEnabled(False)
@@ -1057,7 +1057,7 @@ class TemplateKrs(WindowUnion):
                 return
         if self.data_well.column_additional is False or (
                 self.data_well.column_additional is True and float(
-            self.data_well.head_column_additional._value) >= self.data_well.current_bottom):
+            self.data_well.head_column_additional.get_value) >= self.data_well.current_bottom):
             template_diameter = int(self.tabWidget.currentWidget().template_second_Edit.text())
         else:
             template_diameter = int(self.tabWidget.currentWidget().template_first_Edit.text())
@@ -1072,7 +1072,7 @@ class TemplateKrs(WindowUnion):
             return
         if self.data_well.column_additional is False or \
                 self.data_well.column_additional and self.data_well.current_bottom <= \
-                self.data_well.head_column_additional._value:
+                self.data_well.head_column_additional.get_value:
             if self.data_well.template_depth >= self.data_well.current_bottom:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
                 return
@@ -1080,11 +1080,11 @@ class TemplateKrs(WindowUnion):
             if self.data_well.template_depth_addition >= self.data_well.current_bottom:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
                 return
-            if self.data_well.template_depth >= self.data_well.head_column_additional._value:
+            if self.data_well.template_depth >= self.data_well.head_column_additional.get_value:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже головы хвостовика')
                 return
             if template_key == 'ПСШ Доп колонна СКМ в основной колонне' and \
-                    self.data_well.skm_depth >= self.data_well.head_column_additional._value:
+                    self.data_well.skm_depth >= self.data_well.head_column_additional.get_value:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'СКМ спускается ниже головы хвостовика')
                 return
         if distance_second < 0 or distance_first < 0:
@@ -1135,17 +1135,17 @@ class TemplateKrs(WindowUnion):
         if not self.data_well.column_additional:
 
             volume_well = 3.14 * (
-                    self.data_well.column_diameter._value - self.data_well.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
+                    self.data_well.column_diameter.get_value - self.data_well.column_wall_thickness.get_value * 2) ** 2 / 4 / 1000000 * (
                               self.data_well.current_bottom)
             return volume_well
         else:
             volume_well = (3.14 * (
-                    self.data_well.column_additional_diameter._value - self.data_well.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
+                    self.data_well.column_additional_diameter.get_value - self.data_well.column_wall_thickness.get_value * 2) ** 2 / 4 / 1000 * (
                                    self.data_well.current_bottom - float(
-                               self.data_well.head_column_additional._value)) / 1000) + (
+                               self.data_well.head_column_additional.get_value)) / 1000) + (
                                   3.14 * (
-                                  self.data_well.column_diameter._value - self.data_well.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                      self.data_well.head_column_additional._value) / 1000)
+                                  self.data_well.column_diameter.get_value - self.data_well.column_wall_thickness.get_value * 2) ** 2 / 4 / 1000 * (
+                                      self.data_well.head_column_additional.get_value) / 1000)
             return volume_well
 
     def template_ek(self, template_str, template_diameter, skm_list):
@@ -1197,7 +1197,7 @@ class TemplateKrs(WindowUnion):
                 f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work}  при расходе '
                 f'жидкости 6-8 л/сек '
                 f'в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ПРИ ПРОМЫВКЕ НЕ '
-                f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {self.data_well.max_admissible_pressure._value}АТМ, '
+                f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {self.data_well.max_admissible_pressure.get_value}АТМ, '
                 f'ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
                 None, None, None, None, None, None, None,
                 'Мастер КРС, представитель ЦДНГ', well_volume_norm(TemplateKrs.well_volume(self) * 1.5)],
@@ -1354,7 +1354,7 @@ class TemplateKrs(WindowUnion):
              f'6-8 л/сек в присутствии представителя Заказчика в объеме '
              f'{round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. '
              f'ПРИ ПРОМЫВКЕ НЕ '
-             f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {self.data_well.max_admissible_pressure._value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
+             f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {self.data_well.max_admissible_pressure.get_value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
              f'НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
              None, None, None, None, None, None, None,
              'Мастер КРС, представитель ЦДНГ', 1.5],
@@ -1383,7 +1383,7 @@ class TemplateKrs(WindowUnion):
         if self.data_well.gips_in_well is True:
             template_diameter = TabPageSoDrill.drillingBit_diam_select(self, self.data_well.current_bottom)
 
-            if self.data_well.column_diameter._value > 127 or (self.data_well.column_additional and \
+            if self.data_well.column_diameter.get_value > 127 or (self.data_well.column_additional and \
                                                                       self.data_well.column_additional_diameter > 127):
                 downhole_motor = 'Д-106'
             else:
@@ -1409,13 +1409,13 @@ class TemplateKrs(WindowUnion):
     def calc_combo_nkt(self, type_nkt, current):
         if self.data_well.column_additional is False or \
                 self.data_well.column_additional and \
-                self.data_well.current_bottom <= self.data_well.head_column_additional._value:
+                self.data_well.current_bottom <= self.data_well.head_column_additional.get_value:
             if type_nkt == 'СБТ':
                 nkt_string = ''
             else:
                 nkt_string = f' + НКТ{self.data_well.nkt_diam} 20м + репер'
         else:
-            if self.data_well.column_additional_diameter._value > 110:
+            if self.data_well.column_additional_diameter.get_value > 110:
                 if type_nkt == 'СБТ':
                     nkt_type = {type_nkt: '2" 7/8'}
                 else:
@@ -1423,17 +1423,17 @@ class TemplateKrs(WindowUnion):
             else:
                 if type_nkt == 'СБТ':
                     nkt_type = {type_nkt: '2" 3/8'}
-                elif 110 < self.data_well.column_additional_diameter._value < 125:
+                elif 110 < self.data_well.column_additional_diameter.get_value < 125:
                     nkt_type = {type_nkt: '73 c обточными муфтами'}
                 else:
                     nkt_type = {type_nkt: '60'}
 
             if type_nkt == 'СБТ':
                 nkt_string = f'{type_nkt}{nkt_type[type_nkt]}  ' \
-                             f'{round(self.data_well.head_column_additional._value - current, 0)}м '
+                             f'{round(self.data_well.head_column_additional.get_value - current, 0)}м '
             else:
                 nkt_string = f'{type_nkt}{nkt_type[type_nkt]} 20м + репер + {type_nkt}{nkt_type[type_nkt]} ' \
-                             f'{round(self.data_well.head_column_additional._value - current - 20, 0)}м '
+                             f'{round(self.data_well.head_column_additional.get_value - current - 20, 0)}м '
         return nkt_string
 
 

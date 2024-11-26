@@ -22,12 +22,11 @@ from openpyxl.utils import get_column_letter
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Alignment, Font
 from block_name import region_select
-from data_base.config_base import connect_to_database, CheckWellExistence, connection_to_database, WorkDatabaseWell
 
 from log_files.log import logger, QPlainTextEditLogger
 from openpyxl.drawing.image import Image
 from PyQt5.QtCore import QThread, pyqtSlot
-from users.login_users import LoginWindow
+
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
 
 
@@ -38,10 +37,10 @@ class UncaughtExceptions(QObject):
         super().__init__()
 
     @pyqtSlot(object)
-    def handleException(self, ex):
+    def handle_exception(self, ex):
         try:
-            logger.critical(f'{self.data_well.well_number._value}'
-                            f' {self.data_well.well_area._value} Критическая ошибка: {ex}')
+            logger.critical(f'{self.data_well.well_number.get_value}'
+                            f' {self.data_well.well_area.get_value} Критическая ошибка: {ex}')
         except:
             logger.critical(f'{self.well_number} {self.data_well.well_area} Критическая ошибка: {ex}')
 
@@ -54,6 +53,7 @@ class ExcelWorker(QThread):
         self.data_well = data_well
 
     def check_well_existence(self, well_number, deposit_area, region):
+        from data_base.config_base import CheckWellExistence, connection_to_database
         check_true = True
         try:
             db = connection_to_database(data_list.DB_CLASSIFICATION)
@@ -72,6 +72,7 @@ class ExcelWorker(QThread):
         return result
 
     def insert_data_in_database(self, excel_data_dict, data_well):
+        from data_base.config_base import connection_to_database, WorkDatabaseWell
         try:
             db = connection_to_database(data_list.DB_WELL_DATA)
             data_well_base = WorkDatabaseWell(db)
@@ -102,12 +103,11 @@ class MyMainWindow(QMainWindow):
         self.perforation_correct_window2 = None
         self.work_plan = None
 
-
     def check_gpp_upa(self, table_widget):
         for row in range(table_widget.rowCount()):
             for column in range(table_widget.columnCount()):
                 value = self.table_widget.item(row, column)
-                if value != None:
+                if value is not None:
                     value = value.text()
                     if 'Установить подъёмный агрегат на устье не менее 40т' in value:
                         new_value = QtWidgets.QTableWidgetItem(
@@ -169,23 +169,24 @@ class MyMainWindow(QMainWindow):
         self.data_well.work_plan = self.work_plan
         data_well_dict = {}
         self.data_well = WellName.read_well(
-            self.data_well, self.data_well.cat_well_max._value, self.data_well.data_pvr_min._value)
+            self.data_well, self.data_well.cat_well_max.get_value, self.data_well.data_pvr_min.get_value)
 
-        self.data_well.region = region_select(self.data_well.cdng._value)
+        self.data_well.region = region_select(self.data_well.cdng.get_value)
 
         date_str2 = datetime.strptime('2024-09-19', '%Y-%m-%d')
 
         if self.work_plan == 'dop_plan':
+            from data_base.config_base import connection_to_database, WorkDatabaseWell
             number_list = list(map(str, range(1, 50)))
             self.data_well.number_dp, ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',
-                                                                        'Введите номер дополнительного плана работ',
-                                                                        number_list, 0, False)
+                                                                'Введите номер дополнительного плана работ',
+                                                                number_list, 0, False)
 
             db = connection_to_database(data_list.DB_WELL_DATA)
             data_well_base = WorkDatabaseWell(db, self.data_well)
 
-            data_well = data_well_base.check_in_database_dp_data(self.data_well.well_number._value,
-                                                                 self.data_well.well_area._value,
+            data_well = data_well_base.check_in_database_dp_data(self.data_well.well_number.get_value,
+                                                                 self.data_well.well_area.get_value,
                                                                  f'ДП№{self.data_well.number_dp}')
 
             if data_well:
@@ -215,26 +216,29 @@ class MyMainWindow(QMainWindow):
 
         if data_list.data_well_is_True is False:
             WellNkt.read_well(
-                self.data_well, self.data_well.pipes_ind._value, self.data_well.condition_of_wells._value)
+                self.data_well, self.data_well.pipes_ind.get_value, self.data_well.condition_of_wells.get_value)
             WellHistoryData.read_well(
-                self.data_well, self.data_well.data_pvr_max._value, self.data_well.data_fond_min._value)
+                self.data_well, self.data_well.data_pvr_max.get_value, self.data_well.data_fond_min.get_value)
             WellCondition.read_well(
-                self.data_well, self.data_well.condition_of_wells._value, self.data_well.data_well_max._value)
+                self.data_well, self.data_well.condition_of_wells.get_value, self.data_well.data_well_max.get_value)
 
             WellExpectedPickUp.read_well(
-                self.data_well, self.data_well.data_x_min._value, self.data_well.data_x_max._value)
+                self.data_well, self.data_well.data_x_min.get_value, self.data_well.data_x_max.get_value)
             if self.work_plan not in ['application_pvr', 'application_gis']:
                 WellSuckerRod.read_well(
-                    self.data_well, self.data_well.sucker_rod_ind._value, self.data_well.pipes_ind._value)
+                    self.data_well, self.data_well.sucker_rod_ind.get_value, self.data_well.pipes_ind.get_value)
 
                 WellFondData.read_well(
-                    self.data_well, self.data_well.data_fond_min._value, self.data_well.condition_of_wells._value)
-            WellData.read_well(self.data_well, self.data_well.cat_well_max._value, self.data_well.data_pvr_min._value)
+                    self.data_well, self.data_well.data_fond_min.get_value, self.data_well.condition_of_wells.get_value)
+            WellData.read_well(self.data_well, self.data_well.cat_well_max.get_value,
+                               self.data_well.data_pvr_min.get_value)
 
-            WellPerforation.read_well(self.data_well, self.data_well.data_pvr_min._value, self.data_well.data_pvr_max._value + 1)
+            WellPerforation.read_well(self.data_well, self.data_well.data_pvr_min.get_value,
+                                      self.data_well.data_pvr_max.get_value + 1)
 
             self.data_well = \
-                WellCategory.read_well(self.data_well, self.data_well.cat_well_min._value, self.data_well.data_well_min._value)
+                WellCategory.read_well(self.data_well, self.data_well.cat_well_min.get_value,
+                                       self.data_well.data_well_min.get_value)
 
             # self.set_modal_window(self.data_list.pdata_window)
 
@@ -263,19 +267,19 @@ class MyMainWindow(QMainWindow):
                     self.data_well.emergency_bottom, ok = QInputDialog.getInt(
                         self, 'Аварийный забой',
                         'Введите глубину аварийного забоя', 0, 0,
-                        int(self.data_well.bottom_hole_artificial._value))
+                        int(self.data_well.bottom_hole_artificial.get_value))
                 else:
                     self.data_well.emergency_well = False
             if self.data_well.problem_with_ek is True:
                 problem_with_ek_quest = QMessageBox.question(self, 'ВНИМАНИЕ НЕПРОХОД ',
                                                              f'Программа определила что в скважине '
-                                                             f'ссужение в ЭК -, верно ли?')
+                                                             f'сужение в ЭК -, верно ли?')
                 if problem_with_ek_quest == QMessageBox.StandardButton.Yes:
                     self.data_well.problem_with_ek = True
                     self.data_well.problem_with_ek_depth, ok = QInputDialog.getInt(self, 'Глубина сужения',
-                                                                                           "Введите глубину cсужения",
-                                                                                           0, 0,
-                                                                                           int(self.data_well.current_bottom))
+                                                                                   "Введите глубину cсужения",
+                                                                                   0, 0,
+                                                                                   int(self.data_well.current_bottom))
                     self.data_well.problem_with_ek_diameter = \
                         QInputDialog.getInt(self, 'диаметр внутренний cсужения',
                                             "ВВедите внутренний диаметр cсужения", 0,
@@ -287,15 +291,17 @@ class MyMainWindow(QMainWindow):
 
             if self.data_well.gips_in_well is True:
                 gips_true_quest = QMessageBox.question(self, 'Гипсовые отложения',
-                                                       'Программа определила что скважина осложнена гипсовыми отложениями '
-                                                       'и требуется предварительно определить забой на НКТ, верно ли это?')
+                                                       'Программа определила что скважина осложнена гипсовыми '
+                                                       'отложениями '
+                                                       'и требуется предварительно определить забой на НКТ, верно ли '
+                                                       'это?')
 
                 if gips_true_quest == QMessageBox.StandardButton.Yes:
                     self.data_well.gips_in_well = True
                 else:
                     self.data_well.gips_in_well = False
 
-        if self.data_well.inventory_number._value == 'не корректно' or self.data_well.inventory_number is None:
+        if self.data_well.inventory_number.get_value == 'не корректно' or self.data_well.inventory_number is None:
             QMessageBox.warning(self, 'Инвентарный номер отсутствует',
                                 'Необходимо уточнить наличие инвентарного номера')
             return
@@ -310,7 +316,8 @@ class MyMainWindow(QMainWindow):
 
     def privyazka_nkt(self):
         priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
-                      f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+                      f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС '
+                      f'{data_list.contractor}". '
                       f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
                       f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                       f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
@@ -357,8 +364,6 @@ class MyMainWindow(QMainWindow):
             elif self.work_plan == 'gnkt_frez':
                 self.gnkt_data = WorkWithGnkt(self.ws, self.table_title, self.table_schema, self.table_widget,
                                               self.data_well)
-
-
         elif self.work_plan in ['plan_change', 'dop_plan_in_base']:
             data_list.data_in_base = True
             self.data_well = FindIndexPZ
@@ -369,7 +374,6 @@ class MyMainWindow(QMainWindow):
             elif self.work_plan == 'dop_plan_in_base':
                 self.data_well.work_plan = self.work_plan
                 self.rir_window = DopPlanWindow(self.data_well, self.table_widget)
-
 
             self.rir_window.setGeometry(200, 400, 800, 200)
             self.set_modal_window(self.rir_window)
@@ -392,6 +396,7 @@ class MyMainWindow(QMainWindow):
         self.ws = self.wb.active
 
     def definition_filenames(self):
+        contractor = 'Ойл'
         if 'РН' in data_list.contractor:
             contractor = 'РН'
         elif 'Ойл' in data_list.contractor:
@@ -416,7 +421,7 @@ class MyMainWindow(QMainWindow):
         else:
             string_work = 'ГНКТ'
 
-        filenames = f'{self.data_well.well_number._value} {self.data_well.well_area._value} ' \
+        filenames = f'{self.data_well.well_number.get_value} {self.data_well.well_area.get_value} ' \
                     f'{self.data_well.type_kr.split(" ")[0]} кат {self.data_well.category_pressure}' \
                     f' {string_work} {contractor}.xlsx'
         return filenames
@@ -549,7 +554,7 @@ class MyMainWindow(QMainWindow):
             if row > ind:
                 for column in range(self.table_widget.columnCount()):
                     value = self.table_widget.item(row, column)
-                    if value != None:
+                    if value is not None:
                         value = value.text()
                         if 'схеме №' in value or 'схемы №' in value or \
                                 'Схемы обвязки №' in value or 'схемы ПВО №' in value:
@@ -599,7 +604,7 @@ class MyMainWindow(QMainWindow):
         plast_work_json = json.dumps(self.data_well.plast_work)
         skm_list_json = json.dumps(self.data_well.skm_interval)
         raiding_list_json = json.dumps(self.data_well.ribbing_interval)
-        head_column = self.data_well.head_column._value
+        head_column = self.data_well.head_column.get_value
 
         template_ek = json.dumps(
             [self.data_well.template_depth, self.data_well.template_length,
@@ -627,7 +632,7 @@ class MyMainWindow(QMainWindow):
         check_true = False
         check_ribbing = False
 
-        for interval in  self.data_well.skm_interval:
+        for interval in self.data_well.skm_interval:
             if float(interval[0]) <= float(depth) <= float(interval[1]):
                 check_true = True
                 return int(depth)
@@ -725,7 +730,7 @@ class MyMainWindow(QMainWindow):
         if self.data_well.column_additional:
 
             if self.data_well.template_depth_addition < depth and \
-                    depth > self.data_well.head_column_additional._value:
+                    depth > self.data_well.head_column_additional.get_value:
                 check = False
                 check_question = QMessageBox.question(
                     self,
@@ -735,7 +740,7 @@ class MyMainWindow(QMainWindow):
                 if check_question == QMessageBox.StandardButton.Yes:
                     check = True
             if self.data_well.template_depth < depth and \
-                    depth < self.data_well.head_column_additional._value:
+                    depth < self.data_well.head_column_additional.get_value:
                 check = False
                 check_question = QMessageBox.question(
                     self,
@@ -765,7 +770,7 @@ class MyMainWindow(QMainWindow):
             self.data_well.count_row_well = table_widget.rowCount()
 
             if work_plan == 'plan_change':
-                self.data_well.count_row_well = self.data_well.data_x_max._value
+                self.data_well.count_row_well = self.data_well.data_x_max.get_value
 
             border_styles = {}
             for row in sheet.iter_rows():
@@ -897,7 +902,7 @@ class MyWindow(MyMainWindow):
 
         # Обработка критических ошибок
         self.excepthook = UncaughtExceptions()
-        self.excepthook._exception_caught.connect(self.excepthook.handleException)
+        self.excepthook._exception_caught.connect(self.excepthook.handle_exception)
 
         # # Запускаем обработчик исключений в отдельном потоке
         self.thread = QThread()
@@ -927,8 +932,8 @@ class MyWindow(MyMainWindow):
             string_work = 'ГНКТ'
 
         date_today = datetime.now()
-        data_work = (self.data_well.well_number._value,
-                     self.data_well.well_area._value,
+        data_work = (self.data_well.well_number.get_value,
+                     self.data_well.well_area.get_value,
                      self.data_well.region,
                      data_list.costumer,
                      data_list.contractor,
@@ -1122,49 +1127,44 @@ class MyWindow(MyMainWindow):
 
         action = self.sender()
 
-        if action == self.create_KRS and self.table_widget == None:
+        if action == self.create_KRS and self.table_widget is None:
             self.work_plan = 'krs'
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
-        elif action == self.create_KRS_DP and self.table_widget == None:
+        elif action == self.create_KRS_DP and self.table_widget is None:
             self.work_plan = 'dop_plan'
 
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
-        elif action == self.create_KRS_DP_in_base and self.table_widget == None:
+        elif action == self.create_KRS_DP_in_base and self.table_widget is None:
             self.work_plan = 'dop_plan_in_base'
 
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
-        elif action == self.create_KRS_change and self.table_widget == None:
+        elif action == self.create_KRS_change and self.table_widget is None:
             self.work_plan = 'plan_change'
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
-        elif action == self.create_gnkt_opz and self.table_widget == None:
+        elif action == self.create_gnkt_opz and self.table_widget is None:
             self.work_plan = 'gnkt_opz'
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
-
-        elif action == self.create_GNKT_GRP and self.table_widget == None:
+        elif action == self.create_GNKT_GRP and self.table_widget is None:
             self.work_plan = 'gnkt_after_grp'
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
-
-
-        elif action == self.create_GNKT_BOPZ and self.table_widget == None:
+        elif action == self.create_GNKT_BOPZ and self.table_widget is None:
             self.work_plan = 'gnkt_bopz'
             self.data_well.bvo = True
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
-
-
-        elif action == self.create_GNKT_frez and self.table_widget == None:
+        elif action == self.create_GNKT_frez and self.table_widget is None:
             self.work_plan = 'gnkt_frez'
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
@@ -1523,7 +1523,6 @@ class MyWindow(MyMainWindow):
             self.thread_excel_insert = ExcelWorker(self.data_well)
             self.thread_excel_insert.insert_data_in_database(excel_data_dict, self.data_well)
 
-
             ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
             ws2.page_setup.fitToPage = True
             ws2.page_setup.fitToHeight = False
@@ -1846,7 +1845,7 @@ class MyWindow(MyMainWindow):
             self.data_well.dict_perforation_project = {}
             self.data_well.itog_ind_min = 0
             self.data_well.category_pvo = 2
-            self.data_well.gaz_factor_procent = []
+            self.data_well.gaz_factor_percent = []
             data_list.paker_layout = 0
             self.data_well.ribbing_interval = []
             self.data_well.column_direction_diameter = ProtectedIsNonNone('не корректно')
@@ -1928,7 +1927,7 @@ class MyWindow(MyMainWindow):
             self.data_well.max_angle = 0
             data_list.pakerTwoSKO = False
             data_list.privyazkaSKO = 0
-            self.data_well.value_h2s_procent = []
+            self.data_well.value_h2s_percent = []
             self.data_well.category_h2s_list = []
             self.data_well.dict_perforation_short = {}
             self.data_well.value_h2s_mg = []
@@ -1980,7 +1979,7 @@ class MyWindow(MyMainWindow):
         from data_correct import DataWindow
 
         row = row - self.data_well.count_row_well
-        # print(self.data_well.column_diameter._value)
+        # print(self.data_well.column_diameter.get_value)
         data = self.data_well.data_list
 
         self.data_well.current_bottom = data[row][1]
@@ -1992,7 +1991,8 @@ class MyWindow(MyMainWindow):
         self.data_well.column_additional = data[row][6]
 
         self.data_well.fluid_work = data[row][7]
-        self.data_well.template_depth, self.data_well.template_length, self.data_well.template_depth_addition, self.data_well.template_length_addition = json.loads(
+        self.data_well.template_depth, self.data_well.template_length, \
+        self.data_well.template_depth_addition, self.data_well.template_length_addition = json.loads(
             data[row][11])
         self.data_well.skm_interval = json.loads(data[row][12])
 
@@ -2026,6 +2026,7 @@ class MyWindow(MyMainWindow):
     def magnet_action(self):
         from work_py.emergency_magnit import EmergencyMagnit
         self.add_window(EmergencyMagnit)
+
     def emergency_sticking_action(self):
         from work_py.emergencyWork import emergency_sticking
         emergency_sticking_list = emergency_sticking(self)
@@ -2254,7 +2255,7 @@ class MyWindow(MyMainWindow):
         self.data_well.data_list[-1][1] = self.data_well.current_bottom
 
         self.data_well.data_list[-1][2] = json.dumps(self.data_well.dict_perforation, default=str,
-                                                             ensure_ascii=False, indent=4)
+                                                     ensure_ascii=False, indent=4)
 
     def correct_curator(self):
         from work_py.curators import SelectCurator
@@ -2276,7 +2277,7 @@ class MyWindow(MyMainWindow):
             WellCondition.leakage_window.close()  # Close window.
             WellCondition.leakage_window = None  # Discard reference.
         self.data_well.data_list[-1][5] = json.dumps(self.data_well.dict_leakiness, default=str,
-                                                             ensure_ascii=False, indent=4)
+                                                     ensure_ascii=False, indent=4)
 
     def correctData(self):
         from data_correct import DataWindow
@@ -2308,8 +2309,8 @@ class MyWindow(MyMainWindow):
 
         for row in range(15):
             ws4.insert_rows(ws4.max_row)
-        ws4.cell(row=1, column=1).value = self.data_well.well_number._value
-        ws4.cell(row=2, column=1).value = self.data_well.well_area._value
+        ws4.cell(row=1, column=1).value = self.data_well.well_number.get_value
+        ws4.cell(row=2, column=1).value = self.data_well.well_area.get_value
 
         if self.data_well.dict_pump_shgn["do"] != 0 and self.data_well.dict_pump_ecn["do"] == 0 and \
                 self.data_well.paker_before["do"] == 0:
@@ -2378,8 +2379,8 @@ class MyWindow(MyMainWindow):
         ws4.cell(row=7, column=1).value = f'Рпл: \n {" ".join(list(pressur_set))}атм'
         # ws4.cell(row=8, column=1).value = f'ЖГС = {self.data_well.fluid_work_short}г/см3'
         ws4.cell(row=9,
-                 column=1).value = f'Нст- {self.data_well.static_level._value}м / Ндин -' \
-                                   f' {self.data_well.dinamic_level._value}м'
+                 column=1).value = f'Нст- {self.data_well.static_level.get_value}м / Ндин -' \
+                                   f' {self.data_well.dinamic_level.get_value}м'
         if self.data_well.curator == 'ОР':
             ws4.cell(row=10,
                      column=1).value = f'Ожид {self.data_well.expected_Q}м3/сут при Р-{self.data_well.expected_P}м3/сут'
@@ -2387,8 +2388,9 @@ class MyWindow(MyMainWindow):
             ws4.cell(row=10,
                      column=1).value = f'Qн {self.data_well.Qoil}т Qж- {self.data_well.Qwater}м3/сут'
         ws4.cell(row=11,
-                 column=1).value = f'макс угол {self.data_well.max_angle._value} на {self.data_well.max_angle_depth._value}'
-        ws4.cell(row=1, column=2).value = self.data_well.cdng._value
+                 column=1).value = f'макс угол {self.data_well.max_angle.get_value} на ' \
+                                   f'{self.data_well.max_angle_depth.get_value}'
+        ws4.cell(row=1, column=2).value = self.data_well.cdng.get_value
         try:
             try:
                 category_pressure = self.data_well.dict_category[self.data_well.plast_work_short[0]][
@@ -2401,7 +2403,7 @@ class MyWindow(MyMainWindow):
             except:
                 category_h2s = self.data_well.category_h2s_second
             try:
-                gaz_f_pr = self.data_well.gaz_factor_procent[0]
+                gaz_f_pr = self.data_well.gaz_factor_percent[0]
             except:
                 gaz_f_pr = self.data_well.gaz_factor_pr_second
 
@@ -2413,21 +2415,22 @@ class MyWindow(MyMainWindow):
             QMessageBox.warning(self, 'ОШИБКА',
                                 f"Программа не смогла вставить данные в краткое содержание значения по "
                                 f"Рпл {type(e).__name__}\n\n{str(e)}")
-        column_well = f'{self.data_well.column_diameter._value}х{self.data_well.column_wall_thickness._value} в ' \
-                      f'инт 0 - {self.data_well.shoe_column._value}м ' \
+        column_well = f'{self.data_well.column_diameter.get_value}х{self.data_well.column_wall_thickness.get_value} ' \
+                      f'в ' \
+                      f'инт 0 - {self.data_well.shoe_column.get_value}м ' \
             if self.data_well.column_additional is False else \
-            f'{self.data_well.column_diameter._value} х ' \
-            f'{self.data_well.column_wall_thickness._value} \n' \
-            f'0 - {self.data_well.shoe_column._value}м/\n{self.data_well.column_additional_diameter._value}' \
-            f' х {self.data_well.column_additional_wall_thickness._value} в инт ' \
-            f'{self.data_well.head_column_additional._value}-{self.data_well.head_column_additional._value}м'
+            f'{self.data_well.column_diameter.get_value} х ' \
+            f'{self.data_well.column_wall_thickness.get_value} \n' \
+            f'0 - {self.data_well.shoe_column.get_value}м/\n{self.data_well.column_additional_diameter.get_value}' \
+            f' х {self.data_well.column_additional_wall_thickness.get_value} в инт ' \
+            f'{self.data_well.head_column_additional.get_value}-{self.data_well.head_column_additional.get_value}м'
         ws4.cell(row=1, column=7).value = column_well
-        ws4.cell(row=4, column=7).value = f'Пробур забой {self.data_well.bottom_hole_drill._value}м'
-        ws4.cell(row=5, column=7).value = f'Исскус забой {self.data_well.bottom_hole_artificial._value}м'
+        ws4.cell(row=4, column=7).value = f'Пробур забой {self.data_well.bottom_hole_drill.get_value}м'
+        ws4.cell(row=5, column=7).value = f'Исскус забой {self.data_well.bottom_hole_artificial.get_value}м'
         ws4.cell(row=6, column=7).value = f'Тек забой {self.data_well.bottom}м'
 
         ws4.cell(row=7, column=7).value = plast_str
-        ws4.cell(row=11, column=7).value = f'Рмакс {self.data_well.max_admissible_pressure._value}атм'
+        ws4.cell(row=11, column=7).value = f'Рмакс {self.data_well.max_admissible_pressure.get_value}атм'
         ws4.cell(row=3, column=2).value = plan_short
         nek_str = 'НЭК '
         if len(self.data_well.leakiness_interval) != 0:
@@ -2481,6 +2484,9 @@ class MyWindow(MyMainWindow):
 
 
 if __name__ == "__main__":
+    from data_base.config_base import connect_to_database
+    from users.login_users import LoginWindow
+
     # app3 = QApplication(sys.argv)
 
     app = QApplication(sys.argv)

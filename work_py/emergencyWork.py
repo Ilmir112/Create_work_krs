@@ -9,32 +9,32 @@ def magnet_select(self, nkt_str):
 
 
     if self.data_well.column_additional is False or (self.data_well.column_additional is True and\
-            self.data_well.current_bottom <= self.data_well.head_column_additional._value):
+            self.data_well.current_bottom <= self.data_well.head_column_additional.get_value):
         magnet_select = f'{nkt_str} {self.data_well.nkt_diam}мм 20м + репер'
 
-    elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 and \
-            self.data_well.current_bottom >= self.data_well.head_column_additional._value:
+    elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
+            self.data_well.current_bottom >= self.data_well.head_column_additional.get_value:
         magnet_select = f'{nkt_str}60мм 20м + репер + {nkt_str}60мм L- ' \
-                        f'{round(self.data_well.current_bottom - self.data_well.head_column_additional._value, 1)}м'
-    elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value > 110 and\
-            self.data_well.current_bottom >= self.data_well.head_column_additional._value:
+                        f'{round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value, 1)}м'
+    elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110 and\
+            self.data_well.current_bottom >= self.data_well.head_column_additional.get_value:
         magnet_select = f'{nkt_str}{self.data_well.nkt_diam}мм со снятыми фасками 20м +' \
                         f' {nkt_str}{self.data_well.nkt_diam}мм со снятыми фасками' \
-                        f' L- {round(self.data_well.current_bottom - self.data_well.head_column_additional._value, 1)}м'
+                        f' L- {round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value, 1)}м'
     return magnet_select
 
 
 def sbt_select(self, nkt_str_combo):
 
-    if self.data_well.column_additional is False and self.data_well.column_additional_diameter._value < 127:
+    if self.data_well.column_additional is False and self.data_well.column_additional_diameter.get_value < 127:
         sbt_select = 'СБТ 2 3/8"'
 
     elif self.data_well.column_additional is False or self.data_well.column_additional is True and \
-            self.data_well.current_bottom <= self.data_well.head_column_additional._value:
+            self.data_well.current_bottom <= self.data_well.head_column_additional.get_value:
         sbt_select = 'СБТ 2 7/8"'
 
-    elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 127:
-        sbt_select = f'СБТ 2 3/8 L- {round(self.data_well.current_bottom - self.data_well.head_column_additional._value,0)}м ' \
+    elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 127:
+        sbt_select = f'СБТ 2 3/8 L- {round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value,0)}м ' \
                      f'на СБТ 2 7/8"'
 
 

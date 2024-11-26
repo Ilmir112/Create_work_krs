@@ -95,10 +95,10 @@ class TubingPressureWindow(WindowUnion):
                 distance_between_nkt_edit = int(float(distance_between_nkt_edit))
             select_nkt_combo = self.tabWidget.currentWidget().select_nkt_combo.currentText()
             current_edit = int(float(self.tabWidget.currentWidget().current_edit.text().replace(',', '.')))
-            if current_edit >= self.data_well.bottom_hole_artificial._value:
+            if current_edit >= self.data_well.bottom_hole_artificial.get_value:
                 QMessageBox.warning(self, 'Ошибка',
                                     f'Необходимый забой-{current_edit}м ниже исскуственного '
-                                    f'{self.data_well.bottom_hole_artificial._value}м')
+                                    f'{self.data_well.bottom_hole_artificial.get_value}м')
                 return
 
             length_nkt_edit = self.tabWidget.currentWidget().length_nkt_edit.text().replace(',', '.')

@@ -40,8 +40,8 @@ class TabPageSoPvr(TabPageUnion):
 
         self.nkt_label = QLabel("Внешний диаметр НКТ:", self)
         self.nkt_edit = QLineEdit(self)
-        if self.data_well.column_additional is False and self.data_well.column_diameter._value > 110 or \
-                (self.data_well.column_additional and self.data_well.column_additional_diameter._value > 110):
+        if self.data_well.column_additional is False and self.data_well.column_diameter.value > 110 or \
+                (self.data_well.column_additional and self.data_well.column_additional_diameter.value > 110):
             self.nkt_edit.setText('73')
         else:
             self.nkt_edit.setText('60')
@@ -387,7 +387,7 @@ class GisApplication(MyMainWindow):
         self.data_well.pvr_row_list = []
         self.ws_pvr.print_area = f'B1:AP{85}'
 
-        filenames = f'{self.data_well.well_number._value} {self.data_well.well_area._value} ГИС {data_list.current_date}.xlsx'
+        filenames = f'{self.data_well.well_number.value} {self.data_well.well_area.value} ГИС {data_list.current_date}.xlsx'
         path = 'D:\Documents\Desktop\ГТМ\заявки ГИС'
         full_path = path + "/" + filenames
         if wb:
@@ -410,18 +410,18 @@ class GisApplication(MyMainWindow):
                             nkt_edit, nkt_shoe_edit,
                             nkt_com_edit, paker_type, paker_depth, fluid, note_to_gis):
 
-        column_data = f'{self.data_well.column_diameter._value}мм x {self.data_well.column_wall_thickness._value} в инт ' \
-                      f'0-{self.data_well.shoe_column._value}м'
+        column_data = f'{self.data_well.column_diameter.value}мм x {self.data_well.column_wall_thickness.value} в инт ' \
+                      f'0-{self.data_well.shoe_column.value}м'
         if self.data_well.column_additional:
-            column_data_add = f'{self.data_well.column_additional_diameter._value}мм x ' \
-                              f'{self.data_well.column_additional_wall_thickness._value} в инт ' \
-                          f'{self.data_well.head_column_additional._value}-{self.data_well.shoe_column_additional._value}м'
+            column_data_add = f'{self.data_well.column_additional_diameter.value}мм x ' \
+                              f'{self.data_well.column_additional_wall_thickness.value} в инт ' \
+                          f'{self.data_well.head_column_additional.value}-{self.data_well.shoe_column_additional.value}м'
         else:
             column_data_add = ''
         pressure = self.data_well.dict_category[list(self.data_well.dict_category.keys())[0]]['по давлению'].data_pressure
 
-        conductor = f'{self.data_well.column_conductor_diameter._value}мм x {self.data_well.column_conductor_wall_thickness._value} в инт ' \
-                      f'0-{self.data_well.column_conductor_length._value}м'
+        conductor = f'{self.data_well.column_conductor_diameter.value}мм x {self.data_well.column_conductor_wall_thickness.value} в инт ' \
+                      f'0-{self.data_well.column_conductor_length.value}м'
         if nkt_edit != '':
             nkt_edit_vn = float(nkt_edit) - 2 * 5.5
         else:
@@ -443,17 +443,17 @@ class GisApplication(MyMainWindow):
              None, None, 'по договору №', None, None, None, None, None, 'ГТМ', None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None],
             [None, 'Заказчик', None, None, None, f'{data_list.contractor}', None, None, None, None, None, None, None, None, None,
-             None, None, None, None, 'Цех', None, None, self.data_well.cdng._value, None, None, None, None, None, None, None, None,
+             None, None, None, None, 'Цех', None, None, self.data_well.cdng.value, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None],
             [None, 'Уполномоченный представитель', None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None],
-            [None, '№ скважины', None, None, None, None, self.data_well.well_number._value, None, None, None, None, None,
+            [None, '№ скважины', None, None, None, None, self.data_well.well_number.value, None, None, None, None, None,
              None, 'куст', None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None],
             [None, 'Регион', None, None, None, self.data_well.region, None, None, None, None, None, None, None, 'Месторождение', None,
-             None, None, None, None, self.data_well.well_area._value, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, self.data_well.well_area.value, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None],
             [None, 'Дата', None, None, date_new_edit, None, None, None, None, None, 'Время',
              None, None, time_new_edit, None, None, None, None, None, None, None, None, None, None, None,
@@ -506,17 +506,17 @@ class GisApplication(MyMainWindow):
              None, None, None, None, None, 'H2S:', None, self.data_well.category_h2s, None, None, None, None, None, None,
              'Газовый фактор:', None,
              None, None, None, None, None,  self.data_well.category_gas_factor, None,  None, None, None, None],
-            [None, 'Пробуренный забой', None, None, None, None, None, None, self.data_well.bottom_hole_drill._value, None,
+            [None, 'Пробуренный забой', None, None, None, None, None, None, self.data_well.bottom_hole_drill.value, None,
              None, None, None, 'м.', None,
-             'Искусственный забой', None, None, None, None, None, None, None, self.data_well.bottom_hole_artificial._value,
+             'Искусственный забой', None, None, None, None, None, None, None, self.data_well.bottom_hole_artificial.value,
              None, None, 'м.', None,
              'Текущий забой', None, None, None, None, None, self.data_well.current_bottom, None,  None, None, 'м.', None, None],
-            [None, 'Максимальный угол', None, None, None, None, None, None, self.data_well.max_angle._value, None, None,
+            [None, 'Максимальный угол', None, None, None, None, None, None, self.data_well.max_angle.value, None, None,
              None, None, None, None,
-             'гр.', None, 'на глубине', None, None, None, self.data_well.max_angle_depth._value, None, None, None, None, 'м.',
+             'гр.', None, 'на глубине', None, None, None, self.data_well.max_angle_depth.value, None, None, None, None, 'м.',
              None, None, None, None,
              None, None, None, None, None, None, None, None, None, None],
-            [None, 'Расстояние муфта-ротор', None, None, None, None, None, None, None, None, self.data_well.stol_rotor._value, None, None, None,
+            [None, 'Расстояние муфта-ротор', None, None, None, None, None, None, None, None, self.data_well.stol_rotor.value, None, None, None,
              'м.', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None],
             [None, 'Кондуктор: глубина спуска, м.', None, None, None, None, None, None, None, None, None,
@@ -532,7 +532,7 @@ class GisApplication(MyMainWindow):
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              'Окно врезки, м.', None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Высота подъема цемента за колонной, м.', None, None, None, None, None, None, None, None, None, None,
-             None, None, None, self.data_well.level_cement_column._value, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, self.data_well.level_cement_column.value, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Толщина стенки труб последней колонны, мм', None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -553,12 +553,12 @@ class GisApplication(MyMainWindow):
             [None, 'Пусковые муфты', None, None, None, None, None, None, None, 'муфты', None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None],
-            [None, 'Расстояние муфта-ротор, м.', None, None, None, None, None, None, None, None, None, self.data_well.stol_rotor._value, None, None,
+            [None, 'Расстояние муфта-ротор, м.', None, None, None, None, None, None, None, None, None, self.data_well.stol_rotor.value, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None],
             [None, 'Скважина заполнена:', None, None, None, None, None, None, None, 'Тип:', None, None, 'тех.вода ',
              None, None, None, None, None, None, None, None, None, None, None, None, 'Уровень, м.', None, None, None,
-              None, self.data_well.static_level._value, None,  None, None, None, None, None, None, None, None, None],
+              None, self.data_well.static_level.value, None,  None, None, None, None, None, None, None, None, None],
             [None, 'Плотность, г/см3', None, None, None, None, None, fluid, None, None, None, None, 'Вязкость, сек.',
              None, None, None, None, None, None, None, None, None, None, None, 'УЭС, Омм', None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None],
@@ -664,7 +664,7 @@ class GisApplication(MyMainWindow):
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
             [None, 'Максимально ожидаемое давление на устье скважины', None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None, None, None, self.data_well.max_admissible_pressure._value, None,
+             None, None, None, None, None, None, None, None, None, self.data_well.max_admissible_pressure.value, None,
              None, None, None, None, None, 'атм.', None,
              None, None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Расстояние до скважины', None, None, None, None, None, None, None, None, None, None, None, None,

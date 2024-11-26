@@ -31,7 +31,7 @@ def events_gnvp_gnkt(self):
         [None, ' 4. Движение транспортных средств осуществлять согласно схемы маршрута передвижения специальной '
                'техники по площадке скважины в присутствии ответственного лица', None, None,
          None, None, None, None, None, None, None],
-        [None, f'5. Производить опрессовку плашек ПВО {self.data_well.max_admissible_pressure._value}атм на максимально'
+        [None, f'5. Производить опрессовку плашек ПВО {self.data_well.max_admissible_pressure.get_value}атм на максимально'
                f' ожидаемое давление на устье + 10 % (для освоения), но не выше максимально допустимого '
                f'давления опрессовки эксплуатационной колонны с выдержкой в течении 30мин и составлением '
                f'акта на опрессовку ПВО (согласно плана мероприятий по результатам  расследования и анализа '
@@ -199,7 +199,7 @@ def events_gnvp_frez(self, distance, fluid):
          f'Производить замеры ГВС при спуске, промывках и освоении не реже, чем как через каждый час, '
          f'с записью в журнале времени и результатов замеров ГВС. В случае возникновения '
          f'газонефтеводопроявления следует прекратить все работы, загерметизировать устье скважины и '
-         f'сообщить об этом в службу ЦИТС{data_list.contractor} и «Заказчика» {dict_data_cdng[self.data_well.cdng._value]}',
+         f'сообщить об этом в службу ЦИТС{data_list.contractor} и «Заказчика» {dict_data_cdng[self.data_well.cdng.get_value]}',
          None, None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
         [None, 5, 'Перед началом работ по капитальному ремонту скважин иметь в наличии в исправном состоянии '
@@ -208,7 +208,7 @@ def events_gnvp_frez(self, distance, fluid):
          'Мастер ГНКТ', None],
         [None, 6, f'Двухкратный запас жидкости глушения уд.веса {fluid}г/см3 в объеме '
                   f'{round(float(self.data_well.well_volume_in_pz[0]) * 2, 1)}м3 находится на '
-                  f'{"".join(calc_pntzh(float(fluid), self.data_well.cdng._value))} на расстоянии {distance}км от скважины.'
+                  f'{"".join(calc_pntzh(float(fluid), self.data_well.cdng.get_value))} на расстоянии {distance}км от скважины.'
                   f' {data_list.contractor} в случае необходимости '
                   '(аварийного глушения) обязуется обеспечить завоз жидкости глушения на объект работ.', None, None,
          None, None, None, None, None, None, 'Подрядчик по КРС', None],
@@ -284,7 +284,7 @@ def events_gnvp(self, contractor):
              None, None, None, None, None, None, None],
             [None,
              f'5. Производить опрессовку трубных  плашек ПВО с СПО тех.пакера на гл.10м на давление '
-             f'{self.data_well.max_admissible_pressure._value}атм на максимально'
+             f'{self.data_well.max_admissible_pressure.get_value}атм на максимально'
              f' ожидаемое давление на устье + 10 % (для освоения), но не выше максимально допустимого '
              f'давления опрессовки эксплуатационной колонны с выдержкой в течении 30мин и составлением '
              f'акта на опрессовку ПВО (согласно плана мероприятий по результатам  расследования и анализа '
@@ -726,7 +726,7 @@ def add_itog(self):
          None, None, None, None, f'=ROUND(SUM(L{self.data_well.itog_ind_min}:L{self.data_well.itog_ind_max - 1})/11.5*0.3,1)'],
         [None, 'Непредвиденные  работы  : ', None, None, None, None, None, None, None, None, None,
          f'=ROUND(SUM(L{self.data_well.itog_ind_min}:L{self.data_well.itog_ind_max + 2})*'
-         f'{self.data_well.bottom_hole_artificial._value}/100*0.0004 ,1)'],
+         f'{self.data_well.bottom_hole_artificial.get_value}/100*0.0004 ,1)'],
         [None, 'ВСЕГО  :', None, None, None, None, None, None, None, None, None,
          f'=ROUND(l{self.data_well.itog_ind_max + 1} + l{self.data_well.itog_ind_max + 2} +'
          f' l{self.data_well.itog_ind_max + 3} + l{self.data_well.itog_ind_max + 4} +l{self.data_well.itog_ind_max + 5}, 1)'],

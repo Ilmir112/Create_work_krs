@@ -19,7 +19,7 @@ from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 
 
 class TabPageDp(TabPageUnion):
-    def __init__(self, data_well, tableWidget, old_index, parent =None):
+    def __init__(self, data_well, tableWidget, old_index, parent=None):
         super().__init__(data_well)
 
         self.tableWidget = tableWidget
@@ -73,7 +73,7 @@ class TabPageDp(TabPageUnion):
         self.skm_interval_label = QLabel('интервалы \nскреперования')
         self.skm_interval_edit = QLineEdit(self)
 
-        self.raiding_interval_label = QLabel('интервалы \n Райбирования')
+        self.raiding_interval_label = QLabel('интервалы \n райбирования')
         self.raiding_interval_edit = QLineEdit(self)
 
         self.table_name = ''
@@ -153,11 +153,11 @@ class TabPageDp(TabPageUnion):
 
         self.well_number_edit.editingFinished.connect(self.update_well)
         try:
-            self.well_area_edit.setText(f'{self.data_well.well_area._value}')
-            self.well_number_edit.setText(f'{self.data_well.well_number._value}')
+            self.well_area_edit.setText(f'{self.data_well.well_area.get_value}')
+            self.well_number_edit.setText(f'{self.data_well.well_number.get_value}')
             self.well_area_edit.setEnabled(False)
             # self.well_number_edit.setEnabled(False)
-        except:
+        except Exception:
             pass
 
         # self.well_area_edit.textChanged.connect(self.update_well)
@@ -166,9 +166,7 @@ class TabPageDp(TabPageUnion):
         self.change_pvr_combo.setCurrentIndex(1)
         self.change_pvr_combo.setCurrentIndex(0)
 
-
         if data_list.data_in_base:
-
             # self.table_in_base_label = QLabel('данные по скважине')
             # self.table_in_base_combo = QComboBox()
             # self.table_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
@@ -187,9 +185,6 @@ class TabPageDp(TabPageUnion):
             self.grid.addWidget(self.index_change_label, 2, 7)
             self.grid.addWidget(self.index_change_line, 3, 7)
 
-
-
-
             self.index_change_line.editingFinished.connect(self.update_table_in_base_combo)
 
     def update_well_data_in_base_combo(self, index):
@@ -201,7 +196,6 @@ class TabPageDp(TabPageUnion):
     def check_in_database_well_data2(self, number_well):
         db = connection_to_database(data_list.DB_WELL_DATA)
         data_well_base = WorkDatabaseWell(db, self.data_well)
-
 
         # Получение всех результатов
         wells_with_data = data_well_base.check_well_in_database_well_data(number_well)
@@ -217,12 +211,11 @@ class TabPageDp(TabPageUnion):
 
                     # Форматируем объект datetime в нужный формат
                     formatted_date = datetime_object.strftime("%d.%m.%Y")
-                except:
+                except Exception:
                     formatted_date = well[3]
 
                 # Формируем список скважин
                 well_list.append(f'{well[0]} {well[1]} {well[2]} {well[4]} от {formatted_date}')
-
 
                 self.grid.setColumnMinimumWidth(6, self.well_data_in_base_combo.sizeHint().width())
 
@@ -301,7 +294,6 @@ class TabPageDp(TabPageUnion):
 
             self.index_change_line.editingFinished.connect(self.update_table_in_base_combo)
 
-
             # self.table_in_base_combo.currentTextChanged.connect(self.update_table_in_base_combo)
 
     def update_table_name(self):
@@ -330,7 +322,7 @@ class TabPageDp(TabPageUnion):
 
             try:
                 if len(self.data_well.skm_interval) != 0:
-                    for roof, sole in  self.data_well.skm_interval:
+                    for roof, sole in self.data_well.skm_interval:
                         if f'{roof}-{sole}' not in skm_interval:
                             skm_interval += f'{roof}-{sole}, '
             except Exception as e:
@@ -342,7 +334,7 @@ class TabPageDp(TabPageUnion):
             try:
 
                 if len(self.data_well.ribbing_interval) != 0:
-                    asddfg = self.data_well.ribbing_interval
+
                     for roof, sole in self.data_well.ribbing_interval:
                         if f'{roof}-{sole}' not in raiding_interval:
                             raiding_interval += f'{roof}-{sole}, '
@@ -382,7 +374,6 @@ class DopPlanWindow(WindowUnion):
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-
 
         self.table_widget = table_widget
         self.work_plan = self.data_well.work_plan
@@ -434,13 +425,14 @@ class DopPlanWindow(WindowUnion):
         vertical_line = current_widget.vertical_line.text().replace(',', '.')
 
         if '' in [self.plast_line, self.roof_edit, self.sole_edit, self.count_pvr_edit, self.type_pvr_edit]:
-            QMessageBox.warning(self, 'Ошибка', 'Не введены все даныые')
+            QMessageBox.warning(self, 'Ошибка', 'Не введены все данные')
             return
         udlin = round(float(self.roof_edit) - float(vertical_line), 1)
         if [self.plast_line, vertical_line, self.roof_edit, self.sole_edit, self.date_pvr_edit, self.count_pvr_edit,
             self.type_pvr_edit, self.pressure_pvr_edit, self.date_pressure_edit] not in self.dict_perforation:
             self.dict_perforation.append(
-                [self.plast_line, vertical_line, self.roof_edit, self.sole_edit, self.date_pvr_edit, self.count_pvr_edit,
+                [self.plast_line, vertical_line, self.roof_edit, self.sole_edit, self.date_pvr_edit,
+                 self.count_pvr_edit,
                  self.type_pvr_edit, self.pressure_pvr_edit, self.date_pressure_edit])
         rows = 0
         self.tableWidget.insertRow(rows)
@@ -464,7 +456,6 @@ class DopPlanWindow(WindowUnion):
             self.tableWidget.setItem(rows, 8, QTableWidgetItem(str(self.pressure_pvr_edit)))
             self.tableWidget.setItem(rows, 9, QTableWidgetItem(str(self.date_pressure_edit)))
 
-
     def addPerfProject(self):
         current_widget = self.tabWidget.currentWidget()
         table_in_base_combo = str(current_widget.well_data_in_base_combo.currentText())
@@ -477,7 +468,7 @@ class DopPlanWindow(WindowUnion):
         well_number = current_widget.well_number_edit.text()
         well_area = current_widget.well_area_edit.text()
         if well_number == '' or well_area == '':
-            QMessageBox.critical(self, 'ошибка', 'Ввведите номер площадь скважины')
+            QMessageBox.critical(self, 'ошибка', 'Введите номер площадь скважины')
             return
         self.work_with_excel(well_number, well_area, table_in_base, type_kr)
 
@@ -492,7 +483,6 @@ class DopPlanWindow(WindowUnion):
         self.target_row_index_cancel = 5000
         self.bottom_row_index = 5000
 
-
         perforation_list = []
 
         for i, row in self.data.items():
@@ -503,11 +493,12 @@ class DopPlanWindow(WindowUnion):
                         self.target_row_index = int(i) + 1
                     elif 'вскрытия/отключения' in str(row[col]['value']):
                         self.old_index = 1
-                    elif 'II. История эксплуатации скважины' in str(row[col]['value'])  and \
+                    elif 'II. История эксплуатации скважины' in str(row[col]['value']) and \
                             self.data_well.work_plan not in ['plan_change']:
                         self.target_row_index_cancel = int(i) - 1
                         break
-                    elif 'внутренний диаметр ( d шарошечного долота) необсаженной части ствола' in str(row[col]['value']) and \
+                    elif 'внутренний диаметр ( d шарошечного долота) не обсаженной части ствола' in str(
+                            row[col]['value']) and \
                             self.data_well.work_plan not in ['plan_change']:
                         self.target_row_index_cancel = int(i)
                         break
@@ -515,7 +506,7 @@ class DopPlanWindow(WindowUnion):
                         self.data_well.data_x_max = data_list.ProtectedIsDigit(int(i) + 1)
                         break
                     elif 'ИТОГО:' in str(row[col]['value']) and self.data_well.work_plan in ['plan_change']:
-                        self.target_row_index_cancel = int(i)+1
+                        self.target_row_index_cancel = int(i) + 1
                         break
                     elif 'Текущий забой ' == str(row[col]['value']):
                         self.bottom_row_index = int(i)
@@ -529,12 +520,12 @@ class DopPlanWindow(WindowUnion):
 
                 self.data_well.image_list = row
 
-            if len(list_row) != 0 and not 'внутренний диаметр ( d шарошечного долота) необсаженной части ствола' in list_row:
-                if all([col == None or col == '' for col in list_row]) is False:
+            if len(list_row) != 0 and \
+                    'внутренний диаметр ( d шарошечного долота) не обсаженной части ствола' not in list_row:
+                if all([col is None or col == '' for col in list_row]) is False:
                     perforation_list.append(list_row)
-        self.data_well.insert_index2 = self.data_well.data_x_max._value
+        self.data_well.insert_index2 = self.data_well.data_x_max.get_value
         self.data_well.count_template = 1
-
 
         if self.data_well.work_plan != 'plan_change':
             self.tableWidget.setSortingEnabled(False)
@@ -542,10 +533,11 @@ class DopPlanWindow(WindowUnion):
             for row_pvr in perforation_list[::-1]:
                 self.tableWidget.insertRow(rows)
                 for index_col, col_pvr in enumerate(row_pvr):
-                    if col_pvr != None:
+                    if col_pvr is not None:
                         self.tableWidget.setItem(rows, index_col - 1, QTableWidgetItem(str(col_pvr)))
 
         DataWindow.definition_open_trunk_well(self)
+
     @staticmethod
     def read_excel_in_base(number_well, area_well, work_plan, type_kr):
         db = connection_to_database(data_list.DB_WELL_DATA)
@@ -576,7 +568,6 @@ class DopPlanWindow(WindowUnion):
                         self.bottom_row_index = int(i)
                         break
         if 0 not in [current_bottom, current_bottom_date_edit, method_bottom_combo]:
-
             data[str(self.bottom_row_index)][3]['value'] = current_bottom
             data[str(self.bottom_row_index)][5]['value'] = current_bottom_date_edit
             data[str(self.bottom_row_index)][-1]['value'] = method_bottom_combo
@@ -589,10 +580,10 @@ class DopPlanWindow(WindowUnion):
         count_row_in_plan = self.target_row_index_cancel - self.target_row_index - 1
         boundaries_dict_new = {}
         if self.target_row_index != 5000:
-            n = len(data)-1
+            n = len(data) - 1
             if count_row_in_plan < count_row_insert:
                 count_row_insert = count_row_insert - count_row_in_plan
-                while n+1 != int(self.target_row_index):
+                while n + 1 != int(self.target_row_index):
                     data.update({str(n + count_row_insert): data[str(n)]})
                     n -= 1
                 rowHeights.insert(int(self.target_row_index) + count_row_insert, None)
@@ -743,7 +734,7 @@ class DopPlanWindow(WindowUnion):
         from data_list import ProtectedIsNonNone
         from work_py.advanted_file import definition_plast_work
         self.data_well.data_list = []
-        
+
         current_widget = self.tabWidget.currentWidget()
         method_bottom_combo = current_widget.method_bottom_combo.currentText()
         if method_bottom_combo == '':
@@ -785,7 +776,7 @@ class DopPlanWindow(WindowUnion):
                                                                   'так ли это?')
                 if mes == QMessageBox.StandardButton.No:
                     return
-            if float(template_depth_edit) > float(self.data_well.bottom_hole_drill._value):
+            if float(template_depth_edit) > float(self.data_well.bottom_hole_drill.get_value):
                 QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже искусственного забоя забоя')
                 return
             if number_dp != '':
@@ -793,7 +784,7 @@ class DopPlanWindow(WindowUnion):
 
             if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
                 QMessageBox.critical(self, 'рабочая жидкость',
-                                           'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
+                                     'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
                 return
 
             if data_list.data_in_base:
@@ -807,7 +798,7 @@ class DopPlanWindow(WindowUnion):
             else:
                 self.data_well.fluid = float(fluid)
 
-                if float(current_bottom) > self.data_well.bottom_hole_drill._value:
+                if float(current_bottom) > self.data_well.bottom_hole_drill.get_value:
                     QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
                     return
                 self.data_well.fluid_work, self.data_well.fluid_work_short = self.calc_work_fluid(fluid)
@@ -832,9 +823,9 @@ class DopPlanWindow(WindowUnion):
 
                 self.data_well.skm_interval = skm_interval_new
 
-            except:
+            except Exception:
                 QMessageBox.warning(self, 'Ошибка',
-                                          'в интервале скреперования отсутствует корректные интервалы скреперования')
+                                    'в интервале скреперования отсутствует корректные интервалы скреперования')
                 return
 
             try:
@@ -846,7 +837,7 @@ class DopPlanWindow(WindowUnion):
                 else:
                     if '-' in raiding_interval_edit:
                         raid = raiding_interval_edit.split('-')
-                        raiding_interval.append(list(map(int,  raid)))
+                        raiding_interval.append(list(map(int, raid)))
 
                 raiding_interval_new = merge_overlapping_intervals(raiding_interval)
 
@@ -854,8 +845,8 @@ class DopPlanWindow(WindowUnion):
 
             except Exception as e:
                 QMessageBox.warning(self, 'Ошибка',
-                                          f'в интервале райбирования отсутствует корректные интервалы '
-                                          f' {e}')
+                                    f'в интервале райбирования отсутствует корректные интервалы '
+                                    f' {e}')
                 return
 
             if len(self.data_well.skm_interval) == 0:
@@ -961,9 +952,9 @@ class DopPlanWindow(WindowUnion):
                 work_list = self.work_list(work_earlier)
                 self.populate_row(self.insert_index + 3, work_list, self.table_widget, self.work_plan)
 
-                if len(self.dict_perforation) != 0:
-                    for plast, vertical_line,  roof_int, sole_int, date_pvr_edit, count_pvr_edit, \
-                        type_pvr_edit, pressure_pvr_edit, date_pressure_edit in self.dict_perforation:
+                if len(self.data_well.dict_perforation) != 0:
+                    for plast, vertical_line, roof_int, sole_int, date_pvr_edit, count_pvr_edit, \
+                        type_pvr_edit, pressure_pvr_edit, date_pressure_edit in self.data_well.dict_perforation:
                         self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
                         self.data_well.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
 
@@ -998,9 +989,9 @@ class DopPlanWindow(WindowUnion):
                     else:
                         self.data_well.skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
 
-            except:
+            except Exception:
                 QMessageBox.warning(self, 'Ошибка',
-                                          'в интервале скреперования отсутствует корректные интервалы скреперования')
+                                    'в интервале скреперования отсутствует корректные интервалы скреперования')
                 return
 
             if current_bottom == '' or fluid == '' or work_earlier == '' or \
@@ -1010,7 +1001,7 @@ class DopPlanWindow(WindowUnion):
                 return
             if template_length_edit == '0':
                 QMessageBox.critical(self, 'Длина шаблона',
-                                           'Введите длину шаблонов которые были спущены в скважину')
+                                     'Введите длину шаблонов которые были спущены в скважину')
                 return
             if float(template_depth_edit) > float(current_bottom):
                 QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже текущего забоя')
@@ -1020,10 +1011,10 @@ class DopPlanWindow(WindowUnion):
 
             if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
                 QMessageBox.critical(self, 'рабочая жидкость',
-                                           'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
+                                     'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
                 return
 
-            # if float(current_bottom) > self.data_well.bottom_hole_drill._value:
+            # if float(current_bottom) > self.data_well.bottom_hole_drill.get_value:
             #     QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
             #     return
             self.data_well.fluid_work, self.data_well.fluid_work_short = self.calc_work_fluid(fluid)
@@ -1106,13 +1097,11 @@ class DopPlanWindow(WindowUnion):
                 dict_data_well = json.loads(result_table[3])
                 # self.data_well.dict_category
                 pressure = namedtuple("pressure", "category data_pressure")
-                Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
+                Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
                 Data_gaz = namedtuple("Data_gaz", "category data")
                 self.data_well.dict_category = {}
 
-
                 for plast, plast_data in dict_data_well.items():
-                    sfdfr = dict_data_well[plast]['по давлению']
                     self.data_well.dict_category.setdefault(plast, {}).setdefault(
                         'по давлению',
                         pressure(*dict_data_well[plast]['по давлению']))
@@ -1123,8 +1112,6 @@ class DopPlanWindow(WindowUnion):
 
                     self.data_well.dict_category.setdefault(plast, {}).setdefault(
                         'отключение', dict_data_well[plast]['отключение'])
-
-
 
             if self.data_well.work_plan in ['dop_plan', 'dop_plan_in_base']:
                 data = DopPlanWindow.insert_data_dop_plan(self, result, paragraph_row)
@@ -1139,7 +1126,7 @@ class DopPlanWindow(WindowUnion):
         else:
             data_list.data_in_base = False
             QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
-                                      f"Таблицы '{table_name}' нет в базе данных.")
+                                f"Таблицы '{table_name}' нет в базе данных.")
 
         return True
 
@@ -1199,6 +1186,7 @@ class DopPlanWindow(WindowUnion):
 
         definition_plast_work(self)
         return True
+
     def insert_data_dop_plan(self, result, paragraph_row):
         self.data_well.plast_project = []
         self.data_well.dict_perforation_project = {}
@@ -1248,9 +1236,9 @@ class DopPlanWindow(WindowUnion):
             self.data_well.category_pvo = 1
         try:
             self.data_well.template_depth, self.data_well.template_length, \
-            self.data_well.template_depth_addition, \
-            self.data_well.template_length_addition = json.loads(result[paragraph_row][11])
-        except:
+            self.data_well.template_depth_addition, self.data_well.template_length_addition = \
+                json.loads(result[paragraph_row][11])
+        except Exception:
             self.data_well.template_depth = result[paragraph_row][11]
         self.data_well.skm_interval = json.loads(result[paragraph_row][12])
 
@@ -1258,13 +1246,13 @@ class DopPlanWindow(WindowUnion):
         self.data_well.problem_with_ek_diameter = result[paragraph_row][14]
         try:
             self.data_well.head_column = data_list.ProtectedIsDigit(result[paragraph_row][16])
-        except:
+        except Exception:
             print('отсутствуют данные по голове хвостовика')
         self.data_well.dict_perforation_short = json.loads(result[paragraph_row][2])
 
         try:
             self.data_well.ribbing_interval = json.loads(result[paragraph_row][15])
-        except:
+        except Exception:
             print('отсутствуют данные по интервалам райбирования')
 
         definition_plast_work(self)

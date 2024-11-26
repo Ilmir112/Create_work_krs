@@ -329,7 +329,7 @@ class TabPageSoRir(TabPageUnion):
 
                 self.paker_depth_zumpf_Label.setParent(None)
                 self.paker_depth_zumpf_edit.setParent(None)
-            except:
+            except Exception:
                 pass
 
     def update_plast_edit(self):
@@ -348,7 +348,7 @@ class TabPageSoRir(TabPageUnion):
                             roof_plast = dict_perforation[plast]['кровля']
                         if sole_plast <= dict_perforation[plast]['подошва']:
                             sole_plast = dict_perforation[plast]['подошва']
-                    except:
+                    except Exception:
                         pass
 
             if len(self.data_well.dict_leakiness):
@@ -607,7 +607,7 @@ class RirWindow(WindowUnion):
         need_opress = ''
         if rir_rpk_plast_true is False:
             need_opress = f'Опрессовать эксплуатационную колонну на' \
-                          f' Р={self.data_well.max_admissible_pressure._value}атм в присутствии представителя' \
+                          f' Р={self.data_well.max_admissible_pressure.get_value}атм в присутствии представителя' \
                           f' заказчика'
         return need_opress
     def perf_new(self, roof_rir, sole_rir):
@@ -634,10 +634,10 @@ class RirWindow(WindowUnion):
                     self.data_well.dict_leakiness['НЭК']['интервал'][nek]['отключение'] = True
             # print(f"при {self.data_well.dict_leakiness['НЭК']['интервал'][nek]['отключение']}")
         if self.data_well.column_additional:
-            if self.data_well.current_bottom <= self.data_well.shoe_column_additional._value:
+            if self.data_well.current_bottom <= self.data_well.shoe_column_additional.get_value:
                 self.data_well.open_trunk_well = False
         else:
-            if self.data_well.current_bottom <= self.data_well.shoe_column._value:
+            if self.data_well.current_bottom <= self.data_well.shoe_column.get_value:
                 self.data_well.open_trunk_well = False
 
     def rpk_nkt(self, paker_depth):
@@ -646,24 +646,24 @@ class RirWindow(WindowUnion):
         self.data_well.nkt_opress_true = False
 
         if self.data_well.column_additional is False or self.data_well.column_additional is True and \
-                paker_depth < self.data_well.head_column_additional._value:
-            rpk_nkt_select = f' для ЭК {self.data_well.column_diameter._value}мм х ' \
-                             f'{self.data_well.column_wall_thickness._value}мм ' \
+                paker_depth < self.data_well.head_column_additional.get_value:
+            rpk_nkt_select = f' для ЭК {self.data_well.column_diameter.get_value}мм х ' \
+                             f'{self.data_well.column_wall_thickness.get_value}мм ' \
                              f'+ {OpressovkaEK.nkt_opress(self)[0]} + НКТ + репер'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 and \
-                paker_depth > self.data_well.head_column_additional._value:
-            rpk_nkt_select = f' для ЭК {self.data_well.column_additional_diameter._value}мм х ' \
-                             f'{self.data_well.column_additional_wall_thickness._value}мм  +' \
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
+                paker_depth > self.data_well.head_column_additional.get_value:
+            rpk_nkt_select = f' для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
+                             f'{self.data_well.column_additional_wall_thickness.get_value}мм  +' \
                              f' {OpressovkaEK.nkt_opress(self)[0]} ' \
                              f'+ НКТ60мм + репер + НКТ60мм L- ' \
-                             f'{round(paker_depth - self.data_well.head_column_additional._value, 0)}м '
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value > 110 and \
-                paker_depth > self.data_well.head_column_additional._value:
-            rpk_nkt_select = f' для ЭК {self.data_well.column_additional_diameter._value}мм х ' \
-                             f'{self.data_well.column_additional_wall_thickness._value}мм  + ' \
+                             f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м '
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110 and \
+                paker_depth > self.data_well.head_column_additional.get_value:
+            rpk_nkt_select = f' для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
+                             f'{self.data_well.column_additional_wall_thickness.get_value}мм  + ' \
                              f'{OpressovkaEK.nkt_opress(self)[0]}' \
                              f'+ НКТ + репер + НКТ{self.data_well.nkt_diam}мм со снятыми фасками L- ' \
-                             f'{round(paker_depth - self.data_well.head_column_additional._value, 0)}м '
+                             f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м '
 
         return rpk_nkt_select
 
@@ -672,12 +672,12 @@ class RirWindow(WindowUnion):
                        fluid_new_edit='', pressure_new_edit='', pressure_zumpf_question='Не нужно',
                        diameter_paker=122, paker_khost=0, paker_depth=0):
 
-        nkt_diam = ''.join(['73' if self.data_well.column_diameter._value > 110 else '60'])
+        nkt_diam = ''.join(['73' if self.data_well.column_diameter.get_value > 110 else '60'])
 
-        if self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 and \
-                sole_rir_edit > self.data_well.head_column_additional._value:
-            dict_nkt = {73: self.data_well.head_column_additional._value,
-                        60: sole_rir_edit - self.data_well.head_column_additional._value}
+        if self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
+                sole_rir_edit > self.data_well.head_column_additional.get_value:
+            dict_nkt = {73: self.data_well.head_column_additional.get_value,
+                        60: sole_rir_edit - self.data_well.head_column_additional.get_value}
         else:
             dict_nkt = {73: sole_rir_edit}
 
@@ -739,9 +739,9 @@ class RirWindow(WindowUnion):
              f'телефонограммой.',
              None, None, None, None, None, None, None,
              'мастер КРС', 1.2],
-            [f'Опрессовать на Р={self.data_well.max_admissible_pressure._value}атм',
+            [f'Опрессовать на Р={self.data_well.max_admissible_pressure.get_value}атм',
              None,
-             f'Опрессовать цементный мост на Р={self.data_well.max_admissible_pressure._value}атм в '
+             f'Опрессовать цементный мост на Р={self.data_well.max_admissible_pressure.get_value}атм в '
              f'присутствии представителя '
              f'УСРСиСТ Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с'
              f' подтверждением за 2 часа до '
@@ -766,11 +766,11 @@ class RirWindow(WindowUnion):
                 'мастер КРС', 0.67])
         RirWindow.perf_new(self, roof_rir_edit, sole_rir_edit)
         # print(plast_combo)
-        if self.data_well.head_column._value == 0:
+        if self.data_well.head_column.get_value == 0:
             if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:
                 uzmPero_list.pop(-1)
         else:
-            if self.data_well.column_conductor_length._value > roof_rir_edit:
+            if self.data_well.column_conductor_length.get_value > roof_rir_edit:
                 uzmPero_list.pop(-1)
 
         if need_change_zgs_combo == "Да":
@@ -802,12 +802,12 @@ class RirWindow(WindowUnion):
                     diameter_paker=122, paker_khost=0, paker_depth=0):
         from .claySolution import ClayWindow
 
-        nkt_diam = ''.join(['73' if self.data_well.column_diameter._value > 110 else '60'])
+        nkt_diam = ''.join(['73' if self.data_well.column_diameter.get_value > 110 else '60'])
 
-        if self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 and \
-                sole_rir_edit > self.data_well.head_column_additional._value:
-            dict_nkt = {73: self.data_well.head_column_additional._value,
-                        60: sole_rir_edit - self.data_well.head_column_additional._value}
+        if self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
+                sole_rir_edit > self.data_well.head_column_additional.get_value:
+            dict_nkt = {73: self.data_well.head_column_additional.get_value,
+                        60: sole_rir_edit - self.data_well.head_column_additional.get_value}
         else:
             dict_nkt = {73: sole_rir_edit}
         rir_list = RirWindow.need_paker(self, paker_need_combo, plast_combo, diameter_paker, paker_khost,
@@ -835,7 +835,7 @@ class RirWindow(WindowUnion):
                  f'Закачать в НКТ при открытом затрубном пространстве глинистый раствор в объеме 5м3 + тех. воду '
                  f'в объёме {round(volume_vn_nkt(dict_nkt) - 5, 1)}м3. Закрыть затруб. '
                  f'Продавить в НКТ тех. воду  в объёме {volume_vn_nkt(dict_nkt)}м3 при давлении не более '
-                 f'{self.data_well.max_admissible_pressure._value}атм.',
+                 f'{self.data_well.max_admissible_pressure.get_value}атм.',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 0.5],
                 [f'Коагуляция 4 часа', None,
@@ -868,7 +868,7 @@ class RirWindow(WindowUnion):
                     f'объеме {volume_vn_nkt(dict_nkt)}м3. Закрыть затруб. '
                     f'Продавить в НКТ остаток глинистого раствора в объеме '
                     f'{round(5 - volume_vn_nkt(dict_nkt), 1)} и тех. воду  в объёме '
-                    f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более {self.data_well.max_admissible_pressure._value}атм.',
+                    f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более {self.data_well.max_admissible_pressure.get_value}атм.',
                     None, None, None, None, None, None, None,
                     'мастер КРС', 0.5]
 
@@ -910,7 +910,7 @@ class RirWindow(WindowUnion):
             [None, None,
              f'Приподнять перо до гл.{roof_rir_edit}м. Закрыть трубное пространство. '
              f'Продавить по затрубному пространству '
-             f'тех.жидкостью  при давлении не более {self.data_well.max_admissible_pressure._value}атм '
+             f'тех.жидкостью  при давлении не более {self.data_well.max_admissible_pressure.get_value}атм '
              f'(до получения технологического СТОП).',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
@@ -940,9 +940,9 @@ class RirWindow(WindowUnion):
              f'телефонограммой.',
              None, None, None, None, None, None, None,
              'мастер КРС', 1.2],
-            [f'Опрессовать цементный мост на Р={self.data_well.max_admissible_pressure._value}атм',
+            [f'Опрессовать цементный мост на Р={self.data_well.max_admissible_pressure.get_value}атм',
              None,
-             f'Опрессовать цементный мост на Р={self.data_well.max_admissible_pressure._value}атм в'
+             f'Опрессовать цементный мост на Р={self.data_well.max_admissible_pressure.get_value}атм в'
              f'присутствии представителя '
              f'УСРСиСТ Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
              f'с подтверждением за 2 часа до '
@@ -995,18 +995,18 @@ class RirWindow(WindowUnion):
     def pero_select(self, sole_rir_edit, pero_combo_QCombo='перо'):
 
         if self.data_well.column_additional is False or self.data_well.column_additional is True \
-                and sole_rir_edit < self.data_well.head_column_additional._value:
+                and sole_rir_edit < self.data_well.head_column_additional.get_value:
             pero_select = f'{pero_combo_QCombo} + опрессовочное седло + НКТ{self.data_well.nkt_diam} 20м + репер'
 
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 \
-                and sole_rir_edit > self.data_well.head_column_additional._value:
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 \
+                and sole_rir_edit > self.data_well.head_column_additional.get_value:
             pero_select = f'{pero_combo_QCombo} + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- ' \
-                          f'{round(sole_rir_edit - self.data_well.head_column_additional._value, 1)}м'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value > 110 \
-                and sole_rir_edit > self.data_well.head_column_additional._value:
+                          f'{round(sole_rir_edit - self.data_well.head_column_additional.get_value, 1)}м'
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110 \
+                and sole_rir_edit > self.data_well.head_column_additional.get_value:
             pero_select = f'{pero_combo_QCombo} + опрессовочное седло + НКТ{self.data_well.nkt_diam}мм со снятыми фасками 20м + ' \
                           f'НКТ{self.data_well.nkt_diam}мм со снятыми фасками' \
-                          f' L- {sole_rir_edit - self.data_well.head_column_additional._value}м'
+                          f' L- {sole_rir_edit - self.data_well.head_column_additional.get_value}м'
         return pero_select
 
     def need_paker(self, paker_need_combo, plast_combo, diameter_paker, paker_khost,
@@ -1016,7 +1016,7 @@ class RirWindow(WindowUnion):
 
         try:
             paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
-        except:
+        except Exception:
             paker_depth_zumpf = 0
         if paker_need_combo == 'Нужно СПО':
 
@@ -1070,8 +1070,8 @@ class RirWindow(WindowUnion):
              f' с прямой промывкой и разгрузкой на забой 3т',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
-            [f'Опрессовать на Р={self.data_well.max_admissible_pressure._value}атм', None,
-             f'Опрессовать цементный мост на Р={self.data_well.max_admissible_pressure._value}атм в '
+            [f'Опрессовать на Р={self.data_well.max_admissible_pressure.get_value}атм', None,
+             f'Опрессовать цементный мост на Р={self.data_well.max_admissible_pressure.get_value}атм в '
              f'присутствии '
              f'представителя заказчика '
              f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
@@ -1128,8 +1128,8 @@ class RirWindow(WindowUnion):
              f' с прямой промывкой и разгрузкой на забой 3т',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
-            [f'Опрессовать на Р={self.data_well.max_admissible_pressure._value}атм', None,
-             f'Опрессовать цементный мост на Р={self.data_well.max_admissible_pressure._value}атм в '
+            [f'Опрессовать на Р={self.data_well.max_admissible_pressure.get_value}атм', None,
+             f'Опрессовать цементный мост на Р={self.data_well.max_admissible_pressure.get_value}атм в '
              f'присутствии '
              f'представителя заказчика '
              f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
@@ -1185,7 +1185,7 @@ class RirWindow(WindowUnion):
                 plast_new_combo = current_widget.plast_new_combo.text()
             fluid_new_edit = current_widget.fluid_new_edit.text().replace(',', '.')
             pressure_new_edit = current_widget.pressure_new_edit.text()
-        except:
+        except Exception:
             QMessageBox.warning(self, 'ОШИБКА', 'Введены не все данные')
         if paker_need_combo == 'Нужно СПО':
             diameter_paker = int(float(current_widget.diameter_paker_edit.text()))
@@ -1291,7 +1291,7 @@ class RirWindow(WindowUnion):
         paker_izv_paker, ok = QInputDialog.getInt(None, 'Глубина извлекаемого пакера',
                                                   'Введите глубину установки извлекаемого пакера ',
                                                   int(self.data_well.perforation_roof - 50), 0,
-                                                  int(self.data_well.bottom_hole_drill._value))
+                                                  int(self.data_well.bottom_hole_drill.get_value))
 
         data_list.paker_izv_paker = paker_izv_paker
         rir_list = [[f'СПО пакера извлекаемый до глубины {paker_izv_paker}м',
@@ -1421,6 +1421,6 @@ class RirWindow(WindowUnion):
         self.data_well.current_bottom, ok = QInputDialog.getInt(None, 'Глубина забоя',
                                                            'Введите глубину текущего забоя после извлечения',
                                                            int(self.data_well.current_bottom), 0,
-                                                           int(self.data_well.bottom_hole_drill._value))
+                                                           int(self.data_well.bottom_hole_drill.get_value))
         self.data_well.for_paker_list = None
         return rir_list

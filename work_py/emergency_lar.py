@@ -49,7 +49,7 @@ class TabPageSoLar(TabPageUnion):
         self.udlinitelel_length.setText('2')
 
         if self.data_well.column_additional is False or (self.data_well.column_additional and
-                                                    self.data_well.head_column_additional._value < self.data_well.current_bottom):
+                                                    self.data_well.head_column_additional.get_value < self.data_well.current_bottom):
             self.nkt_select_combo.setCurrentIndex(0)
         else:
             self.nkt_select_combo.setCurrentIndex(1)
@@ -105,7 +105,7 @@ class TabPageSoLar(TabPageUnion):
         self.bottom_line.setText(f'{self.data_well.current_bottom}')
 
         if self.data_well.column_additional is False or \
-                (self.data_well.column_additional and self.data_well.current_bottom < self.data_well.head_column_additional._value):
+                (self.data_well.column_additional and self.data_well.current_bottom < self.data_well.head_column_additional.get_value):
             self.nkt_select_combo.setCurrentIndex(1)
             self.nkt_select_combo.setCurrentIndex(0)
         else:
@@ -180,12 +180,12 @@ class EmergencyLarWork(WindowUnion):
             return
 
         if nkt_key == 'оборудование в ЭК' and self.data_well.column_additional and \
-                emergency_bottom_line > self.data_well.head_column_additional._value:
+                emergency_bottom_line > self.data_well.head_column_additional.get_value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для доп колонны')
             return
         elif nkt_key == 'оборудование в ДП' and self.data_well.column_additional and \
-                emergency_bottom_line < self.data_well.head_column_additional._value:
+                emergency_bottom_line < self.data_well.head_column_additional.get_value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для основной колонны')
             return

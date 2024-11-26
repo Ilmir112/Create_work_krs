@@ -13,6 +13,8 @@ from typing import Dict, List
 from abc import ABC, abstractmethod
 
 
+
+
 class DatabaseConnection(ABC):
     @abstractmethod
     def connect_to_database(self):
@@ -187,6 +189,7 @@ class RegistrationService:
 
 
 class WorkDatabaseWell:
+    from find import FindIndexPZ
     def __init__(self, connect_to_database: DatabaseConnection, dict_data_well=None):
         self.db_connection = connect_to_database.connect_to_database()
         self.path_index = connect_to_database.path_index
@@ -226,38 +229,38 @@ class WorkDatabaseWell:
         row_exists = cursor.fetchone()
         return row_exists
 
-    def insert_in_database_well_data(self, dict_data_well, contractor: str, costumer: str, excel: str) -> None:
-        work_plan = dict_data_well["work_plan"]
-        well_number = dict_data_well["well_number"]._value
-        well_area = dict_data_well["well_area"]._value
+    def insert_in_database_well_data(self, data_well: FindIndexPZ, contractor: str, costumer: str, excel: str) -> None:
+        work_plan = data_well.work_plan
+        well_number = data_well.well_number.get_value
+        well_area = data_well.well_area.get_value
 
-        data_well = json.dumps(dict_data_well["data_well_dict"], ensure_ascii=False)
+        data_well_dict = json.dumps(data_well.data_well_dict, ensure_ascii=False)
         excel_json = json.dumps(excel, ensure_ascii=False)
         date_today = datetime.now().strftime('%Y-%m-%d')
 
-        type_kr = dict_data_well["type_kr"].split(' ')[0]
-        adedaas = dict_data_well["data_list"]
-        data_paragraph = json.dumps(dict_data_well["data_list"], ensure_ascii=False)
-        cdng = dict_data_well["cdng"]._value
+        type_kr = data_well.type_kr.split(' ')[0]
+        adedaas = data_well.data_list
+        data_paragraph = json.dumps(data_well.data_list, ensure_ascii=False)
+        cdng = data_well.cdng.get_value
 
-        wellhead_fittings = dict_data_well["wellhead_fittings"]
-        well_oilfield = dict_data_well["well_oilfield"]._value
-        inv_number = dict_data_well["inv_number"]._value
-        appointment = dict_data_well["appointment"]._value
-        category_dict = json.dumps(dict_data_well["dict_category"], ensure_ascii=False)
-        angle_data = json.dumps(dict_data_well["angle_data"], ensure_ascii=False)
+        wellhead_fittings = data_well.wellhead_fittings
+        well_oilfield = data_well.well_oilfield.get_value
+        inv_number = data_well.inventory_number.get_value
+        appointment = data_well.appointment.get_value
+        category_dict = json.dumps(data_well.dict_category, ensure_ascii=False)
+        angle_data = json.dumps(data_well.angle_data, ensure_ascii=False)
 
         # print(row, self.dict_data_well["count_row_well"])
 
         if 'dop_plan' in work_plan:
-            work_plan_str = f'ДП№{dict_data_well["number_dp"]}'
+            work_plan_str = f'ДП№{data_well.number_dp}'
         elif 'krs' in work_plan:
             work_plan_str = 'ПР'
         elif work_plan == 'plan_change':
-            if dict_data_well["work_plan_change"] == 'krs':
+            if data_well.work_plan_change == 'krs':
                 work_plan_str = 'ПР'
             else:
-                work_plan_str = f'ДП№{dict_data_well["number_dp"]}'
+                work_plan_str = f'ДП№{data_well.number_dp}'
 
         try:
             if not self.db_connection:
@@ -284,7 +287,7 @@ class WorkDatabaseWell:
                                          AND costumer ={self.path_index} AND work_plan ={self.path_index} 
                                          AND type_kr={self.path_index}
                                                     """, (
-                            data_well, date_today, excel_json, work_plan_str, data_list.user[1], type_kr,
+                            data_well_dict, date_today, excel_json, work_plan_str, data_list.user[1], type_kr,
                             data_paragraph, cdng,
                             category_dict, str(well_number), well_area, contractor, costumer, work_plan_str,
                             type_kr))
@@ -301,8 +304,8 @@ class WorkDatabaseWell:
                             f"{self.path_index}, {self.path_index}, {self.path_index})"
 
                     data_values = (str(well_number), well_area,
-                                   data_well, date_today, excel_json, contractor, data_list.costumer, work_plan_str,
-                                   data_list.user[1], type_kr, data_paragraph, cdng, category_dict,
+                                   data_well_dict, date_today, excel_json, contractor, data_list.costumer,
+                                   work_plan_str, data_list.user[1], type_kr, data_paragraph, cdng, category_dict,
                                    well_oilfield, appointment, str(inv_number), wellhead_fittings, angle_data)
 
                     # Выполнение запроса с использованием параметров
@@ -321,34 +324,34 @@ class WorkDatabaseWell:
             QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных  well_data'
                                                 f' {type(e).__name__}\n\n{str(e)}')
 
-    def insert_data_in_chemistry(self, dict_data_well) -> None:
-        if dict_data_well["work_plan"] in ['dop_plan', 'dop_plan_in_base']:
-            string_work = f' ДП№ {dict_data_well["number_dp"]}'
-        elif dict_data_well["work_plan"] == 'krs':
+    def insert_data_in_chemistry(self, data_well: FindIndexPZ) -> None:
+        if data_well.work_plan in ['dop_plan', 'dop_plan_in_base']:
+            string_work = f' ДП№ {data_well.number_dp}'
+        elif data_well.work_plan == 'krs':
             string_work = 'ПР'
-        elif dict_data_well["work_plan"] == 'plan_change':
-            if dict_data_well["work_plan_change"] == 'krs':
+        elif data_well.work_plan == 'plan_change':
+            if data_well["work_plan_change"] == 'krs':
                 string_work = 'ПР изм'
             else:
-                string_work = f'ДП№{dict_data_well["number_dp"]} изм '
+                string_work = f'ДП№{data_well["number_dp"]} изм '
 
-        elif dict_data_well["work_plan"] == 'gnkt_bopz':
+        elif data_well.work_plan == 'gnkt_bopz':
             string_work = 'ГНКТ БОПЗ ВНС'
-        elif dict_data_well["work_plan"] == 'gnkt_opz':
+        elif data_well.work_plan == 'gnkt_opz':
             string_work = 'ГНКТ ОПЗ'
-        elif dict_data_well["work_plan"] == 'gnkt_after_grp':
+        elif data_well.work_plan == 'gnkt_after_grp':
             string_work = 'ГНКТ ОСВ ГРП'
         else:
             string_work = 'ГНКТ'
 
         date_today = datetime.now()
-        data_work = (dict_data_well["well_number"]._value,
-                     dict_data_well["well_area"]._value,
-                     dict_data_well["region"],
+        data_work = (data_well.well_number.get_value,
+                     data_well.well_area.get_value,
+                     data_well.region,
                      data_list.costumer,
                      data_list.contractor,
                      string_work,
-                     dict_data_well["type_kr"].split(" ")[0],
+                     data_well.type_kr.split(" ")[0],
                      date_today,
                      data_list.DICT_VOLUME_CHEMISTRY['цемент'],
                      data_list.DICT_VOLUME_CHEMISTRY['HCl'],
@@ -365,8 +368,8 @@ class WorkDatabaseWell:
                      data_list.DICT_VOLUME_CHEMISTRY["РИР 2С"],
                      data_list.DICT_VOLUME_CHEMISTRY["РИР ОВП"],
                      data_list.DICT_VOLUME_CHEMISTRY['гидрофабизатор'],
-                     round(dict_data_well["norm_of_time"], 1),
-                     dict_data_well["fluid"]
+                     round(data_well.norm_of_time, 1),
+                     data_well.fluid
                      )
 
         cursor = self.db_connection.cursor()
@@ -676,7 +679,7 @@ class CheckWellExistence:
         # if self.db_connection:
         #     self.db_connection.close()
 
-        if result == None:
+        if result is None:
             QMessageBox.warning(None, 'Некорректная дата перечня',
                                 f'Необходимо обновить перечень скважин без '
                                 f'глушения на текущий квартал {region} от {date_string}, '
@@ -713,7 +716,7 @@ class CheckWellExistence:
             # Проверка наличия записи в базе данных
             query = f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор " \
                     f"WHERE well_number =({self.path_index}) and deposit_area =({self.path_index})"
-            data = (str(well_number._value), str(deposit_area._value).replace("_", " "))
+            data = (str(well_number.get_value), str(deposit_area.get_value).replace("_", " "))
             cursor.execute(query, data)
 
             result = cursor.fetchone()

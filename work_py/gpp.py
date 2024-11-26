@@ -116,7 +116,7 @@ class GppWindow(WindowUnion):
         elif 'РН' in data_list.contractor:
             schema_grp = '6'
 
-        nkt_diam = ''.join(['89' if self.data_well.column_diameter._value > 110 else '60'])
+        nkt_diam = ''.join(['89' if self.data_well.column_diameter.get_value > 110 else '60'])
 
         gpp_300 = self.check_depth_in_skm_interval(300)
         if gpp_300 is False:
@@ -174,7 +174,7 @@ class GppWindow(WindowUnion):
              f' ООО "БашнефтьДобыча". Посадить планшайбу. '
              f'Произвести демонтаж'
              f' оборудования. Опрессовать установленную арматуру для ГРП на '
-             f'Р={self.data_well.max_admissible_pressure._value}атм, '
+             f'Р={self.data_well.max_admissible_pressure.get_value}атм, '
              f'составить акт в присутствии следующих представителей: УСРСиСТ (супервайзер), подрядчика по ГРП. '
              f'В случае негерметичности арматуры, составить акт и устранить негерметичность под руководством следующих '
              f'представителей:  УСРСиСТ (супервайзер), подрядчика по ГРП .',
@@ -268,7 +268,7 @@ class GppWindow(WindowUnion):
         for row in range(self.table_widget.rowCount()):
             for column in range(self.table_widget.columnCount()):
                 value = self.table_widget.item(row, column)
-                if value != None:
+                if value is not None:
                     value = value.text()
                     if 'Установить подъёмный агрегат на устье не менее 40т' in value:
                         new_value = QtWidgets.QTableWidgetItem(
@@ -281,33 +281,33 @@ class GppWindow(WindowUnion):
     def gpp_select(self, paker_depth):
 
         from .opressovka import TabPageSo
-        if self.data_well.column_diameter._value > 120:
+        if self.data_well.column_diameter.get_value > 120:
             nkt_diam = '89'
         else:
             nkt_diam = '60'
-        if self.data_well.column_additional is True and self.data_well.column_additional_diameter._value <= 120:
+        if self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value <= 120:
             nkt_diam_add = '60'
 
         if self.data_well.column_additional is False or (
-                self.data_well.column_additional is True and paker_depth < self.data_well.head_column_additional._value):
-            paker_select = f'гидропескоструйный перфоратор под ЭК {self.data_well.column_diameter._value}мм-' \
-                           f'{self.data_well.column_wall_thickness._value}мм+' \
+                self.data_well.column_additional is True and paker_depth < self.data_well.head_column_additional.get_value):
+            paker_select = f'гидропескоструйный перфоратор под ЭК {self.data_well.column_diameter.get_value}мм-' \
+                           f'{self.data_well.column_wall_thickness.get_value}мм+' \
                            f'опрессовочный узел +НКТ{nkt_diam}м - 10м, реперный патрубок НКТ{nkt_diam}м - 2м,'
-            paker_short = f'ГПП под ЭК {self.data_well.column_diameter._value}мм' \
-                          f'-{self.data_well.column_wall_thickness._value}мм+' \
+            paker_short = f'ГПП под ЭК {self.data_well.column_diameter.get_value}мм' \
+                          f'-{self.data_well.column_wall_thickness.get_value}мм+' \
                           f'опрессовочный узел +НКТ{nkt_diam}м - 10м, репер НКТ{nkt_diam}м - 2м,'
         else:
 
-            paker_select = f'гидропескоструйный перфоратор под ЭК {self.data_well.column_additional_diameter._value}мм-' \
-                           f'{self.data_well.column_additional_wall_thickness._value}мм +' \
+            paker_select = f'гидропескоструйный перфоратор под ЭК {self.data_well.column_additional_diameter.get_value}мм-' \
+                           f'{self.data_well.column_additional_wall_thickness.get_value}мм +' \
                            f'опрессовочный узел +НКТ{nkt_diam_add}мм - 10м, реперный патрубок НКТ{nkt_diam_add}мм -' \
                            f' 2м, + НКТ{nkt_diam_add} L-' \
-                           f'{round(paker_depth - self.data_well.head_column_additional._value, 0)}м'
-            paker_short = f'ГПП под ЭК {self.data_well.column_additional_diameter._value}мм-' \
-                          f'{self.data_well.column_additional_wall_thickness._value}мм +' \
+                           f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
+            paker_short = f'ГПП под ЭК {self.data_well.column_additional_diameter.get_value}мм-' \
+                          f'{self.data_well.column_additional_wall_thickness.get_value}мм +' \
                           f'опрессовочный узел +НКТ{nkt_diam_add}мм - 10м, репер НКТ{nkt_diam_add}мм - 2м,+ ' \
                           f'НКТ{nkt_diam_add} L-' \
-                          f'{round(paker_depth - self.data_well.head_column_additional._value, 0)}м'
+                          f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
 
         return paker_select, paker_short
 
@@ -315,10 +315,10 @@ class GppWindow(WindowUnion):
 
         if self.data_well.column_additional is False or (
                 self.data_well.column_additional is True and
-                self.data_well.current_bottom >= self.data_well.head_column_additional._value):
+                self.data_well.current_bottom >= self.data_well.head_column_additional.get_value):
             return f'НКТ{self.data_well.nkt_diam}мм'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110:
-            return f'НКТ60мм L- {round(self.data_well.current_bottom - self.data_well.head_column_additional._value + 20, 0)}'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value > 110:
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110:
+            return f'НКТ60мм L- {round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value + 20, 0)}'
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110:
             return f'НКТ{self.data_well.nkt_diam}мм со снятыми фасками L- ' \
-                   f'{round(self.data_well.current_bottom - self.data_well.head_column_additional._value + 20, 0)}'
+                   f'{round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value + 20, 0)}'

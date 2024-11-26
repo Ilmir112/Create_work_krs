@@ -14,18 +14,18 @@ from .rationingKRS import liftingNKT_norm, descentNKT_norm, well_volume_norm
 def kot_select(self, current_bottom):
     if self.data_well.column_additional is False \
             or (
-            self.data_well.column_additional is True and self.data_well.current_bottom <= self.data_well.head_column_additional._value):
+            self.data_well.column_additional is True and self.data_well.current_bottom <= self.data_well.head_column_additional.get_value):
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{self.data_well.nkt_diam}мм 10м + репер '
 
-    elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 and \
-            current_bottom >= self.data_well.head_column_additional._value:
+    elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
+            current_bottom >= self.data_well.head_column_additional.get_value:
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) + НКТ{60}мм 10м + репер + ' \
-                     f'НКТ60мм L- {round(current_bottom - self.data_well.head_column_additional._value, 0)}м'
-    elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value > 110 and \
-            current_bottom >= self.data_well.head_column_additional._value:
+                     f'НКТ60мм L- {round(current_bottom - self.data_well.head_column_additional.get_value, 0)}м'
+    elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110 and \
+            current_bottom >= self.data_well.head_column_additional.get_value:
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) + НКТ{73}мм со снятыми фасками 10м + репер + ' \
                      f'НКТ{self.data_well.nkt_diam}мм со снятыми фасками' \
-                     f' L- {round(current_bottom - self.data_well.head_column_additional._value, 0)}м'
+                     f' L- {round(current_bottom - self.data_well.head_column_additional.get_value, 0)}м'
 
     return kot_select
 
@@ -38,7 +38,7 @@ def kot_work(self, current_bottom=0):
                                                    self.data_well.current_bottom, 1, 10000, 1)
 
     kot_list = [
-        [f'статической уровень {self.data_well.static_level._value}', None,
+        [f'статической уровень {self.data_well.static_level.get_value}', None,
          f'При отсутствии циркуляции:\n'
          f'Спустить {kot_select(self, current_bottom)} на НКТ{self.data_well.nkt_diam}мм до глубины'
          f' {current_bottom}м'
@@ -161,7 +161,7 @@ def need_h2s(self, fluid_new, plast_edit, expected_pressure):
         h2s_pr, _ = QInputDialog.getDouble(None, 'сероводород в процентах',
                                            'Введите значение серовородода в процентах', 0, 0, 100, 1)
         poglot = H2S.calv_h2s(None, category_h2s, h2s_mg, h2s_pr)
-        Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
+        Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
         pressure = namedtuple("pressure", "category data_pressure")
         self.data_well.dict_category.setdefault(plast_edit, {}).setdefault(
             'по давлению', pressure(int(category_h2s), pressure))
@@ -220,10 +220,10 @@ def definition_q(self):
 def definition_q_nek(self):
     open_checkbox_dialog(self.data_well)
     plast = data_list.plast_select
-    definition_q_list = [[f'Насыщение 5м3 Q-{plast} при {self.data_well.max_admissible_pressure._value}', None,
+    definition_q_list = [[f'Насыщение 5м3 Q-{plast} при {self.data_well.max_admissible_pressure.get_value}', None,
                           f'Произвести насыщение скважины по затрубу до стабилизации давления закачки не '
                           f'менее 5м3. Опробовать по затрубу'
-                          f' на приемистость {plast} при Р={self.data_well.max_admissible_pressure._value}атм в присутствии '
+                          f' на приемистость {plast} при Р={self.data_well.max_admissible_pressure.get_value}атм в присутствии '
                           f'представителя ЦДНГ. '
                           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
                           f'с подтверждением за 2 часа до '
@@ -281,7 +281,7 @@ def pvo_cat1(self):
             f' П178х168 или П168 х 146 или ' \
             f'П178 х 146 в зависимости от типоразмера крестовины и колонной головки). Спустить и посадить ' \
             f'пакер на глубину 10м. Опрессовать ПВО (трубные плашки превентора) на ' \
-            f'Р-{self.data_well.max_admissible_pressure._value}атм ' \
+            f'Р-{self.data_well.max_admissible_pressure.get_value}атм ' \
             f'(на максимально допустимое давление опрессовки ' \
             f'эксплуатационной колонны в течении 30мин), сорвать и извлечь пакер. \n' \
             f'- Обеспечить о обогрев превентора, станции управления ПВО оборудовать теплоизоляционными ' \
@@ -352,7 +352,7 @@ def update_fluid(self, index_plan, fluid_str, table_widget):
                     if column == 2 or column == 0:
                         row_change = index_row + self.data_well.count_row_well
                         value = table_widget.item(row_change, column).text()
-                        if value != None or value != '':
+                        if value is not None or value != '':
                             if fluid_str_old in value:
                                 new_value = value.replace(fluid_str_old, fluid_str)
                                 new_value = QtWidgets.QTableWidgetItem(f'{new_value}')
@@ -397,17 +397,17 @@ def lifting_unit(self):
     upa_60 = f'Установить подъёмный агрегат на устье не менее 60т. Пусковой комиссией составить ' \
              f'акт готовности  подьемного агрегата и бригады для проведения ремонта скважины.'
 
-    return upa_60 if self.data_well.bottom_hole_artificial._value >= 2300 else aprs_40
+    return upa_60 if self.data_well.bottom_hole_artificial.get_value >= 2300 else aprs_40
 
 
 def volume_vn_ek(self, current):
     if self.data_well.column_additional is False or self.data_well.column_additional is True \
-            and current < self.data_well.head_column_additional._value:
+            and current < self.data_well.head_column_additional.get_value:
         volume = round(
-            (self.data_well.column_diameter._value - 2 * self.data_well.column_wall_thickness._value) ** 2 * 3.14 / 4 / 1000, 2)
+            (self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value) ** 2 * 3.14 / 4 / 1000, 2)
     else:
         volume = round(
-            (self.data_well.column_additional_diameter._value - 2 * self.data_well.column_additional_wall_thickness._value
+            (self.data_well.column_additional_diameter.get_value - 2 * self.data_well.column_additional_wall_thickness.get_value
              ) ** 2 * 3.14 / 4 / 1000, 2)
 
     return round(volume, 1)
@@ -488,19 +488,19 @@ def volume_nkt_metal(dict_nkt):  # Внутренний объем НКТ жел
 def well_volume(self, current_bottom):
     # print(self.data_well.column_additional)
     if self.data_well.column_additional is False:
-        # print(self.data_well.column_diameter._value, self.data_well.column_wall_thickness._value, current_bottom)
+        # print(self.data_well.column_diameter.get_value, self.data_well.column_wall_thickness.get_value, current_bottom)
         volume_well = 3.14 * (
-                self.data_well.column_diameter._value - self.data_well.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
+                self.data_well.column_diameter.get_value - self.data_well.column_wall_thickness.get_value * 2) ** 2 / 4 / 1000000 * (
                           current_bottom)
 
     else:
-        # print(f' ghb [{self.data_well.column_additional_diameter._value, self.data_well.column_additional_wall_thickness._value}]')
+        # print(f' ghb [{self.data_well.column_additional_diameter.get_value, self.data_well.column_additional_wall_thickness.get_value}]')
         volume_well = (3.14 * (
-                self.data_well.column_additional_diameter._value - self.data_well.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                               current_bottom - float(self.data_well.head_column_additional._value)) / 1000) + (
+                self.data_well.column_additional_diameter.get_value - self.data_well.column_additional_wall_thickness.get_value * 2) ** 2 / 4 / 1000 * (
+                               current_bottom - float(self.data_well.head_column_additional.get_value)) / 1000) + (
                               3.14 * (
-                              self.data_well.column_diameter._value - self.data_well.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                  float(self.data_well.head_column_additional._value)) / 1000)
+                              self.data_well.column_diameter.get_value - self.data_well.column_wall_thickness.get_value * 2) ** 2 / 4 / 1000 * (
+                                  float(self.data_well.head_column_additional.get_value)) / 1000)
     # print(f'Объем скважины {volume_well}')
     return round(volume_well, 1)
 
@@ -509,19 +509,19 @@ def volume_pod_nkt(self):  # Расчет необходимого объема 
 
     nkt_l = round(sum(list(self.data_well.dict_nkt_before.values())), 1)
     if self.data_well.column_additional is False:
-        v_pod_gno = 3.14 * (int(self.data_well.column_diameter._value) - int(
-            self.data_well.column_wall_thickness._value) * 2) ** 2 / 4 / 1000 * (
+        v_pod_gno = 3.14 * (int(self.data_well.column_diameter.get_value) - int(
+            self.data_well.column_wall_thickness.get_value) * 2) ** 2 / 4 / 1000 * (
                             float(self.data_well.current_bottom) - int(nkt_l)) / 1000
 
-    elif round(sum(list(self.data_well.dict_nkt_before.values())), 1) > float(self.data_well.head_column_additional._value):
+    elif round(sum(list(self.data_well.dict_nkt_before.values())), 1) > float(self.data_well.head_column_additional.get_value):
         v_pod_gno = 3.14 * (
-                self.data_well.column_diameter._value - self.data_well.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                            float(self.data_well.head_column_additional._value) - nkt_l) / 1000 + 3.14 * (
-                            self.data_well.column_additional_diameter._value - self.data_well.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                            self.data_well.current_bottom - float(self.data_well.head_column_additional._value)) / 1000
-    elif nkt_l <= float(self.data_well.head_column_additional._value):
+                self.data_well.column_diameter.get_value - self.data_well.column_wall_thickness.get_value * 2) ** 2 / 4 / 1000 * (
+                            float(self.data_well.head_column_additional.get_value) - nkt_l) / 1000 + 3.14 * (
+                            self.data_well.column_additional_diameter.get_value - self.data_well.column_additional_wall_thickness.get_value * 2) ** 2 / 4 / 1000 * (
+                            self.data_well.current_bottom - float(self.data_well.head_column_additional.get_value)) / 1000
+    elif nkt_l <= float(self.data_well.head_column_additional.get_value):
         v_pod_gno = 3.14 * (
-                self.data_well.column_additional_diameter._value - self.data_well.column_additional_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
+                self.data_well.column_additional_diameter.get_value - self.data_well.column_additional_wall_thickness.get_value * 2) ** 2 / 4 / 1000 * (
                             self.data_well.current_bottom - nkt_l) / 1000
     volume_in_nkt = v_pod_gno + volume_vn_nkt(self.data_well.dict_nkt_before) - volume_rod(self, self.data_well.dict_sucker_rod)
     # print(f'Внутренный объем + Зумпф{volume_in_nkt, v_pod_gno, volume_vn_nkt(self.data_well.dict_nkt_before)}, ')

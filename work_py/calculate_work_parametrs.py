@@ -48,12 +48,12 @@ class VolumeWell(ABC):
 class VolumeWellWithoutExstraColumn(VolumeWell):
     def __init__(self, data_well):
         self.data_well = data_well
-        self.column_diameter = data_well.column_diameter._value
-        self.column_wall_thickness = data_well.column_wall_thickness._value
+        self.column_diameter = data_well.column_diameter.get_value
+        self.column_wall_thickness = data_well.column_wall_thickness.get_value
         self.current_bottom = data_well.current_bottom
         self.area_column = self.area_calculate(self.column_diameter, self.column_wall_thickness)
-        if self.data_well.head_column._value != 0:
-            self.area_well_without_column = self.area_calculate(self.data_well.diameter_doloto_ek._value, 0)
+        if self.data_well.head_column.get_value != 0:
+            self.area_well_without_column = self.area_calculate(self.data_well.diameter_doloto_ek.get_value, 0)
 
     def volume_well_calculate(self):
         return round(self.area_column * self.current_bottom, 1)
@@ -66,34 +66,34 @@ class VolumeWellWithoutExstraColumn(VolumeWell):
 
     def volume_calculate_roof_of_sole(self, roof, sole):
 
-        if self.data_well.head_column._value == 0:
+        if self.data_well.head_column.get_value == 0:
             return round(self.area_column * (sole - roof))
         else:
-            if float(sole) > self.data_well.head_column._value and float(roof) > self.data_well.head_column._value:
+            if float(sole) > self.data_well.head_column.get_value and float(roof) > self.data_well.head_column.get_value:
                 return round(self.area_column * (sole - roof), 1)
-            elif float(sole) < self.data_well.head_column._value and float(roof) < self.data_well.head_column._value:
+            elif float(sole) < self.data_well.head_column.get_value and float(roof) < self.data_well.head_column.get_value:
                 return round(self.area_well_without_column * (sole - roof), 1)
             else:
                 return round(self.area_column * (
-                        sole - float(self.data_well.head_column._value)) + \
-                       self.area_well_without_column * (float(self.data_well.head_column._value) - roof), 1)
+                        sole - float(self.data_well.head_column.get_value)) + \
+                       self.area_well_without_column * (float(self.data_well.head_column.get_value) - roof), 1)
 
 
 class VolumeWellWithExstraColumn(VolumeWell):
     def __init__(self, data_well):
         self.data_well = data_well
 
-        self.column_diameter = data_well.column_diameter._value
-        self.column_wall_thickness = data_well.column_wall_thickness._value
-        self.column_diameter_additional = data_well.column_additional_diameter._value
-        self.column_wall_thickness_additional = data_well.column_additional_wall_thickness._value
+        self.column_diameter = data_well.column_diameter.get_value
+        self.column_wall_thickness = data_well.column_wall_thickness.get_value
+        self.column_diameter_additional = data_well.column_additional_diameter.get_value
+        self.column_wall_thickness_additional = data_well.column_additional_wall_thickness.get_value
         self.current_bottom = data_well.current_bottom
 
-        self.head_column_additional = data_well.head_column_additional._value
+        self.head_column_additional = data_well.head_column_additional.get_value
         self.area_column = self.area_calculate(self.column_diameter, self.column_wall_thickness)
         self.area_column_additional = self.area_calculate(self.column_diameter_additional,
                                                           self.column_wall_thickness_additional)
-        if self.data_well.head_column._value != 0:
+        if self.data_well.head_column.get_value != 0:
             self.area_well_without_column = self.area_calculate(self.data_well.diameter_doloto_ek, 0)
 
     def volume_well_calculate(self):
@@ -103,42 +103,42 @@ class VolumeWellWithExstraColumn(VolumeWell):
 
     def volume_well_pod_nkt(self):
         nkt_length = round(sum(list(self.data_well.dict_nkt_before.values())), 1)
-        if nkt_length > float(self.data_well.head_column_additional._value):
+        if nkt_length > float(self.data_well.head_column_additional.get_value):
             volume_well_pod_nkt = self.area_column_additional * (
                     float(self.data_well.current_bottom - int(nkt_length)))
         else:
             volume_add = self.area_column_additional * (
                     float(self.data_well.current_bottom) - int(nkt_length))
-            volume_ek = self.area_column * (float(self.data_well.head_column_additional._value - nkt_length))
+            volume_ek = self.area_column * (float(self.data_well.head_column_additional.get_value - nkt_length))
 
             volume_well_pod_nkt = round(volume_add + volume_ek, 1)
 
         return volume_well_pod_nkt
 
     def volume_calculate_roof_of_sole(self, roof, sole):
-        if self.data_well.head_column._value == 0:
-            if sole and roof > float(self.data_well.head_column_additional._value):
+        if self.data_well.head_column.get_value == 0:
+            if sole and roof > float(self.data_well.head_column_additional.get_value):
                 return round(self.area_column_additional * (sole - roof))
-            elif sole and roof < float(self.data_well.head_column_additional._value):
+            elif sole and roof < float(self.data_well.head_column_additional.get_value):
                 return round(self.area_column * (sole - roof))
             else:
                 return round(self.area_column_additional * (
-                            sole - float(self.data_well.head_column_additional._value))) + \
-                       self.area_column * (float(self.data_well.head_column_additional._value) - roof)
+                            sole - float(self.data_well.head_column_additional.get_value))) + \
+                       self.area_column * (float(self.data_well.head_column_additional.get_value) - roof)
         else:
-            if sole and roof > self.data_well.head_column._value:
+            if sole and roof > self.data_well.head_column.get_value:
                 return round(self.area_column * (sole - roof))
-            elif sole and roof < self.data_well.head_column._value:
+            elif sole and roof < self.data_well.head_column.get_value:
                 return round(self.area_well_without_column * (sole - roof))
             else:
                 return round(self.area_well_without_column * (
-                        sole - float(self.data_well.head_column._value))) + \
-                       self.area_column * (float(self.data_well.head_column._value) - roof)
+                        sole - float(self.data_well.head_column.get_value))) + \
+                       self.area_column * (float(self.data_well.head_column.get_value) - roof)
 
 
 def volume_work(data_well):
     if data_well.column_additional is False or (data_well.column_additional and
-                                                        data_well.head_column_additional._value >=
+                                                        data_well.head_column_additional.get_value >=
                                                         data_well.current_bottom):
         volume_well = VolumeWellWithoutExstraColumn(data_well)
         return volume_well.volume_well_calculate()
@@ -151,7 +151,7 @@ def volume_calculate_roof_of_sole(data_well, roof, sole):
     roof = float(roof)
     sole = float(sole)
     if data_well.column_additional is False or (data_well.column_additional and
-                                                        data_well.head_column_additional._value >=
+                                                        data_well.head_column_additional.get_value >=
                                                         sole):
         volume_well = VolumeWellWithoutExstraColumn(data_well)
         return volume_well.volume_calculate_roof_of_sole(roof, sole)
@@ -165,13 +165,13 @@ def volume_well_pod_nkt_calculate(
 
     if (data_well.column_additional is False or
             (data_well.column_additional and
-             data_well.head_column_additional._value >= data_well.current_bottom)):
+             data_well.head_column_additional.get_value >= data_well.current_bottom)):
         volume_well = VolumeWellWithoutExstraColumn(data_well)
         return volume_well.volume_well_pod_nkt()
 
     else:
         # round(sum(list(data_well.dict_nkt_before.values())), 1) > float(
-        #     data_well.head_column_additional._value):
+        #     data_well.head_column_additional.get_value):
         volume_well = VolumeWellWithExstraColumn(data_well)
 
 

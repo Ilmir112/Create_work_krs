@@ -53,7 +53,7 @@ class LoginWindow(QWidget):
         self.username.addItems(users_list)
 
     def closeEvent(self, event):
-        if self.sender() == None:  # Проверяем вызывающий объект
+        if self.sender() is None:  # Проверяем вызывающий объект
             # Закрываем основное окно при закрытии окна входа
             # self.main_window.close()
             event.accept()  # Принимаем событие закрытия

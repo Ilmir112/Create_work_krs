@@ -294,7 +294,7 @@ class TabPageSoSwab(TabPageUnion):
                 self.fluid_new_edit.setParent(None)
                 self.pressure_new_label.setParent(None)
                 self.pressure_new_edit.setParent(None)
-            except:
+            except Exception:
                 pass
 
     def update_calculate_h2s(self):
@@ -783,7 +783,7 @@ class SwabWindow(WindowUnion):
                         asdwd = self.data_well.dict_category
 
                         pressure = namedtuple("pressure", "category data_pressure")
-                        Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
+                        Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
                         Data_gaz = namedtuple("Data_gaz", "category data")
 
                         category_pressure_line_combo = self.tabWidget.currentWidget().category_pressure_line_combo.currentText()
@@ -809,7 +809,7 @@ class SwabWindow(WindowUnion):
                                 float(gf_edit)))
                         try:
                             self.data_well.dict_category[plast_new_combo]['отключение'] = 'планируемый'
-                        except:
+                        except Exception:
                             self.data_well.dict_category.setdefault(plast_new_combo, {}).setdefault(
                                 'отключение', 'планируемый')
 
@@ -997,46 +997,46 @@ class SwabWindow(WindowUnion):
             fluid_new_edit = int(float(self.tabWidget.currentWidget().fluid_new_edit.text()))
             pressure_new_edit = int(float(self.tabWidget.currentWidget().pressure_new_edit.text()))
 
-        nkt_diam = ''.join(['73' if self.data_well.column_diameter._value > 110 or (
-                self.data_well.column_diameter._value > 110 and
+        nkt_diam = ''.join(['73' if self.data_well.column_diameter.get_value > 110 or (
+                self.data_well.column_diameter.get_value > 110 and
                 self.data_well.column_additional is True \
-                and self.data_well.head_column_additional._value < depth_opy is True) else '60'])
+                and self.data_well.head_column_additional.get_value < depth_opy is True) else '60'])
 
         if self.data_well.column_additional is False \
                 or (self.data_well.column_additional is True and 
-                    paker_depth < self.data_well.head_column_additional._value and
-                                                    self.data_well.head_column_additional._value > 800) or \
-                (self.data_well.column_additional_diameter._value < 110 and
-                 paker_depth > self.data_well.head_column_additional._value):
+                    paker_depth < self.data_well.head_column_additional.get_value and
+                                                    self.data_well.head_column_additional.get_value > 800) or \
+                (self.data_well.column_additional_diameter.get_value < 110 and
+                 paker_depth > self.data_well.head_column_additional.get_value):
             paker_select = f'заглушка +  НКТ{nkt_diam} {paker_khost}м + пакер ' \
                            f'ПРО-ЯМО-{diameter_paker}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_diameter._value}мм х ' \
-                           f'{self.data_well.column_wall_thickness._value}мм +' \
+                           f'для ЭК {self.data_well.column_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_wall_thickness.get_value}мм +' \
                            f' щелевой фильтр НКТ 10м'
             paker_short = f'заглушка  + НКТ{nkt_diam} {paker_khost}м + пакер ПРО-ЯМО-{diameter_paker}мм + ' \
                           f'щелевой фильтр НКТ 10м + репер'
 
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
         elif self.data_well.column_additional is True and \
-                self.data_well.column_additional_diameter._value < 110 and \
-                paker_depth > self.data_well.head_column_additional._value:
+                self.data_well.column_additional_diameter.get_value < 110 and \
+                paker_depth > self.data_well.head_column_additional.get_value:
             paker_select = f'заглушка + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                            f'{diameter_paker}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_additional_diameter._value}мм х' \
-                           f' {self.data_well.column_additional_wall_thickness._value}мм + щелевой фильтр ' \
+                           f'для ЭК {self.data_well.column_additional_diameter.get_value}мм х' \
+                           f' {self.data_well.column_additional_wall_thickness.get_value}мм + щелевой фильтр ' \
                            f'+ НКТ60мм 10м '
             paker_short = f'заглушка+ НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{diameter_paker}мм  + щелевой фильтр + ' \
                           f'НКТ60мм 10м '
-            dict_nkt = {int(nkt_diam): self.data_well.head_column_additional._value, 60:
-                int(paker_depth - self.data_well.head_column_additional._value)}
+            dict_nkt = {int(nkt_diam): self.data_well.head_column_additional.get_value, 60:
+                int(paker_depth - self.data_well.head_column_additional.get_value)}
         elif self.data_well.column_additional is True and \
-                self.data_well.column_additional_diameter._value > 110 \
-                and paker_depth > self.data_well.head_column_additional._value:
+                self.data_well.column_additional_diameter.get_value > 110 \
+                and paker_depth > self.data_well.head_column_additional.get_value:
             paker_select = f'заглушка + НКТ{self.data_well.nkt_diam}мм со' \
                            f' снятыми фасками {paker_khost}м + ' \
                            f'пакер ПРО-ЯМО-{diameter_paker}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_additional_diameter._value}мм х ' \
-                           f'{self.data_well.column_additional_wall_thickness._value}мм' \
+                           f'для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_additional_wall_thickness.get_value}мм' \
                            f' + щелевой фильтр + НКТ{self.data_well.nkt_diam}мм со снятыми фасками 10м'
             paker_short = f'заглушка + НКТ{self.data_well.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
                           f'пакер ПРО-ЯМО-{diameter_paker}мм + щелевой фильтр + ' \
@@ -1066,7 +1066,7 @@ class SwabWindow(WindowUnion):
              f'главным инженером от '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}. '
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое давление '
-             f'опрессовки э/колонны на устье {self.data_well.max_admissible_pressure._value}атм,'
+             f'опрессовки э/колонны на устье {self.data_well.max_admissible_pressure.get_value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое '
              f'обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',
@@ -1135,36 +1135,36 @@ class SwabWindow(WindowUnion):
         if template_second_need_combo == 'Да':
             template_second_str = f'+ шаблон {template_second}мм L-{length_template_second}'
 
-        nkt_diam = ''.join(['73' if self.data_well.column_diameter._value > 110 or (
-                self.data_well.column_diameter._value > 110 and self.data_well.column_additional is True \
-                and self.data_well.head_column_additional._value < depth_opy is True) else '60'])
+        nkt_diam = ''.join(['73' if self.data_well.column_diameter.get_value > 110 or (
+                self.data_well.column_diameter.get_value > 110 and self.data_well.column_additional is True \
+                and self.data_well.head_column_additional.get_value < depth_opy is True) else '60'])
 
-        if self.data_well.head_column_additional._value < depth_opy + 200 and self.data_well.column_additional:
+        if self.data_well.head_column_additional.get_value < depth_opy + 200 and self.data_well.column_additional:
             nkt_diam = '60'
 
         if self.data_well.column_additional is False or self.data_well.column_additional is True and \
-                self.data_well.current_bottom < self.data_well.head_column_additional._value and \
-                self.data_well.head_column_additional._value > 600:
+                self.data_well.current_bottom < self.data_well.head_column_additional.get_value and \
+                self.data_well.head_column_additional.get_value > 600:
             paker_select = f'воронку со свабоограничителем {template_second_str} + НКТ{nkt_diam} + НКТ 10м + репер'
             paker_short = f'воронку со с/о  + НКТ{nkt_diam}  + НКТ 10м + репер'
             dict_nkt = {73: depth_opy}
             self.data_well.template_depth = self.data_well.current_bottom
 
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 and \
-                self.data_well.current_bottom >= self.data_well.head_column_additional._value:
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
+                self.data_well.current_bottom >= self.data_well.head_column_additional.get_value:
             paker_select = f'воронку со свабоограничителем {template_second_str} + НКТ60мм 10м + репер +НКТ60мм ' \
-                           f'{round(self.data_well.current_bottom - self.data_well.head_column_additional._value + 10, 0)}м'
+                           f'{round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value + 10, 0)}м'
             paker_short = f'воронку со с/о {template_second_str} + НКТ60мм 10м + репер + НКТ60мм'
-            dict_nkt = {73: self.data_well.head_column_additional._value,
-                        60: int(self.data_well.current_bottom - self.data_well.head_column_additional._value)}
+            dict_nkt = {73: self.data_well.head_column_additional.get_value,
+                        60: int(self.data_well.current_bottom - self.data_well.head_column_additional.get_value)}
             self.data_well.template_depth = self.data_well.current_bottom
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value > 110 and \
-                self.data_well.current_bottom >= self.data_well.head_column_additional._value:
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110 and \
+                self.data_well.current_bottom >= self.data_well.head_column_additional.get_value:
             paker_select = f'воронку со свабоограничителем {template_second_str} + ' \
                            f'НКТ{self.data_well.nkt_diam}мм ' \
                            f'со снятыми фасками + ' \
                            f'НКТ{self.data_well.nkt_diam}мм со снятыми фасками 10м ' \
-                           f'{round(self.data_well.current_bottom - self.data_well.head_column_additional._value + 10, 0)}м'
+                           f'{round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value + 10, 0)}м'
             paker_short = f'в/у со c/о + шаблон {template_second} L-{length_template_second} + НКТ{self.data_well.nkt_diam}мм ' \
                           f'со снятыми фасками + ' \
                           f'НКТ{self.data_well.nkt_diam}мм со снятыми фасками 10м'
@@ -1190,7 +1190,7 @@ class SwabWindow(WindowUnion):
              f'расходе жидкости 6-8 л/сек '
              f'в присутствии представителя Заказчика в объеме '
              f'{round(well_volume(self, self.data_well.current_bottom) * 1.5, 1)}м3 ПРИ ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ '
-             f'ДАВЛЕНИЕ {self.data_well.max_admissible_pressure._value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: '
+             f'ДАВЛЕНИЕ {self.data_well.max_admissible_pressure.get_value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: '
              f'0,5-1,0 ТН',
              None, None, None, None, None, None, None,
              'Мастер КРС, представитель ЦДНГ', 1.5],
@@ -1212,7 +1212,7 @@ class SwabWindow(WindowUnion):
              f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО максимально допустимое'
-             f' давление опрессовки э/колонны на устье {self.data_well.max_admissible_pressure._value}атм,'
+             f' давление опрессовки э/колонны на устье {self.data_well.max_admissible_pressure.get_value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое '
              f'обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',
@@ -1349,42 +1349,42 @@ class SwabWindow(WindowUnion):
         else:
             depth_gauge = ''
 
-        nkt_diam = ''.join(['73' if self.data_well.column_diameter._value > 110 or (
-                self.data_well.column_diameter._value > 110 and self.data_well.column_additional is True and
-                self.data_well.head_column_additional._value > 800) else '60'])
+        nkt_diam = ''.join(['73' if self.data_well.column_diameter.get_value > 110 or (
+                self.data_well.column_diameter.get_value > 110 and self.data_well.column_additional is True and
+                self.data_well.head_column_additional.get_value > 800) else '60'])
 
         if self.data_well.column_additional is False or (self.data_well.column_additional is True and \
-                                                    paker_depth < self.data_well.head_column_additional._value and self.data_well.head_column_additional._value > 800) or \
-                (self.data_well.column_additional_diameter._value < 110 and
-                        paker_depth > self.data_well.head_column_additional._value):
+                                                    paker_depth < self.data_well.head_column_additional.get_value and self.data_well.head_column_additional.get_value > 800) or \
+                (self.data_well.column_additional_diameter.get_value < 110 and
+                        paker_depth > self.data_well.head_column_additional.get_value):
             paker_select = f'заглушка + {depth_gauge} НКТ{nkt_diam} {paker_khost}м + пакер ' \
                            f'ПРО-ЯМО-{diameter_paker}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_diameter._value}мм х ' \
-                           f'{self.data_well.column_wall_thickness._value}мм + ' \
+                           f'для ЭК {self.data_well.column_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_wall_thickness.get_value}мм + ' \
                            f'щелевой фильтр + {depth_gauge} НКТ 10м'
             paker_short = f'заглушка {depth_gauge} + НКТ{nkt_diam} {paker_khost}м + пакер ПРО-ЯМО-{diameter_paker}мм +' \
                           f' {depth_gauge} щелевой фильтр  +НКТ 10м + репер'
 
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
         elif self.data_well.column_additional is True and\
-                self.data_well.column_additional_diameter._value < 110 and \
-                paker_depth > self.data_well.head_column_additional._value:
+                self.data_well.column_additional_diameter.get_value < 110 and \
+                paker_depth > self.data_well.head_column_additional.get_value:
             paker_select = f'заглушка + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                            f'{diameter_paker}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_additional_diameter._value}мм х' \
-                           f' {self.data_well.column_additional_wall_thickness._value}мм + НКТ60мм 10м '
+                           f'для ЭК {self.data_well.column_additional_diameter.get_value}мм х' \
+                           f' {self.data_well.column_additional_wall_thickness.get_value}мм + НКТ60мм 10м '
             paker_short = f'заглушка + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{diameter_paker}мм  + ' \
                           f'НКТ60мм 10м '
-            dict_nkt = {int(nkt_diam): self.data_well.head_column_additional._value, 60:
-                int(paker_depth - self.data_well.head_column_additional._value)}
+            dict_nkt = {int(nkt_diam): self.data_well.head_column_additional.get_value, 60:
+                int(paker_depth - self.data_well.head_column_additional.get_value)}
         elif self.data_well.column_additional is True and \
-                self.data_well.column_additional_diameter._value > 110 \
-                and paker_depth > self.data_well.head_column_additional._value:
+                self.data_well.column_additional_diameter.get_value > 110 \
+                and paker_depth > self.data_well.head_column_additional.get_value:
             paker_select = f'заглушка +  НКТ{self.data_well.nkt_diam}мм со' \
                            f' снятыми фасками {paker_khost}м + ' \
                            f'пакер ПРО-ЯМО-{diameter_paker}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_additional_diameter._value}мм х ' \
-                           f'{self.data_well.column_additional_wall_thickness._value}мм' \
+                           f'для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_additional_wall_thickness.get_value}мм' \
                            f' + щелевой фильтр + НКТ{self.data_well.nkt_diam}мм со снятыми фасками 10м'
             paker_short = f'заглушка + НКТ{self.data_well.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
                           f'пакер ПРО-ЯМО-{diameter_paker}мм + щелевой фильтр + ' \
@@ -1422,7 +1422,7 @@ class SwabWindow(WindowUnion):
              f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г.'
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое '
-             f'давление на устье {self.data_well.max_admissible_pressure._value}атм,'
+             f'давление на устье {self.data_well.max_admissible_pressure.get_value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести '
              f'практическое обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',
@@ -1504,58 +1504,58 @@ class SwabWindow(WindowUnion):
         else:
             depth_gauge = ''
 
-        nkt_diam = ''.join(['73' if self.data_well.column_diameter._value > 110 or (
-                self.data_well.column_diameter._value > 110 and
+        nkt_diam = ''.join(['73' if self.data_well.column_diameter.get_value > 110 or (
+                self.data_well.column_diameter.get_value > 110 and
                 self.data_well.column_additional is True and
-                self.data_well.head_column_additional._value > 800) else '60'])
+                self.data_well.head_column_additional.get_value > 800) else '60'])
 
 
         if self.data_well.column_additional is False or (self.data_well.column_additional is True and \
-                                                paker_depth < self.data_well.head_column_additional._value and \
-                                                self.data_well.head_column_additional._value > 800):
+                                                paker_depth < self.data_well.head_column_additional.get_value and \
+                                                self.data_well.head_column_additional.get_value > 800):
             paker_select = f'воронку со свабоограничителем + {depth_gauge} НКТ{nkt_diam} {paker_khost}м + пакер ' \
                            f'ПРО-ЯМО-{diameter_paker}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_diameter._value}мм х ' \
-                           f'{self.data_well.column_wall_thickness._value}мм ' \
+                           f'для ЭК {self.data_well.column_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_wall_thickness.get_value}мм ' \
                            f'+ {depth_gauge} НКТ 10м'
             paker_short = f'в/ку со с/о {depth_gauge} + НКТ{nkt_diam} {paker_khost}м + пакер ПРО-ЯМО-{diameter_paker}мм' \
                           f' + {depth_gauge}НКТ 10м + репер'
 
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
         elif self.data_well.column_additional is True and \
-                self.data_well.column_additional_diameter._value < 110 and \
-                paker_depth > self.data_well.head_column_additional._value:
+                self.data_well.column_additional_diameter.get_value < 110 and \
+                paker_depth > self.data_well.head_column_additional.get_value:
             paker_select = f'воронку со свабоограничителем+ НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                            f'{diameter_paker}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_additional_diameter._value}мм х' \
-                           f' {self.data_well.column_additional_wall_thickness._value}мм + ' \
+                           f'для ЭК {self.data_well.column_additional_diameter.get_value}мм х' \
+                           f' {self.data_well.column_additional_wall_thickness.get_value}мм + ' \
                            f'НКТ60мм 10м + репер + НКТ60мм ' \
-                           f'{round(paker_depth - self.data_well.head_column_additional._value, 0)}м '
+                           f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м '
             paker_short = f'в-ку со свабоогр.+ НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{diameter_paker}мм  + ' \
                           f'НКТ60мм 10м + ' \
-                          f'НКТ60мм{round(paker_depth - self.data_well.head_column_additional._value, 0)}м '
+                          f'НКТ60мм{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м '
 
-            dict_nkt = {int(nkt_diam): self.data_well.head_column_additional._value, 60:
-                int(paker_depth - self.data_well.head_column_additional._value)}
+            dict_nkt = {int(nkt_diam): self.data_well.head_column_additional.get_value, 60:
+                int(paker_depth - self.data_well.head_column_additional.get_value)}
 
         elif self.data_well.column_additional is True and \
-                self.data_well.column_additional_diameter._value > 110 \
-                and paker_depth > self.data_well.head_column_additional._value:
+                self.data_well.column_additional_diameter.get_value > 110 \
+                and paker_depth > self.data_well.head_column_additional.get_value:
             paker_select = f'воронку со свабоограничителем+ НКТ{self.data_well.nkt_diam}мм со' \
                            f' снятыми фасками {paker_khost}м + ' \
                            f'пакер ПРО-ЯМО-{diameter_paker}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_additional_diameter._value}мм х ' \
-                           f'{self.data_well.column_additional_wall_thickness._value}мм' \
+                           f'для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_additional_wall_thickness.get_value}мм' \
                            f' + НКТ{self.data_well.nkt_diam}мм со ' \
                            f'снятыми фасками 10м + НКТ{self.data_well.nkt_diam}мм ' \
                           f'со снятыми фасками' \
-                           f'{round(paker_depth - self.data_well.head_column_additional._value, 0)}м '
+                           f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м '
             paker_short = f'в-ку со свабоогр.+ НКТ{self.data_well.nkt_diam}мм со ' \
                           f'снятыми фасками {paker_khost}м + ' \
                           f'пакер ПРО-ЯМО-{diameter_paker}мм + НКТ{self.data_well.nkt_diam}мм ' \
                           f'со снятыми фасками 10м + НКТ{self.data_well.nkt_diam}мм ' \
                           f'со снятыми фасками ' \
-                          f'{round(paker_depth - self.data_well.head_column_additional._value, 0)}м '
+                          f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м '
 
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
         elif nkt_diam == 60:
@@ -1576,9 +1576,9 @@ class SwabWindow(WindowUnion):
                  None, None, None, None, None, None, None,
                  'мастер КРС', descentNKT_norm(paker_depth, 1.2)],
                 [f'Опрессовать ЗУМПФ в инт {paker_depth_zumpf} - {self.data_well.current_bottom}м на '
-                 f'Р={self.data_well.max_admissible_pressure._value}атм', None,
+                 f'Р={self.data_well.max_admissible_pressure.get_value}атм', None,
                  f'Посадить пакер. Опрессовать ЗУМПФ в интервале {paker_depth_zumpf} - {self.data_well.current_bottom}м на '
-                 f'Р={self.data_well.max_admissible_pressure._value}атм в течение 30 минут в присутствии '
+                 f'Р={self.data_well.max_admissible_pressure.get_value}атм в течение 30 минут в присутствии '
                  f'представителя заказчика, '
                  f'составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
                  f'с подтверждением за 2 часа до начала работ)',
@@ -1645,7 +1645,7 @@ class SwabWindow(WindowUnion):
              f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г.'
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое '
-             f'давление на устье {self.data_well.max_admissible_pressure._value}атм,'
+             f'давление на устье {self.data_well.max_admissible_pressure.get_value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести '
              f'практическое обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',
@@ -1722,26 +1722,26 @@ class SwabWindow(WindowUnion):
 
         swab_short, swab_select = SwabWindow.swab_select(self, swab_type_combo, plast_combo, swab_volume_edit)
 
-        nkt_diam = '73' if self.data_well.column_diameter._value > 110 or (
-                self.data_well.column_diameter._value > 110 and
+        nkt_diam = '73' if self.data_well.column_diameter.get_value > 110 or (
+                self.data_well.column_diameter.get_value > 110 and
                 self.data_well.column_additional is True and \
-                self.data_well.head_column_additional._value > 700) else '60'
+                self.data_well.head_column_additional.get_value > 700) else '60'
         if depth_gauge_combo == 'Да':
             depth_gauge = 'контейнер с манометром МТГ-25 + '
         else:
             depth_gauge = ''
 
         if self.data_well.column_additional is False or self.data_well.column_additional is True and \
-                paker1_depth < float(self.data_well.head_column_additional._value) and \
-                float(self.data_well.head_column_additional._value) > 600:
+                paker1_depth < float(self.data_well.head_column_additional.get_value) and \
+                float(self.data_well.head_column_additional.get_value) > 600:
 
             paker_select = f'заглушка + {depth_gauge} НКТ{nkt_diam} {paker_khost}м + пакер ПРО-ЯМО-{diameter_paker}мм ' \
                            f'(либо аналог) ' \
-                           f'для ЭК {self.data_well.column_diameter._value}мм х ' \
-                           f'{self.data_well.column_wall_thickness._value}мм + щелевой фильтр + ' \
+                           f'для ЭК {self.data_well.column_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_wall_thickness.get_value}мм + щелевой фильтр + ' \
                            f'{depth_gauge} НКТ l-{round(paker1_depth - paker2_depth, 0)} + пакер ПУ для ЭК ' \
-                           f'{self.data_well.column_diameter._value}мм х ' \
-                           f'{self.data_well.column_wall_thickness._value}мм + ' \
+                           f'{self.data_well.column_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_wall_thickness.get_value}мм + ' \
                            f'{depth_gauge} НКТ{nkt_diam} 20мм + репер'
             paker_short = f'заглушка + {depth_gauge}НКТ{nkt_diam} {paker_khost}м + пакер ПРО-ЯМО-{diameter_paker}мм + ' \
                           f'щелевой фильтр + {depth_gauge}' \
@@ -1749,36 +1749,36 @@ class SwabWindow(WindowUnion):
                           f'20мм + репер'
             dict_nkt = {73: paker1_depth + paker_khost}
         elif self.data_well.column_additional is True and \
-                self.data_well.column_additional_diameter._value < 110 and paker1_depth > float(
-                self.data_well.head_column_additional._value):
+                self.data_well.column_additional_diameter.get_value < 110 and paker1_depth > float(
+                self.data_well.head_column_additional.get_value):
             paker_select = f'заглушка +  НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{diameter_paker}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_diameter._value}мм х ' \
-                           f'{self.data_well.column_wall_thickness._value}мм ' \
+                           f'для ЭК {self.data_well.column_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_wall_thickness.get_value}мм ' \
                            f'+ щелевой фильтр + ' \
                            f'НКТ l-{round(paker1_depth - paker2_depth, 0)} + пакер ПУ НКТ{60} 20мм + репер + НКТ60мм ' \
-                           f'{round(float(self.data_well.head_column_additional._value) - paker2_depth, 0)}м '
+                           f'{round(float(self.data_well.head_column_additional.get_value) - paker2_depth, 0)}м '
             paker_short = f'заглушка + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{diameter_paker}мм ' \
                           f' + щелевой фильтр + НКТ l-{round(paker1_depth - paker2_depth, 0)} + пакер ПУ + НКТ{60} ' \
                           f'20мм + репер +' \
-                          f' НКТ60мм {round(float(self.data_well.head_column_additional._value) - paker2_depth, 0)}м '
-            dict_nkt = {73: self.data_well.head_column_additional._value,
-                        60: int(paker1_depth - self.data_well.head_column_additional._value)}
+                          f' НКТ60мм {round(float(self.data_well.head_column_additional.get_value) - paker2_depth, 0)}м '
+            dict_nkt = {73: self.data_well.head_column_additional.get_value,
+                        60: int(paker1_depth - self.data_well.head_column_additional.get_value)}
         elif self.data_well.column_additional is True and \
-                self.data_well.column_additional_diameter._value > 110 and \
-                paker1_depth > self.data_well.head_column_additional._value:
+                self.data_well.column_additional_diameter.get_value > 110 and \
+                paker1_depth > self.data_well.head_column_additional.get_value:
             paker_select = f'заглушка + {depth_gauge}НКТ{73}мм со снятыми фасками {paker_khost}м + пакер ПРО-ЯМО-' \
-                           f'{diameter_paker}мм (либо аналог) для ЭК {self.data_well.column_diameter._value}мм х ' \
-                           f'{self.data_well.column_wall_thickness._value}мм + щелевой фильтр + {depth_gauge}' \
+                           f'{diameter_paker}мм (либо аналог) для ЭК {self.data_well.column_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_wall_thickness.get_value}мм + щелевой фильтр + {depth_gauge}' \
                            f'НКТ l-{round(paker1_depth - paker2_depth, 0)} {depth_gauge} + пакер ПУ  со ' \
                            f'снятыми фасками 20мм + репер + ' \
                            f'НКТ{73}мм со снятыми фасками ' \
-                           f'{round(float(self.data_well.head_column_additional._value) - paker2_depth, 0)}м '
+                           f'{round(float(self.data_well.head_column_additional.get_value) - paker2_depth, 0)}м '
             paker_short = f'заглушка +{depth_gauge}  НКТ{73}мм со снятыми фасками {paker_khost}м + пакер ПРО-ЯМО-' \
                           f'{diameter_paker}мм + щелевой фильтр + {depth_gauge}' \
                           f'НКТ l-{round(paker1_depth - paker2_depth, 0)} + пакер ПУ  со снятыми фасками ' \
                           f'20мм + {depth_gauge} + репер + ' \
                           f'НКТ{73}мм со снятыми фасками ' \
-                          f'{round(float(self.data_well.head_column_additional._value) - paker2_depth, 0)}м '
+                          f'{round(float(self.data_well.head_column_additional.get_value) - paker2_depth, 0)}м '
             dict_nkt = {73: paker1_depth + paker_khost}
         elif nkt_diam == 60:
             dict_nkt = {60: paker1_depth + paker_khost}
@@ -1820,7 +1820,7 @@ class SwabWindow(WindowUnion):
              f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое давление на '
-             f'устье {self.data_well.max_admissible_pressure._value}атм,'
+             f'устье {self.data_well.max_admissible_pressure.get_value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое '
              f'обучение вахт по сигналу "выброс" с записью в журнале проведения учебных тревог',
              None, None, None, None, None, None, None,
@@ -1888,10 +1888,10 @@ class SwabWindow(WindowUnion):
                               need_change_zgs_combo, plast_new, fluid_new, pressure_new):
 
         swab_short, swab_select = SwabWindow.swab_select(self, swab_type_combo, plast_combo, swab_volume_edit)
-        nkt_diam = '73' if self.data_well.column_diameter._value > 110 or (
-                self.data_well.column_diameter._value > 110 and
+        nkt_diam = '73' if self.data_well.column_diameter.get_value > 110 or (
+                self.data_well.column_diameter.get_value > 110 and
                 self.data_well.column_additional is True and
-                self.data_well.head_column_additional._value > 700) else '60'
+                self.data_well.head_column_additional.get_value > 700) else '60'
 
         if depth_gauge_combo == 'Да':
             depth_gauge = 'контейнер с манометром МТГ-25 + '
@@ -1901,18 +1901,18 @@ class SwabWindow(WindowUnion):
         paker_short = ''
         if self.data_well.column_additional is False or \
                 (self.data_well.column_additional is True and
-                 paker_depth <= self.data_well.head_column_additional._value):
+                 paker_depth <= self.data_well.head_column_additional.get_value):
             paker_select = f'воронку + {depth_gauge} свабоограничитель  НКТ{nkt_diam} +репер + НКТ 10м'
             paker_short = f'в/у + {depth_gauge} со с/о НКТ{nkt_diam} +репер + НКТ 10м'
             dict_nkt = {73: paker_depth}
         elif self.data_well.column_additional is True and \
-                self.data_well.column_additional_diameter._value < 110 and \
-                paker_depth > self.data_well.head_column_additional._value:
+                self.data_well.column_additional_diameter.get_value < 110 and \
+                paker_depth > self.data_well.head_column_additional.get_value:
             paker_select = f'воронку со свабоограничителем  + НКТ{60}мм ' \
-                           f'{round(paker_depth - self.data_well.head_column_additional._value, 1)}м' \
+                           f'{round(paker_depth - self.data_well.head_column_additional.get_value, 1)}м' \
                            f' {depth_gauge}'
             paker_short = f'обточ муфту + НКТ{60}мм ' \
-                          f'{round(paker_depth - self.data_well.head_column_additional._value, 1)}м ' \
+                          f'{round(paker_depth - self.data_well.head_column_additional.get_value, 1)}м ' \
                           f'{depth_gauge}'
             dict_nkt = {60: paker_depth}
         if 'Ойл' in data_list.contractor:
@@ -1938,7 +1938,7 @@ class SwabWindow(WindowUnion):
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое '
              f'давление на устье '
-             f'{self.data_well.max_admissible_pressure._value}атм,'
+             f'{self.data_well.max_admissible_pressure.get_value}атм,'
              f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести практическое '
              f'обучение вахт по '
              f'сигналу "выброс" с записью в журнале проведения учебных тревог',

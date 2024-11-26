@@ -36,7 +36,7 @@ class ClassifierWell(MyMainWindow):
         self.costumer = costumer
         self.number_well = None
         # if self.well_number:
-        #     self.number_well = self.data_well.well_number._value
+        #     self.number_well = self.data_well.well_number.get_value
 
         self.setCentralWidget(self.table_class)
         self.model = self.table_class.model()
@@ -73,7 +73,7 @@ class ClassifierWell(MyMainWindow):
         self.setLayout(layout)
 
     def closeEvent(self, event):
-        if self.sender() == None:  # Проверяем вызывающий объект
+        if self.sender() is None:  # Проверяем вызывающий объект
             # Закрываем основное окно при закрытии окна входа
             self.new_window = None
             event.accept()  # Принимаем событие закрытия
@@ -381,7 +381,7 @@ class ClassifierWell(MyMainWindow):
                                             row[gas_factor],
                                             version_year, region, costumer
                                         )
-                        except:
+                        except Exception:
                             QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
 
                     else:
@@ -418,7 +418,7 @@ def excel_in_json(self, sheet):
     data = {}
     for row_index, row in enumerate(sheet.iter_rows()):
         row_data = []
-        if all(cell == None for cell in row[:32]) is False:
+        if all(cell is None for cell in row[:32]) is False:
             if any([cell.value == "ИТОГО:" for cell in row[:4]]):
                 index_end_copy = row_index
 
@@ -429,7 +429,7 @@ def excel_in_json(self, sheet):
 
                     break
                 row_data = []
-                if all(cell == None for cell in row[:32]) is False:
+                if all(cell is None for cell in row[:32]) is False:
                     if any([cell.value == "ИТОГО:" for cell in row[:4]]):
                         index_end_copy = row_index
 
@@ -583,14 +583,14 @@ def insert_data_well_dop_plan(self, data_well):
         self.data_well.dict_nkt_before = well_data_dict["НКТ"]['До']
         self.data_well.dict_sucker_rod_after = well_data_dict["штанги"]['После']
         self.data_well.dict_sucker_rod = well_data_dict["штанги"]['До']
-    except:
+    except Exception:
         self.data_well.dict_nkt_after = well_data_dict["НКТ"]
         self.data_well.dict_nkt_before = well_data_dict["НКТ"]
         self.data_well.dict_sucker_rod_after = well_data_dict["штанги"]
         self.data_well.dict_sucker_rod = well_data_dict["штанги"]
     self.data_well.Qoil = well_data_dict['ожидаемые']['нефть']
     self.data_well.Qwater = well_data_dict['ожидаемые']['вода']
-    self.data_well.procent_water = well_data_dict['ожидаемые']['обводненность']
+    self.data_well.percent_water = well_data_dict['ожидаемые']['обводненность']
     self.data_well.expected_P = well_data_dict['ожидаемые']['давление']
     self.data_well.expected_Q = well_data_dict['ожидаемые']['приемистость']
 
@@ -677,7 +677,7 @@ def insert_data_new_excel_file(self, data, rowHeights, colWidth, boundaries_dict
                             # Создание объекта заливки
                             fill = PatternFill(patternType='solid', fgColor=color)
                             cell.fill = fill
-                        except:
+                        except Exception:
                             pass
                     cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
                                      bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
@@ -745,7 +745,7 @@ def insert_data_new_excel_file(self, data, rowHeights, colWidth, boundaries_dict
             sheet_new.row_dimensions[index_row].hidden = True
         try:
             sheet_new.row_dimensions[index_row].height = rowHeights[index_row - 1]
-        except:
+        except Exception:
             pass
 
     if self.data_well.work_plan not in ['plan_change']:

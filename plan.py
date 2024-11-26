@@ -13,7 +13,7 @@ def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
         boundaries_dict[ind] = range_boundaries(str(_range))
 
     # rowHeights_top = [None, 18.0, 18, 18,None, 18.0, 18, 18,None, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18]
-    rowHeights1 = [ws.row_dimensions[i + 1].height for i in range(cat_well_min._value, ws.max_row)]
+    rowHeights1 = [ws.row_dimensions[i + 1].height for i in range(cat_well_min.get_value, ws.max_row)]
     for key, value in boundaries_dict.items():
         try:
             ws.unmerge_cells(start_column=value[0], start_row=value[1],
@@ -22,9 +22,9 @@ def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
             pass
     # print(f'индекс удаления {1, self.cat_well_min - 1} , {data_well_max + 2, ws.max_row - data_well_max}')
 
-    ws.delete_rows(data_x_max._value, ws.max_row - data_x_max._value)
+    ws.delete_rows(data_x_max.get_value, ws.max_row - data_x_max.get_value)
 
-    ws.delete_rows(1, cat_well_min._value - 1)
+    ws.delete_rows(1, cat_well_min.get_value - 1)
 
     # print(sorted(boundaries_dict))
     data_list.rowHeights = rowHeights1
@@ -32,9 +32,9 @@ def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
     for _ in range(16):
         ws.insert_rows(1, 1)
     for key, value in boundaries_dict.items():
-        if value[1] <= data_well_max._value + 1 and value[1] >= cat_well_min._value:
-            ws.merge_cells(start_column=value[0], start_row=value[1] + 16 - cat_well_min._value + 1,
-                           end_column=value[2], end_row=value[3] + 16 - cat_well_min._value + 1)
+        if value[1] <= data_well_max.get_value + 1 and value[1] >= cat_well_min.get_value:
+            ws.merge_cells(start_column=value[0], start_row=value[1] + 16 - cat_well_min.get_value + 1,
+                           end_column=value[2], end_row=value[3] + 16 - cat_well_min.get_value + 1)
 
     # print(f'{ws.max_row, len(data_list.prowHeights)}dd')
     for index_row, row in enumerate(ws.iter_rows()):  # Копирование высоты строки

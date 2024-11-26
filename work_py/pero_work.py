@@ -31,7 +31,7 @@ class TabPageSoSand(TabPageUnion):
         self.pero_combo_QCombo.addItems(
             ['перо + КОТ', 'Перо', 'обточную муфту + КОТ', 'обточную муфту', 'перо-110мм', 'пило-муфту'])
 
-        if self.data_well.column_additional or self.data_well.column_diameter._value < 120:
+        if self.data_well.column_additional or self.data_well.column_diameter.get_value < 120:
             self.pero_combo_QCombo.setCurrentIndex(2)
 
         self.solvent_question_Label = QLabel("необходимость растворителя", self)
@@ -159,10 +159,10 @@ class PeroWindow(WindowUnion):
         try:
             pero_combo_QCombo = self.tabWidget.currentWidget().pero_combo_QCombo.currentText()
             current_edit = int(float(self.tabWidget.currentWidget().current_edit.text().replace(',', '.')))
-            if current_edit >= self.data_well.bottom_hole_artificial._value:
+            if current_edit >= self.data_well.bottom_hole_artificial.get_value:
                 QMessageBox.warning(self, 'Ошибка',
                                     f'Необходимый забой-{current_edit}м ниже исскуственного '
-                                    f'{self.data_well.bottom_hole_artificial._value}м')
+                                    f'{self.data_well.bottom_hole_artificial.get_value}м')
                 return
 
             solvent_question_QCombo = str(self.tabWidget.currentWidget().solvent_question_QCombo.currentText())
@@ -213,7 +213,7 @@ class PeroWindow(WindowUnion):
                 f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work} при расходе жидкости '
                 f'6-8 л/сек в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. '
                 f'ПРИ ПРОМЫВКЕ НЕ '
-                f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {self.data_well.max_admissible_pressure._value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
+                f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {self.data_well.max_admissible_pressure.get_value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
                 f'НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
                 None, None, None, None, None, None, None,
                 'Мастер КРС, представитель ЦДНГ', 1.5],

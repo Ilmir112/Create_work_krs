@@ -91,8 +91,8 @@ class TabPageSo(TabPageUnion):
 
         if self.manufacturer_combo.currentText() == 'НТЦ ЗЭРС':
             self.manufacturer = 'НТЦ ЗЭРС'
-            if (self.data_well.column_additional and self.data_well.column_additional_diameter._value < 110) \
-                    or self.data_well.column_additional is False and self.data_well.column_diameter._value < 110:
+            if (self.data_well.column_additional and self.data_well.column_additional_diameter.get_value < 110) \
+                    or self.data_well.column_additional is False and self.data_well.column_diameter.get_value < 110:
                 self.type_column = "ФПЗН.102"
 
             else:

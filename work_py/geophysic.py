@@ -194,7 +194,7 @@ class GeophysicWindow(WindowUnion):
              f'главным инженером {data_list.contractor} '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. Опрессовать  плашки  ПВО '
              f'(на давление опрессовки ЭК, но '
-             f'не ниже максимального ожидаемого давления на устье) {self.data_well.max_admissible_pressure._value}атм, '
+             f'не ниже максимального ожидаемого давления на устье) {self.data_well.max_admissible_pressure.get_value}атм, '
              f'по невозможности на давление поглощения, но '
              f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). ',
              None, None, None, None, None, None, None,
@@ -238,7 +238,7 @@ class GeophysicWindow(WindowUnion):
             row_max = self.table_widget.rowCount()
             self.insert_data_in_database(row, row_max)
             # lst = [1, 0, 2, len(geophysicalResearch)-1]
-            # if float(self.data_well.max_angle._value) >= 50:
+            # if float(self.data_well.max_angle.get_value) >= 50:
             #     lst.extend([3, 4])
             # Объединение ячеек по горизонтали в столбце "отвественные и норма"
             self.table_widget.setSpan(i + self.insert_index, 2, 1, 8)

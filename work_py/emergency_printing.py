@@ -29,7 +29,7 @@ class TabPageSoPrint(TabPageUnion):
         self.nkt_select_combo.addItems(['печать в ЭК', 'печать в ДП'])
 
         if self.data_well.column_additional is False or (self.data_well.column_additional and
-                                                    self.data_well.head_column_additional._value < self.data_well.current_bottom):
+                                                    self.data_well.head_column_additional.get_value < self.data_well.current_bottom):
             self.nkt_select_combo.setCurrentIndex(0)
         else:
             
@@ -68,7 +68,7 @@ class TabPageSoPrint(TabPageUnion):
         self.nkt_select_combo.setCurrentIndex(1)
 
         if self.data_well.column_additional is False or \
-                (self.data_well.column_additional and self.data_well.current_bottom < self.data_well.head_column_additional._value):
+                (self.data_well.column_additional and self.data_well.current_bottom < self.data_well.head_column_additional.get_value):
             self.nkt_select_combo.setCurrentIndex(1)
             self.nkt_select_combo.setCurrentIndex(0)
         else:
@@ -79,7 +79,7 @@ class TabPageSoPrint(TabPageUnion):
     
     def update_raid_edit(self, index):
         if index == 'печать в ЭК':
-            self.print_diameter_line.setText(str(self.raiding_Bit_diam_select(self.data_well.head_column_additional._value - 10)))
+            self.print_diameter_line.setText(str(self.raiding_Bit_diam_select(self.data_well.head_column_additional.get_value - 10)))
         elif index == 'печать в ДП':
             self.print_diameter_line.setText(str(self.raiding_Bit_diam_select(self.data_well.current_bottom)))
                 
@@ -101,10 +101,10 @@ class TabPageSoPrint(TabPageUnion):
             }
     
             if self.data_well.column_additional is False or (
-                    self.data_well.column_additional is True and depth <= self.data_well.head_column_additional._value):
-                diam_internal_ek = self.data_well.column_diameter._value - 2 * self.data_well.column_wall_thickness._value
+                    self.data_well.column_additional is True and depth <= self.data_well.head_column_additional.get_value):
+                diam_internal_ek = self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value
             else:
-                diam_internal_ek = self.data_well.column_additional_diameter._value - 2 * self.data_well.column_additional_wall_thickness._value
+                diam_internal_ek = self.data_well.column_additional_diameter.get_value - 2 * self.data_well.column_additional_wall_thickness.get_value
     
             for diam, diam_internal_bit in raiding_Bit_dict.items():
                 if diam_internal_bit[0] <= diam_internal_ek <= diam_internal_bit[1]:
@@ -162,12 +162,12 @@ class EmergencyPrintWork(WindowUnion):
             return
 
         if nkt_str_combo == 'печать в ЭК' and self.data_well.column_additional and \
-                emergency_bottom_line > self.data_well.head_column_additional._value:
+                emergency_bottom_line > self.data_well.head_column_additional.get_value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка печати для доп колонны')
             return
         elif nkt_str_combo == 'печать в ДП' and self.data_well.column_additional and \
-                emergency_bottom_line < self.data_well.head_column_additional._value:
+                emergency_bottom_line < self.data_well.head_column_additional.get_value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для основной колонны')
             return

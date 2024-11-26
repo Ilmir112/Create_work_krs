@@ -33,15 +33,15 @@ class TabPageSo(TabPageUnion):
             if plast not in self.plast_all:
                 self.plast_all.append(plast)
 
-        self.cat_P_1 = self.data_well.category_pressure_well
+        self.cat_P_1 = self.data_well.category_pressure
         self.category_h2s_list = self.data_well.category_h2s_list
-        self.cat_gaz_f_pr = self.data_well.category_gaz_factor_procent
-        self.gaz_f_pr = self.data_well.gaz_factor_procent
+        self.cat_gaz_f_pr = self.data_well.category_gaz_factor_percent
+        self.gaz_f_pr = self.data_well.gaz_factor_percent
         self.h2s_mg = self.data_well.value_h2s_mg
 
-        self.h2s_pr = self.data_well.value_h2s_procent
+        self.h2s_pr = self.data_well.value_h2s_percent
 
-        self.cat_P_P = self.data_well.category_pressure
+        self.cat_P_P = self.data_well.category_pressure_well
 
         self.category_pressure_Label = QLabel('По Рпл')
         self.category_h2s_Label = QLabel('По H2S')
@@ -264,8 +264,9 @@ class CategoryWindow(WindowUnion):
         self.data_well.type_absorbent = self.tabWidget.currentWidget().type_absorbent.currentText()
         plast_index = []
         pressure = namedtuple("pressure", "category data_pressure")
-        Data_h2s = namedtuple("Data_h2s", "category data_procent data_mg_l poglot")
+        Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
         Data_gaz = namedtuple("Data_gaz", "category data")
+        aaasse = self.tabWidget.currentWidget().labels_category
         if cat_P_1:
             for index in data_list.number_indez:
                 for ind in range(1, 6):
@@ -283,8 +284,7 @@ class CategoryWindow(WindowUnion):
                     if self.tabWidget.currentWidget().labels_category[index][8].currentText() == 'планируемый':
                         self.data_well.plast_project.append(plast)
                     try:
-                        self.dict_category.setdefault(plast, {}).setdefault(
-                            'по давлению',
+                        self.dict_category.setdefault(plast, {}).setdefault('по давлению',
                             pressure(int(self.tabWidget.currentWidget().labels_category[index][1].text()),
                                      float(self.tabWidget.currentWidget().labels_category[index][7].text())))
 
@@ -307,8 +307,8 @@ class CategoryWindow(WindowUnion):
                         self.data_well.dict_category = self.dict_category
                         data_list.pause = False
 
-                    except:
-                        QMessageBox.warning(self, 'Ошибка', "Ошибка сохранения данных по категории")
+                    except Exception as e:
+                        QMessageBox.warning(self, 'Ошибка', f"Ошибка сохранения данных по категории {e}")
                         return
 
         self.close()

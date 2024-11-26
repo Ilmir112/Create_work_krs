@@ -274,12 +274,12 @@ def razdel_1(self, region, contractor):
             except:
                 cat_P_1 = self.data_well.category_pressure_well[0]
                 category_h2s_list = self.data_well.category_h2s_list[0]
-                cat_gaz = self.data_well.category_gaz_factor_procent[0]
+                cat_gaz = self.data_well.category_gaz_factor_percent[0]
         else:
 
             cat_P_1 = self.data_well.category_pressure_well[0]
             category_h2s_list = self.data_well.category_h2s_list[0]
-            cat_gaz = self.data_well.category_gaz_factor_procent[0]
+            cat_gaz = self.data_well.category_gaz_factor_percent[0]
         try:
             cat_P_1_plan = self.data_well.dict_category[self.data_well.plast_project[0]]['по давлению'].category
             category_h2s_list_plan = self.data_well.dict_category[self.data_well.plast_project[0]]['по сероводороду'].category

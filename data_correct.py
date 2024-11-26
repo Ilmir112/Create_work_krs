@@ -24,7 +24,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.column_direction_diameter_edit = FloatLineEdit(self)
         if self.data_well.column_direction_true:
             self.column_direction_diameter_edit.setText(
-                f'{str(self.data_well.column_direction_diameter._value).strip()}')
+                f'{str(self.data_well.column_direction_diameter.get_value).strip()}')
         else:
             self.column_direction_diameter_edit.setText(f'отсут')
 
@@ -32,14 +32,14 @@ class TabPageSoCorrect(TabPageUnion):
         self.column_direction_wall_thickness_edit = FloatLineEdit(self)
         if self.data_well.column_direction_true:
             self.column_direction_wall_thickness_edit.setText(
-                f'{str(self.data_well.column_direction_wall_thickness._value).strip()}')
+                f'{str(self.data_well.column_direction_wall_thickness.get_value).strip()}')
         else:
             self.column_direction_wall_thickness_edit.setText(f'отсут')
         self.column_direction_length_Label = QLabel("башмак направления", self)
         self.column_direction_length_edit = FloatLineEdit(self)
         if self.data_well.column_direction_true:
             self.column_direction_length_edit.setText(
-                f'{str(self.data_well.column_direction_length._value).strip()}')
+                f'{str(self.data_well.column_direction_length.get_value).strip()}')
         else:
             self.column_direction_length_edit.setText(f'отсут')
 
@@ -47,39 +47,39 @@ class TabPageSoCorrect(TabPageUnion):
         self.level_cement_direction_edit = FloatLineEdit(self)
         if self.data_well.column_direction_true:
             self.level_cement_direction_edit.setText(
-                f'{str(self.data_well.level_cement_direction._value).strip()}')
+                f'{str(self.data_well.level_cement_direction.get_value).strip()}')
         else:
             self.level_cement_direction_edit.setText(f'отсут')
 
         self.column_conductor_diameter_Label = QLabel("диаметр кондуктора", self)
         self.column_conductor_diameter_edit = FloatLineEdit(self)
         self.column_conductor_diameter_edit.setText(
-            f'{str(self.data_well.column_conductor_diameter._value).strip()}')
+            f'{str(self.data_well.column_conductor_diameter.get_value).strip()}')
 
         self.column_conductor_wall_thickness_Label = QLabel("Толщина стенки ", self)
         self.column_conductor_wall_thickness_edit = FloatLineEdit(self)
         self.column_conductor_wall_thickness_edit.setText(
-            f'{str(self.data_well.column_conductor_wall_thickness._value).strip()}')
+            f'{str(self.data_well.column_conductor_wall_thickness.get_value).strip()}')
 
         self.column_conductor_length_Label = QLabel("башмак кондуктора", self)
         self.column_conductor_length_edit = FloatLineEdit(self)
         self.column_conductor_length_edit.setText(
-            f'{str(self.data_well.column_conductor_length._value).strip()}')
+            f'{str(self.data_well.column_conductor_length.get_value).strip()}')
 
         self.level_cement_conductor_Label = QLabel("Уровень цемента за кондуктором", self)
         self.level_cement_conductor_edit = FloatLineEdit(self)
-        self.level_cement_conductor_edit.setText(f'{str(self.data_well.level_cement_conductor._value).strip()}')
+        self.level_cement_conductor_edit.setText(f'{str(self.data_well.level_cement_conductor.get_value).strip()}')
 
         self.column_label = QLabel("диаметр ЭК", self)
         self.column_type = FloatLineEdit(self)
-        self.column_type.setText(f'{self.ifNone(self.data_well.column_diameter._value)}')
+        self.column_type.setText(f'{self.ifNone(self.data_well.column_diameter.get_value)}')
 
         # self.column_type.setClearButtonEnabled(True)
 
         self.column_wall_thickness_label = QLabel("Толщина стенки ЭК", self)
         self.column_wall_thickness_edit_type2 = FloatLineEdit(self)
         self.column_wall_thickness_edit_type2.setText(
-            f'{self.ifNone(self.data_well.column_wall_thickness._value)}')
+            f'{self.ifNone(self.data_well.column_wall_thickness.get_value)}')
         # self.column_wall_thickness_edit_type2.setClearButtonEnabled(True)
 
         self.head_column_label = QLabel("Голова ЭК", self)
@@ -88,7 +88,7 @@ class TabPageSoCorrect(TabPageUnion):
 
         self.shoe_column_label = QLabel("башмак ЭК", self)
         self.shoe_column_edit_type2 = FloatLineEdit(self)
-        self.shoe_column_edit_type2.setText(f'{self.ifNone(self.data_well.shoe_column._value)}')
+        self.shoe_column_edit_type2.setText(f'{self.ifNone(self.data_well.shoe_column.get_value)}')
         # self.shoe_column_edit_type2.setClearButtonEnabled(True)
 
         self.column_add_trueLabel = QLabel("наличие Доп. колонны", self)
@@ -102,33 +102,33 @@ class TabPageSoCorrect(TabPageUnion):
 
         self.column_add_label = QLabel("диаметр доп. колонны", self)
         self.column_add_edit_type = FloatLineEdit(self)
-        self.column_add_edit_type.setText(f'{self.ifNone(self.data_well.column_additional_diameter._value)}')
+        self.column_add_edit_type.setText(f'{self.ifNone(self.data_well.column_additional_diameter.get_value)}')
         # self.column_add_edit_type.setClearButtonEnabled(True)
 
         self.column_add_wall_thicknessLabel = QLabel("Толщина стенки доп.колонны", self)
         self.column_add_wall_thicknessedit_type2 = FloatLineEdit(self)
         self.column_add_wall_thicknessedit_type2.setText(
-            f'{self.ifNone(self.data_well.column_additional_wall_thickness._value)}')
+            f'{self.ifNone(self.data_well.column_additional_wall_thickness.get_value)}')
         # self.column_add_wall_thicknessedit_type2.setClearButtonEnabled(True)
 
         self.head_column_add_label = QLabel("Голова доп колонны", self)
         self.head_column_add_edit_type2 = FloatLineEdit(self)
-        self.head_column_add_edit_type2.setText(f'{self.ifNone(self.data_well.head_column_additional._value)}')
+        self.head_column_add_edit_type2.setText(f'{self.ifNone(self.data_well.head_column_additional.get_value)}')
 
         self.shoe_column_add_label = QLabel("башмак доп колонны", self)
         self.shoe_column_add_edit_type2 = FloatLineEdit(self)
-        self.shoe_column_add_edit_type2.setText(f'{self.ifNone(self.data_well.shoe_column_additional._value)}')
+        self.shoe_column_add_edit_type2.setText(f'{self.ifNone(self.data_well.shoe_column_additional.get_value)}')
         # self.shoe_column_add_edit_type2.setClearButtonEnabled(True)
 
         self.bottomhole_drill_Label = QLabel('Пробуренный забой')
         self.bottomhole_drill_edit_type = FloatLineEdit(self)
         self.bottomhole_drill_edit_type.setText(
-            f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.bottom_hole_drill._value))}')
+            f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.bottom_hole_drill.get_value))}')
 
         self.bottomhole_artificial_Label = QLabel('Искусственный забой')
         self.bottomhole_artificial_edit_type = FloatLineEdit(self)
         self.bottomhole_artificial_edit_type.setText(
-            f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.bottom_hole_artificial._value))}')
+            f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.bottom_hole_artificial.get_value))}')
 
         self.current_bottom_Label = QLabel('Текущий забой')
         self.current_bottom_edit_type = FloatLineEdit(self)
@@ -137,21 +137,21 @@ class TabPageSoCorrect(TabPageUnion):
 
         self.max_angle_Label = QLabel('Максимальный угол')
         self.max_angle_edit_type = FloatLineEdit(self)
-        self.max_angle_edit_type.setText(f'{self.ifNone(self.data_well.max_angle._value)}')
+        self.max_angle_edit_type.setText(f'{self.ifNone(self.data_well.max_angle.get_value)}')
 
         self.max_angle_depth_Label = QLabel('Глубина максимального угла')
         self.max_angle_depth_edit_type = FloatLineEdit(self)
-        self.max_angle_depth_edit_type.setText(f'{self.ifNone(self.data_well.max_angle_depth._value)}')
+        self.max_angle_depth_edit_type.setText(f'{self.ifNone(self.data_well.max_angle_depth.get_value)}')
 
         self.max_expected_pressure_Label = QLabel('Максимальный ожидаемое давление')
         self.max_expected_pressure_edit_type = FloatLineEdit(self)
         self.max_expected_pressure_edit_type.setText(
-            f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.max_expected_pressure._value))}')
+            f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.max_expected_pressure.get_value))}')
 
         self.max_admissible_pressure_Label = QLabel('Максимальный допустимое давление')
         self.max_admissible_pressure_edit_type = FloatLineEdit(self)
         self.max_admissible_pressure_edit_type.setText(
-            f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.max_admissible_pressure._value))}')
+            f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.max_admissible_pressure.get_value))}')
 
         self.pump_SHGN_do_Label = QLabel('Штанговый насос')
         self.pump_SHGN_do_edit_type = QLineEdit(self)
@@ -242,12 +242,12 @@ class TabPageSoCorrect(TabPageUnion):
         self.static_level_Label = QLabel('Статический уровень в скважине')
         self.static_level_edit_type = FloatLineEdit(self)
         self.static_level_edit_type.setText(self.remove_non_numeric_chars(
-            self.ifNone(self.data_well.static_level._value)))
+            self.ifNone(self.data_well.static_level.get_value)))
 
         self.dinamic_level_Label = QLabel('Динамический уровень в скважине')
         self.dinamic_level_edit_type = FloatLineEdit(self)
         self.dinamic_level_edit_type.setText(self.remove_non_numeric_chars(
-            self.ifNone(self.data_well.dinamic_level._value)))
+            self.ifNone(self.data_well.dinamic_level.get_value)))
 
         self.curator_Label = QLabel('Куратор ремонта')
         self.curator_Combo = QComboBox(self)
@@ -556,7 +556,7 @@ class TabPageSoCorrect(TabPageUnion):
 
             self.proc_water_edit = FloatLineEdit(self)
             try:
-                self.proc_water_edit.setText(f'{self.data_well.procent_water}')
+                self.proc_water_edit.setText(f'{self.data_well.percent_water}')
             except:
                 pass
             self.grid.addWidget(self.proc_water_Label, 25, 3)
@@ -673,7 +673,7 @@ class TabPageSoCorrect(TabPageUnion):
 
             self.proc_water_edit = FloatLineEdit(self)
             try:
-                self.proc_water_edit.setText(f'{self.data_well.procent_water}')
+                self.proc_water_edit.setText(f'{self.data_well.percent_water}')
             except:
                 pass
             self.grid.addWidget(self.proc_water_Label, 25, 3)
@@ -1064,7 +1064,7 @@ class DataWindow(WindowUnion):
             self.data_well.max_admissible_pressure = ProtectedIsDigit(
                 self.check_if_none(max_admissible_pressure))
 
-            # print(f'макс {self.data_well.max_expected_pressure._value}')
+            # print(f'макс {self.data_well.max_expected_pressure.get_value}')
             self.data_well.dict_pump_shgn["do"] = self.check_if_none(dict_pump_shgn_do)
             self.data_well.dict_pump_shgn_depth["do"] = self.check_if_none(dict_pump_shgn_h_do)
             self.data_well.dict_pump_shgn_depth["posle"] = self.check_if_none(dict_pump_shgn_h_posle)
@@ -1105,11 +1105,11 @@ class DataWindow(WindowUnion):
                 self.data_well.expected_P = self.check_if_none(expected_P_edit)
                 self.data_well.expected_Q = self.check_if_none(expected_Q_edit)
                 self.data_well.expected_pick_up[self.data_well.expected_Q] = self.data_well.expected_P
-                self.data_well.procent_water = 100
+                self.data_well.percent_water = 100
             else:
                 self.data_well.Qoil = self.check_if_none(Qoil_edit)
                 self.data_well.Qwater = self.check_if_none(Qwater_edit)
-                self.data_well.procent_water = int(self.check_if_none(proc_water_edit))
+                self.data_well.percent_water = int(self.check_if_none(proc_water_edit))
 
             if str(self.data_well.dict_pump_shgn["do"]) != '0' and len(
                     self.data_well.dict_sucker_rod) == 0:
@@ -1139,31 +1139,31 @@ class DataWindow(WindowUnion):
                 self.data_well.bvo = True
             self.data_well.data_well_dict = {
                 'направление': {
-                    'диаметр': self.data_well.column_direction_diameter._value,
-                    'толщина стенки': self.data_well.column_direction_wall_thickness._value,
-                    'башмак': self.data_well.column_direction_length._value,
-                    'цемент': self.data_well.level_cement_direction._value},
+                    'диаметр': self.data_well.column_direction_diameter.get_value,
+                    'толщина стенки': self.data_well.column_direction_wall_thickness.get_value,
+                    'башмак': self.data_well.column_direction_length.get_value,
+                    'цемент': self.data_well.level_cement_direction.get_value},
                 'кондуктор': {
-                    'диаметр': self.data_well.column_conductor_diameter._value,
-                    'толщина стенки': self.data_well.column_conductor_wall_thickness._value,
-                    'башмак': self.data_well.column_conductor_length._value,
-                    'цемент': self.data_well.level_cement_conductor._value},
+                    'диаметр': self.data_well.column_conductor_diameter.get_value,
+                    'толщина стенки': self.data_well.column_conductor_wall_thickness.get_value,
+                    'башмак': self.data_well.column_conductor_length.get_value,
+                    'цемент': self.data_well.level_cement_conductor.get_value},
                 'ЭК': {
-                    'диаметр': self.data_well.column_diameter._value,
-                    'толщина стенки': self.data_well.column_wall_thickness._value,
-                    'башмак': self.data_well.shoe_column._value,
-                    'цемент': self.data_well.level_cement_column._value,
-                    'голова ЭК': self.data_well.head_column._value
+                    'диаметр': self.data_well.column_diameter.get_value,
+                    'толщина стенки': self.data_well.column_wall_thickness.get_value,
+                    'башмак': self.data_well.shoe_column.get_value,
+                    'цемент': self.data_well.level_cement_column.get_value,
+                    'голова ЭК': self.data_well.head_column.get_value
                 },
                 'допколонна': {
                     'наличие': self.data_well.column_additional,
-                    'диаметр': self.data_well.column_additional_diameter._value,
-                    'толщина стенки': self.data_well.column_additional_wall_thickness._value,
-                    'голова': self.data_well.head_column_additional._value,
-                    'башмак': self.data_well.shoe_column_additional._value},
+                    'диаметр': self.data_well.column_additional_diameter.get_value,
+                    'толщина стенки': self.data_well.column_additional_wall_thickness.get_value,
+                    'голова': self.data_well.head_column_additional.get_value,
+                    'башмак': self.data_well.shoe_column_additional.get_value},
                 'куратор': curator,
                 'регион': self.data_well.region,
-                'ЦДНГ': self.data_well.cdng._value,
+                'ЦДНГ': self.data_well.cdng.get_value,
                 'оборудование': {
                     'ЭЦН':
                         {
@@ -1187,8 +1187,8 @@ class DataWindow(WindowUnion):
                         },
 
                 },
-                'статика': self.data_well.static_level._value,
-                'динамика': self.data_well.dinamic_level._value,
+                'статика': self.data_well.static_level.get_value,
+                'динамика': self.data_well.dinamic_level.get_value,
                 'НКТ': {
                     'До': self.data_well.dict_nkt_before,
                     "После": self.data_well.dict_nkt_after
@@ -1200,18 +1200,18 @@ class DataWindow(WindowUnion):
                 'ожидаемые': {
                     'нефть': self.data_well.Qoil,
                     'вода': self.data_well.Qwater,
-                    'обводненность': self.data_well.procent_water,
+                    'обводненность': self.data_well.percent_water,
                     'давление': self.data_well.expected_P,
                     'приемистость': self.data_well.expected_Q
                 },
                 'данные': {
-                    'пробуренный забой': self.data_well.bottom_hole_drill._value,
-                    'искусственный забой': self.data_well.bottom_hole_artificial._value,
-                    'максимальный угол': self.data_well.max_angle._value,
-                    'глубина': self.data_well.max_angle_depth._value,
-                    'максимальное ожидаемое давление': self.data_well.max_expected_pressure._value,
-                    'максимальное допустимое давление': self.data_well.max_admissible_pressure._value,
-                    'диаметр долото при бурении': self.data_well.diameter_doloto_ek._value
+                    'пробуренный забой': self.data_well.bottom_hole_drill.get_value,
+                    'искусственный забой': self.data_well.bottom_hole_artificial.get_value,
+                    'максимальный угол': self.data_well.max_angle.get_value,
+                    'глубина': self.data_well.max_angle_depth.get_value,
+                    'максимальное ожидаемое давление': self.data_well.max_expected_pressure.get_value,
+                    'максимальное допустимое давление': self.data_well.max_admissible_pressure.get_value,
+                    'диаметр долото при бурении': self.data_well.diameter_doloto_ek.get_value
                 }
             }
 
@@ -1236,16 +1236,16 @@ class DataWindow(WindowUnion):
             self.close()
 
     def definition_open_trunk_well(self):
-        self.data_well.nkt_diam = 73 if self.data_well.column_diameter._value > 110 else 60
-        self.data_well.nkt_template = 59.6 if self.data_well.column_diameter._value > 110 else 47.9
+        self.data_well.nkt_diam = 73 if self.data_well.column_diameter.get_value > 110 else 60
+        self.data_well.nkt_template = 59.6 if self.data_well.column_diameter.get_value > 110 else 47.9
 
         if self.data_well.column_additional:
-            if self.data_well.current_bottom > self.data_well.shoe_column_additional._value:
+            if self.data_well.current_bottom > self.data_well.shoe_column_additional.get_value:
                 self.data_well.open_trunk_well = True
             else:
                 self.data_well.open_trunk_well = False
         else:
-            if self.data_well.current_bottom > self.data_well.shoe_column._value:
+            if self.data_well.current_bottom > self.data_well.shoe_column.get_value:
                 self.data_well.open_trunk_well = True
             else:
                 self.data_well.open_trunk_well = False

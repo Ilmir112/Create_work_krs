@@ -86,7 +86,7 @@ class TabPageSo(TabPageUnion):
         self.grid = QGridLayout(self)
         if self.data_well.column_additional is False or \
                 (self.data_well.column_additional and self.data_well.current_bottom <
-                 self.data_well.head_column_additional._value):
+                 self.data_well.head_column_additional.get_value):
             first_template, template_second = TabPageSoWith.template_diam_ek(self)
             self.template_select_list = ['шаблон ЭК с хвостом', 'шаблон открытый ствол', 'шаблон без хвоста']
 
@@ -176,7 +176,7 @@ class TabPageSo(TabPageUnion):
                  self.data_well.plast_work]) is False or \
                 (
                         self.data_well.column_additional is True and self.data_well.current_bottom <
-                        self.data_well.head_column_additional._value and self.data_well.open_trunk_well is False):
+                        self.data_well.head_column_additional.get_value and self.data_well.open_trunk_well is False):
             template_key = 'шаблон ЭК с хвостом'
 
         elif self.data_well.column_additional is False and self.data_well.open_trunk_well is True:
@@ -186,7 +186,7 @@ class TabPageSo(TabPageUnion):
                 [self.data_well.dict_perforation[plast]['отрайбировано'] for plast in
                  self.data_well.plast_work]) is True or \
                 (self.data_well.column_additional is True and \
-                 self.data_well.current_bottom < self.data_well.head_column_additional._value and \
+                 self.data_well.current_bottom < self.data_well.head_column_additional.get_value and \
                  self.data_well.open_trunk_well is False):
             template_key = 'шаблон без хвоста'
 
@@ -232,9 +232,9 @@ class TabPageSo(TabPageUnion):
         nkt_diam = self.data_well.nkt_diam
 
         if self.data_well.column_additional or \
-                (self.data_well.head_column_additional._value >= self.data_well.current_bottom and
+                (self.data_well.head_column_additional.get_value >= self.data_well.current_bottom and
                  self.data_well.column_additional is False):
-            nkt_pod = '60мм' if self.data_well.column_additional_diameter._value < 110 else '73мм со снятыми фасками'
+            nkt_pod = '60мм' if self.data_well.column_additional_diameter.get_value < 110 else '73мм со снятыми фасками'
 
         if first_template != '' and length_template_first != '' and \
                 template_second != '' and length_template_second != '' and \
@@ -260,7 +260,7 @@ class TabPageSo(TabPageUnion):
 
 
             elif self.template_Combo.currentText() == 'шаблон без хвоста':
-                if dictance_template_second != None:
+                if dictance_template_second is not None:
                     template_str = f'перо {kot_str} + шаблон-{template_second}мм L-{length_template_second}м '
                     self.data_well.template_depth = self.data_well.current_bottom
                     skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
@@ -268,7 +268,7 @@ class TabPageSo(TabPageUnion):
 
 
             elif self.template_Combo.currentText() == 'шаблон открытый ствол':
-                if dictance_template_second != None:
+                if dictance_template_second is not None:
                     self.template_first_Edit.setText('фильтр направление')
                     template_str = f'фильтр-направление {kot_str} + НКТ{nkt_diam}м {dictance_template_first}м  ' \
                                    f'шаблон-{template_second}мм L-{length_template_second}м '
@@ -278,7 +278,7 @@ class TabPageSo(TabPageUnion):
                     skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
             elif self.template_Combo.currentText() == 'шаблон ДП с хвостом':
-                if dictance_template_second != None:
+                if dictance_template_second is not None:
                     template_str = f'обточная муфта + {kot_str} НКТ{nkt_pod} {dictance_template_first}м ' \
                                    f'+ шаблон-{first_template}мм ' \
                                    f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_template_second}м + ' \
@@ -314,7 +314,7 @@ class TabPageSo(TabPageUnion):
 
 
             elif self.template_Combo.currentText() == 'шаблон ДП открытый ствол':
-                if dictance_template_second != None:
+                if dictance_template_second is not None:
                     template_str = f'фильтр направление L-2м {kot_str} + НКТ{nkt_pod} {dictance_template_first}м ' \
                                    f'  + шаблон-{first_template}мм ' \
                                    f'L-{length_template_first}м' \
@@ -345,7 +345,7 @@ class TabPageSo(TabPageUnion):
             kot_str = '+ КОТ'
         nkt_diam = self.data_well.nkt_diam
         if self.data_well.column_additional is False or (self.data_well.column_additional and
-                                                                 self.data_well.head_column_additional._value >=
+                                                                 self.data_well.head_column_additional.get_value >=
                                                                  self.data_well.current_bottom):
 
             first_template, template_second = TabPageSoWith.template_diam_ek(self)
@@ -358,7 +358,7 @@ class TabPageSo(TabPageUnion):
 
         self.template_first_Edit.setText(str(first_template))
         self.template_second_Edit.setText(str(template_second))
-        # self.skm_Edit.setText(str(self.data_well.column_diameter._value))
+        # self.skm_Edit.setText(str(self.data_well.column_diameter.get_value))
         self.dictance_template_second_Edit.setText(str(10))
 
         roof_plast, roof_add_column_plast = TabPageSoWith.definition_roof_not_raiding(self, current_bottom)
@@ -391,8 +391,8 @@ class TabPageSo(TabPageUnion):
 
         if self.data_well.column_additional or \
                 (
-                        self.data_well.head_column_additional._value >= self.data_well.current_bottom and self.data_well.column_additional is False):
-            nkt_pod = '60мм' if self.data_well.column_additional_diameter._value < 110 else '73мм со снятыми фасками'
+                        self.data_well.head_column_additional.get_value >= self.data_well.current_bottom and self.data_well.column_additional is False):
+            nkt_pod = '60мм' if self.data_well.column_additional_diameter.get_value < 110 else '73мм со снятыми фасками'
 
         if index == 'шаблон ЭК с хвостом':
             self.dictance_template_second_Edit.setParent(None)
@@ -464,7 +464,7 @@ class TabPageSo(TabPageUnion):
             dictance_template_first = int(self.data_well.current_bottom - roof_add_column_plast + 5)
             self.dictance_template_first_Edit.setText(str(dictance_template_first))
             dictance_template_second = int(
-                roof_add_column_plast - self.data_well.head_column_additional._value - int(
+                roof_add_column_plast - self.data_well.head_column_additional.get_value - int(
                     self.length_template_first_Edit.text()) + 5)
             self.dictance_template_second_Edit.setText(str(dictance_template_second))
 
@@ -494,7 +494,7 @@ class TabPageSo(TabPageUnion):
             self.grid.addWidget(self.length_template_second_Edit, 5, 8)
 
             dictance_template_second = int(
-                self.data_well.current_bottom - self.data_well.head_column_additional._value
+                self.data_well.current_bottom - self.data_well.head_column_additional.get_value
                 - int(length_template_first) + 5)
             self.dictance_template_second_Edit.setText(str(dictance_template_second))
             dictance_template_second = int(self.dictance_template_second_Edit.text())
@@ -531,7 +531,7 @@ class TabPageSo(TabPageUnion):
             dictance_template_first = int(self.dictance_template_first_Edit.text())
 
             dictance_template_second = int(
-                roof_add_column_plast - self.data_well.head_column_additional._value - int(
+                roof_add_column_plast - self.data_well.head_column_additional.get_value - int(
                     self.length_template_first_Edit.text()) + 5)
             self.dictance_template_second_Edit.setText(str(dictance_template_second))
 
@@ -557,17 +557,17 @@ class TabPageSo(TabPageUnion):
 
         if self.data_well.column_additional is False and self.data_well.dict_pump_ecn["posle"] != 0:
             return "2", "30"
-        elif self.data_well.column_additional is False and self.data_well.max_angle._value > 45:
+        elif self.data_well.column_additional is False and self.data_well.max_angle.get_value > 45:
             return "2", "10"
         elif self.data_well.column_additional is True and self.data_well.dict_pump_ecn["posle"] != 0:
             if self.data_well.dict_pump_ecn["posle"] != 0 and \
-                    float(depth_ecn) < self.data_well.head_column_additional._value:
+                    float(depth_ecn) < self.data_well.head_column_additional.get_value:
                 return "2", "30"
 
             elif self.data_well.dict_pump_ecn["posle"] != 0 and \
-                    float(depth_ecn) >= self.data_well.head_column_additional._value:
+                    float(depth_ecn) >= self.data_well.head_column_additional.get_value:
                 return "30", "4"
-            elif self.data_well.max_angle._value > 45:
+            elif self.data_well.max_angle.get_value > 45:
                 return "10", "4"
         else:
             return "2", "4"
@@ -611,7 +611,7 @@ class TemplateWithoutSkm(WindowUnion):
             template_length_addition = int(float(self.tabWidget.currentWidget().length_template_first_Edit.text()))
         if self.data_well.column_additional is False or (
                 self.data_well.column_additional is True and float(
-            self.data_well.head_column_additional._value) >= self.data_well.current_bottom):
+            self.data_well.head_column_additional.get_value) >= self.data_well.current_bottom):
             template_diameter = int(self.tabWidget.currentWidget().template_second_Edit.text())
         else:
             template_diameter = int(self.tabWidget.currentWidget().template_first_Edit.text())
@@ -622,7 +622,7 @@ class TemplateWithoutSkm(WindowUnion):
             return
         if self.data_well.column_additional is False or \
                 self.data_well.column_additional and \
-                self.data_well.current_bottom < self.data_well.head_column_additional._value:
+                self.data_well.current_bottom < self.data_well.head_column_additional.get_value:
             if self.data_well.template_depth > self.data_well.current_bottom:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
                 return
@@ -630,11 +630,11 @@ class TemplateWithoutSkm(WindowUnion):
             if self.data_well.template_depth_addition > self.data_well.current_bottom:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
                 return
-            if self.data_well.template_depth >= self.data_well.head_column_additional._value:
+            if self.data_well.template_depth >= self.data_well.head_column_additional.get_value:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже головы хвостовика')
                 return
             # if self.template_Combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне' and\
-            #         self.data_well.skm_depth >= self.data_well.head_column_additional._value:
+            #         self.data_well.skm_depth >= self.data_well.head_column_additional.get_value:
             #     QMessageBox.warning(self, "ВНИМАНИЕ", 'СКМ спускается ниже головы хвостовика')
             #     return
         if distance_second < 0 or distance_first < 0:
@@ -654,11 +654,11 @@ class TemplateWithoutSkm(WindowUnion):
                                                          'Привязка нужна, корректно ли?')
             if mes == QMessageBox.StandardButton.No:
                 return
-        if self.data_well.head_column._value != 0:
-            if self.data_well.column_conductor_length._value <= self.data_well.template_depth:
+        if self.data_well.head_column.get_value != 0:
+            if self.data_well.column_conductor_length.get_value <= self.data_well.template_depth:
                 QMessageBox.warning(self, 'Ошибка',
                                     f'Нельзя спускать шаблон ниже глубины башмака кондуктора '
-                                    f'{self.data_well.column_conductor_length._value}м')
+                                    f'{self.data_well.column_conductor_length.get_value}м')
 
         work_list = self.template_ek(template_str, template, template_diameter)
 
@@ -727,7 +727,7 @@ class TemplateWithoutSkm(WindowUnion):
              f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work} '
              f'при расходе жидкости 6-8 л/сек '
              f'в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. ПРИ '
-             f'ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ ДАВЛЕНИЕ {self.data_well.max_admissible_pressure._value}АТМ,'
+             f'ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ ДАВЛЕНИЕ {self.data_well.max_admissible_pressure.get_value}АТМ,'
              f' ДОПУСТИМАЯ ОСЕВАЯ '
              f'НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
              None, None, None, None, None, None, None,
@@ -849,7 +849,7 @@ class TemplateWithoutSkm(WindowUnion):
             list_template_ek.pop(1)
         else:
             self.calculate_chemistry('растворитель', solvent_volume_edit)
-        if self.data_well.head_column._value != 0:
+        if self.data_well.head_column.get_value != 0:
             self.data_well.current_bottom = current_bottom
         return list_template_ek
 
@@ -875,7 +875,7 @@ class TemplateWithoutSkm(WindowUnion):
              f'при расходе жидкости '
              f'6-8 л/сек в присутствии представителя Заказчика в объеме '
              f'{round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. ПРИ ПРОМЫВКЕ НЕ '
-             f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {self.data_well.max_admissible_pressure._value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
+             f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {self.data_well.max_admissible_pressure.get_value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
              f'НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
              None, None, None, None, None, None, None,
              'Мастер КРС, представитель ЦДНГ', 1.5],

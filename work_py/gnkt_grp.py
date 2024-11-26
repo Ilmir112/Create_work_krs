@@ -207,7 +207,7 @@ class GnktOsvWindow(GnktModel):
         bvo_int = 0
         # if self.data_well.bvo:
         #     bvo_int += 5
-        head = plan.head_ind(self.data_well.cat_well_min._value - 1 + bvo_int, self.data_well.cat_well_max._value - 1)
+        head = plan.head_ind(self.data_well.cat_well_min.value - 1 + bvo_int, self.data_well.cat_well_max.value - 1)
 
         plan.copy_true_ws(self.data_well, self.sheet, self.ws_title, head)
 
@@ -370,10 +370,10 @@ class GnktOsvWindow(GnktModel):
              'Мастер ГНКТ', 2],
             [None, 13,
              f'При закрытой центральной задвижке фондовой арматуры опрессовать ГНКТ и все '
-             f'нагнетательные линии на {round(self.data_well.max_admissible_pressure._value * 1.5, 1)}атм. '
+             f'нагнетательные линии на {round(self.data_well.max_admissible_pressure.value * 1.5, 1)}атм. '
              f'Опрессовать ПВО, обратные клапана и выкидную линию от '
              f'устья скважины до желобной ёмкости (надёжно закрепить, оборудовать дроссельными задвижками) '
-             f'опрессовать на {self.data_well.max_admissible_pressure._value}атм с выдержкой 30мин. '
+             f'опрессовать на {self.data_well.max_admissible_pressure.value}атм с выдержкой 30мин. '
              f'Опрессовку ПВО зафиксировать в вахтовом журнале. Установить на малом и большом затрубе '
              f'технологический манометр. Провести УТЗ и инструктаж. Опрессовку проводить в присутствии мастера, '
              f'бурильщика, машиниста подъемника и представителя супервайзерской службы. Получить разрешение на '
@@ -740,7 +740,7 @@ class GnktOsvWindow(GnktModel):
                                                            'Введите расчетный удельный вес жидкости глушения в '
                                                            'конце жидкости',
                                                            max(fluid_list), 0.87, 2, 2)
-        except:
+        except Exception:
             fluid_work_insert, ok = QInputDialog.getDouble(self, 'Рабочая жидкость',
                                                            'Введите удельный вес рабочей жидкости',
                                                            0, 0.87, 2, 2)

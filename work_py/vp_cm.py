@@ -164,8 +164,8 @@ class VpWindow(WindowUnion):
                  f'Произвести установку {vp_type_QCombo} (ЗАДАЧА 2.9.4.) на глубине  {vp_depth}м',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', 10],
-                [f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure._value}атм', None,
-                 f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure._value}атм '
+                [f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure.get_value}атм', None,
+                 f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure.get_value}атм '
                  f'в присутствии представителя заказчика '
                  f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением '
                  f'за 2 часа до начала работ) ',
@@ -192,8 +192,8 @@ class VpWindow(WindowUnion):
                  f'взрывные желонки).',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', None],
-                [f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure._value}атм', None,
-                 f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure._value}атм в '
+                [f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure.get_value}атм', None,
+                 f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure.get_value}атм в '
                  f'присутствии представителя заказчика '
                  f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с '
                  f'подтверждением за 2 часа до начала работ) ',
@@ -257,8 +257,8 @@ class VpWindow(WindowUnion):
                  f'Произвести установку {vp_type_QCombo} (ЗАДАЧА 2.9.4.) на глубине  {vp_depth}м',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', 10],
-                [f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure._value}атм', None,
-                 f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure._value}атм в '
+                [f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure.get_value}атм', None,
+                 f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure.get_value}атм в '
                  f'присутствии представителя заказчика '
                  f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с '
                  f'подтверждением за 2 часа до начала работ) ',
@@ -310,9 +310,9 @@ class VpWindow(WindowUnion):
              f'взрывные желонки).',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', None],
-            [f'Опрессовать ЭК на Р={self.data_well.max_admissible_pressure._value}атм',
+            [f'Опрессовать ЭК на Р={self.data_well.max_admissible_pressure.get_value}атм',
              None,
-             f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure._value}атм в присутствии '
+             f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure.get_value}атм в присутствии '
              f'представителя заказчика Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
              f'с подтверждением за 2 часа до начала работ) ',
              None, None, None, None, None, None, None,

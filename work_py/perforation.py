@@ -60,9 +60,9 @@ class TabPageSo(TabPageUnion):
         self.grid.addWidget(TabPageSo.combobox_type_perforation, 1, 6)
 
     def select_type_perforation(self, sole):
-        if len(self.data_well.angle_data) == 0 and self.data_well.max_angle._value < 50:
+        if len(self.data_well.angle_data) == 0 and self.data_well.max_angle.get_value < 50:
             TabPageSo.combobox_type_perforation.setCurrentIndex(0)
-        elif len(self.data_well.angle_data) == 0 and self.data_well.max_angle._value >= 50:
+        elif len(self.data_well.angle_data) == 0 and self.data_well.max_angle.get_value >= 50:
             TabPageSo.combobox_type_perforation.setCurrentIndex(1)
         elif len(self.data_well.angle_data) != 0:
             if sole != '':
@@ -252,10 +252,10 @@ class PerforationWindow(WindowUnion):
         charge_diam_dict = {73: (0, 110), 89: (111, 135), 102: (136, 160), 114: (160, 250)}
 
         if self.data_well.column_additional is False or (
-                self.data_well.column_additional is True and pvr < self.data_well.head_column_additional._value):
-            diam_internal_ek = self.data_well.column_diameter._value
+                self.data_well.column_additional is True and pvr < self.data_well.head_column_additional.get_value):
+            diam_internal_ek = self.data_well.column_diameter.get_value
         else:
-            diam_internal_ek = self.data_well.column_additional_diameter._value
+            diam_internal_ek = self.data_well.column_additional_diameter.get_value
 
         for diam, diam_internal_paker in charge_diam_dict.items():
             if diam_internal_paker[0] <= diam_internal_ek <= diam_internal_paker[1]:
@@ -306,7 +306,7 @@ class PerforationWindow(WindowUnion):
         if len(self.data_well.category_pressure_well) > 1:
             self.data_well.category_pressure = self.data_well.category_pressure[1]
             self.data_well.category_h2s = self.data_well.category_h2s_list[1]
-            self.data_well.category_gas_factor = self.data_well.category_gaz_factor_procent[1]
+            self.data_well.category_gas_factor = self.data_well.category_gaz_factor_percent[1]
             kateg2 = [1 if str(self.data_well.category_pressure[1]) == '1' or str(self.data_well.category_h2s_list[1]) == '1' else 2][0]
 
             if self.data_well.category_pvo < kateg2:
@@ -331,7 +331,7 @@ class PerforationWindow(WindowUnion):
              f'Долить скважину до устья тех жидкостью уд.весом {self.data_well.fluid_work}. '
              f'Опрессовать плашки ПВО (на давление опрессовки ЭК, но '
              f'не ниже максимального ожидаемого давления на устье) '
-             f'{self.data_well.max_admissible_pressure._value}атм, по невозможности на давление поглощения, но '
+             f'{self.data_well.max_admissible_pressure.get_value}атм, по невозможности на давление поглощения, но '
              f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). '
              f'Передать по сводке уровня жидкости до перфорации и после перфорации.'
              f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения '

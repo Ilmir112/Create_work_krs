@@ -34,7 +34,7 @@ class TabPageSoWith(TabPageUnion):
         self.skm_Label = QLabel("диаметр СГМ", self)
         self.skm_Edit = QLineEdit(self)
         self.skm_Edit.setValidator(validator)
-        self.skm_Edit.setText(str(self.data_well.column_diameter._value))
+        self.skm_Edit.setText(str(self.data_well.column_diameter.get_value))
 
 
         self.roof_skm_label = QLabel("Кровля скреперования", self)
@@ -98,7 +98,7 @@ class TabPageSoWith(TabPageUnion):
 
     def definition_template_work(self, current_bottom):
         if self.data_well.column_additional is False or \
-                (self.data_well.column_additional and current_bottom < self.data_well.head_column_additional._value):
+                (self.data_well.column_additional and current_bottom < self.data_well.head_column_additional.get_value):
             self.template_select_list = ['', 'СГМ ЭК', 'СГМ открытый ствол']
 
             self.template_Combo.addItems(self.template_select_list)
@@ -162,7 +162,7 @@ class TabPageSoWith(TabPageUnion):
         if self.skm_Edit.text() != '':
             skm = self.skm_Edit.text()
         if self.template_Combo.currentText() == 'СГМ ЭК':
-            self.skm_Edit.setText(str(self.data_well.column_diameter._value))
+            self.skm_Edit.setText(str(self.data_well.column_diameter.get_value))
             template_str = f'{SKM_type}-{skm} + НКТ + репер'
 
             self.data_well.skm_depth = self.data_well.current_bottom
@@ -171,20 +171,20 @@ class TabPageSoWith(TabPageUnion):
             self.skm_Edit.setText(self.data_well.column_diameter)
 
             template_str = f'заглушка + НКТ{self.data_well.nkt_diam}мм ' \
-                           f'{current_bottom - self.data_well.shoe_column._value +10}м + {SKM_type}-{skm} + НКТ + репер'
+                           f'{current_bottom - self.data_well.shoe_column.get_value +10}м + {SKM_type}-{skm} + НКТ + репер'
 
         elif self.template_Combo.currentText() == 'СГМ в доп колонне':
-            self.skm_Edit.setText(self.data_well.column_additional_diameter._value)
+            self.skm_Edit.setText(self.data_well.column_additional_diameter.get_value)
 
             template_str = f'{SKM_type}-{skm} + НКТ{self.data_well.nkt_diam} ' \
-                           f'{current_bottom - self.data_well.head_column_additional._value +10} + НКТ + репер'
+                           f'{current_bottom - self.data_well.head_column_additional.get_value +10} + НКТ + репер'
 
             self.data_well.skm_depth = current_bottom
         elif self.template_Combo.currentText() == 'СГМ в основной колонне':
             self.skm_Edit.setText(self.data_well.column_additional_diameter)
 
             template_str = f'{SKM_type}-{skm} + НКТ{self.data_well.nkt_diam} ' \
-                           f'{self.data_well.current_bottom - self.data_well.head_column_additional._value +10} + НКТ + репер'
+                           f'{self.data_well.current_bottom - self.data_well.head_column_additional.get_value +10} + НКТ + репер'
 
             self.data_well.skm_depth = current_bottom
 
@@ -268,19 +268,19 @@ class TemplateKrs(WindowUnion):
 
         if template_key in ['СГМ в доп колонне + открытый ствол',
                                          'СГМ в доп колонне'] \
-                and (roof_skm < self.data_well.head_column_additional._value or
-                     sole_skm < self.data_well.head_column_additional._value):
+                and (roof_skm < self.data_well.head_column_additional.get_value or
+                     sole_skm < self.data_well.head_column_additional.get_value):
             QMessageBox.warning(self, 'Ошибка',
                                       f'кровля скреперования выше головы '
-                                      f'хвостовика {self.data_well.head_column_additional._value}')
+                                      f'хвостовика {self.data_well.head_column_additional.get_value}')
             return
 
         elif template_key == 'СГМ в основной колонне' and \
-                (sole_skm > self.data_well.head_column_additional._value or
-                 roof_skm > self.data_well.head_column_additional._value):
+                (sole_skm > self.data_well.head_column_additional.get_value or
+                 roof_skm > self.data_well.head_column_additional.get_value):
             QMessageBox.warning(self, 'Ошибка',
                                       f'подошва скреперования ниже головы '
-                                      f'хвостовика {self.data_well.head_column_additional._value}')
+                                      f'хвостовика {self.data_well.head_column_additional.get_value}')
             return
 
         self.tableWidget.setSortingEnabled(False)
@@ -315,7 +315,7 @@ class TemplateKrs(WindowUnion):
 
 
         if self.data_well.column_additional is False or \
-                self.data_well.column_additional and self.data_well.current_bottom <= self.data_well.head_column_additional._value:
+                self.data_well.column_additional and self.data_well.current_bottom <= self.data_well.head_column_additional.get_value:
             if self.data_well.template_depth >= self.data_well.current_bottom:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'СГМ спускается ниже текущего забоя')
                 return
@@ -323,11 +323,11 @@ class TemplateKrs(WindowUnion):
             if self.data_well.template_depth_addition >= self.data_well.current_bottom:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'СГМспускается ниже текущего забоя')
                 return
-            if self.data_well.template_depth >= self.data_well.head_column_additional._value:
+            if self.data_well.template_depth >= self.data_well.head_column_additional.get_value:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'СГМ спускается ниже головы хвостовика')
                 return
             if template_key == 'ПСШ Доп колонна СКМ в основной колонне' and \
-                    self.data_well.skm_depth >= self.data_well.head_column_additional._value:
+                    self.data_well.skm_depth >= self.data_well.head_column_additional.get_value:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'СГМ спускается ниже головы хвостовика')
                 return
 
@@ -368,17 +368,17 @@ class TemplateKrs(WindowUnion):
         if not self.data_well.column_additional:
 
             volume_well = 3.14 * (
-                    self.data_well.column_diameter._value - self.data_well.column_wall_thickness._value * 2) ** 2 / 4 / 1000000 * (
+                    self.data_well.column_diameter.get_value - self.data_well.column_wall_thickness.get_value * 2) ** 2 / 4 / 1000000 * (
                               self.data_well.current_bottom)
             return volume_well
         else:
             volume_well = (3.14 * (
-                    self.data_well.column_additional_diameter._value - self.data_well.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
+                    self.data_well.column_additional_diameter.get_value - self.data_well.column_wall_thickness.get_value * 2) ** 2 / 4 / 1000 * (
                                    self.data_well.current_bottom - float(
-                               self.data_well.head_column_additional._value)) / 1000) + (
+                               self.data_well.head_column_additional.get_value)) / 1000) + (
                                   3.14 * (
-                                  self.data_well.column_diameter._value - self.data_well.column_wall_thickness._value * 2) ** 2 / 4 / 1000 * (
-                                      self.data_well.head_column_additional._value) / 1000)
+                                  self.data_well.column_diameter.get_value - self.data_well.column_wall_thickness.get_value * 2) ** 2 / 4 / 1000 * (
+                                      self.data_well.head_column_additional.get_value) / 1000)
             return volume_well
 
     def template_ek(self, template_str, skm_list):

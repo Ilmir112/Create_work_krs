@@ -87,33 +87,33 @@ def skm_interval(self, template):
                                          'СГМ в доп колонне + открытый ствол',
                                          'СГМ в доп колонне'] and self.data_well.skm_depth >= interval[1]:
 
-            if interval[0] > float(self.data_well.head_column_additional._value) and interval[1] >= float(
-                    self.data_well.head_column_additional._value) and self.data_well.skm_depth >= interval[1] \
+            if interval[0] > float(self.data_well.head_column_additional.get_value) and interval[1] >= float(
+                    self.data_well.head_column_additional.get_value) and self.data_well.skm_depth >= interval[1] \
                     and interval[1] > interval[0]:
                 # print(f'1 {interval, merged_segments}')
                 merged_segments_new.append(interval)
 
-            elif interval[0] < float(self.data_well.head_column_additional._value) and interval[1] > float(
-                    self.data_well.head_column_additional._value) and self.data_well.skm_depth <= interval[1] \
+            elif interval[0] < float(self.data_well.head_column_additional.get_value) and interval[1] > float(
+                    self.data_well.head_column_additional.get_value) and self.data_well.skm_depth <= interval[1] \
                     and self.data_well.skm_depth >= interval[0] and interval[1] > interval[0]:
                 # print(f'2 {interval, merged_segments}')
 
-                merged_segments_new.append((self.data_well.head_column_additional._value + 2, self.data_well.skm_depth))
-            elif interval[0] < float(self.data_well.head_column_additional._value) and interval[1] > float(
-                    self.data_well.head_column_additional._value) and self.data_well.skm_depth >= interval[1] and interval[1] > \
+                merged_segments_new.append((self.data_well.head_column_additional.get_value + 2, self.data_well.skm_depth))
+            elif interval[0] < float(self.data_well.head_column_additional.get_value) and interval[1] > float(
+                    self.data_well.head_column_additional.get_value) and self.data_well.skm_depth >= interval[1] and interval[1] > \
                     interval[0]:
 
-                merged_segments_new.append((self.data_well.head_column_additional._value + 2, interval[1]))
+                merged_segments_new.append((self.data_well.head_column_additional.get_value + 2, interval[1]))
                 # print(f'3 {interval, merged_segments}')
 
         elif template in ['ПСШ Доп колонна СКМ в основной колонне', 'СГМ в основной колонне']:
-            if interval[0] < float(self.data_well.head_column_additional._value) and interval[1] < float(
-                    self.data_well.head_column_additional._value) and self.data_well.skm_depth >= interval[1] and interval[1] > \
+            if interval[0] < float(self.data_well.head_column_additional.get_value) and interval[1] < float(
+                    self.data_well.head_column_additional.get_value) and self.data_well.skm_depth >= interval[1] and interval[1] > \
                     interval[0]:
                 merged_segments_new.append(interval)
 
-            elif interval[0] < float(self.data_well.head_column_additional._value) and interval[1] > float(
-                    self.data_well.head_column_additional._value) and self.data_well.skm_depth <= interval[1] \
+            elif interval[0] < float(self.data_well.head_column_additional.get_value) and interval[1] > float(
+                    self.data_well.head_column_additional.get_value) and self.data_well.skm_depth <= interval[1] \
                     and self.data_well.skm_depth >= interval[0] and interval[1] > interval[0]:
                 # merged_segments.remove(interval)
                 merged_segments_new.append((interval[0], self.data_well.skm_depth))
@@ -200,27 +200,27 @@ def raiding_interval(data_well, ryber_key):
                 if float(interval[1]) < data_well.current_bottom and float(interval[0]) < float(interval[1]):
                     if data_well.column_additional is False or \
                             (data_well.column_additional and \
-                             data_well.head_column_additional._value > data_well.current_bottom):
+                             data_well.head_column_additional.get_value > data_well.current_bottom):
 
                         if float(interval[1]) + 20 <= data_well.current_bottom and \
-                                data_well.shoe_column._value >= float(interval[1]) + 20:
+                                data_well.shoe_column.get_value >= float(interval[1]) + 20:
                             crt = [float(interval[0]) - 20, float(interval[1]) + 20]
-                        elif float(interval[1]) + 20 >= data_well.shoe_column._value and \
-                                data_well.shoe_column._value > data_well.current_bottom:
-                            crt = [float(interval[0]) - 20, data_well.shoe_column._value]
-                        elif float(interval[1]) + 20 >= data_well.shoe_column._value and \
-                                data_well.shoe_column._value <= data_well.current_bottom:
+                        elif float(interval[1]) + 20 >= data_well.shoe_column.get_value and \
+                                data_well.shoe_column.get_value > data_well.current_bottom:
+                            crt = [float(interval[0]) - 20, data_well.shoe_column.get_value]
+                        elif float(interval[1]) + 20 >= data_well.shoe_column.get_value and \
+                                data_well.shoe_column.get_value <= data_well.current_bottom:
                             crt = [float(interval[0]) - 20, data_well.current_bottom]
-                        elif float(interval[1]) + 20 < data_well.shoe_column._value and \
+                        elif float(interval[1]) + 20 < data_well.shoe_column.get_value and \
                                 float(interval[1] + 20) > data_well.current_bottom:
                             crt = [float(interval[0]) - 20, data_well.current_bottom]
                     else:
                         if float(interval[1]) + 20 <= data_well.current_bottom and \
-                                data_well.shoe_column_additional._value >= float(interval[1]) + 20:
+                                data_well.shoe_column_additional.get_value >= float(interval[1]) + 20:
                             crt = [float(interval[0]) - 20, float(interval[1]) + 20]
-                        elif float(interval[1]) + 20 >= data_well.shoe_column_additional._value:
-                            crt = [float(interval[0]) - 20, data_well.shoe_column._value]
-                        elif float(interval[1]) + 20 < data_well.shoe_column_additional._value and \
+                        elif float(interval[1]) + 20 >= data_well.shoe_column_additional.get_value:
+                            crt = [float(interval[0]) - 20, data_well.shoe_column.get_value]
+                        elif float(interval[1]) + 20 < data_well.shoe_column_additional.get_value and \
                                 float(interval[1] + 20) > data_well.current_bottom:
                             crt = [float(interval[0]) - 20, data_well.current_bottom]
                 if crt != 0 and crt not in str_raid:
@@ -249,12 +249,12 @@ def raiding_interval(data_well, ryber_key):
     merged_segments_new = []
     if ryber_key == 'райбер в ЭК' and data_well.column_additional:
         for str in merged_segments:
-            if str[0] < data_well.head_column_additional._value and str[0] < str[1]:
+            if str[0] < data_well.head_column_additional.get_value and str[0] < str[1]:
                 merged_segments_new.append(str)
 
     elif ryber_key == 'райбер в ДП' and data_well.column_additional:
         for str in merged_segments:
-            if str[1] > data_well.head_column_additional._value and str[0] < str[1]:
+            if str[1] > data_well.head_column_additional.get_value and str[0] < str[1]:
                 merged_segments_new.append(str)
     else:
         for str in merged_segments:

@@ -51,7 +51,7 @@ class TabPageSoGrp(TabPageUnion):
         if self.current_depth_edit.text() != '':
 
             if float(self.current_depth_edit.text()) - self.data_well.perforation_roof > 100 \
-                    or (self.data_well.max_angle._value > 60 and self.data_well.max_angle_depth._value < self.data_well.perforation_roof) \
+                    or (self.data_well.max_angle.get_value > 60 and self.data_well.max_angle_depth.get_value < self.data_well.perforation_roof) \
                     or self.data_well.open_trunk_well is True:
                 self.otz_after_question_QCombo.setCurrentIndex(1)
                 self.otz_question_QCombo.setCurrentIndex(1)
@@ -244,35 +244,35 @@ class GrpWindow(WindowUnion):
 
     def paker_select(self, paker_depth, diameter_paker):
 
-        if self.data_well.column_diameter._value > 120:
+        if self.data_well.column_diameter.get_value > 120:
             nkt_diam = '89'
-        elif 110 < self.data_well.column_diameter._value < 120:
+        elif 110 < self.data_well.column_diameter.get_value < 120:
             nkt_diam = '73'
         else:
             nkt_diam = '60'
 
         if self.data_well.column_additional is False \
-                or (self.data_well.column_additional is True and paker_depth < self.data_well.head_column_additional._value):
-            paker_select = f'воронка, НКТ{nkt_diam}м - 1,5м, пакер ГРП - {diameter_paker}мм для ЭК {self.data_well.column_diameter._value}мм ' \
-                           f'х {self.data_well.column_wall_thickness._value}мм +' \
+                or (self.data_well.column_additional is True and paker_depth < self.data_well.head_column_additional.get_value):
+            paker_select = f'воронка, НКТ{nkt_diam}м - 1,5м, пакер ГРП - {diameter_paker}мм для ЭК {self.data_well.column_diameter.get_value}мм ' \
+                           f'х {self.data_well.column_wall_thickness.get_value}мм +' \
                            f'опрессовочный узел +НКТ{nkt_diam}м - 10м, реперный патрубок НКТ{nkt_diam}м - 2м'
-            paker_short = f'воронка, НКТ{nkt_diam}м - 1,5м, пакер ГРП {diameter_paker}мм для ЭК {self.data_well.column_diameter._value}мм ' \
-                          f'х {self.data_well.column_wall_thickness._value}мм +' \
+            paker_short = f'воронка, НКТ{nkt_diam}м - 1,5м, пакер ГРП {diameter_paker}мм для ЭК {self.data_well.column_diameter.get_value}мм ' \
+                          f'х {self.data_well.column_wall_thickness.get_value}мм +' \
                           f'опрессовочный узел +НКТ{nkt_diam}м - 10м, реперный патрубок НКТ{nkt_diam}м - 2м'
 
         else:
             paker_select = f'воронка, НКТ{nkt_diam}м - 1,5м, пакер ГРП- {diameter_paker}мм для ЭК ' \
-                           f'{self.data_well.column_additional_diameter._value}мм х ' \
-                           f'{self.data_well.column_additional_wall_thickness._value}мм+' \
+                           f'{self.data_well.column_additional_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_additional_wall_thickness.get_value}мм+' \
                            f'опрессовочный узел +НКТ{nkt_diam}м - 10м, реперный патрубок НКТ{nkt_diam}м - 2м, + ' \
                            f'НКТ{nkt_diam} ' \
-                           f' L-{round(paker_depth - self.data_well.head_column_additional._value, 0)}м'
+                           f' L-{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
             paker_short = f'воронка, НКТ{nkt_diam}м - 1,5м, пакер ГРП - {diameter_paker}мм для ЭК ' \
-                          f'{self.data_well.column_additional_diameter._value}мм х ' \
-                          f'{self.data_well.column_additional_wall_thickness._value}мм+' \
+                          f'{self.data_well.column_additional_diameter.get_value}мм х ' \
+                          f'{self.data_well.column_additional_wall_thickness.get_value}мм+' \
                           f'опрессовочный узел +НКТ{nkt_diam}м - 10м, реперный патрубок НКТ{nkt_diam}м - 2м,' \
                           f' + НКТ{nkt_diam} ' \
-                          f' L-{round(paker_depth - self.data_well.head_column_additional._value, 0)}м'
+                          f' L-{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
         return paker_select, paker_short
 
     def grpPaker(self, diameter_paker, paker_depth, paker_khost, gisOTZ_true_quest, gis_otz_after_true_quest,
@@ -282,9 +282,9 @@ class GrpWindow(WindowUnion):
         elif 'РН' in data_list.contractor:
             schema_grp = '6'
 
-        if self.data_well.column_diameter._value > 133:
+        if self.data_well.column_diameter.get_value > 133:
             nkt_diam = 89
-        elif 110 < self.data_well.column_diameter._value <= 133:
+        elif 110 < self.data_well.column_diameter.get_value <= 133:
             nkt_diam = 73
         else:
             nkt_diam = 60
@@ -344,7 +344,7 @@ class GrpWindow(WindowUnion):
              f'ООО "БашнефтьДобыча". Посадить планшайбу. '
              f'Произвести демонтаж'
              f' оборудования. Опрессовать установленную арматуру для ГРП на '
-             f'Р={self.data_well.max_admissible_pressure._value}атм, '
+             f'Р={self.data_well.max_admissible_pressure.get_value}атм, '
              f'составить акт в присутствии следующих представителей: УСРСиСТ (супервайзер), подрядчика по ГРП. '
              f'В случае негерметичности арматуры, составить акт и устранить негерметичность под руководством следующих '
              f'представителей:  УСРСиСТ (супервайзер), подрядчика по ГРП .',
@@ -425,7 +425,7 @@ class GrpWindow(WindowUnion):
              'Мастер КРС, представ. заказчика', liftingNKT_norm(paker_depth, 1.2)],
             [None, None,
              f'Опрессовать глухие плашки превентора на максимально допустимое давление '
-             f'{self.data_well.max_admissible_pressure._value}атм, но не выше '
+             f'{self.data_well.max_admissible_pressure.get_value}атм, но не выше '
              f'максимально допустимого давления опрессовки эксплуатационной колонны с выдержкой в течении '
              f'30 минут,в случае невозможности '
              f'опрессовки по результатам определения приемистости и по согласованию с заказчиком  опрессовать '
@@ -458,38 +458,38 @@ class GrpWindow(WindowUnion):
     def paker_select(self, paker_depth, paker_khost):
 
         from .opressovka import TabPageSo
-        if self.data_well.column_diameter._value > 120:
+        if self.data_well.column_diameter.get_value > 120:
             nkt_diam = '89'
-        elif 110 < self.data_well.column_diameter._value < 120:
+        elif 110 < self.data_well.column_diameter.get_value < 120:
             nkt_diam = '73'
         else:
             nkt_diam = '60'
 
         paker_diameter = TabPageSo.paker_diameter_select(self, paker_depth)
-        if self.data_well.column_additional is False or self.data_well.column_additional is True and paker_depth < self.data_well.head_column_additional._value:
+        if self.data_well.column_additional is False or self.data_well.column_additional is True and paker_depth < self.data_well.head_column_additional.get_value:
             paker_select = f'воронка, НКТ{nkt_diam}м - {paker_khost}м, пакер ПРО-ЯМО-{paker_diameter} (либо аналог) +' \
                            f'опрессовочный узел +НКТ{nkt_diam}м - 10м, реперный патрубок НКТ{nkt_diam}м - 2м,'
             paker_short = f'в-ка, НКТ{nkt_diam}м - {paker_khost}м, пакер {paker_diameter}  +' \
                           f'опрессовочный узел +НКТ{nkt_diam}м - 10м, репер НКТ{nkt_diam}м - 2м,'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110 and \
-                paker_depth > self.data_well.head_column_additional._value:
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
+                paker_depth > self.data_well.head_column_additional.get_value:
             nkt_diam_add = '60'
             paker_select = f'воронка, НКТ{nkt_diam_add}м - {paker_khost}м, пакер ПРО-ЯМО-{paker_diameter} (либо аналог) +' \
                            f'опрессовочный узел +НКТ{nkt_diam_add}м - 10м, реперный патрубок НКТ{nkt_diam_add}м - 2м, + НКТ{nkt_diam_add} L-' \
-                           f'{round(paker_depth - self.data_well.head_column_additional._value, 0)}м'
+                           f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
             paker_short = f'в-ка, НКТ{nkt_diam_add}м - {paker_khost}м, пакер ПРО-ЯМО-{paker_diameter}' \
                           f'опрессовочный узел +НКТ{nkt_diam_add}м - 10м, репер НКТ{nkt_diam_add}м - 2м,' \
-                          f'{round(paker_depth - self.data_well.head_column_additional._value, 0)}м'
+                          f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
 
         return paker_select, paker_short
 
     def nktGrp(self):
 
         if self.data_well.column_additional is False or (
-                self.data_well.column_additional is True and self.data_well.current_bottom >= self.data_well.head_column_additional._value):
+                self.data_well.column_additional is True and self.data_well.current_bottom >= self.data_well.head_column_additional.get_value):
             return f'НКТ{self.data_well.nkt_diam}мм'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value < 110:
-            return f'НКТ60мм L- {round(self.data_well.current_bottom - self.data_well.head_column_additional._value + 20, 0)}'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter._value > 110:
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110:
+            return f'НКТ60мм L- {round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value + 20, 0)}'
+        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110:
             return f'НКТ{self.data_well.nkt_diam}мм со снятыми фасками L-' \
-                   f'{round(self.data_well.current_bottom - self.data_well.head_column_additional._value + 20, 0)}'
+                   f'{round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value + 20, 0)}'
