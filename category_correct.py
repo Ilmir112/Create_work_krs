@@ -25,6 +25,8 @@ class TabPageSo(TabPageUnion):
         self.type_absorbent.addItems(['ХИМТЕХНО 101 Марка А', 'EVASORB марки 121', 'СНПХ-1200'])
         if self.data_well.region in ['ИГМ']:
             self.type_absorbent.setCurrentIndex(0)
+        else:
+            self.type_absorbent.setCurrentIndex(1)
 
 
         self.plast_all = []
