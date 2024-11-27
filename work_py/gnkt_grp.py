@@ -207,7 +207,7 @@ class GnktOsvWindow(GnktModel):
         bvo_int = 0
         # if self.data_well.bvo:
         #     bvo_int += 5
-        head = plan.head_ind(self.data_well.cat_well_min.value - 1 + bvo_int, self.data_well.cat_well_max.value - 1)
+        head = plan.head_ind(self.data_well.cat_well_min.get_value - 1 + bvo_int, self.data_well.cat_well_max.get_value - 1)
 
         plan.copy_true_ws(self.data_well, self.sheet, self.ws_title, head)
 
@@ -706,7 +706,7 @@ class GnktOsvWindow(GnktModel):
         for row in range(len(work_list)):
             for col in range(23):
                 if work_list[row][col]:
-                    # print(work_list[row][col])
+                    print(work_list[row][col], row + 1, col + 1)
                     ws.cell(row=row + 1, column=col + 1).value = work_list[row][col]
         # Перебираем строки и скрываем те, у которых все значения равны None
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):

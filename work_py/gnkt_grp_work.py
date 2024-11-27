@@ -743,7 +743,6 @@ class GnktModel(WindowUnion):
         for ind, plast_ind in enumerate(self.data_well.plast_work):
 
             if self.data_well.paker_before['do'] != 0:
-
                 if self.data_well.dict_perforation[plast_ind]['кровля'] > \
                         self.data_well.depth_fond_paker_before['do']:
                         if pressure != 0:
@@ -753,8 +752,8 @@ class GnktModel(WindowUnion):
             else:
                 pressure.append(max(list(map(
                     float, self.data_well.dict_perforation[plast_ind]["давление"]))))
-                vertikal.append = min(map(
-                    float, list(self.data_well.dict_perforation[plast_ind]["вертикаль"])))
+                vertikal.append(min(list(map(
+                    float, self.data_well.dict_perforation[plast_ind]["вертикаль"]))))
 
         self.pressure = max(pressure)
         vertikal = min(vertikal)
@@ -1001,8 +1000,6 @@ class GnktModel(WindowUnion):
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-             None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Тек. забой по ПЗ ', None, None,
              None, None, None, None, None, None, self.data_well.bottom, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,
@@ -1040,7 +1037,7 @@ class GnktModel(WindowUnion):
              self.date_dmy(self.data_well.date_drilling_cancel),
              None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Дата ввода в эксплуатацию', None,
-             None, None, None, f'{self.data_well.сommissioning_date}', None, None, None, None, None],
+             None, None, None, f'{self.data_well.date_commissioning}', None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Р в межколонном пространстве',
              None, None, None, None, self.data_well.pressure_mkp.get_value, None, ' ', None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Первоначальное Р опр-ки ЭК', None,

@@ -304,7 +304,9 @@ class PerforationWindow(WindowUnion):
         rows = self.tableWidget.rowCount()
         type_perforation = self.tabWidget.currentWidget().combobox_type_perforation.currentText()
         if len(self.data_well.category_pressure_well) > 1:
-            self.data_well.category_pressure = self.data_well.category_pressure_well[1]
+            self.data_well.category_pressure = self.data_well.category_pressure_list[1]
+            aa = self.data_well.category_pressure
+            asde = self.data_well.category_pressure_well
             self.data_well.category_h2s = self.data_well.category_h2s_list[1]
             self.data_well.category_gas_factor = self.data_well.category_gaz_factor_percent[1]
             kateg2 = [1 if str(self.data_well.category_pressure_well[1]) == '1' or

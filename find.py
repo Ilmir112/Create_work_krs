@@ -27,6 +27,7 @@ class FindIndexPZ(MyMainWindow):
     def __init__(self, ws, work_plan, parent=None):
         super().__init__()
 
+        self.fluid_work = None
         self.nkt_template = None
         self.nkt_diam = None
         self.perforation_roof = 5000
@@ -40,6 +41,7 @@ class FindIndexPZ(MyMainWindow):
         self.plan_correct_index = ProtectedIsDigit(0)
         self.type_absorbent = ''
         self.sucker_rod_none = False
+        self.fluid_work_short = '0.87г/см3'
 
         self.ws = ws
         self.wb = parent.wb
@@ -92,7 +94,7 @@ class FindIndexPZ(MyMainWindow):
 
         self.date_drilling_cancel = ''
         self.date_drilling_run = ''
-        self.сommissioning_date = ''
+        self.date_commissioning = ''
         self.max_expected_pressure = ProtectedIsNonNone('не корректно')
         self.max_admissible_pressure = ProtectedIsNonNone('не корректно')
         self.result_pressure = ProtectedIsNonNone('не корректно')
@@ -219,18 +221,18 @@ class FindIndexPZ(MyMainWindow):
 
     def read_pz(self):
         cat_well_min = []
-
+        image_loader = None
         try:
             # Копирование изображения
             image_loader = SheetImageLoader(self.ws)
 
         except Exception as e:
-            QMessageBox.warning(None, 'Ошибка', 'Ошибка в копировании изображений {e}')
+            QMessageBox.warning(None, 'Ошибка', f'Ошибка в копировании изображений {e}')
 
         for row_ind, row in enumerate(self.ws.iter_rows(values_only=True)):
             self.ws.row_dimensions[row_ind].hidden = False
             if self.cat_well_min.get_value != 0:
-                if self.data_x_max.get_value < row_ind:
+                if self.data_x_max.get_value < row_ind and image_loader:
                     self.work_with_img(image_loader, row_ind)
 
             if 'Категория скважины' in row:
@@ -242,7 +244,7 @@ class FindIndexPZ(MyMainWindow):
                 self.cat_well_max = ProtectedIsDigit(row_ind)
                 self.data_well_min = ProtectedIsDigit(row_ind + 1)
             elif any(['стабилизатор' in str(col).lower() and 'желез' in str(col).lower() for col in row]):
-                self.data_well.stabilizator_true = True
+                self.data_well.stabilizator_need = True
 
             elif any(['Ожидаемые показатели после' in str(col) for col in row]):
                 self.data_x_min = ProtectedIsDigit(row_ind)
@@ -796,9 +798,9 @@ class WellHistoryData(FindIndexPZ):
                             self.definition_is_none(self.date_drilling_cancel,
                                                     row_index + begin_index, col + 1, 1)
                     elif 'Дата ввода в экспл' in str(value):
-                        self.сommissioning_date = row[col + 2].value
-                        if type(self.сommissioning_date) is datetime:
-                            self.сommissioning_date = self.сommissioning_date.strftime(
+                        self.date_commissioning = row[col + 2].value
+                        if type(self.date_commissioning) is datetime:
+                            self.date_commissioning = self.date_commissioning.strftime(
                                 '%d.%m.%Y')
                     elif 'ствол скважины' in str(row[col].value).lower() and 'буров' in str(row[col].value).lower():
                         self.bur_rastvor = row[col].value
@@ -825,7 +827,7 @@ class WellHistoryData(FindIndexPZ):
         if self.date_drilling_cancel == '':
             self.check_data_in_pz.append('не указано окончание бурения\n')
 
-        if self.сommissioning_date == '':
+        if self.date_commissioning == '':
             self.check_data_in_pz.append('не указано дата ввода\n')
         if self.max_expected_pressure == '':
             self.check_data_in_pz.append('не указано максимально ожидаемое давление на устье\n')
@@ -1535,7 +1537,6 @@ class WellPerforation(FindIndexPZ):
                         row[col_open_index])
 
                     if col_old_open_index != col_open_index:
-                        aaass = row[col_close_index]
                         if row[col_close_index] is None or row[col_close_index] == '-':
                             self.dict_perforation.setdefault(plast, {}).setdefault('отключение',
                                                                                    False)
@@ -1602,9 +1603,8 @@ class WellPerforation(FindIndexPZ):
                             round(self.check_str_none(row[col_pressure_index]), 1))
                     self.dict_perforation_project.setdefault(plast, {}).setdefault('рабочая жидкость',
                                                                                    []).append(
-                        calculation_fluid_work(self.data_well, row[col_vert_index], row[col_pressure_index]))
+                        calculation_fluid_work(self, row[col_vert_index], row[col_pressure_index]))
 
-            aaaag = self.dict_perforation_project
             # объединение интервалов перфорации если они пересекаются
             for plast, value in self.dict_perforation.items():
                 intervals = value['интервал']

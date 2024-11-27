@@ -896,6 +896,7 @@ class MyWindow(MyMainWindow):
         self.work_plan = 0
         self.table_widget = None
         self.table_pvr = None
+        self.data_well = None
 
         threading.Timer(2.0, self.close_splash).start()
 
@@ -1163,7 +1164,6 @@ class MyWindow(MyMainWindow):
 
         elif action == self.create_GNKT_BOPZ and self.table_widget is None:
             self.work_plan = 'gnkt_bopz'
-            self.data_well.bvo = True
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 

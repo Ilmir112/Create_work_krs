@@ -182,6 +182,8 @@ class TabPageSoSwab(TabPageUnion):
                 if self.data_well.dict_leakiness:
                     paker_depth_zumpf = int(max([float(nek.split('-')[0]) + 10
                                                  for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()]))
+                else:
+                    paker_depth_zumpf = int(self.data_well.perforation_roof + 10)
 
             self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
 

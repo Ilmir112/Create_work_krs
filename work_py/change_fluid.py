@@ -302,7 +302,7 @@ class Change_fluid_Window(WindowUnion):
     def fluid_change_old_plast(self, fluid_new_edit):
         from work_py.alone_oreration import well_volume, update_fluid
         fluid_work = str(fluid_new_edit) + self.data_well.fluid_work[4:]
-        self.data_well.fluid_work_short = str(fluid_new_edit) + self.data_well.fluid_work_short[4:]
+        self.data_well.fluid_work_short = str(fluid_new_edit) + self.data_well.fluid_work[4:]
 
         fluid_change_list = [
             [

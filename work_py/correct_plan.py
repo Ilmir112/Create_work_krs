@@ -207,7 +207,7 @@ class CorrectPlanWindow(WindowUnion):
     @staticmethod
     def work_list(work_earlier):
         krs_begin = [
-            [None, None, f' Ранее проведенные работ: \n {work_earlier}', None, None, None, None, None, None, None,
+            [None, None, f' Ранее проведенные работы: \n {work_earlier}', None, None, None, None, None, None, None,
                       'Мастер КРС', None]]
 
         return krs_begin

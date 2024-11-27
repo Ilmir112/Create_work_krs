@@ -821,42 +821,35 @@ class DataWindow(WindowUnion):
             Qoil_edit = self.current_widget.Qoil_edit.text()
             proc_water_edit = self.current_widget.proc_water_edit.text()
 
+        a = self.current_widget.labels_nkt
+
         # Пересохранение данных по НКТ и штангам
-        self.dict_sucker_rod = self.data_well.dict_sucker_rod
-        self.dict_sucker_rod = self.data_well.dict_sucker_rod_after
-        self.dict_nkt = self.data_well.dict_nkt_before
-        self.dict_nkt_po = self.data_well.dict_nkt_after
-        # print(self.dict_nkt, self.dict_nkt_po)
-        if self.dict_nkt:
-            for key in range(1, len(self.dict_nkt)):
-                self.data_well.dict_nkt_before[self.current_widget.labels_nkt[key][0].text()] = self.check_if_none(
-                    int(float(self.current_widget.labels_nkt[key][1].text())))
-        else:
-            if self.current_widget.labels_nkt[1][1].text():
-                self.data_well.dict_nkt_before[self.current_widget.labels_nkt[1][0].text()] = self.check_if_none(
-                    int(float(self.current_widget.labels_nkt[1][1].text())))
-        if self.dict_nkt_po:
-            for key in range(1, len(self.dict_nkt_po)):
-                dict_nkt_correct = self.current_widget.labels_nkt_po[key][1].text()
+        self.data_well.dict_sucker_rod = {}
+        self.data_well.dict_sucker_rod_after = {}
+        self.data_well.dict_nkt_before = {}
+        self.data_well.dict_nkt_after = {}
 
-                self.data_well.dict_nkt_after[
-                    self.current_widget.labels_nkt_po[key][0].text()] = self.check_if_none(
-                    int(float(dict_nkt_correct)))
-        else:
-            if self.current_widget.labels_nkt_po[1][1].text():
-                self.data_well.dict_nkt_before[self.current_widget.labels_nkt_po[1][0].text()] = self.check_if_none(
-                    int(float(self.current_widget.labels_nkt_po[1][1].text())))
+        if self.current_widget.labels_nkt:
+            for key, value in self.current_widget.labels_nkt.values():
+                asdf = key.text(), value.text()
+                if key.text() != '' and value.text() != '':
+                    self.data_well.dict_nkt_before[key.text()] = self.check_if_none(int(float(value.text())))
 
-        if self.dict_sucker_rod.items():
-            for key in range(1, len(self.dict_sucker_rod.items())):
-                self.data_well.dict_sucker_rod_after[
-                    self.current_widget.labels_sucker_po[key][0].text()] = self.check_if_none(
-                    self.current_widget.labels_sucker_po[key][1].text())
-        else:
-            if self.current_widget.labels_sucker_po[1][1].text():
-                self.data_well.dict_sucker_rod_after[
-                    self.current_widget.labels_sucker_po[1][0].text()] = self.check_if_none(
-                    self.current_widget.labels_sucker_po[1][1].text())
+        if self.current_widget.labels_nkt_po:
+            for key, value in self.current_widget.labels_nkt_po.values():
+                if key.text() != '' and value.text() != '':
+                    self.data_well.dict_nkt_after[key.text()] = self.check_if_none(int(float(value.text())))
+
+        if self.current_widget.labels_sucker:
+            for key, value in self.current_widget.labels_sucker.values():
+                if key.text() != '' and value.text() != '':
+                    self.data_well.dict_sucker_rod[key.text()] = self.check_if_none(int(float(value.text())))
+
+        if self.current_widget.labels_sucker_po:
+            for key, value in self.current_widget.labels_sucker_po.values():
+                if key.text() != '' and value.text() != '':
+                    self.data_well.dict_sucker_rod_after[key.text()] = self.check_if_none(int(float(value.text())))
+
 
         question = QMessageBox.question(self, 'выбор куратора', f'Куратор ремонта сектор {curator}, верно ли?')
         if question == QMessageBox.StandardButton.No:

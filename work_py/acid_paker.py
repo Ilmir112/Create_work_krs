@@ -601,7 +601,7 @@ class TabPageSoAcid(TabPageUnion):
             if paker_depth != '':
                 self.paker_khost.setText(str(int(sole_plast - paker_depth)))
 
-                self.swab_paker_depth.setText(str(int(roof_plast - 30 - int(float(self.paker_khost.text())))))
+                self.swab_paker_depth.setText(str(int(roof_plast - 40 - int(float(self.paker_khost.text())))))
         elif self.paker_layout_combo.currentText() in ['однопакерная, упорный', 'пакер с заглушкой']:
 
             paker_depth = int(roof_plast - 20)
@@ -1154,7 +1154,8 @@ class AcidPakerWindow(WindowUnion):
                                        f'Поднять {self.paker_select} на НКТ{self.data_well.nkt_diam} c глубины '
                                        f'{sum(list(self.dict_nkt.values()))}м с '
                                        f'доливом скважины в '
-                                       f'объеме {round((self.data_well.current_bottom) * 1.12 / 1000, 1)}м3 удельным весом '
+                                       f'объеме {round((self.data_well.current_bottom) * 1.12 / 1000, 1)}м3 '
+                                       f'удельным весом '
                                        f'{self.data_well.fluid_work}',
                                        None, None, None, None, None, None, None,
                                        'мастер КРС',
@@ -1822,7 +1823,8 @@ class AcidPakerWindow(WindowUnion):
             if (self.data_well.perforation_roof - 5 + paker_khost >= self.data_well.current_bottom) or \
                     (all([self.data_well.dict_perforation[plast]['отрайбировано'] for plast in
                           self.data_well.plast_work])):
-                flushing_downhole_list = f'При наличии ЦИРКУЛЯЦИИ: Допустить компоновку до глубины {self.data_well.current_bottom}м.' \
+                flushing_downhole_list = f'При наличии ЦИРКУЛЯЦИИ: Допустить компоновку до глубины ' \
+                                         f'{self.data_well.current_bottom}м.' \
                                          f' Промыть скважину обратной промывкой ' \
                                          f'по круговой циркуляции  жидкостью уд.весом {self.data_well.fluid_work} п' \
                                          f'ри расходе жидкости не ' \
@@ -1833,12 +1835,15 @@ class AcidPakerWindow(WindowUnion):
                                          f'При отсутствии циркуляции на скважине промывку исключить, ' \
                                          f'увеличить объем продавки кислотного состава в 1,5 кратном объеме НКТ'
 
-                flushing_downhole_short = f'При наличии ЦИРКУЛЯЦИИ: Допустить до Н- {self.data_well.current_bottom}м. Промыть уд.весом ' \
+                flushing_downhole_short = f'При наличии ЦИРКУЛЯЦИИ: Допустить ' \
+                                          f'до Н- {self.data_well.current_bottom}м. ' \
+                                          f'Промыть уд.весом ' \
                                           f'{self.data_well.fluid_work[:4]}' \
                                           f'не менее {round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 '
 
             elif self.data_well.perforation_roof - 5 + paker_khost < self.data_well.current_bottom:
-                flushing_downhole_list = f'При наличии ЦИРКУЛЯЦИИ: Допустить пакер до глубины {int(self.data_well.perforation_roof - 5)}м. ' \
+                flushing_downhole_list = f'При наличии ЦИРКУЛЯЦИИ: Допустить пакер до глубины ' \
+                                         f'{int(self.data_well.perforation_roof - 5)}м. ' \
                                          f'(на 5м выше кровли интервала перфорации), низ НКТ до глубины' \
                                          f' {self.data_well.perforation_roof - 5 + paker_khost}м) ' \
                                          f'Промыть скважину обратной промывкой по круговой циркуляции ' \
