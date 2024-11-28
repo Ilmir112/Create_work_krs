@@ -225,20 +225,20 @@ class TabPageSoRir(TabPageUnion):
             if paker_depth != '':
                 paker_khost = 10
                 self.paker_khost_edit.setText(f'{paker_khost}')
-                self.diameter_paker_edit.setText(f'{TabPageSo.paker_diameter_select(self, int(float(paker_depth)))}')
+                self.diameter_paker_edit.setText(f'{self.paker_diameter_select(int(float(paker_depth)))}')
 
     def update_depth_paker(self):
         from work_py.opressovka import TabPageSo
         paker_depth = self.paker_depth_edit.text()
         if paker_depth != '':
-            self.diameter_paker_edit.setText(f'{TabPageSo.paker_diameter_select(self, int(float(paker_depth)))}')
+            self.diameter_paker_edit.setText(f'{self.paker_diameter_select(int(float(paker_depth)))}')
 
         if self.data_well.open_trunk_well is True:
             paker_depth = self.paker_depth_edit.text()
             if paker_depth != '':
                 paker_khost = self.data_well.current_bottom - int(paker_depth)
                 self.paker_khost_edit.setText(f'{paker_khost}')
-                self.diameter_paker_edit.setText(f'{TabPageSo.paker_diameter_select(self, int(paker_depth))}')
+                self.diameter_paker_edit.setText(f'{self.paker_diameter_select(int(paker_depth))}')
 
     def update_rir_type(self, index):
         if index in ['РИР с пакером с 2С', 'РИР ОВП с пакером']:
@@ -776,7 +776,7 @@ class RirWindow(WindowUnion):
         if need_change_zgs_combo == "Да":
             for row in Change_fluid_Window.fluid_change(self, plast_new_combo, fluid_new_edit,
                                                         pressure_new_edit):
-                uzmPero_list.insert(-1, row)
+                uzmPero_list.append(row)
             uzmPero_list.append([
                 None, None,
                 f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в '
@@ -1231,12 +1231,14 @@ class RirWindow(WindowUnion):
                     return
                 if self.check_depth_in_skm_interval(paker_depth) is False:
                     return
+            info_rir_edit = ''
 
             work_list = self.rir_with_pero_gl(paker_need_combo, plast_combo,
-                                            roof_rir_edit, sole_rir_edit, volume_cement, need_change_zgs_combo,
+                                            roof_rir_edit, sole_rir_edit, volume_cement, info_rir_edit, need_change_zgs_combo,
                                             plast_new_combo,
                                             fluid_new_edit, pressure_new_edit, pressure_zumpf_question,
                                             diameter_paker, paker_khost, paker_depth)
+
 
 
         elif self.rir_type_combo in ['РИР с пакером с 2С']:

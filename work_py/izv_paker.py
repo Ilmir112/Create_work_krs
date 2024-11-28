@@ -162,7 +162,7 @@ class TabPageSoPakerIzv(TabPageUnion):
         paker_depth = self.paker_depth_line.text()
         if paker_depth.isdigit():
             self.roof_sand_edit.setText(str(int(float(paker_depth))-20))
-            self.pero_diameter_line.setText(str(TabPageSo.paker_diameter_select(self, paker_depth)))
+            self.pero_diameter_line.setText(str(self.paker_diameter_select(paker_depth)))
 
     def update_raid_edit(self, index):
         pass

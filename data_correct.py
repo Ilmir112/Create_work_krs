@@ -1228,20 +1228,7 @@ class DataWindow(WindowUnion):
             data_list.pause = False
             self.close()
 
-    def definition_open_trunk_well(self):
-        self.data_well.nkt_diam = 73 if self.data_well.column_diameter.get_value > 110 else 60
-        self.data_well.nkt_template = 59.6 if self.data_well.column_diameter.get_value > 110 else 47.9
 
-        if self.data_well.column_additional:
-            if self.data_well.current_bottom > self.data_well.shoe_column_additional.get_value:
-                self.data_well.open_trunk_well = True
-            else:
-                self.data_well.open_trunk_well = False
-        else:
-            if self.data_well.current_bottom > self.data_well.shoe_column.get_value:
-                self.data_well.open_trunk_well = True
-            else:
-                self.data_well.open_trunk_well = False
 
     def check_if_none(self, value):
         if value is None or 'отс' in str(value).lower() or value == '-' or str(value) == '0':

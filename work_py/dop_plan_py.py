@@ -1,20 +1,17 @@
 import json
-from collections import namedtuple
-
 from openpyxl.styles import Font, Alignment
-
 import data_list
 
 from PyQt5.Qt import *
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
-from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
+from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout,  \
     QPushButton, QTextEdit, QDateEdit
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from datetime import datetime
 
 from data_base.config_base import connection_to_database, WorkDatabaseWell
 
-from work_py.advanted_file import merge_overlapping_intervals, definition_plast_work
+from work_py.advanted_file import merge_overlapping_intervals
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 
 
@@ -150,6 +147,7 @@ class TabPageDp(TabPageUnion):
 
         self.grid.addWidget(self.work_label, 25, 1)
         self.grid.addWidget(self.work_edit, 26, 1, 2, 4)
+
 
         self.well_number_edit.editingFinished.connect(self.update_well)
         try:
@@ -465,6 +463,8 @@ class DopPlanWindow(WindowUnion):
             table_in_base = table_in_base_combo.split(' ')[3].replace('krs', 'ПР').replace('dop_plan', 'ДП').replace(
                 'dop_plan_in_base', 'ДП')
             type_kr = table_in_base_combo.split(' ')[2]
+        else:
+            return
         well_number = current_widget.well_number_edit.text()
         well_area = current_widget.well_area_edit.text()
         if well_number == '' or well_area == '':
@@ -473,11 +473,10 @@ class DopPlanWindow(WindowUnion):
         self.work_with_excel(well_number, well_area, table_in_base, type_kr)
 
     def work_with_excel(self, well_number, well_area, work_plan, type_kr):
-        from data_correct import DataWindow
 
         self.data_well.gips_in_well = False
         self.data, self.rowHeights, self.col_width, self.boundaries_dict = \
-            DopPlanWindow.read_excel_in_base(well_number, well_area, work_plan, type_kr)
+            self.read_excel_in_base(well_number, well_area, work_plan, type_kr)
 
         self.target_row_index = 5000
         self.target_row_index_cancel = 5000
@@ -536,27 +535,7 @@ class DopPlanWindow(WindowUnion):
                     if col_pvr is not None:
                         self.tableWidget.setItem(rows, index_col - 1, QTableWidgetItem(str(col_pvr)))
 
-        DataWindow.definition_open_trunk_well(self)
-
-    @staticmethod
-    def read_excel_in_base(number_well, area_well, work_plan, type_kr):
-        db = connection_to_database(data_list.DB_WELL_DATA)
-        data_well_base = WorkDatabaseWell(db)
-
-        data_well = data_well_base.read_excel_in_base(number_well, area_well, work_plan, type_kr)
-
-        try:
-            dict_well = json.loads(data_well[len(data_well) - 1][0])
-            data = dict_well['data']
-            rowHeights = dict_well['rowHeights']
-            col_width = dict_well['col_width']
-            boundaries_dict = dict_well['merged_cells']
-
-        except Exception as e:
-            QMessageBox.warning(None, 'Ошибка', f'Введены не все параметры {type(e).__name__}\n\n{str(e)}')
-            return
-
-        return data, rowHeights, col_width, boundaries_dict
+        self.definition_open_trunk_well()
 
     def change_pvr_in_bottom(self, data, rowHeights, col_width, boundaries_dict, current_bottom=0,
                              current_bottom_date_edit=0, method_bottom_combo=0):
@@ -1065,198 +1044,6 @@ class DopPlanWindow(WindowUnion):
                             ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
                             ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                             vertical='center')
-
-    def extraction_data(self, table_name, paragraph_row=0):
-
-        date_table = table_name.split(' ')[-1]
-        well_number = table_name.split(' ')[0]
-        well_area = table_name.split(' ')[1]
-        type_kr = table_name.split(' ')[-4].replace('None', 'null')
-        contractor = data_list.contractor
-        work_plan = table_name.split(' ')[-3]
-
-        db = connection_to_database(data_list.DB_WELL_DATA)
-        data_well_base = WorkDatabaseWell(db, self.data_well)
-
-        result_table = data_well_base.extraction_data(str(well_number), well_area, type_kr,
-                                                      work_plan, date_table, contractor)
-
-        if result_table is None:
-            QMessageBox.warning(self, 'Ошибка',
-                                f'В базе данных скв {well_number} {well_area} отсутствует данные, '
-                                f'используйте excel вариант плана работ')
-            return None
-
-        if result_table[0]:
-            result = json.loads(result_table[0])
-            from data_base.work_with_base import insert_data_well_dop_plan
-            insert_data_well_dop_plan(self, result_table[1])
-
-            self.data_well.type_kr = result_table[2]
-            if result_table[3]:
-                dict_data_well = json.loads(result_table[3])
-                # self.data_well.dict_category
-                pressure = namedtuple("pressure", "category data_pressure")
-                Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
-                Data_gaz = namedtuple("Data_gaz", "category data")
-                self.data_well.dict_category = {}
-
-                for plast, plast_data in dict_data_well.items():
-                    self.data_well.dict_category.setdefault(plast, {}).setdefault(
-                        'по давлению',
-                        pressure(*dict_data_well[plast]['по давлению']))
-                    self.data_well.dict_category.setdefault(plast, {}).setdefault(
-                        'по сероводороду', Data_h2s(*dict_data_well[plast]['по сероводороду']))
-                    self.data_well.dict_category.setdefault(plast, {}).setdefault(
-                        'по газовому фактору', Data_gaz(*dict_data_well[plast]['по газовому фактору']))
-
-                    self.data_well.dict_category.setdefault(plast, {}).setdefault(
-                        'отключение', dict_data_well[plast]['отключение'])
-
-            if self.data_well.work_plan in ['dop_plan', 'dop_plan_in_base']:
-                data = DopPlanWindow.insert_data_dop_plan(self, result, paragraph_row)
-                if data is None:
-                    return None
-            elif self.data_well.work_plan == 'plan_change':
-                data = DopPlanWindow.insert_data_plan(self, result)
-                if data is None:
-                    return None
-            data_list.data_well_is_True = True
-
-        else:
-            data_list.data_in_base = False
-            QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
-                                f"Таблицы '{table_name}' нет в базе данных.")
-
-        return True
-
-    def insert_data_plan(self, result):
-        self.data_well.data_list = []
-        self.data_well.gips_in_well = False
-        self.data_well.drilling_interval = []
-        self.data_well.for_paker_list = False
-        self.data_well.grp_plan = False
-        self.data_well.angle_data = []
-        self.data_well.nkt_opress_true = False
-        self.data_well.plast_project = []
-        self.data_well.drilling_interval = []
-        self.data_well.dict_perforation_project = {}
-        self.data_well.bvo = False
-        self.data_well.fluid = float(result[0][7][:4].replace('г', ''))
-        self.data_well.stabilizator_need = False
-        self.data_well.current_bottom_second = 0
-
-        for ind, row in enumerate(result):
-            if ind == 1:
-                self.data_well.bottom = row[1]
-                self.data_well.category_pressure_second = row[8]
-                self.data_well.category_h2s_second = row[9]
-                self.data_well.gaz_factor_pr_second = row[10]
-
-                self.data_well.plast_work_short = json.dumps(row[3], ensure_ascii=False)
-
-            data_list = []
-            for index, data in enumerate(row):
-                if index == 6:
-                    if data == 'false' or data == 0 or data == '0':
-                        data = False
-                    else:
-                        data = True
-                data_list.append(data)
-            self.data_well.data_list.append(data_list)
-        self.data_well.current_bottom = result[ind][1]
-        self.data_well.dict_perforation = json.loads(result[ind][2])
-
-        self.data_well.plast_all = json.loads(result[ind][3])
-        self.data_well.plast_work = json.loads(result[ind][4])
-        self.data_well.dict_leakiness = json.loads(result[ind][5])
-        self.data_well.leakiness = False
-        self.data_well.leakiness_interval = []
-        if self.data_well.dict_leakiness:
-            self.data_well.leakiness = True
-            self.data_well.leakiness_interval = list(self.data_well.dict_leakiness['НЭК'].keys())
-
-        self.data_well.dict_perforation_short = json.loads(result[ind][2])
-
-        self.data_well.category_pressure = result[ind][8]
-        self.data_well.category_h2s = result[ind][9]
-        self.data_well.category_gas_factor = result[ind][10]
-        if str(result[ind][8]) == '1' or str(result[ind][9]) == '1' or str(result[ind][10]) or '1':
-            self.data_well.bvo = True
-
-        definition_plast_work(self)
-        return True
-
-    def insert_data_dop_plan(self, result, paragraph_row):
-        self.data_well.plast_project = []
-        self.data_well.dict_perforation_project = {}
-        self.data_well.data_list = []
-        self.data_well.gips_in_well = False
-        self.data_well.drilling_interval = []
-        self.data_well.for_paker_list = False
-        self.data_well.grp_plan = False
-        self.data_well.angle_data = []
-        self.data_well.nkt_opress_true = False
-        self.data_well.bvo = False
-        self.data_well.stabilizator_need = False
-        self.data_well.current_bottom_second = 0
-
-        paragraph_row = paragraph_row - 1
-
-        if len(result) <= paragraph_row:
-            QMessageBox.warning(self, 'Ошибка', f'В плане работ только {len(result)} пунктов')
-            return
-
-        self.data_well.current_bottom = result[paragraph_row][1]
-
-        self.data_well.dict_perforation = json.loads(result[paragraph_row][2])
-
-        self.data_well.plast_all = json.loads(result[paragraph_row][3])
-        self.data_well.plast_work = json.loads(result[paragraph_row][4])
-        self.data_well.dict_leakiness = json.loads(result[paragraph_row][5])
-        self.data_well.leakiness = False
-        self.data_well.leakiness_interval = []
-        if self.data_well.dict_leakiness:
-            self.data_well.leakiness = True
-            self.data_well.leakiness_interval = list(self.data_well.dict_leakiness['НЭК'].keys())
-
-        if result[paragraph_row][6] == 'true':
-            self.data_well.column_additional = True
-        else:
-            self.data_well.column_additional = False
-
-        self.data_well.fluid_work = result[paragraph_row][7]
-
-        self.data_well.category_pressure = result[paragraph_row][8]
-        self.data_well.category_h2s = result[paragraph_row][9]
-        self.data_well.category_gas_factor = result[paragraph_row][10]
-        self.data_well.category_pvo = 2
-        if str(self.data_well.category_pressure) == '1' or str(self.data_well.category_h2s) == '1' \
-                or self.data_well.category_gas_factor == '1':
-            self.data_well.category_pvo = 1
-        try:
-            self.data_well.template_depth, self.data_well.template_length, \
-            self.data_well.template_depth_addition, self.data_well.template_length_addition = \
-                json.loads(result[paragraph_row][11])
-        except Exception:
-            self.data_well.template_depth = result[paragraph_row][11]
-        self.data_well.skm_interval = json.loads(result[paragraph_row][12])
-
-        self.data_well.problem_with_ek_depth = result[paragraph_row][13]
-        self.data_well.problem_with_ek_diameter = result[paragraph_row][14]
-        try:
-            self.data_well.head_column = data_list.ProtectedIsDigit(result[paragraph_row][16])
-        except Exception:
-            print('отсутствуют данные по голове хвостовика')
-        self.data_well.dict_perforation_short = json.loads(result[paragraph_row][2])
-
-        try:
-            self.data_well.ribbing_interval = json.loads(result[paragraph_row][15])
-        except Exception:
-            print('отсутствуют данные по интервалам райбирования')
-
-        definition_plast_work(self)
-        return True
 
     def work_list(self, work_earlier):
         krs_begin = [[None, None,

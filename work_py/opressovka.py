@@ -118,41 +118,7 @@ class TabPageSo(TabPageUnion):
                 self.need_privyazka_q_combo.setCurrentIndex(0)
             else:
                 self.need_privyazka_q_combo.setCurrentIndex(1)
-    def paker_diameter_select(self, depth_landing):
-        paker_diam_dict = {
-            82: (84, 92),
-            88: (92.1, 97),
-            92: (97.1, 102),
-            100: (102.1, 109),
-            104: (109, 115),
-            112: (118, 120),
-            114: (120.1, 121.9),
-            116: (122, 123.9),
-            118: (124, 127.9),
-            122: (128, 133),
-            136: (144, 148),
-            142: (148.1, 154),
-            145: (154.1, 164),
-            158: (166, 176),
-            182: (190.6, 203.6),
-            204: (215, 221)
-        }
-        paker_diameter = 0
-        try:
-            if self.data_well.column_additional is False or (
-                    self.data_well.column_additional is True and int(depth_landing) <= self.data_well.head_column_additional.get_value):
-                diam_internal_ek = self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value
-            else:
-                diam_internal_ek = self.data_well.column_additional_diameter.get_value - \
-                                   2 * self.data_well.column_additional_wall_thickness.get_value
-            paker_diameter = 0
-            for diam, diam_internal_paker in paker_diam_dict.items():
-                if diam_internal_paker[0] <= diam_internal_ek <= diam_internal_paker[1]:
-                    paker_diameter = diam
-        except Exception as e:
-            print('ошибка проверки диаметра пакера')
 
-        return paker_diameter
 
 
 class TabWidget(TabWidgetUnion):

@@ -149,22 +149,32 @@ class VpWindow(WindowUnion):
                 # Закрываем основное окно при закрытии окна входа
         self.data_well.operation_window = None
         event.accept()  # Принимаем событие закрытия
-    def vp(self, vp_type_QCombo, vp_depth, cement_vp_edit, need_question_QCombo ):
+    def vp(self, vp_type_QCombo, vp_depth, cement_vp_edit, need_question_QCombo):
+
+        cable_type_text = ''
+        angle_text = ''
+        if self.data_well.angle_data:
+            angle_text = self.calculate_angle(vp_depth, self.data_well.angle_data)
+            if angle_text:
+                cable_type_text = ' СОГЛАСОВАТЬ ЖЕСТКИЙ КАБЕЛЬ'
 
         if self.data_well.perforation_roof > vp_depth:
+
             vp_list = [
                 [None, None,
-                 f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+                 f'Вызвать геофизическую партию {cable_type_text}. '
+                 f'Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
                  f'При необходимости подготовить место для установки партии ГИС напротив мостков. '
                  f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером '
                  f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',
                  None, None, None, None, None, None, None,
                  'Мастер КРС', None, None, None],
                 [f'Произвести установку {vp_type_QCombo} на {vp_depth}м', None,
-                 f'Произвести установку {vp_type_QCombo} (ЗАДАЧА 2.9.4.) на глубине  {vp_depth}м',
+                 f'Произвести установку {vp_type_QCombo} (ЗАДАЧА 2.9.4.) на глубине  {vp_depth}м \n{angle_text}',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', 10],
-                [f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure.get_value}атм', None,
+                [f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure.get_value}атм',
+                 None,
                  f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure.get_value}атм '
                  f'в присутствии представителя заказчика '
                  f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением '
@@ -247,7 +257,7 @@ class VpWindow(WindowUnion):
         if need_question_QCombo == 'Нет':
             vp_list = [
                 [None, None,
-                 f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+                 f'Вызвать геофизическую партию {cable_type_text}. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
                  f'При необходимости подготовить место для установки партии ГИС напротив мостков. '
                  f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером '
                  f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',

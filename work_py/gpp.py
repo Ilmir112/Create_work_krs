@@ -34,9 +34,9 @@ class TabPageSoGrp(TabPageUnion):
         self.current_depth_edit.setText(str(int(self.data_well.current_bottom)))
 
         self.otz_after_question_Label = QLabel("Нужно ли отбивать забой после нормализации", self)
-        self.otz_after_question_QCombo = QComboBox(self)
-        self.otz_after_question_QCombo.currentTextChanged.connect(self.update_paker)
-        self.otz_after_question_QCombo.addItems(['Да', 'Нет'])
+        self.otz_after_question_qcombo = QComboBox(self)
+        self.otz_after_question_qcombo.currentTextChanged.connect(self.update_paker)
+        self.otz_after_question_qcombo.addItems(['Да', 'Нет'])
 
         self.grid_layout = QGridLayout(self)
 
@@ -49,18 +49,18 @@ class TabPageSoGrp(TabPageUnion):
         self.grid_layout.addWidget(self.current_depth_label, 3, 5)
         self.grid_layout.addWidget(self.current_depth_edit, 4, 5)
         self.grid_layout.addWidget(self.otz_after_question_Label, 3, 6)
-        self.grid_layout.addWidget(self.otz_after_question_QCombo, 4, 6)
+        self.grid_layout.addWidget(self.otz_after_question_qcombo, 4, 6)
 
     def update_paker(self):
 
         if self.data_well.open_trunk_well is True:
             paker_depth = self.paker_depth_edit.text()
             if paker_depth != '':
-                self.diameter_paker_edit.setText(f'{TabPageSo.paker_diameter_select(self, int(paker_depth))}')
+                self.diameter_paker_edit.setText(f'{self.paker_diameter_select(int(paker_depth))}')
         else:
             paker_depth = self.paker_depth_edit.text()
             if paker_depth != '':
-                self.diameter_paker_edit.setText(f'{TabPageSo.paker_diameter_select(self, int(paker_depth))}')
+                self.diameter_paker_edit.setText(f'{self.paker_diameter_select(int(paker_depth))}')
 
 
 class TabWidget(TabWidgetUnion):
@@ -72,8 +72,6 @@ class TabWidget(TabWidgetUnion):
 class GppWindow(WindowUnion):
     def __init__(self, data_well, table_widget, parent=None):
         super().__init__(data_well)
-
-
         self.insert_index = data_well.insert_index
         self.tabWidget = TabWidget(self.data_well)
 
@@ -90,27 +88,28 @@ class GppWindow(WindowUnion):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def closeEvent(self, event):
-                # Закрываем основное окно при закрытии окна входа
+        # Закрываем основное окно при закрытии окна входа
         self.data_well.operation_window = None
         event.accept()  # Принимаем событие закрытия
+        
     def add_work(self):
         diameter_paker = int(float(self.tabWidget.currentWidget().diameter_paker_edit.text()))
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
         current_depth = int(float(self.tabWidget.currentWidget().current_depth_edit.text()))
-        gis_otz_after_true_quest = self.tabWidget.currentWidget().otz_after_question_QCombo.currentText()
+        gis_otz_after_true_quest = self.tabWidget.currentWidget().otz_after_question_qcombo.currentText()
 
         if int(paker_depth) > self.data_well.current_bottom:
             QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                              f'ниже текущего забоя')
             return
-        work_list = self.grpGpp(paker_depth, current_depth, diameter_paker, gis_otz_after_true_quest)
+        work_list = self.grp_gpp_work(paker_depth, current_depth, diameter_paker, gis_otz_after_true_quest)
         if work_list:
             self.populate_row(self.insert_index, work_list, self.table_widget)
             data_list.pause = False
             self.close()
 
-    def grpGpp(self, gpp_depth, current_depth, diameter_paker, gis_otz_after_true_quest):
-
+    def grp_gpp_work(self, gpp_depth, current_depth, diameter_paker, gis_otz_after_true_quest):
+        schema_grp = ''
         if 'Ойл' in data_list.contractor:
             schema_grp = '7'
         elif 'РН' in data_list.contractor:
@@ -121,7 +120,6 @@ class GppWindow(WindowUnion):
         gpp_300 = self.check_depth_in_skm_interval(300)
         if gpp_300 is False:
             return
-
 
         main.MyWindow.check_gpp_upa(self, self.table_widget)
 
@@ -140,8 +138,7 @@ class GppWindow(WindowUnion):
              f'Спустить компоновку с замером и шаблонированием НКТ: {self.gpp_select(gpp_depth)[0]} на НКТ{nkt_diam} '
              f'на '
              f'глубину {gpp_depth}м, с замером, шаблонированием НКТ. В компоновке предусмотреть пакер с установкой '
-             f'на глубине 300м для внештатных ситуаций во время ГРП'
-                ,
+             f'на глубине 300м для внештатных ситуаций во время ГРП',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(gpp_depth, 1.2)],
             [None, None, f'При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) '
@@ -285,6 +282,7 @@ class GppWindow(WindowUnion):
             nkt_diam = '89'
         else:
             nkt_diam = '60'
+        nkt_diam_add = ''
         if self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value <= 120:
             nkt_diam_add = '60'
 
@@ -311,14 +309,4 @@ class GppWindow(WindowUnion):
 
         return paker_select, paker_short
 
-    def nktGrp(self):
 
-        if self.data_well.column_additional is False or (
-                self.data_well.column_additional is True and
-                self.data_well.current_bottom >= self.data_well.head_column_additional.get_value):
-            return f'НКТ{self.data_well.nkt_diam}мм'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110:
-            return f'НКТ60мм L- {round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value + 20, 0)}'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110:
-            return f'НКТ{self.data_well.nkt_diam}мм со снятыми фасками L- ' \
-                   f'{round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value + 20, 0)}'

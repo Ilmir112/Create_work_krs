@@ -165,7 +165,6 @@ class GeophysicWindow(WindowUnion):
             research_short = f'ГК и ЛМ в интервале {edit_type}-{edit_type2}м.'
 
         return research, research_short
-
     def check_if_none_gis(self, value):
 
         if isinstance(value, int) or isinstance(value, float):
@@ -180,9 +179,19 @@ class GeophysicWindow(WindowUnion):
     def add_work(self):
 
         rows = self.tableWidget.rowCount()
-        geophysicalResearch = [
+        cable_type_text = ''
+        angle_text = ''
+        
+        if self.data_well.angle_data:
+            max_depth_pvr = max([float(self.tableWidget.item(row, 1).text()) for row in range(rows)])
+            angle_text = self.calculate_angle(max_depth_pvr, self.data_well.angle_data)
+            if angle_text:
+                cable_type_text = ' СОГЛАСОВАТЬ ЖЕСТКИЙ КАБЕЛЬ'
+        
+        geophysical_research = [
             [" ", None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+             f'Вызвать геофизическую партию{cable_type_text}. Заявку оформить за 16 часов сутки через '
+             f'ЦИТС {data_list.contractor}". '
              f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
              f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',
@@ -196,13 +205,13 @@ class GeophysicWindow(WindowUnion):
              f'(на давление опрессовки ЭК, но '
              f'не ниже максимального ожидаемого давления на устье) {self.data_well.max_admissible_pressure.get_value}атм, '
              f'по невозможности на давление поглощения, но '
-             f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). ',
+             f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). \n {angle_text}',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 1.2]
         ]
 
         for row in range(rows):
-            researchGis_list = []
+            research_gis_list = []
             item = self.tableWidget.item(row, 0)
             edit1 = self.tableWidget.item(row, 1)
             edit2 = self.tableWidget.item(row, 2)
@@ -212,32 +221,32 @@ class GeophysicWindow(WindowUnion):
                 edit2_1 = edit2.text()
                 geo_sel = self.geophysic_sel(value, edit1_1, edit2_1)
                 # print(f'геофои {geo_sel}')
-                researchGis_list.extend([geo_sel[1], None, geo_sel[0], None, None, None, None, None, None, None,
+                research_gis_list.extend([geo_sel[1], None, geo_sel[0], None, None, None, None, None, None, None,
                                          'подряд по ГИС', 4])
 
-            if len(researchGis_list) == 0:
-                mes = QMessageBox.critical(self, 'Ошибка', 'Исследования не добавлены')
+            if len(research_gis_list) == 0:
+                QMessageBox.critical(self, 'Ошибка', 'Исследования не добавлены')
                 return
 
-            geophysicalResearch.append(researchGis_list)
-            # print(geophysicalResearch)
+            geophysical_research.append(research_gis_list)
+            # print(geophysical_research)
 
         ori = QMessageBox.question(self, 'ОРИ', 'Нужна ли интерпретация?')
         if ori == QMessageBox.StandardButton.Yes:
-            geophysicalResearch.append([f'ОРИ', None,
+            geophysical_research.append([f'ОРИ', None,
                                         f'Интерпретация данных ГИС, согласовать с ПТО и Ведущим инженером ЦДНГ опрессовку фНКТ ',
                                         None, None, None, None, None, None, None,
                                         'Мастер КРС, подрядчик по ГИС', 8])
 
         text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
                            120: (501, 600), 140: (601, 700)}
-        # print(researchGis_list)
-        for i, row_data in enumerate(geophysicalResearch):
+        # print(research_gis_list)
+        for i, row_data in enumerate(geophysical_research):
             row = self.insert_index + i
             self.table_widget.insertRow(row)
             row_max = self.table_widget.rowCount()
             self.insert_data_in_database(row, row_max)
-            # lst = [1, 0, 2, len(geophysicalResearch)-1]
+            # lst = [1, 0, 2, len(geophysical_research)-1]
             # if float(self.data_well.max_angle.get_value) >= 50:
             #     lst.extend([3, 4])
             # Объединение ячеек по горизонтали в столбце "отвественные и норма"

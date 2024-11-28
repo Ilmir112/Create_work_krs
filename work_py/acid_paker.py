@@ -264,7 +264,9 @@ class TabPageSoAcid(TabPageUnion):
 
         self.swab_type_label = QLabel("задача при освоении", self)
         self.swab_type_combo = QComboBox(self)
-        self.swab_type_combo.addItems(['', 'Задача №2.1.13', 'Задача №2.1.16', 'Задача №2.1.11', 'ГРР', 'своя задача'])
+        self.swab_type_combo.addItems(['Задача №2.1.13', 'Задача №2.1.14', 'Задача №2.1.16', 'Задача №2.1.11',
+                                     'Задача №2.1.16 + герметичность пакера', 'ГРР'
+                                                                              'своя задача'])
         self.swab_type_combo.setCurrentIndex(data_list.swab_type_comboIndex)
 
         self.swab_pakerLabel = QLabel("Глубина посадки нижнего пакера при освоении", self)
@@ -507,11 +509,9 @@ class TabPageSoAcid(TabPageUnion):
             self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text().replace(",", ".")), 1) * 10}')
 
     def update_paker_depth(self):
-        from .opressovka import TabPageSo
-
         paker_depth = self.paker_depth.text()
         if paker_depth:
-            paker_diameter = int(float(TabPageSo.paker_diameter_select(self, paker_depth)))
+            paker_diameter = int(float(self.paker_diameter_select(paker_depth)))
             self.diameter_paker_edit.setText(str(paker_diameter))
 
     def update_paker_layout(self, index):
@@ -700,11 +700,11 @@ class TabPageSoAcid(TabPageUnion):
             self.grid.addWidget(self.swab_paker_depth, 9, 2)
             self.grid.addWidget(self.swab_volumeLabel, 8, 3)
             self.grid.addWidget(self.swab_volume_edit, 9, 3)
-            if self.data_well.curator in ['КР', 'АР']:
+            if self.data_well.region in ['КГМ', 'АГМ']:
                 self.swab_type_combo.setCurrentIndex(2)
                 self.swab_volume_edit.setText('20')
             else:
-                self.swab_type_combo.setCurrentIndex(1)
+                self.swab_type_combo.setCurrentIndex(0)
                 self.swab_volume_edit.setText('25')
         else:
             self.swab_type_label.setParent(None)

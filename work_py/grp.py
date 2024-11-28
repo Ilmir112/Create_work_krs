@@ -1,13 +1,12 @@
 import krs
 import data_list
-from PyQt5.QtGui import QDoubleValidator
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayout, QWidget, QTabWidget, \
-    QMainWindow, QPushButton
-from main import MyMainWindow
+
+from PyQt5.QtWidgets import  QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayout, QWidget, QPushButton
+
 from work_py.alone_oreration import kot_select
-from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
-from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
-from .opressovka import OpressovkaEK, TabPageSo
+from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
+from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from work_py.opressovka import OpressovkaEK, TabPageSo
 
 
 class TabPageSoGrp(TabPageUnion):
@@ -29,14 +28,14 @@ class TabPageSoGrp(TabPageUnion):
         self.paker_depth_edit.setText(str(int(float(self.data_well.perforation_roof)) - 50))
 
         self.otz_question_Label = QLabel("Нужно ли отбивать забой после подьема пакера ГРП", self)
-        self.otz_question_QCombo = QComboBox(self)
-        self.otz_question_QCombo.currentTextChanged.connect(self.update_paker)
-        self.otz_question_QCombo.addItems(['Да', 'Нет'])
+        self.otz_question_qcombo = QComboBox(self)
+        self.otz_question_qcombo.currentTextChanged.connect(self.update_paker)
+        self.otz_question_qcombo.addItems(['Да', 'Нет'])
 
         self.normalization_question_Label = QLabel("Нужно ли нормализовывать забой?", self)
-        self.normalization_QCombo = QComboBox(self)
-        self.normalization_QCombo.currentTextChanged.connect(self.update_paker)
-        self.normalization_QCombo.addItems(['Да', 'Нет'])
+        self.normalization_qcombo = QComboBox(self)
+        self.normalization_qcombo.currentTextChanged.connect(self.update_paker)
+        self.normalization_qcombo.addItems(['Да', 'Нет'])
 
         self.current_depth_label = QLabel("Глубина нормализации", self)
         self.current_depth_edit = QLineEdit(self)
@@ -44,17 +43,17 @@ class TabPageSoGrp(TabPageUnion):
         self.current_depth_edit.setText(str(int(self.data_well.current_bottom)))
 
         self.otz_after_question_Label = QLabel("Нужно ли отбивать забой после нормализации", self)
-        self.otz_after_question_QCombo = QComboBox(self)
-        self.otz_after_question_QCombo.currentTextChanged.connect(self.update_paker)
-        self.otz_after_question_QCombo.addItems(['Да', 'Нет'])
+        self.otz_after_question_qcombo = QComboBox(self)
+        self.otz_after_question_qcombo.currentTextChanged.connect(self.update_paker)
+        self.otz_after_question_qcombo.addItems(['Да', 'Нет'])
 
         if self.current_depth_edit.text() != '':
 
             if float(self.current_depth_edit.text()) - self.data_well.perforation_roof > 100 \
                     or (self.data_well.max_angle.get_value > 60 and self.data_well.max_angle_depth.get_value < self.data_well.perforation_roof) \
                     or self.data_well.open_trunk_well is True:
-                self.otz_after_question_QCombo.setCurrentIndex(1)
-                self.otz_question_QCombo.setCurrentIndex(1)
+                self.otz_after_question_qcombo.setCurrentIndex(1)
+                self.otz_question_qcombo.setCurrentIndex(1)
 
         self.grid_layout = QGridLayout(self)
 
@@ -68,16 +67,16 @@ class TabPageSoGrp(TabPageUnion):
         self.grid_layout.addWidget(self.paker_depth_edit, 4, 3)
 
         self.grid_layout.addWidget(self.otz_question_Label, 3, 4)
-        self.grid_layout.addWidget(self.otz_question_QCombo, 4, 4)
+        self.grid_layout.addWidget(self.otz_question_qcombo, 4, 4)
 
         self.grid_layout.addWidget(self.normalization_question_Label, 3, 5)
-        self.grid_layout.addWidget(self.normalization_QCombo, 4, 5)
+        self.grid_layout.addWidget(self.normalization_qcombo, 4, 5)
 
         self.grid_layout.addWidget(self.current_depth_label, 3, 6)
         self.grid_layout.addWidget(self.current_depth_edit, 4, 6)
 
         self.grid_layout.addWidget(self.otz_after_question_Label, 3, 7)
-        self.grid_layout.addWidget(self.otz_after_question_QCombo, 4, 7)
+        self.grid_layout.addWidget(self.otz_after_question_qcombo, 4, 7)
 
     def update_paker(self):
 
@@ -86,13 +85,13 @@ class TabPageSoGrp(TabPageUnion):
             if paker_depth != '':
                 paker_khost = 1.5
                 self.paker_khost_edit.setText(f'{paker_khost}')
-                self.diameter_paker_edit.setText(f'{TabPageSo.paker_diameter_select(self, int(paker_depth))}')
+                self.diameter_paker_edit.setText(f'{self.paker_diameter_select(int(paker_depth))}')
         else:
             paker_depth = self.paker_depth_edit.text()
             if paker_depth != '':
                 paker_khost = 1.5
                 self.paker_khost_edit.setText(f'{paker_khost}')
-                self.diameter_paker_edit.setText(f'{TabPageSo.paker_diameter_select(self, int(paker_depth))}')
+                self.diameter_paker_edit.setText(f'{self.paker_diameter_select(int(paker_depth))}')
 
 
 class TabWidget(TabWidgetUnion):
@@ -123,14 +122,15 @@ class GrpWindow(WindowUnion):
     def closeEvent(self, event):
                 # Закрываем основное окно при закрытии окна входа
         self.data_well.operation_window = None
-        event.accept()  # Принимаем событие закрытия
+        event.accept() 
+                # Принимаем событие закрытия
     def add_work(self):
         diameter_paker = int(float(self.tabWidget.currentWidget().diameter_paker_edit.text().replace(',', '.')))
         paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text().replace(',', '.')))
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text().replace(',', '.')))
-        gisOTZ_true_quest = self.tabWidget.currentWidget().otz_question_QCombo.currentText()
-        gis_otz_after_true_quest = self.tabWidget.currentWidget().otz_after_question_QCombo.currentText()
-        normalization_true_quest = self.tabWidget.currentWidget().normalization_QCombo.currentText()
+        gis_otz_true_quest = self.tabWidget.currentWidget().otz_question_qcombo.currentText()
+        gis_otz_after_true_quest = self.tabWidget.currentWidget().otz_after_question_qcombo.currentText()
+        normalization_true_quest = self.tabWidget.currentWidget().normalization_qcombo.currentText()
         current_depth = int(float(self.tabWidget.currentWidget().current_depth_edit.text().replace(',', '.')))
         if self.check_true_depth_template(paker_depth) is False:
             return
@@ -140,10 +140,10 @@ class GrpWindow(WindowUnion):
             return
 
         if int(paker_khost) + int(paker_depth) > self.data_well.current_bottom:
-            QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
-                                                                   f'ниже текущего забоя')
+            QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер ниже текущего забоя')
             return
-        work_list = self.grpPaker(diameter_paker, paker_depth, paker_khost, gisOTZ_true_quest, gis_otz_after_true_quest,
+        work_list = self.grpPaker(diameter_paker, paker_depth, paker_khost,
+                                  gis_otz_true_quest, gis_otz_after_true_quest,
                                   normalization_true_quest, current_depth)
 
         self.populate_row(self.insert_index, work_list, self.table_widget)
@@ -164,24 +164,7 @@ class GrpWindow(WindowUnion):
              f'В случае наличия ЗУМПФА не менее 10м продолжить работы со следующего пункта.\n',
              None, None, None, None, None, None, None,
              'Мастер КРС', None],
-            # [None, None,
-            #  f'Спустить компоновку с замером и шаблонированием НКТ: перо (1м), {self.nktGrp()} на НКТ{nkt_diam} '
-            #  f'до гл.текущего забоя.'
-            #  f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
-            #  None, None, None, None, None, None, None,
-            #  'Мастер КРС', descentNKT_norm(self.data_well.current_bottom, 1)],
-            # [f'нормализацию забоя до гл. {current_depth}м', None,
-            #  f'Произвести нормализацию забоя  с наращиванием, комбинированной промывкой по круговой циркуляции жидкостью '
-            #  f'с расходом жидкости не менее 8 л/с до гл. {current_depth}м. Тех отстой 2ч. Повторное определение '
-            #  f'текущего забоя, при необходимости повторно вымыть.',
-            #  None, None, None, None, None, None, None,
-            #  'Мастер КРС', 2.5],
-            # [None, None,
-            #  f'Поднять перо с глубины {current_depth}м с доливом скважины тех.жидкостью уд. весом {self.data_well.fluid_work} '
-            #  f'в объеме '
-            #  f'{round(current_depth * 1.12 / 1000, 1)}м3',
-            #  None, None, None, None, None, None, None,
-            #  'Мастер КРС', liftingNKT_norm(current_depth, 1)],
+
             [None, None,
              f'Спустить {kot_select(self, current_depth)} на НКТ{nkt_diam}мм до глубины текущего забоя'
              f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм.',
@@ -275,7 +258,7 @@ class GrpWindow(WindowUnion):
                           f' L-{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
         return paker_select, paker_short
 
-    def grpPaker(self, diameter_paker, paker_depth, paker_khost, gisOTZ_true_quest, gis_otz_after_true_quest,
+    def grpPaker(self, diameter_paker, paker_depth, paker_khost, gis_otz_true_quest, gis_otz_after_true_quest,
                  normalization_true_quest, current_depth):
         if 'Ойл' in data_list.contractor:
             schema_grp = '7а'
@@ -436,7 +419,7 @@ class GrpWindow(WindowUnion):
              'Мастер КРС', 0.67]
         ]
 
-        if gisOTZ_true_quest == 'Да':
+        if gis_otz_true_quest == 'Да':
             paker_list.append(
                 [f'Отбить забой по ГК и ЛМ', None,
                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
@@ -471,11 +454,12 @@ class GrpWindow(WindowUnion):
                            f'опрессовочный узел +НКТ{nkt_diam}м - 10м, реперный патрубок НКТ{nkt_diam}м - 2м,'
             paker_short = f'в-ка, НКТ{nkt_diam}м - {paker_khost}м, пакер {paker_diameter}  +' \
                           f'опрессовочный узел +НКТ{nkt_diam}м - 10м, репер НКТ{nkt_diam}м - 2м,'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
-                paker_depth > self.data_well.head_column_additional.get_value:
+        else:
             nkt_diam_add = '60'
-            paker_select = f'воронка, НКТ{nkt_diam_add}м - {paker_khost}м, пакер ПРО-ЯМО-{paker_diameter} (либо аналог) +' \
-                           f'опрессовочный узел +НКТ{nkt_diam_add}м - 10м, реперный патрубок НКТ{nkt_diam_add}м - 2м, + НКТ{nkt_diam_add} L-' \
+            paker_select = f'воронка, НКТ{nkt_diam_add}м - {paker_khost}м, пакер ПРО-ЯМО-{paker_diameter} ' \
+                           f'(либо аналог) +' \
+                           f'опрессовочный узел +НКТ{nkt_diam_add}м - 10м, реперный патрубок НКТ{nkt_diam_add}м' \
+                           f' - 2м, + НКТ{nkt_diam_add} L-' \
                            f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
             paker_short = f'в-ка, НКТ{nkt_diam_add}м - {paker_khost}м, пакер ПРО-ЯМО-{paker_diameter}' \
                           f'опрессовочный узел +НКТ{nkt_diam_add}м - 10м, репер НКТ{nkt_diam_add}м - 2м,' \
@@ -483,13 +467,4 @@ class GrpWindow(WindowUnion):
 
         return paker_select, paker_short
 
-    def nktGrp(self):
 
-        if self.data_well.column_additional is False or (
-                self.data_well.column_additional is True and self.data_well.current_bottom >= self.data_well.head_column_additional.get_value):
-            return f'НКТ{self.data_well.nkt_diam}мм'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110:
-            return f'НКТ60мм L- {round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value + 20, 0)}'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110:
-            return f'НКТ{self.data_well.nkt_diam}мм со снятыми фасками L-' \
-                   f'{round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value + 20, 0)}'

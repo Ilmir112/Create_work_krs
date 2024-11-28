@@ -8,9 +8,8 @@ from PyQt5.QtCore import Qt
 
 from main import MyWindow
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
-from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from PyQt5.QtGui import QDoubleValidator
-
 
 
 class TabPageSoWith(TabPageUnion):
@@ -1272,8 +1271,16 @@ class TemplateKrs(WindowUnion):
              f'{round(float(current_bottom) * 1.12 / 1000, 1)}м3',
              None, None, None, None, None, None, None, 'Мастер КРС', None, None]]
 
-        privyazka_nkt = [f'Привязка по ГК и ЛМ По привязому НКТ удостовериться в наличии текущего забоя', None,
-                         f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}.'
+        cable_type_text = ''
+        angle_text = ''
+        if self.data_well.angle_data:
+            angle_text = self.calculate_angle(current_bottom, self.data_well.angle_data)
+            if angle_text:
+                cable_type_text = ' СОГЛАСОВАТЬ ЖЕСТКИЙ КАБЕЛЬ'
+
+        privyazka_nkt = [f'Привязка по ГК и ЛМ по привязому НКТ удостовериться в наличии текущего забоя', None,
+                         f'Вызвать геофизическую партию.{cable_type_text} Заявку оформить за 16 часов сутки через'
+                         f' ЦИТС {data_list.contractor}.'
                          f' ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины.'
                          f' По привязому НКТ удостовериться в наличии '
                          f'текущего забоя с плановым, Нормализовать '

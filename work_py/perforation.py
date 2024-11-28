@@ -71,12 +71,13 @@ class TabPageSo(TabPageUnion):
                 depth_max = max([float(depth.replace(',', '.')) for depth, angle in angle_list])
                 angle_depth = max([float(angle.replace(',', '.')) for depth, angle in angle_list])
 
-                if depth_max < 50:
+                if angle_depth < 50:
                     TabPageSo.combobox_type_perforation.setCurrentIndex(0)
                     return ''
                 else:
                     TabPageSo.combobox_type_perforation.setCurrentIndex(1)
                     return f'На глубине {depth_max}м угол {angle_depth}'
+
 
 class TabWidget(TabWidgetUnion):
     def __init__(self, parent):
@@ -305,8 +306,7 @@ class PerforationWindow(WindowUnion):
         type_perforation = self.tabWidget.currentWidget().combobox_type_perforation.currentText()
         if len(self.data_well.category_pressure_well) > 1:
             self.data_well.category_pressure = self.data_well.category_pressure_list[1]
-            aa = self.data_well.category_pressure
-            asde = self.data_well.category_pressure_well
+
             self.data_well.category_h2s = self.data_well.category_h2s_list[1]
             self.data_well.category_gas_factor = self.data_well.category_gaz_factor_percent[1]
             kateg2 = [1 if str(self.data_well.category_pressure_well[1]) == '1' or
@@ -322,6 +322,11 @@ class PerforationWindow(WindowUnion):
                 shema_str = 'a'
             else:
                 shema_str = 'б'
+        angle_text = ''
+        if self.data_well.angle_data:
+            max_depth_pvr = max([float(self.tableWidget.item(row, 1).text()) for row in range(rows)])
+            angle_text = self.calculate_angle(max_depth_pvr, self.data_well.angle_data)
+
         perforation = [
             [None, None,
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через '
@@ -343,8 +348,8 @@ class PerforationWindow(WindowUnion):
              f' фотографии предоставить в ЦИТС {data_list.contractor}',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 1.2, None],
-            ["ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)", None,
-             "ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)", None, None, None, None,
+            [f"ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1)", None,
+             f"ГИС (Перфорация на кабеле ЗАДАЧА 2.9.1) \n{angle_text}", None, None, None, None,
              None, None, None, 'подрядчик по ГИС', None],
             [None, None, "Кровля", "-", "Подошва", "Тип заряда", "отв на 1 п.м.", "Кол-во отв",
              "пласт", "Доп.данные", 'подрядчик по ГИС', None]
@@ -366,7 +371,7 @@ class PerforationWindow(WindowUnion):
             # pvr_str = TabPageSo.select_type_perforation(self, sool)
             if type_perforation == 'Трубная перфорация':
                 perforation[2] = [f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)", None,
-                                  f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2). ", None, None, None, None,
+                                  f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2). \n{angle_text}", None, None, None, None,
                                   None, None, None, 'подрядчик по ГИС', None]
             type_charge = self.tableWidget.item(row, 2).text()
             count_otv = self.tableWidget.item(row, 3).text()
@@ -468,6 +473,7 @@ class PerforationWindow(WindowUnion):
             self.table_widget.setRowHeight(self.insert_index + 1, 60)
 
             self.close()
+
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()

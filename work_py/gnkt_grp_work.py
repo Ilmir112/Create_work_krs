@@ -1000,6 +1000,8 @@ class GnktModel(WindowUnion):
              None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Тек. забой по ПЗ ', None, None,
              None, None, None, None, None, None, self.data_well.bottom, None],
             [None, None, None, None, None, None, None, None, None, None, None, None,

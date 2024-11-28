@@ -84,11 +84,11 @@ class TabPageSoSwab(TabPageUnion):
         self.swab_volume_edit = QLineEdit(self)
         self.swab_volume_edit.setValidator(self.validator_int)
         
-        if self.data_well.curator in ['КР', 'АР']:
-            self.swab_type_combo.setProperty('value', 'Задача №2.1.16')
+        if self.data_well.region in ['КГМ', 'АГМ']:
+            self.swab_type_combo.setCurrentIndex(3)
             self.swab_volume_edit.setText('20')
         else:
-            self.swab_type_combo.setProperty('value', 'Задача №2.1.13')
+            self.swab_type_combo.setCurrentIndex(1)
             self.swab_volume_edit.setText('25')
 
         self.need_change_zgs_label = QLabel('Необходимо ли менять ЖГС', self)
@@ -372,7 +372,7 @@ class TabPageSoSwab(TabPageUnion):
         from .opressovka import TabPageSo
         paker_depth = self.pakerEdit.text()
         if paker_depth:
-            paker_diameter = int(TabPageSo.paker_diameter_select(self, paker_depth))
+            paker_diameter = int(self.paker_diameter_select(paker_depth))
             self.diameter_paker_edit.setText(str(int(paker_diameter)))
 
     def swabTrueEdit_select(self):

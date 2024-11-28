@@ -130,8 +130,8 @@ class GnktOsvWindow(GnktModel):
         for row_number, row in enumerate(self.ws_title.iter_rows(values_only=True)):
             for col_number, cell in enumerate(row):
                 if 'по H2S' in str(
-                        self.ws_title.cell(row=row_number + 1, column=col_number + 1).value) and 'по H2S' not in str(
-                    self.ws_title.cell(row=row_number + 2, column=col_number).value):
+                        self.ws_title.cell(row=row_number + 1, column=col_number + 1).value) and\
+                        'по H2S' not in str(self.ws_title.cell(row=row_number + 2, column=col_number).value):
                     self.ws_title.merge_cells(start_column=col_number + 1, start_row=row_number + 1,
                                               end_column=col_number + 1, end_row=row_number + 2)
                     self.ws_title.merge_cells(start_column=col_number + 3, start_row=row_number + 1,
@@ -706,7 +706,7 @@ class GnktOsvWindow(GnktModel):
         for row in range(len(work_list)):
             for col in range(23):
                 if work_list[row][col]:
-                    print(work_list[row][col], row + 1, col + 1)
+                    # print(work_list[row][col], row + 1, col + 1)
                     ws.cell(row=row + 1, column=col + 1).value = work_list[row][col]
         # Перебираем строки и скрываем те, у которых все значения равны None
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):

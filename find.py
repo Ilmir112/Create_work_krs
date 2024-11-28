@@ -27,6 +27,7 @@ class FindIndexPZ(MyMainWindow):
     def __init__(self, ws, work_plan, parent=None):
         super().__init__()
 
+        self.number_dp = 0
         self.fluid_work = None
         self.nkt_template = None
         self.nkt_diam = None
@@ -1247,8 +1248,11 @@ class WellData(FindIndexPZ):
             self.check_data_in_pz.append('не указан уровень цемент за колонной\n')
 
         if self.max_angle.get_value > 45 or 'gnkt' in self.work_plan:
-            angle_true_question = QMessageBox.question(self, 'Зенитный угол', 'Зенитный угол больше 45 градусов, '
-                                                                              'есть данные иклинометрии?')
+            angle_true_question = QMessageBox.question(self,
+                                                       'Зенитный угол',
+                                                       'Зенитный угол больше 45 градусов, '
+                                                       'для корректной работы необходимо '
+                                                       'загрузить данные инклинометрии. Загрузить?')
             if angle_true_question == QMessageBox.StandardButton.Yes:
                 self.angle_data = WellData.read_angle_well()
                 if self.angle_data is None:
@@ -1672,9 +1676,6 @@ class WellPerforation(FindIndexPZ):
 
 
 class WellCategory(FindIndexPZ):
-    def __init__(self):
-        super().__init__()
-        # self.read_well(self.ws, self.cat_well_min.get_value, data_list.data_well_min.get_value)
 
     def read_well(self, begin_index, cancel_index):
         if data_list.data_in_base is False:
@@ -1683,12 +1684,12 @@ class WellCategory(FindIndexPZ):
                     for col in range(1, 13):
                         cell = self.ws.cell(row=row, column=col).value
                         if cell:
-                            if str(cell) in ['атм'] and self.ws.cell(row=row, column=col - 2).value:
+                            if str(cell).strip() in ['атм'] and self.ws.cell(row=row, column=col - 2).value:
                                 self.category_pressure_list.append(self.ws.cell(row=row, column=col - 2).value)
                                 self.category_pressure_well.append(self.ws.cell(row=row, column=col - 1).value)
 
-                            elif str(cell) in ['%', 'мг/л', 'мг/дм3', 'мг/м3', 'мг/дм', 'мгдм3']:
-                                if str(cell) == '%':
+                            elif str(cell).strip() in ['%', 'мг/л', 'мг/дм3', 'мг/м3', 'мг/дм', 'мгдм3']:
+                                if str(cell).strip() == '%':
                                     if self.ws.cell(row=row, column=col - 2).value is None:
                                         self.category_h2s_list.append(
                                             self.ws.cell(row=row - 1, column=col - 2).value)
@@ -1705,7 +1706,7 @@ class WellCategory(FindIndexPZ):
                                     else:
                                         self.value_h2s_percent.append(
                                             float(str(self.ws.cell(row=row, column=col - 1).value).replace(',', '.')))
-                                if str(cell) in ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3']:
+                                if str(cell).strip() in ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3']:
                                     if str(self.ws.cell(row=row, column=col - 1).value).strip() in ['', '-', '0',
                                                                                                     'None'] or \
                                             'отс' in str(self.ws.cell(row=row, column=col - 1).value).lower():
@@ -1720,7 +1721,7 @@ class WellCategory(FindIndexPZ):
                                         self.value_h2s_mg.append(
                                             float(str(self.ws.cell(row=row, column=col - 1).value).replace(',', '.')))
 
-                                if str(cell) in ['мг/м3'] and self.ws.cell(row=row - 1, column=col - 1).value not in \
+                                if str(cell).strip() in ['мг/м3'] and self.ws.cell(row=row - 1, column=col - 1).value not in \
                                         ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3'] and \
                                         self.ws.cell(row=row + 1, column=col - 1).value not in \
                                         ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3']:
@@ -1736,7 +1737,7 @@ class WellCategory(FindIndexPZ):
                                                                  column=col - 1).value).replace(
                                                     ',', '.')))) / 1000)
 
-                            elif str(cell) == 'м3/т':
+                            elif str(cell).strip() == 'м3/т':
 
                                 self.category_gaz_factor_percent.append(self.ws.cell(row=row, column=col - 2).value)
                                 if 'отс' in str(self.ws.cell(row=row, column=col - 1).value) or \

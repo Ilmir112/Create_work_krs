@@ -832,14 +832,17 @@ class MyMainWindow(QMainWindow):
                     table_widget.setRowHidden(row, False)
 
             if work_plan == 'krs':
+
                 self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.data_well)
                 self.set_modal_window(self.work_window)
+                self.ws3 = self.wb.create_sheet("Расчет поглотителя сероводорода", 1)
                 data_list.pause = True
                 self.pause_app()
                 data_list.pause = True
                 self.work_window = None
 
-            if work_plan in ['gnkt_frez'] and list_page == 2:
+
+        if work_plan in ['gnkt_frez'] and list_page == 2:
                 col_width = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
                             13.0, 5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
                             13.0,
@@ -848,18 +851,18 @@ class MyMainWindow(QMainWindow):
                             13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
                 for column in range(table_widget.columnCount()):
                     table_widget.setColumnWidth(column, int(col_width[column]))  # Здесь задайте требуемую ширину столбца
-            elif work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz'] and list_page == 2:
+        elif work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz'] and list_page == 2:
 
-                col_width = property_excel.property_excel_pvr.col_width_gnkt_osv
-                for column in range(table_widget.columnCount()):
-                    table_widget.setColumnWidth(column,
-                                                int(col_width[column] * 9))  # Здесь задайте требуемую ширину столбца
+            col_width = property_excel.property_excel_pvr.col_width_gnkt_osv
+            for column in range(table_widget.columnCount()):
+                table_widget.setColumnWidth(column,
+                                            int(col_width[column] * 9))  # Здесь задайте требуемую ширину столбца
 
-            elif work_plan == 'application_pvr':
-                from property_excel import property_excel_pvr
-                for column in range(table_widget.columnCount()):
-                    table_widget.setColumnWidth(column, int(
-                        property_excel_pvr.col_width[column]))  # Здесь задайте требуемую ширину столбца
+        elif work_plan == 'application_pvr':
+            from property_excel import property_excel_pvr
+            for column in range(table_widget.columnCount()):
+                table_widget.setColumnWidth(column, int(
+                    property_excel_pvr.col_width[column]))  # Здесь задайте требуемую ширину столбца
             data_list.pause = True
 
 
@@ -1484,7 +1487,7 @@ class MyWindow(MyMainWindow):
 
             self.data_well.itog_ind_min = insert_index
             self.data_well.itog_ind_max = len(work_list)
-            # print(f' длина {len(work_list)}')
+
             CreatePZ.add_itog(self, ws2, self.table_widget.rowCount() + 1, self.work_plan)
 
             # try:
@@ -1547,12 +1550,27 @@ class MyWindow(MyMainWindow):
             filenames = self.definition_filenames()
             full_path = path + "/" + filenames
 
-            if self.data_well.bvo and self.work_plan != 'dop_plan':
-                ws5 = wb2.create_sheet('Sheet1')
-                ws5.title = "Схемы ПВО"
-                ws5 = wb2["Схемы ПВО"]
-                wb2.move_sheet(ws5, offset=-1)
-                schema_list = self.check_pvo_schema(ws5, insert_index + 2)
+            if self.work_plan not in ['dop_plan', 'dop_plan_in_base']:
+                from H2S import CalculateH2s
+                if self.data_well.bvo:
+                    ws5 = wb2.create_sheet('Sheet1')
+                    ws5.title = "Схемы ПВО"
+                    ws5 = wb2["Схемы ПВО"]
+                    wb2.move_sheet(ws5, offset=-1)
+                    schema_list = self.check_pvo_schema(ws5, insert_index + 2)
+                category_check_list = []
+                for plast in self.data_well.dict_category:
+                    if self.data_well.dict_category[plast] not in category_check_list:
+                        if self.data_well.dict_category[plast]['по сероводороду'].category in [1, 2]:
+                            name_list = f'Расчет H2S {plast}'
+                            self.ws3 = wb2.create_sheet(name_list, 1)
+                            calculate = CalculateH2s(self.data_well)
+                            calculate.calc_h2s(self.ws3, plast)
+                            category_check_list.append(self.data_well.dict_category[plast])
+
+                            # Скрываем лист
+                            self.ws3.sheet_state = 'hidden'
+
 
             # Перед сохранением установите режим расчета
             wb2.calculation.calcMode = "auto"
@@ -2284,7 +2302,13 @@ class MyWindow(MyMainWindow):
 
     def correctData(self):
         from data_correct import DataWindow
-        self.add_window(DataWindow)
+        if self.work_window is None:
+            self.work_window = DataWindow(self.data_well)
+            self.set_modal_window(self.work_window)
+
+            self.pause_app()
+            data_list.pause = True
+            self.work_window = None
 
     def torpedo_action_window(self):
         from work_py.torpedo import TorpedoWindow
