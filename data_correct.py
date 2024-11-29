@@ -527,14 +527,14 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(self.expected_Q_label, 25, 2)
             self.grid.addWidget(self.expected_Q_edit, 26, 2)
 
-            self.expected_P_label = QLabel('Ожидаемое давление закачки')
-            self.expected_P_edit = FloatLineEdit(self)
+            self.expected_pressure_label = QLabel('Ожидаемое давление закачки')
+            self.expected_pressure_edit = FloatLineEdit(self)
             try:
-                self.expected_P_edit.setText(f'{self.data_well.expected_P}')
+                self.expected_pressure_edit.setText(f'{self.data_well.expected_pressure}')
             except:
                 pass
-            self.grid.addWidget(self.expected_P_label, 25, 3)
-            self.grid.addWidget(self.expected_P_edit, 26, 3)
+            self.grid.addWidget(self.expected_pressure_label, 25, 3)
+            self.grid.addWidget(self.expected_pressure_edit, 26, 3)
         else:
             self.Qwater_Label = QLabel('Дебит по жидкости')
             self.Qwater_edit = FloatLineEdit(self)
@@ -597,11 +597,11 @@ class TabPageSoCorrect(TabPageUnion):
         # Очистка и удаление существующих виджетов, если они уже были добавлены ранее
 
         try:
-            self.expected_P_label.setParent(None)
+            self.expected_pressure_label.setParent(None)
         except:
             pass
         try:
-            self.expected_P_edit.setParent(None)
+            self.expected_pressure_edit.setParent(None)
         except:
             pass
         try:
@@ -647,11 +647,11 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(self.expected_Q_label, 25, 4)
             self.grid.addWidget(self.expected_Q_edit, 26, 4)
 
-            self.expected_P_label = QLabel('Ожидаемое давление закачки')
-            self.expected_P_edit = FloatLineEdit(self)
-            self.expected_P_edit.setText(f'{self.data_well.expected_P}')
-            self.grid.addWidget(self.expected_P_label, 25, 5)
-            self.grid.addWidget(self.expected_P_edit, 26, 5)
+            self.expected_pressure_label = QLabel('Ожидаемое давление закачки')
+            self.expected_pressure_edit = FloatLineEdit(self)
+            self.expected_pressure_edit.setText(f'{self.data_well.expected_pressure}')
+            self.grid.addWidget(self.expected_pressure_label, 25, 5)
+            self.grid.addWidget(self.expected_pressure_edit, 26, 5)
         else:
             self.Qwater_Label = QLabel('Дебит по жидкости')
             self.Qwater_edit = FloatLineEdit(self)
@@ -815,7 +815,7 @@ class DataWindow(WindowUnion):
 
         if curator == 'ОР':
             expected_Q_edit = self.current_widget.expected_Q_edit.text()
-            expected_P_edit = self.current_widget.expected_P_edit.text()
+            expected_pressure_edit = self.current_widget.expected_pressure_edit.text()
         else:
             Qwater_edit = self.current_widget.Qwater_edit.text()
             Qoil_edit = self.current_widget.Qoil_edit.text()
@@ -1001,7 +1001,7 @@ class DataWindow(WindowUnion):
 
 
         if curator == 'ОР':
-            if self.ifNum(expected_Q_edit) is False or self.ifNum(expected_P_edit) is False:
+            if self.ifNum(expected_Q_edit) is False or self.ifNum(expected_pressure_edit) is False:
                 QMessageBox.information(self, 'Внимание',
                                         'Не все поля в Ожидаемых показателях соответствуют значениям')
                 close_file = False
@@ -1088,9 +1088,9 @@ class DataWindow(WindowUnion):
                 self.check_if_none(column_conductor_length))
             self.data_well.level_cement_conductor = ProtectedIsDigit(self.check_if_none(level_cement_conductor))
             if curator == 'ОР':
-                self.data_well.expected_P = self.check_if_none(expected_P_edit)
+                self.data_well.expected_pressure= self.check_if_none(expected_pressure_edit)
                 self.data_well.expected_Q = self.check_if_none(expected_Q_edit)
-                self.data_well.expected_pick_up[self.data_well.expected_Q] = self.data_well.expected_P
+                self.data_well.expected_pick_up[self.data_well.expected_Q] = self.data_well.expected_pressure
                 self.data_well.percent_water = 100
             else:
                 self.data_well.Qoil = self.check_if_none(Qoil_edit)
@@ -1187,7 +1187,7 @@ class DataWindow(WindowUnion):
                     'нефть': self.data_well.Qoil,
                     'вода': self.data_well.Qwater,
                     'обводненность': self.data_well.percent_water,
-                    'давление': self.data_well.expected_P,
+                    'давление': self.data_well.expected_pressure,
                     'приемистость': self.data_well.expected_Q
                 },
                 'данные': {

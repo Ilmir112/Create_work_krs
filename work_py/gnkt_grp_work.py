@@ -854,7 +854,7 @@ class GnktModel(WindowUnion):
         if self.data_well.curator == 'ОР':
             expected_title = 'Ожидаемый приемистость скважины'
             Qoil = f'{self.data_well.expected_Q}м3/сут'
-            Qwater = f'{self.data_well.expected_P}атм'
+            Qwater = f'{self.data_well.expected_pressure}атм'
             proc_water = ''
         else:
             expected_title = 'Ожидаемый дебит скважины'

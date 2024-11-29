@@ -738,9 +738,9 @@ class SwabWindow(WindowUnion):
             need_change_zgs_combo = self.tabWidget.currentWidget().need_change_zgs_combo.currentText()
             depth_gauge_combo = self.tabWidget.currentWidget().depth_gauge_combo.currentText()
             paker_depth_zumpf = ''
-            pressureZUMPF_combo = self.tabWidget.currentWidget().pressure_zumpf_question_QCombo.currentText()
+            pressure_zumph_combo = self.tabWidget.currentWidget().pressure_zumpf_question_QCombo.currentText()
 
-            if pressureZUMPF_combo == 'Да':                
+            if pressure_zumph_combo == 'Да':                
                 paker_khost = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().khvostEdit.text())
                 paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
                 if paker_depth_zumpf == '':
@@ -897,7 +897,7 @@ class SwabWindow(WindowUnion):
                                                          swab_type_combo, swab_volume_edit, depth_gauge_combo,
                                                          need_change_zgs_combo,
                                                          plast_new_combo, fluid_new_edit, pressure_new_edit,
-                                                         pressureZUMPF_combo, paker_depth_zumpf)
+                                                         pressure_zumph_combo, paker_depth_zumpf)
                 elif row == 0:
                     work_list.extend(self.swabbing_with_paker(diameter_paker, paker_depth, paker_khost, plast_combo,
                                                               swab_type_combo, swab_volume_edit, depth_gauge_combo,
@@ -1496,7 +1496,7 @@ class SwabWindow(WindowUnion):
 
     def swabbing_with_paker(self, diameter_paker, paker_depth, paker_khost, plast_combo, swab_type_combo, swab_volume_edit,
                             depth_gauge_combo, need_change_zgs_combo='нет', plast_new='', fluid_new='',
-                            pressure_new='', pressureZUMPF_combo='Нет', paker_depth_zumpf=0):
+                            pressure_new='', pressure_zumph_combo='Нет', paker_depth_zumpf=0):
         from .opressovka import OpressovkaEK
 
         swab_short, swab_select = SwabWindow.swab_select(self, swab_type_combo, plast_combo, swab_volume_edit)
@@ -1566,7 +1566,7 @@ class SwabWindow(WindowUnion):
             schema_swab = '8'
         elif 'РН' in data_list.contractor:
             schema_swab = '7'
-        if pressureZUMPF_combo == "Да":
+        if pressure_zumph_combo == "Да":
             paker_list = [
                 [f'СПО {paker_short} на НКТ{nkt_diam}м до H- {paker_depth}м, воронкой до {paker_depth + paker_khost}м',
                  None,

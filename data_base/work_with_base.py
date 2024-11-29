@@ -589,7 +589,7 @@ def insert_data_well_dop_plan(self, data_well):
     self.data_well.Qoil = well_data_dict['ожидаемые']['нефть']
     self.data_well.Qwater = well_data_dict['ожидаемые']['вода']
     self.data_well.percent_water = well_data_dict['ожидаемые']['обводненность']
-    self.data_well.expected_P = well_data_dict['ожидаемые']['давление']
+    self.data_well.expected_pressure = well_data_dict['ожидаемые']['давление']
     self.data_well.expected_Q = well_data_dict['ожидаемые']['приемистость']
 
     self.data_well.bottom_hole_drill = ProtectedIsDigit(well_data_dict['данные']['пробуренный забой'])

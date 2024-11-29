@@ -305,7 +305,7 @@ def definition_plast_work(self):
     perforation_sole = 0
 
     for plast, value in self.data_well.dict_perforation.items():
-        for interval in value['интервал']:
+        for _ in value['интервал']:
 
             if self.data_well.dict_perforation[plast]["отключение"] is False:
                 plast_work.add(plast)
@@ -369,7 +369,7 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
     for i, row_data in enumerate(work_list):
         for column, data in enumerate(row_data):
             if column == 2:
-                if not data is None:
+                if data is not None:
                     text = data
                     for key, value in text_width_dict.items():
                         if value[0] <= len(text) <= value[1]:

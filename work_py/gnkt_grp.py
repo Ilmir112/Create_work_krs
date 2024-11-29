@@ -1,4 +1,3 @@
-
 from datetime import datetime
 
 import psycopg2
@@ -23,7 +22,6 @@ from openpyxl.reader.excel import load_workbook
 
 from open_pz import CreatePZ
 
-
 from work_py.gnkt_grp_work import GnktOsvWindow2, GnktModel
 from gnkt_bopz import GnktBopz
 from abc import ABC, abstractmethod
@@ -32,7 +30,7 @@ from work_py.parent_work import TabPageUnion, TabWidgetUnion
 
 
 class TabPageAll(TabPageUnion):
-    def __init__(self, parent=None ):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.data_well = parent
 
@@ -40,11 +38,10 @@ class TabPageAll(TabPageUnion):
         self.validator_float = QDoubleValidator(0, 8000, 2)
         self.init_it()
 
-
-
     @abstractmethod
     def init_it(self):
         pass
+
 
 class TabPageDp(TabPageAll):
     def __init__(self, parent=None):
@@ -121,8 +118,6 @@ class GnktOsvWindow(GnktModel):
         self.sheet = sheet
         self.data_gnkt = None
 
-
-
         self.work_with_excel()
 
         self.work_with_data_gnkt()
@@ -130,7 +125,7 @@ class GnktOsvWindow(GnktModel):
         for row_number, row in enumerate(self.ws_title.iter_rows(values_only=True)):
             for col_number, cell in enumerate(row):
                 if 'по H2S' in str(
-                        self.ws_title.cell(row=row_number + 1, column=col_number + 1).value) and\
+                        self.ws_title.cell(row=row_number + 1, column=col_number + 1).value) and \
                         'по H2S' not in str(self.ws_title.cell(row=row_number + 2, column=col_number).value):
                     self.ws_title.merge_cells(start_column=col_number + 1, start_row=row_number + 1,
                                               end_column=col_number + 1, end_row=row_number + 2)
@@ -155,9 +150,6 @@ class GnktOsvWindow(GnktModel):
             self.populate_row(0, work_well, table_widget, self.work_plan)
             CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
 
-
-
-
     def select_work_plan_opz(self):
         if self.work_plan == 'gnkt_opz':
 
@@ -170,10 +162,7 @@ class GnktOsvWindow(GnktModel):
             data_list.pause = True
 
             self.data_gnkt_opz.close()  # Close window.
-
-
         elif self.work_plan == 'gnkt_bopz':
-
             self.data_gnkt_opz = GnktBopz(self.table_widget,
                                           self.data_gnkt, self.data_well)
             self.data_gnkt_opz.show()
@@ -187,8 +176,8 @@ class GnktOsvWindow(GnktModel):
             work_well = self.gnkt_work(self.data_gnkt.fluid_edit, self.data_gnkt.current_bottom_edit)
 
         return work_well
-    def work_with_excel(self):
 
+    def work_with_excel(self):
 
         if self.work_plan in ['gnkt_bopz']:
             self.wb_gnkt = load_workbook(f'{data_list.path_image}property_excel/template_gnkt_bopz.xlsx')
@@ -201,7 +190,6 @@ class GnktOsvWindow(GnktModel):
         self.wb_gnkt.sheetnames.insert(0, "Титульник")
         self.ws_title = self.wb_gnkt.create_sheet("Титульник", 0)
         self.ws_work = self.wb_gnkt.create_sheet("Ход работ", 2)
-
 
         self.create_title_list(self.ws_title)
         bvo_int = 0
@@ -218,7 +206,6 @@ class GnktOsvWindow(GnktModel):
         self.data_well.fluid_work, self.data_well.fluid_work_short = self.calc_work_fluid(fluid_work_insert)
 
         block_gnvp_list = events_gnvp_frez(self, self.data_gnkt.distance_pntzh, float(fluid_work_insert))
-
 
         if self.data_well.depth_fond_paker_before["do"] != 0:
             niz_nkt = self.data_well.depth_fond_paker_before["do"]
@@ -461,7 +448,7 @@ class GnktOsvWindow(GnktModel):
              'Мастер ГНКТ', 2],
             [None, 29, f'По истечении 2х часов, произвести допуск КНК-1 на г/трубе в скважину '
                        f'«без циркуляции» до гл. {current_bottom_edit}м. '
-                       f'Забой должен соответствовать ранее нормализованному. Составить АКТ на забой совмесно '
+                       f'Забой должен соответствовать ранее нормализованному. Составить АКТ на забой совместно '
                        f'с представителем Заказчика. При отсутствии нормализованного забоя на гл.{current_bottom_edit}м, '
                        f'по согласованию с Заказчиком, провести работы по нормализации забоя.',
              None, None, None, None, None, None, None,
@@ -510,11 +497,11 @@ class GnktOsvWindow(GnktModel):
                 [None, 29,
                  f'По истечении 2х часов, произвести допуск КНК-1 на г/трубе в скважину '
                  f'«без циркуляции» до гл. {current_bottom_edit}м. Забой должен соответствовать – {current_bottom_edit}м. '
-                 f'Составить АКТ на забой совмесно с представителем Заказчика. При отсутствии нормализованного забоя на '
+                 f'Составить АКТ на забой совместно с представителем Заказчика. При отсутствии нормализованного забоя на '
                  f'гл. {current_bottom_edit}м (по согласованию с Заказчиком) - провести работы по нормализации забоя.',
                  None, None, None, None, None, None, None, 'Мастер ГНКТ', 0.5],
 
-                [None, 29, f'Дальнейшие работы, согласовать с Заказчиком, по результам 1го цикла освоения: \n'
+                [None, 29, f'Дальнейшие работы, согласовать с Заказчиком, по результатам 1го цикла освоения: \n'
                            f' проведение кислотной обработки ;\n'
                            f'- прекращение / продолжение освоения (количество и продолжительность циклов);\n'
                            f'- подтверждение / отмена проведения ГИС О.З.', 8],
@@ -530,14 +517,13 @@ class GnktOsvWindow(GnktModel):
             work_list = self.work_opz_gnkt(acid_info)
 
             gnkt_opz.extend([['', 'По согласованию с заказчиком произвести следующие работы:',
-             None, None, None, None, None, None, None,
-             'Мастер ГНКТ, представитель Заказчика', None]])
+                              None, None, None, None, None, None, None,
+                              'Мастер ГНКТ, представитель Заказчика', None]])
 
             gnkt_opz.extend(work_list)
 
-
         work_list = [
-                [None, 29, f'При наличии забоя на гл.{current_bottom_edit}м, '
+            [None, 29, f'При наличии забоя на гл.{current_bottom_edit}м, '
                        f'по согласованию с Заказчиком: ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', None],
@@ -573,7 +559,7 @@ class GnktOsvWindow(GnktModel):
                        f'Очистить желобные ёмкости от проппанта в мешки – приготовить к вывозу. Составить '
                        f'Акт на количество вымытого проппанта. Произвести демонтаж рабочих линий, рабочей площадки.'
                        f'Внимание: произвести вывоз мешков с вымытым проппантом и отработанной '
-                       f'технологической жидкости на пункты утилизации, соглаованный с Заказчиком.',
+                       f'технологической жидкости на пункты утилизации, согласованный с Заказчиком.',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ', 2.5],
             [None, 29, f'Сдать скважину представителю Заказчика Составить АКТ.',
@@ -697,7 +683,7 @@ class GnktOsvWindow(GnktModel):
 
             volume = round((volume_vn_ek(self, self.data_well.current_bottom) *
                             (self.data_well.current_bottom - self.data_well.depth_fond_paker_before["do"]) / 1000 +
-                            volume_vn_nkt(self.data_well.dict_nkt_before) ) * 1.2, 1)
+                            volume_vn_nkt(self.data_well.dict_nkt_before)) * 1.2, 1)
         else:
             volume = volume_jamming_well(self.data_well.current_bottom)
         return volume
@@ -749,6 +735,6 @@ class GnktOsvWindow(GnktModel):
 
 if __name__ == '__main__':
     app = QApplication([])
-    window = GnktOsvWindow(2,2,2,2,1)
+    window = GnktOsvWindow(2, 2, 2, 2, 1)
     window.show()
     app.exec_()

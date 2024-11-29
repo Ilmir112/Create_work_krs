@@ -114,7 +114,7 @@ class FindIndexPZ(MyMainWindow):
         self.angle_data = []
         self.Qoil = 0
         self.Qwater = 0
-        self.expected_P = 0
+        self.expected_pressure = 0
         self.appointment = ProtectedIsNonNone('')
         self.expected_Q = 0
         self.sucker_rod_ind = ProtectedIsDigit(0)
@@ -230,7 +230,7 @@ class FindIndexPZ(MyMainWindow):
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f'Ошибка в копировании изображений {e}')
 
-        for row_ind, row in enumerate(self.ws.iter_rows(values_only=True)):
+        for row_ind, row in enumerate(self.ws.iter_rows(values_only=True, max_row=300, max_col=20)):
             self.ws.row_dimensions[row_ind].hidden = False
             if self.cat_well_min.get_value != 0:
                 if self.data_x_max.get_value < row_ind and image_loader:
@@ -460,30 +460,26 @@ class FindIndexPZ(MyMainWindow):
                                 f'Ошибка в прочтении файла в строке {string} {e}, Проверьте excel файл')
 
     def definition_is_none(self, data, row, col, step, m=12):
-        try:
-
+        if data.__class__ == ProtectedIsNonNone:
             data = data.get_value
-            while data is None or step == m:
+            while (data is None) and (step < m):
                 data = self.ws.cell(row=row, column=col + step).value
-
                 step += 1
-
             return ProtectedIsNonNone(data)
-
-        except Exception:
-
-            while data is None:
+        elif data.__class__ == ProtectedIsDigit:
+            data = data.get_value
+            while (data is None) and (step < m):
                 data = self.ws.cell(row=row, column=col + step).value
-
-                if step == m:
-                    break
                 step += 1
-
+            return ProtectedIsDigit(data)
+        else:
+            while (data is None) and (step < m):
+                data = self.ws.cell(row=row, column=col + step).value
+                step += 1
             return data
 
 
 class WellNkt(FindIndexPZ):
-
     def __init__(self):
         super().__init__()
         # self.read_well(self.ws, data_list.pipes_ind.get_value, data_list.condition_of_wells.get_value)
@@ -768,7 +764,7 @@ class WellHistoryData(FindIndexPZ):
 
     def read_well(self, begin_index, cancel_index):
 
-        for row_index, row in enumerate(self.ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
+        for row_index, row in enumerate(self.ws.iter_rows(min_row=begin_index, max_row=cancel_index, max_col=20)):
             for col, cell in enumerate(row):
                 value = cell.value
                 if value:
@@ -846,7 +842,7 @@ class WellCondition(FindIndexPZ):
 
     def read_well(self, begin_index, cancel_index):
 
-        for row_index, row in enumerate(self.ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
+        for row_index, row in enumerate(self.ws.iter_rows(min_row=begin_index, max_row=cancel_index, max_col=20)):
             row_index += begin_index
             for col, cell in enumerate(row):
                 value = cell.value
@@ -912,7 +908,7 @@ class WellExpectedPickUp(FindIndexPZ):
 
     def read_well(self, begin_index, cancel_index):
 
-        for row_index, row in enumerate(self.ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
+        for row_index, row in enumerate(self.ws.iter_rows(min_row=begin_index, max_row=cancel_index, max_col=20)):
             row_index += begin_index
             # print(row_index)
             for col, cell in enumerate(row[0:15]):
@@ -927,9 +923,9 @@ class WellExpectedPickUp(FindIndexPZ):
                                                                   col + 1, 1)
 
                     if 'зак' in str(value).lower() or 'давл' in str(value).lower() or 'p' in str(value).lower():
-                        self.expected_P = row[col + 1].value
-                        self.expected_P = self.definition_is_none(self.expected_P, row_index,
-                                                                  col + 1, 1)
+                        self.expected_pressure = row[col + 1].value
+                        self.expected_pressure = self.definition_is_none(self.expected_pressure, row_index,
+                                                                         col + 1, 1)
 
                     if 'qж' in str(value).lower():
                         self.Qwater = str(row[col + 1].value).strip().replace(' ', '').replace(
@@ -955,8 +951,8 @@ class WellExpectedPickUp(FindIndexPZ):
                             print(f'ошибка в определение')
 
             try:
-                if self.expected_Q and self.expected_P:
-                    self.expected_pick_up[self.expected_Q] = self.expected_P
+                if self.expected_Q and self.expected_pressure:
+                    self.expected_pick_up[self.expected_Q] = self.expected_pressure
             except Exception as e:
                 print(f'Ошибка в определении ожидаемых показателей {e}')
 
@@ -969,7 +965,7 @@ class WellName(FindIndexPZ):
         # self.read_well(self.ws, self.cat_well_max.get_value, data_list.data_pvr_min.get_value)
 
     def read_well(self, begin_index, cancel_index):
-        for row_index, row in enumerate(self.ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
+        for row_index, row in enumerate(self.ws.iter_rows(min_row=begin_index, max_row=cancel_index, max_col=20)):
             row_index += begin_index
 
             for col, cell in enumerate(row):
@@ -1005,9 +1001,7 @@ class WellData(FindIndexPZ):
         # self.read_well(self.ws, self.cat_well_max.get_value, data_list.data_pvr_min.get_value)
 
     def read_well(self, begin_index, cancel_index):
-        from work_py.opressovka import TabPageSo
-
-        for row_index, row in enumerate(self.ws.iter_rows(min_row=begin_index, max_row=cancel_index)):
+        for row_index, row in enumerate(self.ws.iter_rows(min_row=begin_index, max_row=cancel_index, max_col=20)):
             row_index += begin_index
 
             for col, cell in enumerate(row[:13]):

@@ -312,10 +312,10 @@ class MyMainWindow(QMainWindow):
         return self.data_well
 
     def determination_injection_pressure(self):
-        if self.data_well.region == 'ЧГМ' and self.data_well.expected_P < 80:
+        if self.data_well.region == 'ЧГМ' and self.data_well.expected_pressure< 80:
             return 80
         else:
-            return self.data_well.expected_P
+            return self.data_well.expected_pressure
 
     def privyazka_nkt(self):
         priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
@@ -1860,7 +1860,7 @@ class MyWindow(MyMainWindow):
             data_list.pipes_ind = ProtectedIsDigit(0)
             data_list.sucker_rod_ind = ProtectedIsDigit(0)
             self.data_well.expected_Q = 0
-            self.data_well.expected_P = 0
+            self.data_well.expected_pressure= 0
             data_list.plast_select = ''
             self.data_well.dict_perforation = {}
             self.data_well.dict_perforation_project = {}
@@ -2410,7 +2410,7 @@ class MyWindow(MyMainWindow):
                                    f' {self.data_well.dinamic_level.get_value}м'
         if self.data_well.curator == 'ОР':
             ws4.cell(row=10,
-                     column=1).value = f'Ожид {self.data_well.expected_Q}м3/сут при Р-{self.data_well.expected_P}м3/сут'
+                     column=1).value = f'Ожид {self.data_well.expected_Q}м3/сут при Р-{self.data_well.expected_pressure}м3/сут'
         else:
             ws4.cell(row=10,
                      column=1).value = f'Qн {self.data_well.Qoil}т Qж- {self.data_well.Qwater}м3/сут'
