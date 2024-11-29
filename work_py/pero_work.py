@@ -29,11 +29,11 @@ class TabPageSoSand(TabPageUnion):
         if self.data_well.column_additional or self.data_well.column_diameter.get_value < 120:
             self.pero_combo_combo.setCurrentIndex(2)
 
-        self.solvent_question_Label = QLabel("необходимость растворителя", self)
+        self.solvent_question_label = QLabel("необходимость растворителя", self)
         self.solvent_question_combo = QComboBox(self)
         self.solvent_question_combo.addItems(['Нет', 'Да'])
 
-        self.solvent_Label = QLabel("объем растворителя", self)
+        self.solvent_label = QLabel("объем растворителя", self)
         self.solvent_volume_edit = QLineEdit(self)
         self.solvent_volume_edit.setValidator(self.validator)
         self.solvent_volume_edit.setText("2")
@@ -65,10 +65,10 @@ class TabPageSoSand(TabPageUnion):
 
         self.grid.addWidget(self.pero_combo_Label, 4, 4)
         self.grid.addWidget(self.pero_combo_combo, 5, 4)
-        self.grid.addWidget(self.solvent_question_Label, 4, 5)
+        self.grid.addWidget(self.solvent_question_label, 4, 5)
         self.grid.addWidget(self.solvent_question_combo, 5, 5)
 
-        self.grid.addWidget(self.solvent_Label, 6, 3)
+        self.grid.addWidget(self.solvent_label, 6, 3)
         self.grid.addWidget(self.solvent_volume_edit, 7, 3)
 
         self.grid.addWidget(self.need_change_zgs_label, 9, 2)

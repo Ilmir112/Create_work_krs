@@ -30,13 +30,13 @@ class TabPageSo(TabPageUnion):
         self.lineEditHolesMetr.addItems(['6', '8', '10', '16', '18', '20', '30'])
         self.lineEditHolesMetr.setCurrentIndex(3)
 
-        self.label_type_perforation = QLabel("Тип перфорации", self)
-        TabPageSo.combobox_type_perforation = QComboBox(self)
-        TabPageSo.combobox_type_perforation.addItems(['ПВР на кабеле', 'Трубная перфорация'])
-
         self.labelIndexFormation = QLabel("Индекс пласта", self)
         self.lineEditIndexFormation = QLineEdit(self)
         self.lineEditIndexFormation.setClearButtonEnabled(True)
+
+        self.label_type_perforation = QLabel("Тип перфорации", self)
+        TabPageSo.combobox_type_perforation = QComboBox(self)
+        TabPageSo.combobox_type_perforation.addItems(['ПВР на кабеле', 'Трубная перфорация'])
 
         self.labelDopInformation = QLabel("Доп информация", self)
         self.lineEditDopInformation = QLineEdit(self)
@@ -324,8 +324,10 @@ class PerforationWindow(WindowUnion):
                 shema_str = 'б'
         angle_text = ''
         if self.data_well.angle_data:
-            max_depth_pvr = max([float(self.tableWidget.item(row, 1).text()) for row in range(rows)])
-            angle_text = self.calculate_angle(max_depth_pvr, self.data_well.angle_data)
+            if self.data_well.max_angle.get_value > 45:
+                max_depth_pvr = max([float(self.tableWidget.item(row, 1).text()) for row in range(rows)])
+                tuple_angle = self.calculate_angle(max_depth_pvr, self.data_well.angle_data)
+                angle_text = tuple_angle[2]
 
         perforation = [
             [None, None,

@@ -31,10 +31,10 @@ class TabPageSoWith(TabPageUnion):
                 and self.data_well.open_trunk_well is False and self.data_well.count_template != 0:
             self.privyazka_question_QCombo.setCurrentIndex(1)
 
-        self.skm_Label = QLabel("диаметр СГМ", self)
-        self.skm_Edit = QLineEdit(self)
-        self.skm_Edit.setValidator(validator)
-        self.skm_Edit.setText(str(self.data_well.column_diameter.get_value))
+        self.skm_label = QLabel("диаметр СГМ", self)
+        self.skm_edit = QLineEdit(self)
+        self.skm_edit.setValidator(validator)
+        self.skm_edit.setText(str(self.data_well.column_diameter.get_value))
 
 
         self.roof_skm_label = QLabel("Кровля скреперования", self)
@@ -90,7 +90,7 @@ class TabPageSoWith(TabPageUnion):
         self.grid.addWidget(self.sole_skm_label, 35, 5, 1, 3)
         self.grid.addWidget(self.sole_skm_line, 36, 5, 1, 3)
 
-        self.skm_Edit.editingFinished.connect(self.update_template)
+        self.skm_edit.editingFinished.connect(self.update_template)
 
         self.current_bottom_edit.editingFinished.connect(self.update_template)
         self.SKM_type_Combo.currentTextChanged.connect(self.update_template)
@@ -109,8 +109,8 @@ class TabPageSoWith(TabPageUnion):
             self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
             self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
 
-            self.grid.addWidget(self.skm_Label, 4, 5)
-            self.grid.addWidget(self.skm_Edit, 5, 5)
+            self.grid.addWidget(self.skm_label, 4, 5)
+            self.grid.addWidget(self.skm_edit, 5, 5)
             self.grid.addWidget(self.SKM_type_label, 4, 6)
             self.grid.addWidget(self.SKM_type_Combo, 5, 6)
 
@@ -128,8 +128,8 @@ class TabPageSoWith(TabPageUnion):
             self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
             self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
 
-            self.grid.addWidget(self.skm_Label, 4, 6)
-            self.grid.addWidget(self.skm_Edit, 5, 6)
+            self.grid.addWidget(self.skm_label, 4, 6)
+            self.grid.addWidget(self.skm_edit, 5, 6)
             self.grid.addWidget(self.SKM_type_label, 4, 7)
             self.grid.addWidget(self.SKM_type_Combo, 5, 7)
 
@@ -159,29 +159,29 @@ class TabPageSoWith(TabPageUnion):
         if current_bottom != '':
             self.data_well.current_bottom = float(current_bottom)
         template_str = ''
-        if self.skm_Edit.text() != '':
-            skm = self.skm_Edit.text()
+        if self.skm_edit.text() != '':
+            skm = self.skm_edit.text()
         if self.template_Combo.currentText() == 'СГМ ЭК':
-            self.skm_Edit.setText(str(self.data_well.column_diameter.get_value))
+            self.skm_edit.setText(str(self.data_well.column_diameter.get_value))
             template_str = f'{SKM_type}-{skm} + НКТ + репер'
 
             self.data_well.skm_depth = self.data_well.current_bottom
 
         elif self.template_Combo.currentText() == 'СГМ открытый ствол':
-            self.skm_Edit.setText(self.data_well.column_diameter)
+            self.skm_edit.setText(self.data_well.column_diameter)
 
             template_str = f'заглушка + НКТ{self.data_well.nkt_diam}мм ' \
                            f'{current_bottom - self.data_well.shoe_column.get_value +10}м + {SKM_type}-{skm} + НКТ + репер'
 
         elif self.template_Combo.currentText() == 'СГМ в доп колонне':
-            self.skm_Edit.setText(self.data_well.column_additional_diameter.get_value)
+            self.skm_edit.setText(self.data_well.column_additional_diameter.get_value)
 
             template_str = f'{SKM_type}-{skm} + НКТ{self.data_well.nkt_diam} ' \
                            f'{current_bottom - self.data_well.head_column_additional.get_value +10} + НКТ + репер'
 
             self.data_well.skm_depth = current_bottom
         elif self.template_Combo.currentText() == 'СГМ в основной колонне':
-            self.skm_Edit.setText(self.data_well.column_additional_diameter)
+            self.skm_edit.setText(self.data_well.column_additional_diameter)
 
             template_str = f'{SKM_type}-{skm} + НКТ{self.data_well.nkt_diam} ' \
                            f'{self.data_well.current_bottom - self.data_well.head_column_additional.get_value +10} + НКТ + репер'

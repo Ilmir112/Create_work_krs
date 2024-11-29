@@ -18,8 +18,8 @@ class TabPageVp(TabPageUnion):
         vp_list = ['ВП', 'ГПШ', 'ВПШ']
 
         self.vp_type_Label = QLabel("вид пакера геофизического", self)
-        self.vp_type_QCombo = QComboBox(self)
-        self.vp_type_QCombo.addItems(vp_list)
+        self.vp_type_qcombo = QComboBox(self)
+        self.vp_type_qcombo.addItems(vp_list)
 
 
         self.vp_depth_label = QLabel("Глубина установки пакера", self)
@@ -41,7 +41,7 @@ class TabPageVp(TabPageUnion):
         self.grid.addWidget(self.need_question_QCombo, 5, 4)
 
         self.grid.addWidget(self.vp_type_Label, 4, 5)
-        self.grid.addWidget(self.vp_type_QCombo, 5, 5)
+        self.grid.addWidget(self.vp_type_qcombo, 5, 5)
 
         self.grid.addWidget(self.vp_depth_label, 6, 3)
         self.grid.addWidget(self.vp_depth_edit, 7, 3)
@@ -66,7 +66,7 @@ class TabPageVp(TabPageUnion):
 
         if index == "Да":
             self.grid.addWidget(self.vp_type_Label, 4, 5)
-            self.grid.addWidget(self.vp_type_QCombo, 5, 5)
+            self.grid.addWidget(self.vp_type_qcombo, 5, 5)
             self.grid.addWidget(self.vp_depth_label, 6, 3)
             self.grid.addWidget(self.vp_depth_edit, 7, 3)
             self.grid.addWidget(self.cement_vp_Label, 6, 4)
@@ -77,7 +77,7 @@ class TabPageVp(TabPageUnion):
             self.cement_vp_edit.setText(f'{int(float(self.data_well.current_bottom)) - 3}')
         else:
             self.vp_type_Label.setParent(None)
-            self.vp_type_QCombo.setParent(None)
+            self.vp_type_qcombo.setParent(None)
             self.vp_depth_label.setParent(None)
             self.vp_depth_edit.setParent(None)
             self.grid.addWidget(self.cement_vp_Label, 6, 4)
@@ -112,7 +112,7 @@ class VpWindow(WindowUnion):
 
     def add_work(self):
 
-        vp_type_QCombo = self.tabWidget.currentWidget().vp_type_QCombo.currentText()
+        vp_type_qcombo = self.tabWidget.currentWidget().vp_type_qcombo.currentText()
         need_question_QCombo = self.tabWidget.currentWidget().need_question_QCombo.currentText()
         vp_depth = int(float(self.tabWidget.currentWidget().vp_depth_edit.text()))
         cement_vp = int(float(self.tabWidget.currentWidget().cement_vp_edit.text()))
@@ -123,7 +123,7 @@ class VpWindow(WindowUnion):
                 return
             if self.check_depth_in_skm_interval(vp_depth) is False:
                 return
-            work_list = self.vp(vp_type_QCombo, vp_depth, cement_vp, need_question_QCombo)
+            work_list = self.vp(vp_type_qcombo, vp_depth, cement_vp, need_question_QCombo)
         elif need_question_QCombo == "Нет":
             if self.check_true_depth_template(vp_depth) is False:
                 return
@@ -131,7 +131,7 @@ class VpWindow(WindowUnion):
                 return
             if self.check_depth_in_skm_interval(vp_depth) is False:
                 return
-            work_list = self.vp(vp_type_QCombo, vp_depth, cement_vp, need_question_QCombo)
+            work_list = self.vp(vp_type_qcombo, vp_depth, cement_vp, need_question_QCombo)
         else:
             work_list = self.czh(cement_vp)
 
@@ -139,38 +139,47 @@ class VpWindow(WindowUnion):
         #     QMessageBox.warning(self, 'Ошибка', 'Не корректные интервалы ')
         #     return
 
+        if work_list:
 
-
-        self.populate_row(self.insert_index, work_list, self.table_widget)
-        data_list.pause = False
-        self.close()
+            self.populate_row(self.insert_index, work_list, self.table_widget)
+            data_list.pause = False
+            self.close()
 
     def closeEvent(self, event):
                 # Закрываем основное окно при закрытии окна входа
         self.data_well.operation_window = None
         event.accept()  # Принимаем событие закрытия
-    def vp(self, vp_type_QCombo, vp_depth, cement_vp_edit, need_question_QCombo):
 
+    def vp(self, vp_type_qcombo, vp_depth, cement_vp_edit, need_question_QCombo):
         cable_type_text = ''
         angle_text = ''
-        if self.data_well.angle_data:
-            angle_text = self.calculate_angle(vp_depth, self.data_well.angle_data)
-            if angle_text:
-                cable_type_text = ' СОГЛАСОВАТЬ ЖЕСТКИЙ КАБЕЛЬ'
+        if self.data_well.angle_data and self.data_well.max_angle.get_value > 45:
+
+            tuple_angle = self.calculate_angle(vp_depth, self.data_well.angle_data)
+            if float(tuple_angle[0]) >= 45:
+                angle_text = tuple_angle[2]
+
+                if angle_text:
+                    question = QMessageBox.question(self, 'Ошибка', f'{angle_text[1]},'
+                                                                   f' есть риски не прохода ВП, продолжить?')
+                    if question == QMessageBox.StandardButton.Yes:
+                        cable_type_text = ' СОГЛАСОВАТЬ ЖЕСТКИЙ КАБЕЛЬ'
+                    else:
+                        return
 
         if self.data_well.perforation_roof > vp_depth:
 
             vp_list = [
                 [None, None,
-                 f'Вызвать геофизическую партию {cable_type_text}. '
+                 f'Вызвать геофизическую партию {cable_type_text} {angle_text}. '
                  f'Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
                  f'При необходимости подготовить место для установки партии ГИС напротив мостков. '
                  f'Произвести  монтаж ГИС согласно схемы  №8а утвержденной главным инженером '
                  f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',
                  None, None, None, None, None, None, None,
                  'Мастер КРС', None, None, None],
-                [f'Произвести установку {vp_type_QCombo} на {vp_depth}м', None,
-                 f'Произвести установку {vp_type_QCombo} (ЗАДАЧА 2.9.4.) на глубине  {vp_depth}м \n{angle_text}',
+                [f'Произвести установку {vp_type_qcombo} на {vp_depth}м', None,
+                 f'Произвести установку {vp_type_qcombo} (ЗАДАЧА 2.9.4.) на глубине  {vp_depth}м \n{angle_text}',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', 10],
                 [f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure.get_value}атм',
@@ -182,7 +191,7 @@ class VpWindow(WindowUnion):
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик РИР, УСРСиСТ', 1.2],
                 [f'докрепление цементными желонками до глубины {vp_depth - 3}м',None,
-                 f'ПРИ НЕГЕРМЕТИЧНОСТИ {vp_type_QCombo}: \n '
+                 f'ПРИ НЕГЕРМЕТИЧНОСТИ {vp_type_qcombo}: \n '
                  f'произвести докрепление цементными желонками до глубины {vp_depth - 3}м (цемент с использование '
                  f'ускорителя схватывания кальций хлористого).'
                  f' Задача 9.5.2   ОЗЦ-12ч',
@@ -227,9 +236,9 @@ class VpWindow(WindowUnion):
                  f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',
                  None, None, None, None, None, None, None,
                  'Мастер КРС', None, None, None],
-                [f'Произвести установку {vp_type_QCombo} на {vp_depth}м',
+                [f'Произвести установку {vp_type_qcombo} на {vp_depth}м',
                  None,
-                 f'Произвести установку {vp_type_QCombo} (ЗАДАЧА 2.9.4.) на глубине  {vp_depth}м',
+                 f'Произвести установку {vp_type_qcombo} (ЗАДАЧА 2.9.4.) на глубине  {vp_depth}м',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', 10],
                 [f'докреплением цементными желонками до глубины {cement_vp_edit}м', None,
@@ -263,8 +272,8 @@ class VpWindow(WindowUnion):
                  f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',
                  None, None, None, None, None, None, None,
                  'Мастер КРС', None, None, None],
-                [f'Произвести установку {vp_type_QCombo} на {vp_depth}м', None,
-                 f'Произвести установку {vp_type_QCombo} (ЗАДАЧА 2.9.4.) на глубине  {vp_depth}м',
+                [f'Произвести установку {vp_type_qcombo} на {vp_depth}м', None,
+                 f'Произвести установку {vp_type_qcombo} (ЗАДАЧА 2.9.4.) на глубине  {vp_depth}м',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', 10],
                 [f'Опрессовать эксплуатационную колонну на Р={self.data_well.max_admissible_pressure.get_value}атм', None,
@@ -290,8 +299,6 @@ class VpWindow(WindowUnion):
 
 
     def czh(self, cement_vp):
-
-
 
         vp_list = [
             [None, None,

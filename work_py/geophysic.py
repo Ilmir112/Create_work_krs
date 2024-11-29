@@ -183,10 +183,13 @@ class GeophysicWindow(WindowUnion):
         angle_text = ''
         
         if self.data_well.angle_data:
-            max_depth_pvr = max([float(self.tableWidget.item(row, 1).text()) for row in range(rows)])
-            angle_text = self.calculate_angle(max_depth_pvr, self.data_well.angle_data)
-            if angle_text:
-                cable_type_text = ' СОГЛАСОВАТЬ ЖЕСТКИЙ КАБЕЛЬ'
+            if self.data_well.max_angle.get_value > 45:
+                max_depth_pvr = max([float(self.tableWidget.item(row, 1).text()) for row in range(rows)])
+
+                tuple_angle = self.calculate_angle(max_depth_pvr, self.data_well.angle_data)
+                if float(tuple_angle[0]) <= max_depth_pvr:
+                    cable_type_text = ' СОГЛАСОВАТЬ ЖЕСТКИЙ КАБЕЛЬ'
+                    angle_text = tuple_angle[2]
         
         geophysical_research = [
             [" ", None,

@@ -516,13 +516,13 @@ class GnktBopz(GnktModel):
         for row in block_gnvp_list[::-1]:
             gnkt_bopz.insert(0, row)
 
-        # number_punkt = 1
+        # item_number = 1
         # for i in range(3, len(gnkt_bopz)):  # нумерация работ
         #     if len(str(gnkt_bopz[i][1])) <= 3 and gnkt_bopz[i][1] != '№':
-        #         gnkt_bopz[i][1] = number_punkt
-        #         number_punkt += 1
+        #         gnkt_bopz[i][1] = item_number
+        #         item_number += 1
         #     else:
-        #         number_punkt = 1
+        #         item_number = 1
 
         return gnkt_bopz
 

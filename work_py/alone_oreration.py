@@ -160,7 +160,7 @@ def need_h2s(self, fluid_new, plast_edit, expected_pressure):
         self.data_well.value_h2s_mg.append(h2s_mg)
         h2s_pr, _ = QInputDialog.getDouble(None, 'сероводород в процентах',
                                            'Введите значение серовородода в процентах', 0, 0, 100, 1)
-        poglot = H2S.calv_h2s(None, category_h2s, h2s_mg, h2s_pr)
+        poglot = H2S.calv_h2s(self, category_h2s, h2s_mg, h2s_pr)
         Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
         pressure = namedtuple("pressure", "category data_pressure")
         self.data_well.dict_category.setdefault(plast_edit, {}).setdefault(

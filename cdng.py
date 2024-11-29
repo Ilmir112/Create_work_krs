@@ -122,6 +122,7 @@ def events_gnvp_frez(self, distance, fluid):
     block_gnvp_list = [
         [None, 'Мероприятия по предотвращению аварий, инцидентов и несчастных случаев:',
          None, None, None, None, None, None, None, None, None, None],
+        [None, '№', 'Мероприятия', None, None, None, None, None, None, None, None, 'Ответственный'],
         [None, 1,
          'Все операции при производстве работ выполнять в соответствии с действующими Федеральными нормами и'
          ' правилами в области промышленной безопасности "Правила безопасности в нефтяной и газовой '
@@ -136,7 +137,6 @@ def events_gnvp_frez(self, distance, fluid):
          None, None, None, None, None, None, None, None, None, None, None],
         [None, 'Мероприятия при нахождении рядом с ремонтируемой скважиной работающих скважин', None, None, None,
          None, None, None, None, None, None, None],
-        [None, '№', 'Мероприятия', None, None, None, None, None, None, None, None, 'Ответственный'],
         [None, 1, 'Провести устный инструктаж бригаде по проведению ремонта с соседними работающими скважинами.',
          None, None, None, None, None, None, None, None, 'Мастер ГНКТ'],
         [None, 2, 'В схеме расстановки бригадного хозяйства обозначить опасные зоны работающих скважин '

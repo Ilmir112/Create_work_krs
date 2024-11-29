@@ -64,18 +64,25 @@ class TabPageSo(TabPageUnion):
                 self.data_well.open_trunk_well is False and self.data_well.count_template != 0:
             self.privyazka_question_QCombo.setCurrentIndex(1)
 
-        self.note_Label = QLabel("Нужно ли добавлять примечание", self)
+        self.note_label = QLabel("Нужно ли добавлять примечание", self)
         self.note_question_qcombo = QComboBox(self)
         self.note_question_qcombo.addItems(['Нет', 'Да'])
 
-        self.solvent_Label = QLabel("объем растворителя", self)
+        self.solvent_label = QLabel("объем растворителя", self)
         self.solvent_volume_edit = QLineEdit(self)
         self.solvent_volume_edit.setValidator(validator)
         self.solvent_volume_edit.setText("2")
 
-        self.solvent_question_Label = QLabel("необходимость растворителя", self)
+        self.solvent_question_label = QLabel("необходимость растворителя", self)
         self.solvent_question_combo = QComboBox(self)
         self.solvent_question_combo.addItems(['Нет', 'Да'])
+
+        self.kot_label = QLabel("Нужно ли добавлять систему КОТ-50", self)
+        self.kot_question_qcombo = QComboBox(self)
+
+        self.kot_question_qcombo.addItems(['Нет', 'Да'])
+        if self.data_well.plast_work:
+            self.kot_question_qcombo.setCurrentIndex(1)
 
         self.template_Combo.currentTextChanged.connect(self.update_template_edit)
 
@@ -139,17 +146,20 @@ class TabPageSo(TabPageUnion):
         self.grid.addWidget(self.current_bottom_label, 8, 3)
         self.grid.addWidget(self.current_bottom_edit, 9, 3)
 
-        self.grid.addWidget(self.solvent_question_Label, 8, 4)
+        self.grid.addWidget(self.solvent_question_label, 8, 4)
         self.grid.addWidget(self.solvent_question_combo, 9, 4)
 
-        self.grid.addWidget(self.solvent_Label, 8, 5)
+        self.grid.addWidget(self.solvent_label, 8, 5)
         self.grid.addWidget(self.solvent_volume_edit, 9, 5)
 
         self.grid.addWidget(self.privyazka_question_Label, 8, 6)
         self.grid.addWidget(self.privyazka_question_QCombo, 9, 6)
 
-        self.grid.addWidget(self.note_Label, 8, 7)
+        self.grid.addWidget(self.note_label, 8, 7)
         self.grid.addWidget(self.note_question_qcombo, 9, 7)
+
+        self.grid.addWidget(self.kot_label, 8, 8)
+        self.grid.addWidget(self.kot_question_qcombo, 9, 8)
 
         self.grid.addWidget(self.template_str_Label, 13, 1, 1, 8)
         self.grid.addWidget(self.template_str_Edit, 14, 1, 1, 8)
@@ -168,6 +178,8 @@ class TabPageSo(TabPageUnion):
         self.dictance_template_second_Edit.textChanged.connect(self.update_template)
         self.dictance_template_first_Edit.textChanged.connect(self.update_template)
         self.length_template_first_Edit.textChanged.connect(self.update_template)
+        self.kot_question_qcombo.currentTextChanged.connect(self.update_template)
+
 
     def definition_pssh(self):
 
@@ -358,7 +370,7 @@ class TabPageSo(TabPageUnion):
 
         self.template_first_Edit.setText(str(first_template))
         self.template_second_Edit.setText(str(template_second))
-        # self.skm_Edit.setText(str(self.data_well.column_diameter.get_value))
+        # self.skm_edit.setText(str(self.data_well.column_diameter.get_value))
         self.dictance_template_second_Edit.setText(str(10))
 
         roof_plast, roof_add_column_plast = TabPageSoWith.definition_roof_not_raiding(self, current_bottom)
@@ -693,7 +705,8 @@ class TemplateWithoutSkm(WindowUnion):
         if solvent_volume_edit != '':
             solvent_volume_edit = round(float(solvent_volume_edit), 1)
 
-        note_question_qcombo = self.tabWidget.currentWidget().note_question_qcombo.currentText()
+        self.note_question_qcombo = self.tabWidget.currentWidget().note_question_qcombo.currentText()
+        self.kot_question_qcombo = self.tabWidget.currentWidget().kot_question_qcombo.currentText()
 
         current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
         if current_bottom != '':
@@ -706,7 +719,11 @@ class TemplateWithoutSkm(WindowUnion):
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(current_bottom, 1.2)],
-
+            [f'Нормализовать до глубины {current_bottom}м.',
+             None, f'ПРИ НЕОБХОДИМОСТИ: \nНормализовать забой обратной промывкой тех жидкостью уд.весом '
+                   f'{self.data_well.fluid_work} до глубины {current_bottom}м.', None, None, None, None, None,
+             None, None,
+             'Мастер КРС', None],
             [f'Обработка растворителем в V-{solvent_volume_edit}', None,
              f'По результатам ревизии ГНО, в случае наличия отложений АСПО:\n'
              f'Очистить колонну от АСПО растворителем - {solvent_volume_edit}м3. При открытом '
@@ -717,11 +734,6 @@ class TemplateWithoutSkm(WindowUnion):
              f'пространство. Реагирование 2 часа.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 4],
-            [f'Нормализовать до глубины {current_bottom}м.',
-             None, f'Нормализовать забой обратной промывкой тех жидкостью уд.весом '
-                   f'{self.data_well.fluid_work} до глубины {current_bottom}м.', None, None, None, None, None,
-             None, None,
-             'Мастер КРС', None],
             [f'Промыть в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3',
              None,
              f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work} '
@@ -743,8 +755,14 @@ class TemplateWithoutSkm(WindowUnion):
                 'Мастер КРС, представитель ЦДНГ', 2.49],
 
         ]
-        if abs(self.data_well.perforation_roof - current_bottom) < 15:
-            list_template_ek.pop(-1)
+        if abs(self.data_well.perforation_sole - current_bottom) > 10:
+            list_template_ek.pop(-2)
+
+        if self.kot_question_qcombo == 'Да' and self.data_well.count_template == 0:
+            list_template_ek.insert(-1, ['опрессовать тНКТ на 150атм', None,
+                                         f'Перед подъемом опрессовать тНКТ на давление 150атм. ',
+                                         None, None, None, None, None, None, None,
+                                         'Мастер КРС', 0.7])
 
         aa = 'КР11' in self.data_well.type_kr, self.data_well.type_kr
         if 'КР11' in self.data_well.type_kr:
@@ -840,7 +858,7 @@ class TemplateWithoutSkm(WindowUnion):
             for row in gips[::-1]:
                 list_template_ek.insert(0, row)
 
-        if note_question_qcombo == "Да":
+        if self.note_question_qcombo == "Да":
             list_template_ek = list_template_ek + notes_list
             self.data_well.count_template += 1
         else:

@@ -47,16 +47,23 @@ class TabPageSoWith(TabPageUnion):
                 and self.data_well.open_trunk_well is False and self.data_well.count_template != 0:
             self.privyazka_question_QCombo.setCurrentIndex(1)
 
-        self.note_Label = QLabel("Нужно ли добавлять примечание", self)
+        self.note_label = QLabel("Нужно ли добавлять примечание", self)
         self.note_question_qcombo = QComboBox(self)
         self.note_question_qcombo.addItems(['Нет', 'Да'])
 
-        self.solvent_Label = QLabel("объем растворителя", self)
+        self.kot_label = QLabel("Нужно ли добавлять систему КОТ-50", self)
+        self.kot_question_qcombo = QComboBox(self)
+
+        self.kot_question_qcombo.addItems(['Нет', 'Да'])
+        if self.data_well.plast_work:
+            self.kot_question_qcombo.setCurrentIndex(1)
+
+        self.solvent_label = QLabel("объем растворителя", self)
         self.solvent_volume_edit = QLineEdit(self)
         self.solvent_volume_edit.setValidator(validator)
         self.solvent_volume_edit.setText("2")
 
-        self.solvent_question_Label = QLabel("необходимость растворителя", self)
+        self.solvent_question_label = QLabel("необходимость растворителя", self)
         self.solvent_question_combo = QComboBox(self)
         self.solvent_question_combo.addItems(['Нет', 'Да'])
 
@@ -64,9 +71,9 @@ class TabPageSoWith(TabPageUnion):
             self.note_question_qcombo.setCurrentIndex(1)
             self.solvent_question_combo.setCurrentIndex(1)
 
-        self.skm_Label = QLabel("диаметр СКМ", self)
-        self.skm_Edit = QLineEdit(self)
-        self.skm_Edit.setValidator(validator)
+        self.skm_label = QLabel("диаметр СКМ", self)
+        self.skm_edit = QLineEdit(self)
+        self.skm_edit.setValidator(validator)
 
         self.dictance_template_second_Label = QLabel("расстояние", self)
         self.dictance_template_second_Edit = QLineEdit(self)
@@ -109,17 +116,20 @@ class TabPageSoWith(TabPageUnion):
         self.grid.addWidget(self.current_bottom_label, 8, 3)
         self.grid.addWidget(self.current_bottom_edit, 9, 3)
 
-        self.grid.addWidget(self.solvent_question_Label, 8, 4)
+        self.grid.addWidget(self.solvent_question_label, 8, 4)
         self.grid.addWidget(self.solvent_question_combo, 9, 4)
 
-        self.grid.addWidget(self.solvent_Label, 8, 5)
+        self.grid.addWidget(self.solvent_label, 8, 5)
         self.grid.addWidget(self.solvent_volume_edit, 9, 5)
 
         self.grid.addWidget(self.privyazka_question_Label, 8, 6)
         self.grid.addWidget(self.privyazka_question_QCombo, 9, 6)
 
-        self.grid.addWidget(self.note_Label, 8, 7)
+        self.grid.addWidget(self.note_label, 8, 7)
         self.grid.addWidget(self.note_question_qcombo, 9, 7)
+
+        self.grid.addWidget(self.kot_label, 8, 8)
+        self.grid.addWidget(self.kot_question_qcombo, 9, 8)
 
         self.grid.addWidget(self.template_str_Label, 11, 1, 1, 8)
         self.grid.addWidget(self.template_str_Edit, 12, 1, 1, 8)
@@ -149,12 +159,13 @@ class TabPageSoWith(TabPageUnion):
         self.template_first_Edit.editingFinished.connect(self.update_template)
         self.length_template_first_Edit.editingFinished.connect(self.update_template)
         self.dictance_template_second_Edit.editingFinished.connect(self.update_template)
-        self.skm_Edit.editingFinished.connect(self.update_template)
+        self.skm_edit.editingFinished.connect(self.update_template)
         self.dictance_three_Edit.editingFinished.connect(self.update_template)
         self.template_second_Edit.editingFinished.connect(self.update_template)
         self.length_template_second_Edit.editingFinished.connect(self.update_template)
         self.current_bottom_edit.editingFinished.connect(self.update_template)
         self.SKM_type_Combo.currentTextChanged.connect(self.update_template)
+        self.kot_question_qcombo.currentTextChanged.connect(self.update_template)
 
     def definition_template_work(self, current_bottom):
         if self.data_well.column_additional is False or \
@@ -174,8 +185,8 @@ class TabPageSoWith(TabPageUnion):
             self.grid.addWidget(self.length_template_first_Edit, 5, 3)
             self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
             self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
-            self.grid.addWidget(self.skm_Label, 4, 5)
-            self.grid.addWidget(self.skm_Edit, 5, 5)
+            self.grid.addWidget(self.skm_label, 4, 5)
+            self.grid.addWidget(self.skm_edit, 5, 5)
             self.grid.addWidget(self.SKM_type_label, 4, 6)
             self.grid.addWidget(self.SKM_type_Combo, 5, 6)
             self.grid.addWidget(self.dictance_template_second_Label, 4, 7)
@@ -209,8 +220,8 @@ class TabPageSoWith(TabPageUnion):
             self.grid.addWidget(self.length_template_first_Edit, 5, 4)
             self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
             self.grid.addWidget(self.dictance_template_second_Edit, 5, 5)
-            self.grid.addWidget(self.skm_Label, 4, 6)
-            self.grid.addWidget(self.skm_Edit, 5, 6)
+            self.grid.addWidget(self.skm_label, 4, 6)
+            self.grid.addWidget(self.skm_edit, 5, 6)
             self.grid.addWidget(self.SKM_type_label, 4, 7)
             self.grid.addWidget(self.SKM_type_Combo, 5, 7)
             self.grid.addWidget(self.dictance_three_Label, 4, 8)
@@ -279,8 +290,8 @@ class TabPageSoWith(TabPageUnion):
             template_second = self.template_second_Edit.text()
         if self.length_template_second_Edit.text() != '':
             length_template_second = self.length_template_second_Edit.text()
-        if self.skm_Edit.text() != '':
-            skm = self.skm_Edit.text()
+        if self.skm_edit.text() != '':
+            skm = self.skm_edit.text()
 
         else:
             dictance_template_first = ''
@@ -293,9 +304,11 @@ class TabPageSoWith(TabPageUnion):
         else:
             dictance_three = ''
         nkt_diam = self.data_well.nkt_diam
+
         kot_str = ''
-        if 'Ойл' in data_list.contractor:
+        if self.kot_question_qcombo.currentText() == 'Да':
             kot_str = '+ КОТ-50'
+
         if self.data_well.column_additional or \
                 (self.data_well.head_column_additional.get_value >= current_bottom and self.data_well.column_additional is False):
             nkt_pod = '60мм' if self.data_well.column_additional_diameter.get_value < 110 else '73мм со снятыми фасками'
@@ -335,7 +348,8 @@ class TabPageSoWith(TabPageUnion):
                                f' + шаблон-{template_second}мм L-{length_template_second}м '
                 self.data_well.template_depth = math.ceil(current_bottom - int(dictance_template_second))
                 self.data_well.skm_depth = self.data_well.template_depth + int(dictance_template_second)
-                skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
+                skm_teml_str = f'{SKM_type}-{skm} до глубины {self.data_well.skm_depth}м, ' \
+                               f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
             elif self.template_Combo.currentText() == 'ПСШ открытый ствол':
                 # if dictance_template_second is not None:
@@ -452,7 +466,7 @@ class TabPageSoWith(TabPageUnion):
         if index != '':
 
             kot_str = ''
-            if 'Ойл' in data_list.contractor:
+            if self.kot_question_qcombo.currentText() == 'Да':
                 kot_str = '+ КОТ-50'
 
             SKM_type = self.SKM_type_Combo.currentText()
@@ -473,7 +487,7 @@ class TabPageSoWith(TabPageUnion):
 
             self.template_first_Edit.setText(str(first_template))
             self.template_second_Edit.setText(str(template_second))
-            self.skm_Edit.setText(str(self.data_well.column_diameter.get_value))
+            self.skm_edit.setText(str(self.data_well.column_diameter.get_value))
             self.dictance_template_second_Edit.setText(str(10))
 
             roof_plast, roof_add_column_plast = self.definition_roof_not_raiding(current_bottom)
@@ -493,7 +507,7 @@ class TabPageSoWith(TabPageUnion):
 
             length_template_second = int(self.length_template_second_Edit.text())
             dictance_template_second = int(self.dictance_template_second_Edit.text())
-            skm = self.skm_Edit.text()
+            skm = self.skm_edit.text()
 
             self.template_first_Label.setParent(None)
             self.template_first_Edit.setParent(None)
@@ -522,7 +536,8 @@ class TabPageSoWith(TabPageUnion):
                 self.data_well.template_depth = int(current_bottom - int(dictance_template_first) -
                                                             int(length_template_first)) - int(dictance_template_second)
                 self.data_well.skm_depth = self.data_well.template_depth + dictance_template_second
-                skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
+                skm_teml_str = f'{SKM_type}-{skm} до глубины {self.data_well.skm_depth}м, ' \
+                               f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
                 self.grid.addWidget(self.template_first_Label, 4, 2)
                 self.grid.addWidget(self.template_first_Edit, 5, 2)
@@ -535,11 +550,12 @@ class TabPageSoWith(TabPageUnion):
 
 
             elif index == 'ПСШ без хвоста':
-                template_str = f'перо {kot_str}+ {SKM_type}-{skm} + {dictance_template_second}м ' \
+                template_str = f'перо {kot_str} + {SKM_type}-{skm} + {dictance_template_second}м ' \
                                f'НКТ{nkt_diam}м + шаблон-{template_second}мм L-{length_template_second}м '
                 self.data_well.template_depth = math.ceil(current_bottom - int(dictance_template_second))
                 self.data_well.skm_depth = current_bottom
-                skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
+                skm_teml_str = f'{SKM_type}-{skm} до глубины {self.data_well.skm_depth}м, ' \
+                               f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
             elif index == 'ПСШ открытый ствол':
 
@@ -559,7 +575,8 @@ class TabPageSoWith(TabPageUnion):
                     current_bottom - dictance_template_first - dictance_template_second)
                 self.data_well.skm_depth = self.data_well.template_depth + dictance_template_second
 
-                skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
+                skm_teml_str = f'{SKM_type}-{skm} до глубины {self.data_well.skm_depth}м, ' \
+                               f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
                 self.grid.addWidget(self.length_template_first_Label, 4, 3)
                 self.grid.addWidget(self.length_template_first_Edit, 5, 3)
@@ -575,7 +592,7 @@ class TabPageSoWith(TabPageUnion):
                 dictance_template_first1 = int(current_bottom - roof_add_column_plast + 5)
 
                 # print(f'дистанци {dictance_template_first }')
-                self.skm_Edit.setText(str(self.data_well.column_diameter.get_value))
+                self.skm_edit.setText(str(self.data_well.column_diameter.get_value))
                 self.dictance_template_first_Edit.setText(str(dictance_template_first1))
                 dictance_template_first = int(self.dictance_template_first_Edit.text())
                 dictance_template_second = int(current_bottom - dictance_template_first1 - \
@@ -620,7 +637,7 @@ class TabPageSoWith(TabPageUnion):
             elif index == 'ПСШ СКМ в доп колонне c хвостом':
 
                 skm = str(self.data_well.column_additional_diameter.get_value)
-                self.skm_Edit.setText(skm)
+                self.skm_edit.setText(skm)
 
                 dictance_template_first = int(current_bottom - roof_add_column_plast + 5)
                 self.dictance_template_first_Edit.setText(str(dictance_template_first))
@@ -668,7 +685,7 @@ class TabPageSoWith(TabPageUnion):
                 self.dictance_template_first_Edit.setText(str(dictance_template_first))
 
                 skm = str(self.data_well.column_additional_diameter.get_value)
-                self.skm_Edit.setText(skm)
+                self.skm_edit.setText(skm)
                 dictance_template_second = 10
                 self.dictance_template_second_Edit.setText(str(dictance_template_second))
 
@@ -705,7 +722,7 @@ class TabPageSoWith(TabPageUnion):
             elif index == 'ПСШ СКМ в доп колонне + открытый ствол':
 
                 skm = str(self.data_well.column_additional_diameter.get_value)
-                self.skm_Edit.setText(skm)
+                self.skm_edit.setText(skm)
 
                 dictance_template_first = int(current_bottom - roof_add_column_plast + 5)
                 self.dictance_template_first_Edit.setText(str(dictance_template_first))
@@ -963,9 +980,11 @@ class TemplateKrs(WindowUnion):
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonadd_string, 3, 1)
 
+        self.current_widget = self.tabWidget.currentWidget()
+
     def add_row_table(self):
-        roof_skm = self.tabWidget.currentWidget().roof_skm_line.text()
-        sole_skm = self.tabWidget.currentWidget().sole_skm_line.text()
+        roof_skm = self.current_widget.roof_skm_line.text()
+        sole_skm = self.current_widget.sole_skm_line.text()
         if roof_skm != '':
             roof_skm = int(float(roof_skm))
         if sole_skm != '':
@@ -975,7 +994,7 @@ class TemplateKrs(WindowUnion):
                                         f'Глубина СКМ на {self.data_well.skm_depth}м не позволяет скреперовать в '
                                         f'{roof_skm}-{sole_skm}м')
                 return
-        template_key = self.tabWidget.currentWidget().template_Combo.currentText()
+        template_key = self.current_widget.template_Combo.currentText()
 
         if not roof_skm or not sole_skm:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
@@ -1019,13 +1038,11 @@ class TemplateKrs(WindowUnion):
     def add_string(self):
         from .advanted_file import skm_interval
 
-        template_key = str(self.tabWidget.currentWidget().template_Combo.currentText())
+        template_key = str(self.current_widget.template_Combo.currentText())
         skm_interval = skm_interval(self, template_key)
 
         if len(skm_interval) == 0:
-            QMessageBox.warning(self, 'Ошибка',
-                                'Интервалы перфорации не отрайбированы,'
-                                'данная компоновка не позволяет скреперовать посадку пакера')
+            QMessageBox.warning(self, 'Ошибка', 'данная компоновка не позволяет скреперовать посадку пакера')
             return
         rows = self.tableWidget.rowCount()
 
@@ -1037,13 +1054,16 @@ class TemplateKrs(WindowUnion):
 
     def add_work(self):
 
-        template_str = str(self.tabWidget.currentWidget().template_str_Edit.text())
-        template_key = str(self.tabWidget.currentWidget().template_Combo.currentText())
-        distance_second = int(float(self.tabWidget.currentWidget().dictance_template_second_Edit.text()))
-        distance_first = int(self.tabWidget.currentWidget().dictance_template_first_Edit.text())
-        template_length = int(float(self.tabWidget.currentWidget().length_template_second_Edit.text()))
+
+        template_str = str(self.current_widget.template_str_Edit.text())
+        template_key = str(self.current_widget.template_Combo.currentText())
+        distance_second = int(float(self.current_widget.dictance_template_second_Edit.text()))
+        distance_first = int(self.current_widget.dictance_template_first_Edit.text())
+        template_length = int(float(self.current_widget.length_template_second_Edit.text()))
+        
+        
         if self.data_well.column_additional:
-            template_length_addition = int(float(self.tabWidget.currentWidget().length_template_first_Edit.text()))
+            template_length_addition = int(float(self.current_widget.length_template_first_Edit.text()))
         if self.data_well.skm_depth > self.data_well.perforation_roof:
             question = QMessageBox.question(self, 'Проверка глубины СКМ',
                                             f'Согласно указания главного инженера СКМ (на глубине '
@@ -1057,9 +1077,9 @@ class TemplateKrs(WindowUnion):
         if self.data_well.column_additional is False or (
                 self.data_well.column_additional is True and float(
             self.data_well.head_column_additional.get_value) >= self.data_well.current_bottom):
-            template_diameter = int(self.tabWidget.currentWidget().template_second_Edit.text())
+            template_diameter = int(self.current_widget.template_second_Edit.text())
         else:
-            template_diameter = int(self.tabWidget.currentWidget().template_first_Edit.text())
+            template_diameter = int(self.current_widget.template_first_Edit.text())
         # print(self.data_well.problem_with_ek_diameter)
         if (template_diameter >= int(self.data_well.problem_with_ek_diameter) - 2
                 and self.data_well.template_depth > float(self.data_well.problem_with_ek_depth)):
@@ -1109,7 +1129,7 @@ class TemplateKrs(WindowUnion):
         if self.data_well.column_additional:
             self.data_well.template_length_addition = template_length_addition
 
-        self.privyazka_question = self.tabWidget.currentWidget().privyazka_question_QCombo.currentText()
+        self.privyazka_question = self.current_widget.privyazka_question_QCombo.currentText()
         if self.privyazka_question == 'Да':
             mes = QMessageBox.question(self, 'Привязка', 'ЗУМПФ меньше 10м. '
                                                          'Нужна привязка, корректно ли?')
@@ -1153,14 +1173,15 @@ class TemplateKrs(WindowUnion):
         # print(f'внут {skm_list}')
         skm_interval = raid(skm_list)
 
-        solvent_question = self.tabWidget.currentWidget().solvent_question_combo.currentText()
-        solvent_volume_edit = self.tabWidget.currentWidget().solvent_volume_edit.text()
+        solvent_question = self.current_widget.solvent_question_combo.currentText()
+        solvent_volume_edit = self.current_widget.solvent_volume_edit.text()
         if solvent_volume_edit != '':
             solvent_volume_edit = round(float(solvent_volume_edit), 1)
 
-        note_question_qcombo = self.tabWidget.currentWidget().note_question_qcombo.currentText()
+        self.note_question_qcombo = self.current_widget.note_question_qcombo.currentText()
+        self.kot_question_qcombo = self.current_widget.kot_question_qcombo.currentText()
 
-        current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
+        current_bottom = self.current_widget.current_bottom_edit.text()
         if current_bottom != '':
             current_bottom = round(float(current_bottom), 1)
 
@@ -1171,13 +1192,18 @@ class TemplateKrs(WindowUnion):
              f'(при недохождении до нужного интервала допускается посадка инструмента не более 2т)',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(current_bottom, 1.2)],
+            [None, None, f'Нормализовать забой обратной промывкой тех жидкостью уд.весом '
+                         f'{self.data_well.fluid_work} до глубины {current_bottom}м.', None, None, None, None,
+             None, None, None,
+             'Мастер КРС', None],
             [f'Произвести скреперование в интервале {skm_interval}м Допустить низ НКТ до гл. {current_bottom}м',
              None,
              f'Произвести скреперование э/к в интервале {skm_interval}м обратной промывкой и проработкой 5 раз каждого '
              'наращивания. Работы производить согласно сборника технологических регламентов и инструкций в присутствии '
              f'представителя Заказчика. Допустить низ НКТ до гл. {current_bottom}м, шаблон '
              f'до глубины {self.data_well.template_depth}м. Составить акт. \n'
-             '(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до начала работ). ',
+             '(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за '
+             '2 часа до начала работ). ',
              None, None, None, None, None, None, None,
              'Мастер КРС, представитель УСРСиСТ', round(0.012 * 90 * 1.04 + 1.02 + 0.77, 2)],
             [f'Очистить колонну от АСПО растворителем - {solvent_volume_edit}м3', None,
@@ -1200,10 +1226,6 @@ class TemplateKrs(WindowUnion):
                 f'ДОПУСТИМАЯ ОСЕВАЯ НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
                 None, None, None, None, None, None, None,
                 'Мастер КРС, представитель ЦДНГ', well_volume_norm(TemplateKrs.well_volume(self) * 1.5)],
-            [None, None, f'Нормализовать забой обратной промывкой тех жидкостью уд.весом '
-                         f'{self.data_well.fluid_work} до глубины {current_bottom}м.', None, None, None, None,
-             None, None, None,
-             'Мастер КРС', None],
             [f'Приподнять до глубины {round(float(current_bottom) - 20, 1)}м. Тех отстой 2ч', None,
              f'Приподнять до глубины {round(float(current_bottom) - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя, '
              f'при необходимости повторная промывка.',
@@ -1215,8 +1237,14 @@ class TemplateKrs(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер КРС', liftingNKT_norm(float(current_bottom), 1.2)]
         ]
-        if abs(self.data_well.perforation_roof - current_bottom) < 15:
+        if abs(self.data_well.perforation_sole - current_bottom) > 10:
             list_template_ek.pop(-2)
+
+        if self.kot_question_qcombo == 'Да' and self.data_well.count_template == 0:
+            list_template_ek.insert(-1, ['опрессовать тНКТ на 150атм', None,
+             f'Перед подъемом опрессовать тНКТ на давление 150атм. ',
+             None, None, None, None, None, None, None,
+             'Мастер КРС', 0.7])
 
         notes_list = [
             [None, None,
@@ -1273,32 +1301,37 @@ class TemplateKrs(WindowUnion):
 
         cable_type_text = ''
         angle_text = ''
-        if self.data_well.angle_data:
-            angle_text = self.calculate_angle(current_bottom, self.data_well.angle_data)
-            if angle_text:
-                cable_type_text = ' СОГЛАСОВАТЬ ЖЕСТКИЙ КАБЕЛЬ'
 
-        privyazka_nkt = [f'Привязка по ГК и ЛМ по привязому НКТ удостовериться в наличии текущего забоя', None,
-                         f'Вызвать геофизическую партию.{cable_type_text} Заявку оформить за 16 часов сутки через'
-                         f' ЦИТС {data_list.contractor}.'
-                         f' ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины.'
-                         f' По привязому НКТ удостовериться в наличии '
-                         f'текущего забоя с плановым, Нормализовать '
-                         f'забой обратной промывкой тех жидкостью '
-                         f'уд.весом {self.data_well.fluid_work}   до глубины {self.data_well.current_bottom}м',
-                         None, None, None, None, None, None, None, 'Мастер КРС', None, None]
 
         if self.privyazka_question == "Да":
+            if self.data_well.angle_data:
+                if self.data_well.max_angle.get_value > 50:
+                    tuple_angle = self.calculate_angle(self.data_well.current_bottom, self.data_well.angle_data)
+                    if float(tuple_angle[0]) >= self.data_well.max_angle_depth.get_value:
+                        cable_type_text = ' СОГЛАСОВАТЬ ЖЕСТКИЙ КАБЕЛЬ'
+                        angle_text = angle_text[1]
+
+            privyazka_nkt = [f'Привязка по ГК и ЛМ по привязому НКТ удостовериться в наличии текущего забоя', None,
+                             f'Вызвать геофизическую партию.{cable_type_text} {angle_text}. '
+                             f'Заявку оформить за 16 часов сутки через'
+                             f' ЦИТС {data_list.contractor}.'
+                             f' ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины.'
+                             f' По привязому НКТ удостовериться в наличии '
+                             f'текущего забоя с плановым, Нормализовать '
+                             f'забой обратной промывкой тех жидкостью '
+                             f'уд.весом {self.data_well.fluid_work}   до глубины {self.data_well.current_bottom}м',
+                             None, None, None, None, None, None, None, 'Мастер КРС', None, None]
+
             list_template_ek.insert(-1, privyazka_nkt)
 
         self.update_skm_interval(self.data_well.insert_index, skm_list)
 
-        if self.data_well.gips_in_well is True and self.data_well.count_template == 0:  # Добавление работ при наличии Гипсово-солевых отложений
+        if self.data_well.gips_in_well is True and self.data_well.count_template == 0:
             gips = TemplateKrs.pero(self)
             for row in gips[::-1]:
                 list_template_ek.insert(0, row)
         # print(f'счет использования шаблн {self.data_well.count_template}')
-        if note_question_qcombo == "Да":
+        if self.note_question_qcombo == "Да":
             list_template_ek = list_template_ek + notes_list
             self.data_well.count_template += 1
         else:
@@ -1348,7 +1381,7 @@ class TemplateKrs(WindowUnion):
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5],
-            [None, None, f'Нормализовать забой обратной промывкой тех жидкостью уд.весом '
+            [None, None, f'ПРИ НЕОБХОДИМОСТИ: \n Нормализовать забой обратной промывкой тех жидкостью уд.весом '
                          f'{self.data_well.fluid_work} до глубины {self.data_well.current_bottom}м.',
              None, None, None, None,
              None, None, None,

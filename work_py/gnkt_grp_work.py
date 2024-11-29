@@ -27,7 +27,7 @@ class TabPageGnkt(TabPageUnion):
         super().__init__(parent)
 
         self.validator_int = QIntValidator(0, 8000)
-        self.validator_float = QDoubleValidator(0, 8000, 1)
+        self.validator_float = QDoubleValidator(0, 8000, 2)
 
         self.init_gnkt()
 
@@ -61,10 +61,15 @@ class TabPageGnkt(TabPageUnion):
 
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
         self.fluid_edit = QLineEdit(self)
+        self.fluid_edit.setValidator(self.validator_float)
+        self.fluid_edit.setText(self.data_well.fluid)
+
+        self.fluid_work_label = QLabel("уд.вес рабочей жидкости", self)
+        self.fluid_work_edit = QLineEdit(self)
         if self.data_well.work_plan == 'gnkt_opz':
-            self.fluid_edit.setText('1.18')
+            self.fluid_work_edit.setText('1.18')
         else:
-            self.fluid_edit.setText('1.01')
+            self.fluid_work_edit.setText('1.01')
 
         self.distance_pntzh_label = QLabel('Расстояние до ПНТЖ')
         self.distance_pntzh_line = QLineEdit(self)
@@ -91,6 +96,8 @@ class TabPageGnkt(TabPageUnion):
         self.grid.addWidget(self.current_bottom_edit, 5, 2)
         self.grid.addWidget(self.fluid_label, 4, 3)
         self.grid.addWidget(self.fluid_edit, 5, 3)
+        self.grid.addWidget(self.fluid_work_label, 4, 4)
+        self.grid.addWidget(self.fluid_work_edit, 5, 4)
         self.grid.addWidget(self.distance_pntzh_label, 4, 5)
         self.grid.addWidget(self.distance_pntzh_line, 5, 5)
 
@@ -238,6 +245,7 @@ class GnktModel(WindowUnion):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.fluid_work_edit = None
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -530,7 +538,8 @@ class GnktModel(WindowUnion):
                                     f'Текущий забой ниже пробуренного забоя {self.data_well.bottom_hole_drill.get_value}')
                 return
 
-        self.fluid_edit = self.current_widget.fluid_edit.text()
+        self.fluid_edit = self.current_widget.fluid_edit.text().replace(',', '.')
+        self.fluid_work_edit = self.current_widget.fluid_work_edit.text().replace(',', '.')
 
         if self.data_well.work_plan in ['gnkt_after_grp', 'gnkt_frez']:
 
@@ -567,16 +576,17 @@ class GnktModel(WindowUnion):
             return
 
         fluid_question = QMessageBox.question(self, 'Удельный вес',
-                                              f'Работы необходимо производить на тех воде {self.fluid_edit}г/см3?')
+                                              f'Работы необходимо производить на тех воде {self.fluid_work_edit}г/см3?')
         if fluid_question == QMessageBox.StandardButton.No:
             return
 
         self.data_well.gnkt_number_combo = self.gnkt_number_combo
-        self.data_well.length_gnkt_edit = float(self.length_gnkt_edit)
-        self.data_well.iznos_gnkt_edit = float(self.iznos_gnkt_edit)
-        self.data_well.fluid_edit = self.fluid_edit
+        self.data_well.length_gnkt_edit = float(self.length_gnkt_edit.replace(',', '.'))
+        self.data_well.iznos_gnkt_edit = float(self.iznos_gnkt_edit.replace(',', '.'))
+        self.data_well.fluid_edit = self.fluid_edit.replace(',', '.')
+        self.data_well.fluid_work_edit = self.fluid_work_edit.replace(',', '.')
         self.data_well.pvo_number = self.pvo_number
-        self.data_well.pipe_mileage_edit = self.pipe_mileage_edit
+        self.data_well.pipe_mileage_edit = self.pipe_mileage_edit.replace(',', '.')
 
         self.well_volume_ek, self.well_volume_dp = self.check_volume_well(self.data_well)
 
@@ -1023,8 +1033,10 @@ class GnktModel(WindowUnion):
              None, self.data_well.gaz_factor_percent[0], None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Коэффициент аномальности', None,
              None, None, None, koef_anomal, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, 'Плотность жидкость глушения',
+            [None, None, None, None, None, None, None, None, None, None, None, None, 'Плотность жидкости глушения',
              None, None, None, None, fluid_edit, None, 'в объеме', None, self.well_volume_ek, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None, 'Плотность рабочей жидкости',
+             None, None, None, None, self.fluid_work_edit, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, expected_title, None,
              None, None, None, Qoil, None, Qwater, None, proc_water, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Максимальный угол наклона', None,

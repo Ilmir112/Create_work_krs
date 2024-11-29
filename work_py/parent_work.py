@@ -48,14 +48,86 @@ class TabPageUnion(QWidget):
             else:
                 diam_internal_ek = self.data_well.column_additional_diameter.get_value - \
                                    2 * self.data_well.column_additional_wall_thickness.get_value
-            paker_diameter = 0
+
             for diam, diam_internal_paker in paker_diam_dict.items():
                 if diam_internal_paker[0] <= diam_internal_ek <= diam_internal_paker[1]:
                     paker_diameter = diam
+                    break
         except Exception as e:
             print('ошибка проверки диаметра пакера')
 
         return paker_diameter
+
+    def insert_data_dop_plan(self, result, paragraph_row):
+        self.data_well.plast_project = []
+        self.data_well.dict_perforation_project = {}
+        self.data_well.data_list = []
+        self.data_well.gips_in_well = False
+        self.data_well.drilling_interval = []
+        self.data_well.for_paker_list = False
+        self.data_well.grp_plan = False
+        self.data_well.angle_data = []
+        self.data_well.nkt_opress_true = False
+        self.data_well.bvo = False
+        self.data_well.stabilizator_need = False
+        self.data_well.current_bottom_second = 0
+
+        paragraph_row = paragraph_row - 1
+
+        if len(result) <= paragraph_row:
+            QMessageBox.warning(self, 'Ошибка', f'В плане работ только {len(result)} пунктов')
+            return
+
+        self.data_well.current_bottom = result[paragraph_row][1]
+
+        self.data_well.dict_perforation = json.loads(result[paragraph_row][2])
+
+        self.data_well.plast_all = json.loads(result[paragraph_row][3])
+        self.data_well.plast_work = json.loads(result[paragraph_row][4])
+        self.data_well.dict_leakiness = json.loads(result[paragraph_row][5])
+        self.data_well.leakiness = False
+        self.data_well.leakiness_interval = []
+        if self.data_well.dict_leakiness:
+            self.data_well.leakiness = True
+            self.data_well.leakiness_interval = list(self.data_well.dict_leakiness['НЭК'].keys())
+
+        if result[paragraph_row][6] == 'true':
+            self.data_well.column_additional = True
+        else:
+            self.data_well.column_additional = False
+
+        self.data_well.fluid_work = result[paragraph_row][7]
+
+        self.data_well.category_pressure = result[paragraph_row][8]
+        self.data_well.category_h2s = result[paragraph_row][9]
+        self.data_well.category_gas_factor = result[paragraph_row][10]
+        self.data_well.category_pvo = 2
+        if str(self.data_well.category_pressure) == '1' or str(self.data_well.category_h2s) == '1' \
+                or self.data_well.category_gas_factor == '1':
+            self.data_well.category_pvo = 1
+        try:
+            self.data_well.template_depth, self.data_well.template_length, \
+            self.data_well.template_depth_addition, self.data_well.template_length_addition = \
+                json.loads(result[paragraph_row][11])
+        except Exception:
+            self.data_well.template_depth = result[paragraph_row][11]
+        self.data_well.skm_interval = json.loads(result[paragraph_row][12])
+
+        self.data_well.problem_with_ek_depth = result[paragraph_row][13]
+        self.data_well.problem_with_ek_diameter = result[paragraph_row][14]
+        try:
+            self.data_well.head_column = ProtectedIsDigit(result[paragraph_row][16])
+        except Exception:
+            print('отсутствуют данные по голове хвостовика')
+        self.data_well.dict_perforation_short = json.loads(result[paragraph_row][2])
+
+        try:
+            self.data_well.ribbing_interval = json.loads(result[paragraph_row][15])
+        except Exception:
+            print('отсутствуют данные по интервалам райбирования')
+
+        definition_plast_work(self)
+        return True
 
     @staticmethod
     def check_if_none(value):
@@ -101,7 +173,10 @@ class WindowUnion(MyMainWindow):
             dict_well = json.loads(data_well[len(data_well) - 1][0])
             data = dict_well['data']
             rowHeights = dict_well['rowHeights']
-            col_width = dict_well['col_width']
+            if 'colWidth' in list(dict_well.keys()):
+                col_width = dict_well['colWidth']
+            elif 'col_width' in list(dict_well.keys()):
+                col_width = dict_well['col_width']
             boundaries_dict = dict_well['merged_cells']
 
         except Exception as e:
@@ -125,7 +200,6 @@ class WindowUnion(MyMainWindow):
             else:
                 self.data_well.open_trunk_well = False
     def extraction_data(self, table_name, paragraph_row=0):
-
         date_table = table_name.split(' ')[-1]
         well_number = table_name.split(' ')[0]
         well_area = table_name.split(' ')[1]
@@ -245,84 +319,13 @@ class WindowUnion(MyMainWindow):
         definition_plast_work(self)
         return True
 
-    def insert_data_dop_plan(self, result, paragraph_row):
-        self.data_well.plast_project = []
-        self.data_well.dict_perforation_project = {}
-        self.data_well.data_list = []
-        self.data_well.gips_in_well = False
-        self.data_well.drilling_interval = []
-        self.data_well.for_paker_list = False
-        self.data_well.grp_plan = False
-        self.data_well.angle_data = []
-        self.data_well.nkt_opress_true = False
-        self.data_well.bvo = False
-        self.data_well.stabilizator_need = False
-        self.data_well.current_bottom_second = 0
-
-        paragraph_row = paragraph_row - 1
-
-        if len(result) <= paragraph_row:
-            QMessageBox.warning(self, 'Ошибка', f'В плане работ только {len(result)} пунктов')
-            return
-
-        self.data_well.current_bottom = result[paragraph_row][1]
-
-        self.data_well.dict_perforation = json.loads(result[paragraph_row][2])
-
-        self.data_well.plast_all = json.loads(result[paragraph_row][3])
-        self.data_well.plast_work = json.loads(result[paragraph_row][4])
-        self.data_well.dict_leakiness = json.loads(result[paragraph_row][5])
-        self.data_well.leakiness = False
-        self.data_well.leakiness_interval = []
-        if self.data_well.dict_leakiness:
-            self.data_well.leakiness = True
-            self.data_well.leakiness_interval = list(self.data_well.dict_leakiness['НЭК'].keys())
-
-        if result[paragraph_row][6] == 'true':
-            self.data_well.column_additional = True
-        else:
-            self.data_well.column_additional = False
-
-        self.data_well.fluid_work = result[paragraph_row][7]
-
-        self.data_well.category_pressure = result[paragraph_row][8]
-        self.data_well.category_h2s = result[paragraph_row][9]
-        self.data_well.category_gas_factor = result[paragraph_row][10]
-        self.data_well.category_pvo = 2
-        if str(self.data_well.category_pressure) == '1' or str(self.data_well.category_h2s) == '1' \
-                or self.data_well.category_gas_factor == '1':
-            self.data_well.category_pvo = 1
-        try:
-            self.data_well.template_depth, self.data_well.template_length, \
-            self.data_well.template_depth_addition, self.data_well.template_length_addition = \
-                json.loads(result[paragraph_row][11])
-        except Exception:
-            self.data_well.template_depth = result[paragraph_row][11]
-        self.data_well.skm_interval = json.loads(result[paragraph_row][12])
-
-        self.data_well.problem_with_ek_depth = result[paragraph_row][13]
-        self.data_well.problem_with_ek_diameter = result[paragraph_row][14]
-        try:
-            self.data_well.head_column = ProtectedIsDigit(result[paragraph_row][16])
-        except Exception:
-            print('отсутствуют данные по голове хвостовика')
-        self.data_well.dict_perforation_short = json.loads(result[paragraph_row][2])
-
-        try:
-            self.data_well.ribbing_interval = json.loads(result[paragraph_row][15])
-        except Exception:
-            print('отсутствуют данные по интервалам райбирования')
-
-        definition_plast_work(self)
-        return True
-
-    @staticmethod
-    def calculate_angle(max_depth_pvr, angle_data):
+    def calculate_angle(self, max_depth_pvr, angle_data):
+        tuple_angle = ()
         for depth, angle, _ in angle_data:
             if abs(float(depth) - float(max_depth_pvr)) < 10:
-                if float(str(angle).replace(',', '.')) > 45.1:
-                    return f'Зенитный угол на глубине {depth}м равен {angle}гр'
-        return ''
+                tuple_angle = depth, angle, f'Зенитный угол на глубине {depth}м равен {angle}гр'
+
+        return tuple_angle
 
     def calc_work_fluid(self, fluid_work_insert):
         self.data_well.fluid = float(fluid_work_insert)

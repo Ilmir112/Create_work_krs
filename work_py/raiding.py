@@ -34,7 +34,7 @@ class TabPageSo_raid(TabPageUnion):
         self.downhole_motor_line.setClearButtonEnabled(True)
 
         if self.data_well.column_additional is False or (self.data_well.column_additional and
-                                                    self.data_well.head_column_additional.value < self.data_well.current_bottom):
+                                    self.data_well.head_column_additional.get_value < self.data_well.current_bottom):
             self.raid_select_combo.setCurrentIndex(0)
             if self.data_well.column_diameter.get_value > 127:
                 self.downhole_motor_line.setText('Д-106')

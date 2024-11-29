@@ -154,7 +154,7 @@ class CorrectPlanWindow(WindowUnion):
 
                 insert_data_well_dop_plan(self, data_well[0])
 
-            self.extraction_data(self, well_data_in_base_combo)
+            self.extraction_data(well_data_in_base_combo)
 
             DopPlanWindow.work_with_excel(self, well_number, well_area, well_data_in_base, self.data_well.type_kr)
 

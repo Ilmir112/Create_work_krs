@@ -835,6 +835,15 @@ class DataWindow(WindowUnion):
                 if key.text() != '' and value.text() != '':
                     self.data_well.dict_nkt_before[key.text()] = self.check_if_none(int(float(value.text())))
 
+        if all([pump for pump in [self.ifNum(dict_pump_ecn_posle), self.ifNum(paker2_posle),
+                                    self.ifNum(dict_pump_shgn_posle), self.ifNum(paker_posle)]]):
+
+            voronka_question = QMessageBox.question(self, 'Внимание',
+                                                    'Программа определила что в скважине '
+                                                    'После ремонта воронка, верно ли')
+            if voronka_question == QMessageBox.StandardButton.No:
+                return
+
         if self.current_widget.labels_nkt_po:
             for key, value in self.current_widget.labels_nkt_po.values():
                 if key.text() != '' and value.text() != '':
@@ -947,16 +956,7 @@ class DataWindow(WindowUnion):
 
 
 
-        if all([pump for pump in [self.ifNum(dict_pump_ecn_posle), self.ifNum(paker2_posle),
-                                    self.ifNum(dict_pump_shgn_posle), self.ifNum(paker_posle)]]):
 
-            voronka_question = QMessageBox.question(self, 'Внимание',
-                                                    'Программа определила что в скважине '
-                                                    'После ремонта воронка, верно ли')
-            if voronka_question == QMessageBox.StandardButton.No:
-                close_file = False
-            else:
-                close_file = True
         if (data_list.nkt_mistake is True and len(self.data_well.dict_nkt_before) == 0):
             QMessageBox.information(self, 'Внимание',
                                     'При вызванной ошибке НКТ до ремонта не может быть пустым')
@@ -998,14 +998,7 @@ class DataWindow(WindowUnion):
                              'КР7-4  Проведение ГПП']:
             self.data_well.grp_plan = True
 
-        if all([pump for pump in [self.ifNum(dict_pump_ecn_do), self.ifNum(paker2_do),
-                                    self.ifNum(dict_pump_shgn_do), self.ifNum(paker_do)]]):
-            voronka_question = QMessageBox.question(self, 'Внимание',
-                                                    'Программа определила что в скважине до ремонта воронка, верно ли')
-            if voronka_question == QMessageBox.StandardButton.No:
-                close_file = False
-            else:
-                close_file = True
+
 
         if curator == 'ОР':
             if self.ifNum(expected_Q_edit) is False or self.ifNum(expected_P_edit) is False:

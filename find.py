@@ -13,7 +13,6 @@ from openpyxl.workbook import Workbook
 from openpyxl.utils.cell import get_column_letter
 from openpyxl_image_loader import SheetImageLoader
 
-
 from main import ExcelWorker, MyMainWindow, MyWindow
 
 from plan import delete_rows_pz
@@ -27,6 +26,7 @@ class FindIndexPZ(MyMainWindow):
     def __init__(self, ws, work_plan, parent=None):
         super().__init__()
 
+        self.perforation_sole = 5000
         self.number_dp = 0
         self.fluid_work = None
         self.nkt_template = None
@@ -1259,25 +1259,25 @@ class WellData(FindIndexPZ):
                     self.pause_app()
 
         if type(self.column_diameter.get_value) in [float, int]:
-            if str(self.paker_before["do"]).lower() not in ['0', 0, '-', 'отсут', '', 'none', None]:
-
-                if '/' in str(self.depth_fond_paker_before["do"]):
-                    paker_diameter = TabPageSo.paker_diameter_select(
-                        self, str(self.depth_fond_paker_before["do"]).split('/')[0])
-                    if paker_diameter not in self.paker_before["do"]:
-                        self.check_data_in_pz.append(
-                            f'Не корректно указан диаметр фондового пакера в карте спуска '
-                            f'ремонта {str(self.paker_before["do"]).split("/")[0]} требуется пакер '
-                            f'диаметром {paker_diameter}мм')
-                else:
-                    if self.depth_fond_paker_before["do"] != 0:
-                        paker_diameter = TabPageSo.paker_diameter_select(self,
-                                                                         self.depth_fond_paker_before["do"])
-                        if str(paker_diameter) not in self.paker_before["do"]:
-                            self.check_data_in_pz.append(
-                                f'Не корректно указан диаметр фондового пакера в карте спуска '
-                                f'ремонта {self.paker_before["do"]} требуется пакер '
-                                f'диаметром {paker_diameter}мм')
+            # if str(self.paker_before["do"]).lower() not in ['0', 0, '-', 'отсут', '', 'none', None]:
+            #
+            #     if '/' in str(self.depth_fond_paker_before["do"]):
+            #         paker_diameter = TabPageSo.paker_diameter_select(
+            #             self, str(self.depth_fond_paker_before["do"]).split('/')[0])
+            #         if paker_diameter not in self.paker_before["do"]:
+            #             self.check_data_in_pz.append(
+            #                 f'Не корректно указан диаметр фондового пакера в карте спуска '
+            #                 f'ремонта {str(self.paker_before["do"]).split("/")[0]} требуется пакер '
+            #                 f'диаметром {paker_diameter}мм')
+            #     else:
+            #         if self.depth_fond_paker_before["do"] != 0:
+            #             paker_diameter = TabPageSo.paker_diameter_select(self,
+            #                                                              self.depth_fond_paker_before["do"])
+            #             if str(paker_diameter) not in self.paker_before["do"]:
+            #                 self.check_data_in_pz.append(
+            #                     f'Не корректно указан диаметр фондового пакера в карте спуска '
+            #                     f'ремонта {self.paker_before["do"]} требуется пакер '
+            #                     f'диаметром {paker_diameter}мм')
 
             if self.dict_pump_ecn["do"] != '0' and self.dict_pump_shgn["do"] != '0':
                 if self.paker_before["do"] in ['0', None, 0]:
@@ -1322,50 +1322,44 @@ class WellData(FindIndexPZ):
 
     @staticmethod
     def read_angle_well():
-        fname, _ = QtWidgets.QFileDialog.getOpenFileName(None, 'Выберите файл', '.',
-                                                         "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
-        # Загрузка файла Excel
-        wb = load_workbook(fname)
-        sheet_angle = wb.active
-        angle_data = []
-        depth_column = ''
-        row_data = ''
-        angle_column = ''
-        curvature_column = ''
-        for index_row, row in enumerate(sheet_angle.iter_rows(min_row=1, max_row=50, values_only=True)):
-            for col, value in enumerate(row):
-                if value is not None:
-                    if 'глубина' in str(value).lower() and col <= 7:
-                        depth_column = col
-                        row_data = index_row
+        fname = None
+        while fname is None:
+            fname, _ = QtWidgets.QFileDialog.getOpenFileName(None, 'Выберите файл', '.',
+                                                             "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+            # Загрузка файла Excel
+            wb = load_workbook(fname)
+            sheet_angle = wb.active
+            angle_data = []
+            depth_column = ''
+            row_data = ''
+            angle_column = ''
+            curvature_column = ''
+            for index_row, row in enumerate(sheet_angle.iter_rows(min_row=1, max_row=10, values_only=True)):
+                for col, value in enumerate(row):
+                    if value is not None:
+                        if 'глубина' in str(value).lower() and col <= 7:
+                            depth_column = col
+                            row_data = index_row
 
-                    elif ('Угол, гpад' in str(value) and col <= 7) or 'зенитный' in str(value).lower():
-                        angle_column = col
+                        elif ('Угол, гpад' in str(value) and col <= 7) or 'зенитный' in str(value).lower():
+                            angle_column = col
 
-                    elif 'кривизна' in str(value).lower() or 'гр./10' in str(value).lower():
-                        curvature_column = col
+                        elif 'кривизна' in str(value).lower() or 'гр./10' in str(value).lower():
+                            curvature_column = col
 
-        if depth_column == '':
-            depth_column, ok = QInputDialog.getInt(None, 'номер столбца', 'Программа не смогла найти номер столбца с '
-                                                                          'указанием значений глубин')
-        if row_data == '':
-            row_data, ok = QInputDialog.getInt(None, 'номер столбца', 'Программа не смогла найти номер строки с '
-                                                                      'указанием данных строки')
-        if angle_column == '':
-            angle_column, ok = QInputDialog.getInt(None, 'номер столбца', 'Программа не смогла найти номер столбца с '
-                                                                          'указанием значений угла')
-        if curvature_column == '':
-            curvature_column, ok = QInputDialog.getInt(None, 'номер столбца',
-                                                       'Программа не смогла найти номер столбца с '
-                                                       'указанием интенсивности набора угла')
-        if depth_column != '' and row_data != '' and angle_data != '' and curvature_column != '':
+            if depth_column == '' or row_data == '' or angle_column == '' or curvature_column == '':
+                mes = QMessageBox.question(None, 'Ошибка', 'Файл не корректный, необходимо загрузить корректный файл')
+                if mes == QMessageBox.StandardButton.No:
+                    fname = 'без загрузки'
+                else:
+                    fname = None
+        if fname not in ['без загрузки']:
             # Вставка данных в таблицу
             for index_row, row in enumerate(sheet_angle.iter_rows(min_row=row_data, values_only=True)):
                 if str(row[depth_column]).replace(',', '').replace('.', '').isdigit():
                     angle_data.append((row[depth_column], row[angle_column], row[curvature_column]))
         else:
-            QMessageBox.warning(None, 'Ошибка', 'Ошибка обработки excel файла, Необходимо проверить файл')
-            return None
+            return []
         return angle_data
 
 
@@ -1721,7 +1715,8 @@ class WellCategory(FindIndexPZ):
                                         self.value_h2s_mg.append(
                                             float(str(self.ws.cell(row=row, column=col - 1).value).replace(',', '.')))
 
-                                if str(cell).strip() in ['мг/м3'] and self.ws.cell(row=row - 1, column=col - 1).value not in \
+                                if str(cell).strip() in ['мг/м3'] and self.ws.cell(row=row - 1,
+                                                                                   column=col - 1).value not in \
                                         ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3'] and \
                                         self.ws.cell(row=row + 1, column=col - 1).value not in \
                                         ['мг/л', 'мг/дм3', 'мг/дм', 'мгдм3']:

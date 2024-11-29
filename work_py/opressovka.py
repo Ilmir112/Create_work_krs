@@ -316,7 +316,8 @@ class OpressovkaEK(WindowUnion):
                 [f'Опрессовать ЗУМПФ в инт {paker_depth_zumpf} - {self.data_well.current_bottom}м на '
                  f'Р={self.data_well.max_admissible_pressure.get_value}атм', None,
                  f'Посадить пакер. Опрессовать ЗУМПФ в интервале {paker_depth_zumpf} - {self.data_well.current_bottom}м на '
-                 f'Р={self.data_well.max_admissible_pressure.get_value}атм в течение 30 минут в присутствии представителя заказчика, '
+                 f'Р={self.data_well.max_admissible_pressure.get_value}атм в течение 30 минут в присутствии '
+                 f'представителя заказчика, '
                  f'составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
                  f'с подтверждением за 2 часа до начала работ)',
                  None, None, None, None, None, None, None,
@@ -551,17 +552,12 @@ class OpressovkaEK(WindowUnion):
 
         return paker_list
 
-
-
-
-
     def nkt_opress(self):
-
         if self.data_well.nkt_opress_true is False:
             self.data_well.nkt_opress_true is True
-            return 'НКТ + опрессовочное седло', 'Опрессовать НКТ на 200атм. Вымыть шар'
+            return 'НКТ + репер', ''
         else:
-            return 'НКТ', ''
+            return 'НКТ + репер', ''
 
     # функция проверки спуска пакера выше прошаблонированной колонны
     def check_for_template_paker(self, depth):

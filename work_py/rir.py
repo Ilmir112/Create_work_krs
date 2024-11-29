@@ -88,7 +88,7 @@ class TabPageSoRir(TabPageUnion):
         self.pressure_zumpf_question_QCombo.addItems(['Нет', 'Да'])
         self.paker_need_combo.currentTextChanged.connect(self.update_paker)
 
-        self.pressure_zumpf_question_QCombo.currentTextChanged.connect(self.update_pakerZUMPF)
+        self.pressure_zumpf_question_QCombo.currentTextChanged.connect(self.update_paker_zumph)
 
         self.need_privyazka_Label = QLabel("Привязка оборудования", self)
         self.need_privyazka_q_combo = QComboBox()
@@ -199,9 +199,7 @@ class TabPageSoRir(TabPageUnion):
             self.pressure_new_label.setParent(None)
             self.pressure_new_edit.setParent(None)
 
-    def update_pakerZUMPF(self, index):
-        from .opressovka import TabPageSo
-
+    def update_paker_zumph(self, index):
         if index == 'Да':
             if len(self.data_well.plast_work) != 0:
                 paker_depth_zumpf = self.data_well.perforation_roof + 10
@@ -668,7 +666,8 @@ class RirWindow(WindowUnion):
         return rpk_nkt_select
 
     def rir_with_pero_gl(self, paker_need_combo, plast_combo,
-                       roof_rir_edit, sole_rir_edit, volume_cement, info_rir_edit='', need_change_zgs_combo='Нет', plast_new_combo='',
+                       roof_rir_edit, sole_rir_edit, volume_cement, info_rir_edit='',
+                         need_change_zgs_combo='Нет', plast_new_combo='',
                        fluid_new_edit='', pressure_new_edit='', pressure_zumpf_question='Не нужно',
                        diameter_paker=122, paker_khost=0, paker_depth=0):
 
@@ -1233,10 +1232,9 @@ class RirWindow(WindowUnion):
                     return
             info_rir_edit = ''
 
-            work_list = self.rir_with_pero_gl(paker_need_combo, plast_combo,
-                                            roof_rir_edit, sole_rir_edit, volume_cement, info_rir_edit, need_change_zgs_combo,
-                                            plast_new_combo,
-                                            fluid_new_edit, pressure_new_edit, pressure_zumpf_question,
+            work_list = self.rir_with_pero_gl(
+                paker_need_combo, plast_combo, roof_rir_edit, sole_rir_edit, volume_cement, info_rir_edit,
+                need_change_zgs_combo, plast_new_combo,fluid_new_edit, pressure_new_edit, pressure_zumpf_question,
                                             diameter_paker, paker_khost, paker_depth)
 
 
