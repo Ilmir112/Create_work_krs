@@ -45,7 +45,6 @@ def head_ind(start, finish):
     return f'A{start}:L{finish}'
 
 
-
 def copy_true_ws(data_well, ws, ws2, head):
     for row_number, row in enumerate(ws[head]):
         for col_number, cell in enumerate(row):
@@ -54,7 +53,7 @@ def copy_true_ws(data_well, ws, ws2, head):
                     break
                 ws2.cell(row_number + 1, col_number + 1, cell.value)
 
-            if 'катег' in str(cell.value).lower():
+            if 'катег' in str(cell.value).lower() and 'план' not in str(cell.value).lower():
                 if data_well.work_plan not in ['krs', 'dop_plan', 'dop_plan_in_base', 'plan_change']:
                     ws2.cell(row=row_number + 1, column=col_number + 1).alignment = Alignment(wrap_text=True,
                                                                                               horizontal='left',

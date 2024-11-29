@@ -207,7 +207,7 @@ class GnktOsvWindow(GnktModel):
         bvo_int = 0
         # if self.data_well.bvo:
         #     bvo_int += 5
-        head = plan.head_ind(self.data_well.cat_well_min.get_value - 1 + bvo_int, self.data_well.cat_well_max.get_value - 1)
+        head = plan.head_ind(self.data_well.cat_well_min.get_value - 1 + bvo_int, self.data_well.cat_well_max.get_value)
 
         plan.copy_true_ws(self.data_well, self.sheet, self.ws_title, head)
 
