@@ -75,7 +75,7 @@ class TabPageSoDrill(TabPageUnion):
         self.need_privyazka_q_combo = QComboBox()
         self.need_privyazka_q_combo.addItems(['Нет', 'Да'])
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.setColumnMinimumWidth(1, 150)
 
         self.grid.addWidget(self.drill_select_label, 2, 0)

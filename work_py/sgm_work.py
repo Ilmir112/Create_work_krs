@@ -56,7 +56,7 @@ class TabPageSoWith(TabPageUnion):
         self.current_bottom_edit = QLineEdit(self)
         self.current_bottom_edit.setText(f'{self.data_well.current_bottom}')
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
 
         self.definition_template_work(float(self.current_bottom_edit.text()))
 

@@ -24,7 +24,7 @@ class TabPageSoTorpedo(TabPageUnion):
         self.diameter_doloto_ek_line = QLineEdit(self)
         self.diameter_doloto_ek_line.setValidator(self.validator_float)
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
 
         self.grid.addWidget(self.roof_torpedo_label, 4, 4)
         self.grid.addWidget(self.roof_torpedo_edit, 5, 4)

@@ -14,7 +14,7 @@ from work_py.rationingKRS import descentNKT_norm, well_volume_norm, liftingNKT_n
 from work_py.swabbing import SwabWindow
 
 
-class CheckableComboBox(TabPageUnion):
+class CheckableComboBox(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.combo_box = CheckableComboBoxChild(self)
@@ -169,7 +169,7 @@ class TabPageSoAcid(TabPageUnion):
     def __init__(self, tableWidget, parent=None):
         super().__init__(parent)
         self.le = QLineEdit()
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.tableWidget = tableWidget
 
         self.validator_int = QIntValidator(0, 8000)
@@ -307,13 +307,13 @@ class TabPageSoAcid(TabPageUnion):
         self.calculate_sko_label = QLabel('Расчет на п.м.')
         self.calculate_sko_line = QLineEdit(self)
 
-        self.paker_depth_zumpf_Label = QLabel("Глубина посадки для ЗУМПФа", self)
+        self.paker_depth_zumpf_label = QLabel("Глубина посадки для ЗУМПФа", self)
         self.paker_depth_zumpf_edit = QLineEdit(self)
         self.paker_depth_zumpf_edit.setValidator(self.validator_int)
 
-        self.pressure_zumpf_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
-        self.pressure_zumpf_question_QCombo = QComboBox(self)
-        self.pressure_zumpf_question_QCombo.addItems(["Нет", "Да"])
+        self.pressure_zumpf_question_label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
+        self.pressure_zumpf_question_combo = QComboBox(self)
+        self.pressure_zumpf_question_combo.addItems(["Нет", "Да"])
 
         self.grid.addWidget(self.paker_layout_label, 0, 0, 1, 0)
         self.grid.addWidget(self.paker_layout_combo, 1, 0, 1, 0)
@@ -336,9 +336,9 @@ class TabPageSoAcid(TabPageUnion):
         self.grid.addWidget(self.need_privyazka_Label, 2, 7)
         self.grid.addWidget(self.need_privyazka_q_combo, 3, 7)
 
-        self.grid.addWidget(self.pressure_zumpf_question_Label, 2, 8)
-        self.grid.addWidget(self.pressure_zumpf_question_QCombo, 3, 8)
-        self.grid.addWidget(self.paker_depth_zumpf_Label, 2, 9)
+        self.grid.addWidget(self.pressure_zumpf_question_label, 2, 8)
+        self.grid.addWidget(self.pressure_zumpf_question_combo, 3, 8)
+        self.grid.addWidget(self.paker_depth_zumpf_label, 2, 9)
         self.grid.addWidget(self.paker_depth_zumpf_edit, 3, 9)
 
         self.grid.addWidget(self.skv_true_label_type, 4, 0)
@@ -418,9 +418,9 @@ class TabPageSoAcid(TabPageUnion):
             self.Qplast_after_edit.setCurrentIndex(1)
         self.calculate_sko_line.editingFinished.connect(self.update_calculate_sko)
 
-        self.pressure_zumpf_question_QCombo.currentTextChanged.connect(self.update_paker_need)
-        self.pressure_zumpf_question_QCombo.setCurrentIndex(1)
-        self.pressure_zumpf_question_QCombo.setCurrentIndex(0)
+        self.pressure_zumpf_question_combo.currentTextChanged.connect(self.update_paker_need)
+        self.pressure_zumpf_question_combo.setCurrentIndex(1)
+        self.pressure_zumpf_question_combo.setCurrentIndex(0)
 
     def update_paker_need(self, index):
         if index == 'Да':
@@ -433,10 +433,10 @@ class TabPageSoAcid(TabPageUnion):
 
             self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
 
-            self.grid.addWidget(self.paker_depth_zumpf_Label, 2, 9)
+            self.grid.addWidget(self.paker_depth_zumpf_label, 2, 9)
             self.grid.addWidget(self.paker_depth_zumpf_edit, 3, 9)
         elif index == 'Нет':
-            self.paker_depth_zumpf_Label.setParent(None)
+            self.paker_depth_zumpf_label.setParent(None)
             self.paker_depth_zumpf_edit.setParent(None)
 
     def update_calculate_sko(self):
@@ -518,11 +518,11 @@ class TabPageSoAcid(TabPageUnion):
         self.paker_layout_index = index
 
         if index not in ['однопакерная']:
-            self.pressure_zumpf_question_Label.setParent(None)
-            self.pressure_zumpf_question_QCombo.setParent(None)
+            self.pressure_zumpf_question_label.setParent(None)
+            self.pressure_zumpf_question_combo.setParent(None)
         else:
-            self.grid.addWidget(self.pressure_zumpf_question_Label, 2, 8)
-            self.grid.addWidget(self.pressure_zumpf_question_QCombo, 3, 8)
+            self.grid.addWidget(self.pressure_zumpf_question_label, 2, 8)
+            self.grid.addWidget(self.pressure_zumpf_question_combo, 3, 8)
 
         if index in ['однопакерная', 'пакер с заглушкой', 'однопакерная, упорный', ]:
             paker_layout_list_tab = ["Пласт", "хвост", "пакер", "СКВ", "вид кислоты", "процент", "объем", "объем нефти"]
@@ -901,9 +901,9 @@ class AcidPakerWindow(WindowUnion):
                 self.expected_P = int(float(self.expected_P))
             self.pressure_three = self.tabWidget.currentWidget().pressure_three_edit.text()
 
-            pressureZUMPF_combo = self.tabWidget.currentWidget().pressure_zumpf_question_QCombo.currentText()
+            pressure_zumph_combo = self.tabWidget.currentWidget().pressure_zumpf_question_combo.currentText()
 
-            if pressureZUMPF_combo == 'Да':
+            if pressure_zumph_combo == 'Да':
                 paker_khost = self.check_if_none(self.tabWidget.currentWidget().paker_khost.text())
                 paker_depth_zumpf = self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()
 
@@ -994,7 +994,7 @@ class AcidPakerWindow(WindowUnion):
 
                 if row == 0:
                     work_template_list = self.paker_layout_one(swab_true_edit_type, diameter_paker, paker_khost,
-                                                               paker_depth, depth_gauge_combo, pressureZUMPF_combo,
+                                                               paker_depth, depth_gauge_combo, pressure_zumph_combo,
                                                                paker_depth_zumpf)
                 else:
                     work_template_list.append(
@@ -1317,7 +1317,7 @@ class AcidPakerWindow(WindowUnion):
         return nkt_diam, nkt_pod, template_nkt_diam
 
     def paker_layout_one(self, swab_true_edit_type, paker_diameter, paker_khost, paker_depth,
-                         depth_gauge_combo, pressureZUMPF_combo='Нет', paker_depth_zumpf=0):
+                         depth_gauge_combo, pressure_zumph_combo='Нет', paker_depth_zumpf=0):
         from work_py.alone_oreration import privyazka_nkt
         from .opressovka import OpressovkaEK, TabPageSo
         # print(swab_true_edit_type, paker_diameter, paker_khost, paker_depth, depth_gauge_combo)
@@ -1373,7 +1373,7 @@ class AcidPakerWindow(WindowUnion):
                 nkt_diam: round(self.data_well.head_column_additional.get_value - self.data_well.current_bottom, 0),
                 nkt_pod: int(float(paker_depth) + float(paker_khost) - round(
                     self.data_well.head_column_additional.get_value - self.data_well.current_bottom, 0))}
-        if pressureZUMPF_combo == 'Нет':
+        if pressure_zumph_combo == 'Нет':
             paker_list = [
                 [f' СПО {self.paker_short} до глубины {paker_depth}м, воронкой до {paker_depth + paker_khost}м', None,
                  f'Спустить {self.paker_select} + {gidroyakor_str} на НКТ{nkt_diam}мм до глубины '

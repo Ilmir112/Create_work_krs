@@ -69,7 +69,7 @@ class TabPageSoSand(TabPageUnion):
         self.cement_volume_label = QLabel('Объем цемента')
         self.cement_volume_line = QLineEdit(self)
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
 
         self.grid.addWidget(self.privyazka_question_Label, 4, 3)
         self.grid.addWidget(self.privyazka_question_QCombo, 5, 3)
@@ -156,7 +156,6 @@ class TabPageSoSand(TabPageUnion):
 
     def update_change_fluid(self, index):
         if index == 'Да':
-
             category_h2s_list_plan = list(
                 map(int, [self.data_well.dict_category[plast]['по сероводороду'].category for plast in
                           self.data_well.plast_project if self.data_well.dict_category.get(plast) and

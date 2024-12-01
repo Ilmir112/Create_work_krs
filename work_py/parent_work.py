@@ -1,25 +1,138 @@
 import json
 from collections import namedtuple
 from datetime import datetime
+from typing import List
 
 import data_list
 from data_base.config_base import connection_to_database, WorkDatabaseWell
 from find import FindIndexPZ
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
-from PyQt5.QtWidgets import QWidget, QTabWidget, QInputDialog, QMessageBox
+from PyQt5.QtWidgets import QWidget, QTabWidget, QInputDialog, QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayout
 
 from main import MyMainWindow
 from data_list import contractor, ProtectedIsDigit
 from work_py.advanted_file import definition_plast_work
+from work_py.calc_fond_nkt import CalcFond
 
 
 class TabPageUnion(QWidget):
     def __init__(self, data_well: FindIndexPZ):
         super().__init__()
+        self.pressure_zumpf_question_combo = None
+        self.pressure_zumpf_question_label = None
+        self.need_privyazka_q_combo = None
+        self.need_privyazka_Label = None
+        self.grid = QGridLayout(self)
 
+        self.paker_depth_zumpf_edit = None
+        self.paker_depth_zumpf_label = None
+        self.paker_depth_edit = None
+        self.paker_depth_label = None
+        self.paker_khost_edit = None
+        self.paker_khost_label = None
+        self.diameter_paker_edit = None
+        self.diameter_paker_labelType = None
         self.validator_float = QDoubleValidator(0.0, 8000.0, 2)
         self.validator_int = QIntValidator(0, 8000)
         self.data_well = data_well
+
+    def view_paker_work(self):
+        self.diameter_paker_labelType = QLabel("Диаметр пакера", self)
+        self.diameter_paker_edit = QLineEdit(self)
+
+        self.paker_khost_label = QLabel("Длина хвостовика", self)
+        self.paker_khost_edit = QLineEdit(self)
+        self.paker_khost_edit.setValidator(self.validator_int)
+
+        self.paker_depth_label = QLabel("Глубина посадки", self)
+        self.paker_depth_edit = QLineEdit(self)
+        self.paker_depth_edit.setValidator(self.validator_int)
+        self.paker_depth_edit.textChanged.connect(self.update_paker)
+        
+
+        self.paker_depth_zumpf_label = QLabel("Глубина посадки для ЗУМПФа", self)
+        self.paker_depth_zumpf_edit = QLineEdit(self)
+        self.paker_depth_zumpf_edit.setValidator(self.validator_int)
+
+        self.need_privyazka_Label = QLabel("Привязка оборудования", self)
+        self.need_privyazka_q_combo = QComboBox()
+        self.need_privyazka_q_combo.addItems(['Нет', 'Да'])
+
+        self.pressure_zumpf_question_label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
+        self.pressure_zumpf_question_combo = QComboBox(self)
+        self.pressure_zumpf_question_combo.currentTextChanged.connect(self.update_paker_need)
+        self.pressure_zumpf_question_combo.addItems(['Нет', 'Да'])
+
+        paker_depth = ''
+        if len(self.data_well.plast_work) != 0:
+            paker_depth = self.data_well.perforation_roof - 20
+        else:
+            if self.data_well.dict_leakiness:
+                paker_depth = min([float(nek.split('-')[0]) - 10
+                                   for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()])
+        self.paker_depth_edit.setText(str(int(paker_depth)))
+
+        self.grid.addWidget(self.diameter_paker_labelType, 1, 1)
+        self.grid.addWidget(self.diameter_paker_edit, 2, 1)
+
+        self.grid.addWidget(self.paker_khost_label, 1, 2)
+        self.grid.addWidget(self.paker_khost_edit, 2, 2)
+
+        self.grid.addWidget(self.paker_depth_label, 1, 3)
+        self.grid.addWidget(self.paker_depth_edit, 2, 3)
+
+        self.grid.addWidget(self.pressure_zumpf_question_label, 1, 5)
+        self.grid.addWidget(self.pressure_zumpf_question_combo, 2, 5)
+        self.grid.addWidget(self.need_privyazka_Label, 1, 4)
+        self.grid.addWidget(self.need_privyazka_q_combo, 2, 4)
+
+        
+
+    def update_paker_need(self, index):
+        if index == 'Да':
+            paker_depth_zumpf = None
+            if len(self.data_well.plast_work) != 0:
+                paker_depth_zumpf = int(self.data_well.perforation_roof + 10)
+            else:
+                if self.data_well.dict_leakiness:
+                    paker_depth_zumpf = int(max([float(nek.split('-')[0])+10
+                                           for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()]))
+
+            self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
+
+            self.grid.addWidget(self.paker_depth_zumpf_label, 3, 6)
+            self.grid.addWidget(self.paker_depth_zumpf_edit, 4, 6)
+        elif index == 'Нет':
+            self.paker_depth_zumpf_label.setParent(None)
+            self.paker_depth_zumpf_edit.setParent(None)
+
+    def update_paker(self):
+        paker_depth = self.paker_depth_edit.text()
+        if paker_depth != '':
+            if self.data_well.open_trunk_well is True:
+
+                paker_khost = self.data_well.current_bottom - int(float(paker_depth))
+                self.paker_khost_edit.setText(f'{paker_khost}')
+                self.diameter_paker_edit.setText(f'{self.paker_diameter_select(int(float(paker_depth)))}')
+            else:
+                paker_khost = 10
+                self.paker_khost_edit.setText(f'{paker_khost}')
+                self.diameter_paker_edit.setText(f'{self.paker_diameter_select(int(float(paker_depth)))}')
+            need_count = 0
+            for plast in self.data_well.plast_all:
+                for roof, sole in self.data_well.dict_perforation[plast]['интервал']:
+                    if abs(float(roof) - float(paker_depth)) < 10 or abs(float(sole) - float(paker_depth))< 10:
+                        need_count += 1
+            if self.data_well.dict_leakiness:
+                for interval in self.data_well.dict_leakiness['НЭК']['интервал']:
+                    roof, sole = interval.split('-')
+                    if abs(float(roof) - float(paker_depth)) < 10 or abs(float(sole) - float(paker_depth)) < 10:
+                        need_count += 1
+
+            if need_count == 0:
+                self.need_privyazka_q_combo.setCurrentIndex(0)
+            else:
+                self.need_privyazka_q_combo.setCurrentIndex(1)
 
     def paker_diameter_select(self, depth_landing):
         paker_diam_dict = {
@@ -105,12 +218,11 @@ class TabPageUnion(QWidget):
         if str(self.data_well.category_pressure) == '1' or str(self.data_well.category_h2s) == '1' \
                 or self.data_well.category_gas_factor == '1':
             self.data_well.category_pvo = 1
-        try:
-            self.data_well.template_depth, self.data_well.template_length, \
-            self.data_well.template_depth_addition, self.data_well.template_length_addition = \
-                json.loads(result[paragraph_row][11])
-        except Exception:
-            self.data_well.template_depth = result[paragraph_row][11]
+
+        self.data_well.template_depth, self.data_well.template_length, \
+        self.data_well.template_depth_addition, self.data_well.template_length_addition = \
+            json.loads(result[paragraph_row][11])
+
         self.data_well.skm_interval = json.loads(result[paragraph_row][12])
 
         self.data_well.problem_with_ek_depth = result[paragraph_row][13]
@@ -150,6 +262,32 @@ class WindowUnion(MyMainWindow):
         super().__init__()
         self.data_well = data_well
 
+    def calc_fond_nkt(self, len_nkt: str, distance_between_nkt: str) -> List:
+
+        # расчет необходимого давления опрессовки НКТ при спуске
+        static_level = self.data_well.static_level.get_value
+        fluid = float(self.data_well.fluid_work[:4].replace(',', '.').replace('г', ''))
+
+        pressure = 40
+
+        if self.data_well.dict_pump_ecn["posle"] != "0":
+            pressure = 50
+
+        calc = CalcFond(static_level, len_nkt, fluid, pressure, distance_between_nkt)
+        calc_fond_dict = calc.calc_pressure_list()
+        press_str = f'В случае не завоза новых или завоза не опрессованных НКТ, согласовать алгоритм ' \
+                    f'опрессовки с ЦДНГ,' \
+                    f' произвести спуск  фондовых НКТ с поинтервальной опрессовкой через ' \
+                    f'каждые {distance_between_nkt}м ' \
+                    f'с учетом статического уровня уровня на на глубине {static_level}м  по телефонограмме заказчика ' \
+                    f'в следующей последовательности:\n'
+        n = 0
+        for nkt, pressure in calc_fond_dict.items():
+            press_str += f'Опрессовать НКТ в интервале {n} - {int(nkt)} на давление {pressure}атм \n'
+            n = nkt
+
+        return press_str
+
     def select_nkt_grp(self):
 
         if self.data_well.column_additional is False or\
@@ -170,9 +308,10 @@ class WindowUnion(MyMainWindow):
         data_well = data_well_base.read_excel_in_base(number_well, area_well, work_plan, type_kr)
 
         try:
+            col_width = []
             dict_well = json.loads(data_well[len(data_well) - 1][0])
             data = dict_well['data']
-            rowHeights = dict_well['rowHeights']
+            row_heights = dict_well['rowHeights']
             if 'colWidth' in list(dict_well.keys()):
                 col_width = dict_well['colWidth']
             elif 'col_width' in list(dict_well.keys()):
@@ -183,7 +322,7 @@ class WindowUnion(MyMainWindow):
             QMessageBox.warning(None, 'Ошибка', f'Введены не все параметры {type(e).__name__}\n\n{str(e)}')
             return
 
-        return data, rowHeights, col_width, boundaries_dict
+        return data, row_heights, col_width, boundaries_dict
 
     def definition_open_trunk_well(self):
         self.data_well.nkt_diam = 73 if self.data_well.column_diameter.get_value > 110 else 60
@@ -204,14 +343,14 @@ class WindowUnion(MyMainWindow):
         well_number = table_name.split(' ')[0]
         well_area = table_name.split(' ')[1]
         type_kr = table_name.split(' ')[-4].replace('None', 'null')
-        contractor = data_list.contractor
+        contractor_select = data_list.contractor
         work_plan = table_name.split(' ')[-3]
 
         db = connection_to_database(data_list.DB_WELL_DATA)
         data_well_base = WorkDatabaseWell(db, self.data_well)
 
         result_table = data_well_base.extraction_data(str(well_number), well_area, type_kr,
-                                                      work_plan, date_table, contractor)
+                                                      work_plan, date_table, contractor_select)
 
         if result_table is None:
             QMessageBox.warning(self, 'Ошибка',
@@ -287,15 +426,15 @@ class WindowUnion(MyMainWindow):
 
                 self.data_well.plast_work_short = json.dumps(row[3], ensure_ascii=False)
 
-            data_list = []
+            data_in_base_list = []
             for index, data in enumerate(row):
                 if index == 6:
                     if data == 'false' or data == 0 or data == '0':
                         data = False
                     else:
                         data = True
-                data_list.append(data)
-            self.data_well.data_list.append(data_list)
+                data_in_base_list.append(data)
+            self.data_well.data_list.append(data_in_base_list)
         self.data_well.current_bottom = result[ind][1]
         self.data_well.dict_perforation = json.loads(result[ind][2])
 
@@ -319,12 +458,12 @@ class WindowUnion(MyMainWindow):
         definition_plast_work(self)
         return True
 
-    def calculate_angle(self, max_depth_pvr, angle_data):
+    @staticmethod
+    def calculate_angle(max_depth_pvr, angle_data):
         tuple_angle = ()
         for depth, angle, _ in angle_data:
             if abs(float(depth) - float(max_depth_pvr)) < 10:
                 tuple_angle = depth, angle, f'Зенитный угол на глубине {depth}м равен {angle}гр'
-
         return tuple_angle
 
     def calc_work_fluid(self, fluid_work_insert):

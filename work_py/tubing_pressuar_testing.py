@@ -1,8 +1,7 @@
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
-from PyQt5.QtWidgets import  QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, QPushButton
+from PyQt5.QtWidgets import  QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QPushButton
 
 import data_list
-from main import MyMainWindow
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 
 
@@ -37,7 +36,7 @@ class TabPageSoBlock(TabPageUnion):
         self.distance_between_nkt_edit.setValidator(self.validator_float)
         self.distance_between_nkt_edit.setText(f'{300}')
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
 
         self.grid.addWidget(self.current_label, 4, 3)
         self.grid.addWidget(self.current_edit, 5, 3)
@@ -73,7 +72,11 @@ class TubingPressureWindow(WindowUnion):
     def __init__(self, data_well, table_widget, parent=None):
         super().__init__(data_well)
 
-
+        self.pressure_data = None
+        self.length_nkt = None
+        self.current_bottom = None
+        self.select_nkt_combo = None
+        self.distance_between_nkt = None
         self.insert_index = data_well.insert_index
         self.tabWidget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
@@ -90,78 +93,76 @@ class TubingPressureWindow(WindowUnion):
     def add_work(self):
         try:
 
-            distance_between_nkt_edit = self.tabWidget.currentWidget().distance_between_nkt_edit.text().replace(',', '.')
-            if distance_between_nkt_edit != '':
-                distance_between_nkt_edit = int(float(distance_between_nkt_edit))
-            select_nkt_combo = self.tabWidget.currentWidget().select_nkt_combo.currentText()
-            current_edit = int(float(self.tabWidget.currentWidget().current_edit.text().replace(',', '.')))
-            if current_edit >= self.data_well.bottom_hole_artificial.get_value:
+            self.distance_between_nkt = self.tabWidget.currentWidget().distance_between_nkt_edit.text().replace(',', '.')
+            if self.distance_between_nkt != '':
+                self.distance_between_nkt = int(float(self.distance_between_nkt))
+            self.select_nkt_combo = self.tabWidget.currentWidget().select_nkt_combo.currentText()
+            self.current_bottom = int(float(self.tabWidget.currentWidget().current_edit.text().replace(',', '.')))
+            if self.current_bottom >= self.data_well.bottom_hole_artificial.get_value:
                 QMessageBox.warning(self, 'Ошибка',
-                                    f'Необходимый забой-{current_edit}м ниже исскуственного '
+                                    f'Необходимый забой-{self.current_bottom}м ниже искусственного '
                                     f'{self.data_well.bottom_hole_artificial.get_value}м')
                 return
 
-            length_nkt_edit = self.tabWidget.currentWidget().length_nkt_edit.text().replace(',', '.')
-            if length_nkt_edit != '':
-                length_nkt_edit = int(float(length_nkt_edit))
-            pressure_edit = self.tabWidget.currentWidget().pressure_edit.text().replace(',', '.')
-            if pressure_edit != '':
-                pressure_edit = round(float(pressure_edit), 1)
+            self.length_nkt = self.tabWidget.currentWidget().length_nkt_edit.text().replace(',', '.')
+            if self.length_nkt != '':
+                self.length_nkt = int(float(self.length_nkt))
+            self.pressure_data = self.tabWidget.currentWidget().pressure_edit.text().replace(',', '.')
+            if self.pressure_data != '':
+                self.pressure_data = round(float(self.pressure_data), 1)
 
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
 
-        work_list = self.pressure_nkt_work(current_edit, select_nkt_combo, length_nkt_edit, pressure_edit,
-                                           distance_between_nkt_edit)
-
-        self.populate_row(self.insert_index, work_list, self.table_widget)
-        data_list.pause = False
-        self.close()
+        work_list = self.pressure_nkt_work()
+        if work_list:
+            self.populate_row(self.insert_index, work_list, self.table_widget)
+            data_list.pause = False
+            self.close()
 
     def closeEvent(self, event):
-                # Закрываем основное окно при закрытии окна входа
+        # Закрываем основное окно при закрытии окна входа
         self.data_well.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
-    def pressure_nkt_work(self, current_edit, select_nkt_combo, length_nkt_edit, pressure_edit,
-                          distance_between_nkt_edit):
-        from .descent_gno import DescentParent
-        from .rationingKRS import liftingNKT_norm, descentNKT_norm
+    def pressure_nkt_work(self):
+        from work_py.descent_gno import DescentParent
+        from work_py.rationingKRS import liftingNKT_norm, descentNKT_norm
 
-        if select_nkt_combo != 'Фондовые НКТ' or self.data_well.curator == 'ОР':
+        if self.select_nkt_combo != 'Фондовые НКТ' or self.data_well.curator == 'ОР':
             block_pack_list = [
-                [f'Спустить заглушку на фНКТ{self.data_well.nkt_diam} до глубины {current_edit}мм', None,
+                [f'Спустить заглушку на фНКТ{self.data_well.nkt_diam} до глубины {self.current_bottom}мм', None,
                  f'Произвести спуск заглушки на фондовых НКТ с поинтервальной опрессовкой их через каждые '
-                 f'{distance_between_nkt_edit}м на Р={pressure_edit}тм  на Н={length_nkt_edit}м. '
+                 f'{self.distance_between_nkt}м на Р={self.pressure_data}тм  на Н={self.length_nkt}м. '
                  f'Негерметичные НКТ отбраковать. (При СПО первых десяти НКТ на спайдере дополнительно устанавливать'
                  f' элеватор ЭХЛ). ',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', descentNKT_norm(length_nkt_edit, 1)],
+                 'мастер КРС', descentNKT_norm(self.length_nkt, 1)],
                 [None, None,
                  f'Поднять заглушку на НКТ с доливом тех жидкости {self.data_well.fluid_work}', None, None, None, None,
                  None, None, None,
-                 'Мастер КРС', liftingNKT_norm(length_nkt_edit, 1)],
+                 'Мастер КРС', liftingNKT_norm(self.length_nkt, 1)],
             ]
         else:
 
-            calc_fond_list = DescentParent.calc_fond_nkt(self, length_nkt_edit, distance_between_nkt_edit)
+            calc_fond_list = self.calc_fond_nkt(self.length_nkt, self.distance_between_nkt)
 
             block_pack_list = [
-                [f'Спустить заглушку на фНКТ{self.data_well.nkt_diam} до глубины {current_edit}мм', None,
+                [f'Спустить заглушку на фНКТ{self.data_well.nkt_diam} до глубины {self.current_bottom}мм', None,
                  f'Произвести спуск заглушки на фондовых НКТ с поинтервальной опрессовкой их через каждые '
-                 f'{distance_between_nkt_edit}м на Р={pressure_edit}тм  на Н={length_nkt_edit}м. '
+                 f'{self.distance_between_nkt}м на Р={self.pressure_data}атм  на Н={self.length_nkt}м. '
                  f'Негерметичные НКТ отбраковать. (При СПО первых десяти НКТ на спайдере дополнительно устанавливать'
                  f' элеватор ЭХЛ). ',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', descentNKT_norm(length_nkt_edit, 1)],
+                 'мастер КРС', descentNKT_norm(self.length_nkt, 1)],
                 [None, None,
                  calc_fond_list,
                  None, None, None, None, None, None, None,
-                 'мастер КРС, заказчик', descentNKT_norm(length_nkt_edit, 1)],
+                 'мастер КРС, заказчик', descentNKT_norm(self.length_nkt, 1)],
                 [None, None,
-                 f'Поднять заглушку на НКТ с доливом тех жидкости {self.data_well.fluid_work} с глубины {length_nkt_edit}м',
+                 f'Поднять заглушку на НКТ с доливом тех жидкости {self.data_well.fluid_work} с глубины {self.length_nkt}м',
                  None, None, None, None,
                  None, None, None,
-                 'Мастер КРС', liftingNKT_norm(length_nkt_edit, 1)]]
+                 'Мастер КРС', liftingNKT_norm(self.length_nkt, 1)]]
 
         return block_pack_list

@@ -1,11 +1,11 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QInputDialog, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, QTabWidget, QPushButton, \
+from PyQt5.QtWidgets import  QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, QTabWidget, QPushButton, \
     QMessageBox
 
 import data_list
-from main import MyMainWindow
-from .parent_work import TabPageUnion, WindowUnion,TabWidgetUnion
-from .rationingKRS import descentNKT_norm, liftingNKT_norm
+
+from work_py.parent_work import TabPageUnion, WindowUnion,TabWidgetUnion
+from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm
 
 
 class TabPageSoLar(TabPageUnion):
@@ -49,7 +49,7 @@ class TabPageSoLar(TabPageUnion):
             ['НКТ', 'СБТ'])
         # self.nkt_select_combo.currentTextChanged.connect(self.update_nkt)
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.setColumnMinimumWidth(1, 150)
 
         self.grid.addWidget(self.po_type_label, 2, 0)

@@ -12,6 +12,7 @@ from .rationingKRS import liftingNKT_norm, descentNKT_norm, well_volume_norm
 
 
 def kot_select(self, current_bottom):
+    kot_select =''
     if self.data_well.column_additional is False \
             or (
             self.data_well.column_additional is True and self.data_well.current_bottom <= self.data_well.head_column_additional.get_value):
@@ -98,7 +99,7 @@ def check_h2s(self, plast=0, fluid_new=0, expected_pressure=0):
 
 
 def need_h2s(self, fluid_new, plast_edit, expected_pressure):
-    asd = self.data_well.dict_category
+    
     сat_h2s_list = list(map(int, [self.data_well.dict_category[plast]['по сероводороду'].category for plast in
                                   self.data_well.plast_work if self.data_well.dict_category.get(plast) and
                                   self.data_well.dict_category[plast]['отключение'] == 'рабочий']))
@@ -128,7 +129,7 @@ def need_h2s(self, fluid_new, plast_edit, expected_pressure):
                      for plast in self.data_well.plast_project])
             except:
                 expenditure_h2s_plan = QInputDialog.getDouble(self, 'нет данных',
-                                                              'ВВедите расход поглотетеля сероводорода', 0.25, 0, 3)
+                                                              'ВВедите расход поглотителя сероводорода', 0.25, 0, 3)
 
             expenditure_h2s = max(
                 [self.data_well.dict_category[self.data_well.plast_work[0]]['по сероводороду'].poglot])
@@ -156,10 +157,10 @@ def need_h2s(self, fluid_new, plast_edit, expected_pressure):
 
         category_h2s_list_plan.append(category_h2s)
         h2s_mg, _ = QInputDialog.getDouble(None, 'сероводород в мг/л',
-                                           'Введите значение серовородода в мг/л', 0, 0, 100, 5)
+                                           'Введите значение сероводорода в мг/л', 0, 0, 100, 5)
         self.data_well.value_h2s_mg.append(h2s_mg)
         h2s_pr, _ = QInputDialog.getDouble(None, 'сероводород в процентах',
-                                           'Введите значение серовородода в процентах', 0, 0, 100, 1)
+                                           'Введите значение сероводорода в процентах', 0, 0, 100, 1)
         poglot = H2S.calv_h2s(self, category_h2s, h2s_mg, h2s_pr)
         Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
         pressure = namedtuple("pressure", "category data_pressure")
@@ -384,19 +385,19 @@ def calculation_fluid_work(data_well, vertical, pressure):
 
 def lifting_unit(self):
     aprs_40 = f'Установить подъёмный агрегат на устье не менее 40т.\n' \
-              f' Пусковой комиссией составить акт готовности  подьемного агрегата и бригады для проведения ремонта скважины.' \
+              f' Пусковой комиссией составить акт готовности  подъемного агрегата и бригады для проведения ремонта скважины.' \
               f'ПРИМЕЧАНИЕ:  ПРИ ИСПОЛЬЗОВАНИИ ПОДЪЕМНОГО АГРЕТАТА АПРС-50, А5-40, АПРС-50 ДОПУСКАЕТСЯ РАБОТА БЕЗ ' \
               f'ПРИМЕНЕНИЯ ВЕТРОВЫХ ОТТЯЖЕК ПРИ НАГРУЗКАХ НЕ БОЛЕЕ 25ТН. ПРИ НЕОБХОДИМОСТИ УВЕЛИЧЕНИЯ НАГРУЗКИ ТРЕБУЕТСЯ ' \
               f'ОСНАСТИТЬ ПОДЪЕМНЫЙ АГРЕГАТ ВЕТРОВЫМИ ОТТЯЖКАМИ. ПРИ ЭТОМ МАКСИМАЛЬНУЮ НАГРУЗКА НЕ ДОЛЖНА ПРЕВЫШАТЬ 80% ОТ' \
-              f' СТРАГИВАЮЩЕЙ НАГРУЗКИ НА НКТ.ПРИ ИСПОЛЬЗОВАНИИ ПОДЬЕМНОГО АГРЕГАТА  УПА-60/80, БАРС, А-50, АПР 60/80 ' \
+              f' СТРАГИВАЮЩЕЙ НАГРУЗКИ НА НКТ.ПРИ ИСПОЛЬЗОВАНИИ подъемного АГРЕГАТА  УПА-60/80, БАРС, А-50, АПР 60/80 ' \
               f'РАБОТАТЬ ТОЛЬКО С ПРИМЕНЕНИЕМ  ОТТЯЖЕК МАКСИМАЛЬНУЮ НАГРУЗКА НЕ ДОЛЖНА ПРЕВЫШАТЬ 80% ОТ СТРАГИВАЮЩЕЙ ' \
               f'НАГРУЗКИ НА НКТ. После монтажа подъёмника якоря ветровых оттяжек должны быть испытаны на нагрузки, ' \
               f'установленные инструкцией по эксплуатации завода - изготовителя в присутствии супервайзера Заказчика. ' \
-              f'Составить акт готовности подъемного агрегата. Пусковой комиссией составить акт готовности  подьемного ' \
+              f'Составить акт готовности подъемного агрегата. Пусковой комиссией составить акт готовности  подъемного ' \
               f'агрегата и бригады для проведения ремонта скважины. Дальнейшие работы продолжить после проведения пусковой ' \
               f'комиссии заполнения пусковой документации. '
     upa_60 = f'Установить подъёмный агрегат на устье не менее 60т. Пусковой комиссией составить ' \
-             f'акт готовности  подьемного агрегата и бригады для проведения ремонта скважины.'
+             f'акт готовности  подъемного агрегата и бригады для проведения ремонта скважины.'
 
     return upa_60 if self.data_well.bottom_hole_artificial.get_value >= 2300 else aprs_40
 
@@ -415,25 +416,25 @@ def volume_vn_ek(self, current):
 
 
 def volume_vn_nkt(dict_nkt):  # Внутренний объем одного погонного местра НКТ
-    volume_vn_nkt = 0
+    volume_vn_nkt_sel = 0
     for nkt, length_nkt in dict_nkt.items():
 
         nkt = ''.join(c for c in str(nkt) if c.isdigit())
         if '60' in str(nkt):
             t_nkt = 5
-            volume_vn_nkt += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * length_nkt, 5)
+            volume_vn_nkt_sel += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * length_nkt, 5)
         elif '73' in str(nkt):
             t_nkt = 5.5
-            volume_vn_nkt += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * length_nkt, 5)
+            volume_vn_nkt_sel += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * length_nkt, 5)
         elif '89' in str(nkt):
             t_nkt = 6
-            volume_vn_nkt += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * length_nkt, 5)
+            volume_vn_nkt_sel += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * length_nkt, 5)
 
         elif '48' in str(nkt):
             t_nkt = 4.5
-            volume_vn_nkt += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * length_nkt * 1.1, 5)
+            volume_vn_nkt_sel += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * length_nkt * 1.1, 5)
 
-    return round(volume_vn_nkt, 1)
+    return round(volume_vn_nkt_sel, 1)
 
 
 def volume_rod(self, dict_sucker_rod):  # Объем штанг
@@ -525,7 +526,6 @@ def volume_pod_nkt(self):  # Расчет необходимого объема 
                 self.data_well.column_additional_diameter.get_value - self.data_well.column_additional_wall_thickness.get_value * 2) ** 2 / 4 / 1000 * (
                             self.data_well.current_bottom - nkt_l) / 1000
     volume_in_nkt = v_pod_gno + volume_vn_nkt(self.data_well.dict_nkt_before) - volume_rod(self, self.data_well.dict_sucker_rod)
-    # print(f'Внутренный объем + Зумпф{volume_in_nkt, v_pod_gno, volume_vn_nkt(self.data_well.dict_nkt_before)}, ')
     return round(volume_in_nkt, 1)
 
 

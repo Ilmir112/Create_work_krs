@@ -42,7 +42,7 @@ class TabPageSo(TabPageUnion):
         self.lineEditDopInformation = QLineEdit(self)
         self.lineEditDopInformation.setClearButtonEnabled(True)
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.addWidget(self.labelType, 0, 0)
         self.grid.addWidget(self.labelType2, 0, 1)
         self.grid.addWidget(self.labelTypeCharges, 0, 2)

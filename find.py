@@ -364,7 +364,7 @@ class FindIndexPZ(MyMainWindow):
             self.pause_app()
             return
         if self.data_fond_min.get_value == 0:
-            QMessageBox.warning(self, 'индекс начала строки с таблицей фондовыго оборудования',
+            QMessageBox.warning(self, 'индекс начала строки с таблицей фондового оборудования',
                                 'Программа не смогла найти строку с таблицей фондового оборудования')
             self.pause_app()
             return
@@ -1767,7 +1767,7 @@ class WellCategory(FindIndexPZ):
                 QMessageBox.warning(self, 'Ошибка', 'Программа не смогла найти данные по содержания '
                                                     'сероводорода в процентах')
                 h2s_pr, _ = QInputDialog.getDouble(self, 'сероводород в процентах',
-                                                   'Введите значение серовородода в процентах', 0, 0, 100, 5)
+                                                   'Введите значение сероводорода в процентах', 0, 0, 100, 5)
 
                 self.value_h2s_percent.append(h2s_pr)
 

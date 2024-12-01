@@ -272,7 +272,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.dict_sucker_rod = self.data_well.dict_sucker_rod
         self.dict_sucker_rod_po = self.data_well.dict_sucker_rod_after
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
 
         self.grid.addWidget(self.column_direction_diameter_Label, 0, 0)
         self.grid.addWidget(self.column_direction_diameter_edit, 1, 0)

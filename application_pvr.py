@@ -89,7 +89,7 @@ class TabPageSoPvr(TabPageUnion):
         self.combo_pvr_type = QComboBox(self)
         self.combo_pvr_type.addItems(["На кабеле", 'Трубная перфорация'])
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
 
         self.grid.addWidget(self.number_brigada_label, 7, 2)
         self.grid.addWidget(self.number_brigada_combo, 8, 2)

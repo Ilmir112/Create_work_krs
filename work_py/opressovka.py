@@ -14,112 +14,7 @@ from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm
 class TabPageSo(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.validator = QDoubleValidator(0.0, 80000.0, 2)
-
-        self.diameter_paker_labelType = QLabel("Диаметр пакера", self)
-        self.diameter_paker_edit = QLineEdit(self)
-
-        self.paker_khost_Label = QLabel("Длина хвостовика", self)
-        self.paker_khost_edit = QLineEdit(self)
-        self.paker_khost_edit.setValidator(self.validator)
-
-        self.paker_depth_Label = QLabel("Глубина посадки", self)
-        self.paker_depth_edit = QLineEdit(self)
-        self.paker_depth_edit.setValidator(self.validator)
-        self.paker_depth_edit.textChanged.connect(self.update_paker)
-
-        self.need_privyazka_Label = QLabel("Привязка оборудования", self)
-        self.need_privyazka_q_combo = QComboBox()
-        self.need_privyazka_q_combo.addItems(['Нет', 'Да'])
-        paker_depth = None
-        if len(self.data_well.plast_work) != 0:
-            paker_depth = self.data_well.perforation_roof - 20
-        else:
-            # print(self.data_well.dict_perforation)
-            if self.data_well.dict_leakiness:
-                
-                paker_depth = min([float(nek.split('-')[0]) - 10
-                                       for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()])
-        try:
-            self.paker_depth_edit.setText(str(int(paker_depth)))
-        except Exception:
-            pass
-
-
-        self.paker_depth_zumpf_Label = QLabel("Глубина посадки для ЗУМПФа", self)
-        self.paker_depth_zumpf_edit = QLineEdit(self)
-        self.paker_depth_zumpf_edit.setValidator(self.validator)
-
-        self.pressure_zumpf_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
-        self.pressure_zumpf_question_QCombo = QComboBox(self)
-        self.pressure_zumpf_question_QCombo.currentTextChanged.connect(self.update_paker_need)
-
-        self.pressure_zumpf_question_QCombo.addItems(['Нет', 'Да'])
-
-        self.grid_layout = QGridLayout(self)
-
-        self.grid_layout.addWidget(self.diameter_paker_labelType, 3, 1)
-        self.grid_layout.addWidget(self.diameter_paker_edit, 4, 1)
-
-        self.grid_layout.addWidget(self.paker_khost_Label, 3, 2)
-        self.grid_layout.addWidget(self.paker_khost_edit, 4, 2)
-
-        self.grid_layout.addWidget(self.paker_depth_Label, 3, 3)
-        self.grid_layout.addWidget(self.paker_depth_edit, 4, 3)
-
-        self.grid_layout.addWidget(self.pressure_zumpf_question_Label, 3, 5)
-        self.grid_layout.addWidget(self.pressure_zumpf_question_QCombo, 4, 5)
-        self.grid_layout.addWidget(self.need_privyazka_Label, 3, 4)
-        self.grid_layout.addWidget(self.need_privyazka_q_combo, 4, 4)
-
-    def update_paker_need(self, index):
-        if index == 'Да':
-            paker_depth_zumpf = None
-            if len(self.data_well.plast_work) != 0:
-                paker_depth_zumpf = int(self.data_well.perforation_roof + 10)
-            else:
-                if self.data_well.dict_leakiness:
-                    paker_depth_zumpf = int(max([float(nek.split('-')[0])+10
-                                           for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()]))
-
-            self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
-
-            self.grid_layout.addWidget(self.paker_depth_zumpf_Label, 3, 6)
-            self.grid_layout.addWidget(self.paker_depth_zumpf_edit, 4, 6)
-        elif index == 'Нет':
-            self.paker_depth_zumpf_Label.setParent(None)
-            self.paker_depth_zumpf_edit.setParent(None)
-
-    def update_paker(self):
-        paker_depth = self.paker_depth_edit.text()
-        if paker_depth != '':
-            if self.data_well.open_trunk_well is True:
-
-                paker_khost = self.data_well.current_bottom - int(paker_depth)
-                self.paker_khost_edit.setText(f'{paker_khost}')
-                self.diameter_paker_edit.setText(f'{self.paker_diameter_select(int(paker_depth))}')
-            else:
-                paker_khost = 10
-                self.paker_khost_edit.setText(f'{paker_khost}')
-                self.diameter_paker_edit.setText(f'{self.paker_diameter_select(int(paker_depth))}')
-            need_count = 0
-            for plast in self.data_well.plast_all:
-                for roof, sole in self.data_well.dict_perforation[plast]['интервал']:
-                    if abs(float(roof) - float(paker_depth)) < 10 or abs(float(sole) - float(paker_depth))< 10:
-                        need_count += 1
-            if self.data_well.dict_leakiness:
-                a = self.data_well.dict_leakiness
-                for interval in self.data_well.dict_leakiness['НЭК']['интервал']:
-                    roof, sole = interval.split('-')
-                    if abs(float(roof) - float(paker_depth)) < 10 or abs(float(sole) - float(paker_depth)) < 10:
-                        need_count += 1
-
-            if need_count == 0:
-                self.need_privyazka_q_combo.setCurrentIndex(0)
-            else:
-                self.need_privyazka_q_combo.setCurrentIndex(1)
-
-
+        self.view_paker_work()
 
 class TabWidget(TabWidgetUnion):
     def __init__(self, parent):
@@ -170,13 +65,13 @@ class OpressovkaEK(WindowUnion):
 
         paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
-        pressureZUMPF_combo = self.tabWidget.currentWidget().pressure_zumpf_question_QCombo.currentText()
+        pressure_zumph_combo = self.tabWidget.currentWidget().pressure_zumpf_question_combo.currentText()
         if not paker_khost or not paker_depth:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
 
 
-        if pressureZUMPF_combo == 'Да':
+        if pressure_zumph_combo == 'Да':
             paker_depth_zumpf = self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()
             if paker_depth_zumpf != '':
                 paker_depth_zumpf = int(float(paker_depth_zumpf))
@@ -190,9 +85,9 @@ class OpressovkaEK(WindowUnion):
         else:
             paker_depth_zumpf = 0
 
-        if int(paker_khost) + int(paker_depth) > self.data_well.current_bottom and pressureZUMPF_combo == 'Нет' \
+        if int(paker_khost) + int(paker_depth) > self.data_well.current_bottom and pressure_zumph_combo == 'Нет' \
                 or int(paker_khost) + int(
-            paker_depth_zumpf) > self.data_well.current_bottom and pressureZUMPF_combo == 'Да':
+            paker_depth_zumpf) > self.data_well.current_bottom and pressure_zumph_combo == 'Да':
             QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                    f'ниже текущего забоя')
             return
@@ -222,8 +117,8 @@ class OpressovkaEK(WindowUnion):
         rows = self.tableWidget.rowCount()
         paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
         diameter_paker = int(float(self.tabWidget.currentWidget().diameter_paker_edit.text()))
-        pressure_zumpf_question_QCombo = self.tabWidget.currentWidget().pressure_zumpf_question_QCombo.currentText()
-        if pressure_zumpf_question_QCombo == 'Да':
+        pressure_zumpf_question_combo = self.tabWidget.currentWidget().pressure_zumpf_question_combo.currentText()
+        if pressure_zumpf_question_combo == 'Да':
             paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
             if paker_khost + paker_depth_zumpf >= self.data_well.current_bottom:
                 QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
@@ -231,6 +126,7 @@ class OpressovkaEK(WindowUnion):
 
         else:
             paker_depth_zumpf = 0
+            
         self.need_privyazka_q_combo = self.tabWidget.currentWidget().need_privyazka_q_combo.currentText()
 
         if rows == 0:
@@ -243,7 +139,7 @@ class OpressovkaEK(WindowUnion):
 
 
             work_list = OpressovkaEK.paker_list(self, diameter_paker, paker_khost, paker_depth,
-                                            pressure_zumpf_question_QCombo, paker_depth_zumpf)
+                                            pressure_zumpf_question_combo, paker_depth_zumpf)
         else:
             depth_paker_list = []
             for row in range(rows):
@@ -559,30 +455,6 @@ class OpressovkaEK(WindowUnion):
         else:
             return 'НКТ + репер', ''
 
-    # функция проверки спуска пакера выше прошаблонированной колонны
-    def check_for_template_paker(self, depth):
-
-        check_true = False
-        # print(f' глубина шаблона {self.data_well.template_depth}, посадка пакера {depth}')
-        while check_true is False:
-            if depth < float(
-                    self.data_well.head_column_additional.get_value) and depth <= self.data_well.template_depth and self.data_well.column_additional:
-                check_true = True
-            elif depth > float(
-                    self.data_well.head_column_additional.get_value) and depth <= self.data_well.template_depth_addition and self.data_well.column_additional:
-                check_true = True
-            elif depth <= self.data_well.template_depth and self.data_well.column_additional is False:
-                check_true = True
-
-            if check_true is False:
-
-                false_template = QMessageBox.question(None, 'Проверка глубины пакера',
-                                                      f'Проверка показала посадка пакера {depth}м '
-                                                      f'опускается ниже глубины шаблонирования ЭК '
-                                                      f'{self.data_well.template_depth}м'
-                                                      f'изменить глубину ?')
-
-        return check_true
 
     def testing_pressure(self, depth):
 
@@ -602,8 +474,7 @@ class OpressovkaEK(WindowUnion):
 
         if any([float(interval[1]) < float(depth) for interval in interval_list]):
             check_true = True
-            testing_pressure_str = f'Закачкой тех жидкости в затрубное пространство при Р=' \
-                                   f'{self.data_well.max_admissible_pressure.get_value}атм' \
+            testing_pressure_str = f'Закачкой тех жидкости в затрубное пространство при Р={self.data_well.max_admissible_pressure.get_value}атм' \
                                    f' удостоверить в отсутствии выхода тех жидкости и герметичности пакера, составить акт. ' \
                                    f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа ' \
                                    f'до начала работ)'

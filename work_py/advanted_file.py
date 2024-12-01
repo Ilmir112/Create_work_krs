@@ -305,7 +305,7 @@ def definition_plast_work(self):
     perforation_sole = 0
 
     for plast, value in self.data_well.dict_perforation.items():
-        for interval in value['интервал']:
+        for _ in value['интервал']:
 
             if self.data_well.dict_perforation[plast]["отключение"] is False:
                 plast_work.add(plast)

@@ -22,6 +22,24 @@ from data_base.config_base import connect_to_database, connection_to_database, C
 from main import MyMainWindow
 
 
+def get_data_from_db(region):
+    db = connection_to_database(data_list.DB_CLASSIFICATION)
+
+    well_classification = CheckWellExistence(db)
+    data = well_classification.get_data_from_db(region)
+
+    return data
+
+
+def get_data_from_class_well_db(region):
+    db = connection_to_database(data_list.DB_CLASSIFICATION)
+
+    well_classification = CheckWellExistence(db)
+    data = well_classification.get_data_from_class_well_db(region)
+
+    return data
+
+
 class ClassifierWell(MyMainWindow):
     number_well = None
 
@@ -53,7 +71,7 @@ class ClassifierWell(MyMainWindow):
         self.edit_well_number.setText(self.number_well)
         layout.addWidget(self.edit_well_number)
 
-        data = self.get_data_from_db(region)
+        data = get_data_from_db(region)
         if data:
 
             self.table_class.setColumnCount(len(data[0]))
@@ -91,7 +109,7 @@ class ClassifierWell(MyMainWindow):
         layout.addWidget(self.edit_well_area)
         region = f'{region}_классификатор'
         # print(region)
-        data = self.get_data_from_class_well_db(region)
+        data = get_data_from_class_well_db(region)
         if data:
             # print(data)
 
@@ -124,14 +142,6 @@ class ClassifierWell(MyMainWindow):
         self.table_class.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         # layout.addWidget(table)
         self.setLayout(layout)
-
-    def get_data_from_db(self, region):
-        db = connection_to_database(data_list.DB_CLASSIFICATION)
-
-        well_classification = CheckWellExistence(db)
-        data = well_classification.get_data_from_db(region)
-
-        return data
 
     @staticmethod
     def insert_database(data_base, data_work, query):
@@ -193,19 +203,11 @@ class ClassifierWell(MyMainWindow):
         if conn:
             conn.close()
 
-    def get_data_from_class_well_db(self, region):
-        db = connection_to_database(data_list.DB_CLASSIFICATION)
-
-        well_classification = CheckWellExistence(db)
-        data = well_classification.get_data_from_class_well_db(region)
-
-        return data
-
     def export_to_sqlite_without_juming(self, fname, costumer, region):
         # Загрузка файла Excel
         wb = load_workbook(fname)
         ws = wb.active
-
+        check_param = ''
         # Получение данных из Excel и запись их в базу данных
         for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
             for col, value in enumerate(row):
@@ -530,8 +532,8 @@ def excel_in_json(self, sheet):
                         data[row[0].row] = row_data
 
     data['image'] = self.data_well.image_data
-    rowHeights = [sheet.row_dimensions[i + 1].height for i in range(sheet.max_row) if i <= index_end_copy]
-    # rowHeights = [sheet.row_dimensions[i + 1].height for i in range(sheet.max_row)if i <= 46]
+    row_heights = [sheet.row_dimensions[i + 1].height for i in range(sheet.max_row) if i <= index_end_copy]
+    # row_heights = [sheet.row_dimensions[i + 1].height for i in range(sheet.max_row)if i <= 46]
     col_width = [sheet.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 80)] + [None]
     boundaries_dict = {}
 
@@ -539,7 +541,7 @@ def excel_in_json(self, sheet):
         if range_boundaries(str(_range))[1] <= index_end_copy:
             boundaries_dict[ind] = range_boundaries(str(_range))
 
-    data_excel = {'data': data, 'rowHeights': rowHeights, 'col_width': col_width, 'merged_cells': boundaries_dict}
+    data_excel = {'data': data, 'rowHeights': row_heights, 'col_width': col_width, 'merged_cells': boundaries_dict}
 
     return data_excel
 
@@ -630,7 +632,7 @@ def round_cell(data):
         return data
 
 
-def insert_data_new_excel_file(self, data, rowHeights, col_width, boundaries_dict):
+def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_dict):
     wb_new = openpyxl.Workbook()
     sheet_new = wb_new.active
 
@@ -742,7 +744,7 @@ def insert_data_new_excel_file(self, data, rowHeights, col_width, boundaries_dic
         elif all([col is None for col in row[:13]]):
             sheet_new.row_dimensions[index_row].hidden = True
         try:
-            sheet_new.row_dimensions[index_row].height = rowHeights[index_row - 1]
+            sheet_new.row_dimensions[index_row].height = row_heights[index_row - 1]
         except Exception:
             pass
 

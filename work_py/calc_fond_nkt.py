@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QInputDialog, QMessageBox
+from PyQt5.QtWidgets import QMessageBox
 
 
 class CalcFond:
@@ -27,7 +27,7 @@ class CalcFond:
         try:
             for nkt_l in calc_nkt_list:
                 if nkt_l <= float(self.static_level):
-                    a = self.fluid
+
                     p = round(float(str(self.fluid)[:3]) * 9.81 * nkt_l / 100, 0)
                 else:
                     p = round(float(str(self.fluid)[:3]) * 9.81 * nkt_l / 100-
