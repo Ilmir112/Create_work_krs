@@ -16,11 +16,11 @@ class TabPageSoGrp(TabPageUnion):
         self.diameter_paker_labelType = QLabel("Диаметр пакера", self)
         self.diameter_paker_edit = QLineEdit(self)
 
-        self.paker_khost_Label = QLabel("Длина хвостовика", self)
+        self.paker_khost_label = QLabel("Длина хвостовика", self)
         self.paker_khost_edit = QLineEdit(self)
         self.paker_khost_edit.setValidator(self.validator_int)
 
-        self.paker_depth_Label = QLabel("Глубина посадки", self)
+        self.paker_depth_label = QLabel("Глубина посадки", self)
         self.paker_depth_edit = QLineEdit(self)
         self.paker_depth_edit.setValidator(self.validator_int)
         self.paker_depth_edit.textChanged.connect(self.update_paker)
@@ -55,28 +55,28 @@ class TabPageSoGrp(TabPageUnion):
                 self.otz_after_question_qcombo.setCurrentIndex(1)
                 self.otz_question_qcombo.setCurrentIndex(1)
 
-        self.grid_layout = QGridLayout(self)
+        # self.grid = QGridLayout(self)
 
-        self.grid_layout.addWidget(self.diameter_paker_labelType, 3, 1)
-        self.grid_layout.addWidget(self.diameter_paker_edit, 4, 1)
+        self.grid.addWidget(self.diameter_paker_labelType, 3, 1)
+        self.grid.addWidget(self.diameter_paker_edit, 4, 1)
 
-        self.grid_layout.addWidget(self.paker_khost_Label, 3, 2)
-        self.grid_layout.addWidget(self.paker_khost_edit, 4, 2)
+        self.grid.addWidget(self.paker_khost_label, 3, 2)
+        self.grid.addWidget(self.paker_khost_edit, 4, 2)
 
-        self.grid_layout.addWidget(self.paker_depth_Label, 3, 3)
-        self.grid_layout.addWidget(self.paker_depth_edit, 4, 3)
+        self.grid.addWidget(self.paker_depth_label, 3, 3)
+        self.grid.addWidget(self.paker_depth_edit, 4, 3)
 
-        self.grid_layout.addWidget(self.otz_question_Label, 3, 4)
-        self.grid_layout.addWidget(self.otz_question_qcombo, 4, 4)
+        self.grid.addWidget(self.otz_question_Label, 3, 4)
+        self.grid.addWidget(self.otz_question_qcombo, 4, 4)
 
-        self.grid_layout.addWidget(self.normalization_question_Label, 3, 5)
-        self.grid_layout.addWidget(self.normalization_qcombo, 4, 5)
+        self.grid.addWidget(self.normalization_question_Label, 3, 5)
+        self.grid.addWidget(self.normalization_qcombo, 4, 5)
 
-        self.grid_layout.addWidget(self.current_depth_label, 3, 6)
-        self.grid_layout.addWidget(self.current_depth_edit, 4, 6)
+        self.grid.addWidget(self.current_depth_label, 3, 6)
+        self.grid.addWidget(self.current_depth_edit, 4, 6)
 
-        self.grid_layout.addWidget(self.otz_after_question_Label, 3, 7)
-        self.grid_layout.addWidget(self.otz_after_question_qcombo, 4, 7)
+        self.grid.addWidget(self.otz_after_question_Label, 3, 7)
+        self.grid.addWidget(self.otz_after_question_qcombo, 4, 7)
 
     def update_paker(self):
 

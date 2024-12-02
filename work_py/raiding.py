@@ -67,7 +67,7 @@ class TabPageSo_raid(TabPageUnion):
             ['НКТ', 'СБТ'])
         self.raid_select_combo.currentTextChanged.connect(self.update_nkt)
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.setColumnMinimumWidth(1, 150)
 
         self.grid.addWidget(self.raid_select_label, 2, 0)

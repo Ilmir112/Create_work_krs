@@ -7,10 +7,10 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QTabWidget, QWidget, QLab
 
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
-from work_py.alone_oreration import kot_work
+
 from PyQt5.QtGui import QDoubleValidator
-from .template_work import TemplateKrs, TabPageSoWith
-from main import MyMainWindow
+from work_py.template_work import TemplateKrs, TabPageSoWith
+
 
 
 class TabPageSo(TabPageUnion):
@@ -90,7 +90,7 @@ class TabPageSo(TabPageUnion):
             self.note_question_qcombo.setCurrentIndex(1)
             self.solvent_question_combo.setCurrentIndex(1)
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         if self.data_well.column_additional is False or \
                 (self.data_well.column_additional and self.data_well.current_bottom <
                  self.data_well.head_column_additional.get_value):

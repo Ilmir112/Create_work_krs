@@ -45,7 +45,7 @@ class TabPageSoMagnit(TabPageUnion):
             ['НКТ', 'СБТ'])
         # self.nkt_select_combo.currentTextChanged.connect(self.update_nkt)
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.setColumnMinimumWidth(1, 150)
 
         self.grid.addWidget(self.print_type_label, 2, 1)

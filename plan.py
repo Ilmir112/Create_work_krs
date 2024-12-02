@@ -12,7 +12,7 @@ def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
     for ind, _range in enumerate(ws.merged_cells.ranges):
         boundaries_dict[ind] = range_boundaries(str(_range))
 
-    # rowHeights_top = [None, 18.0, 18, 18,None, 18.0, 18, 18,None, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18]
+    # row_heights_top = [None, 18.0, 18, 18,None, 18.0, 18, 18,None, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18]
     row_heights1 = [ws.row_dimensions[i + 1].height for i in range(cat_well_min.get_value, ws.max_row)]
     for key, value in boundaries_dict.items():
         try:
@@ -27,7 +27,7 @@ def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
     ws.delete_rows(1, cat_well_min.get_value - 1)
 
     # print(sorted(boundaries_dict))
-    data_list.rowHeights = row_heights1
+    data_list.row_heights = row_heights1
 
     for _ in range(16):
         ws.insert_rows(1, 1)
@@ -36,9 +36,9 @@ def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
             ws.merge_cells(start_column=value[0], start_row=value[1] + 16 - cat_well_min.get_value + 1,
                            end_column=value[2], end_row=value[3] + 16 - cat_well_min.get_value + 1)
 
-    # print(f'{ws.max_row, len(data_list.prowHeights)}dd')
+    # print(f'{ws.max_row, len(data_list.prow_heights)}dd')
     for index_row, row in enumerate(ws.iter_rows()):  # Копирование высоты строки
-        ws.row_dimensions[index_row + 17].height = data_list.rowHeights[index_row - 1]
+        ws.row_dimensions[index_row + 17].height = data_list.row_heights[index_row - 1]
 
 
 def head_ind(start, finish):

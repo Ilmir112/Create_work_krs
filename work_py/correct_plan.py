@@ -26,7 +26,7 @@ class TabPageDp(TabPageUnion):
 
         self.table_name = ''
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
 
         self.grid.addWidget(self.well_number_label, 2, 1)
         self.grid.addWidget(self.well_number_edit, 3, 1)
@@ -96,7 +96,7 @@ class CorrectPlanWindow(WindowUnion):
         self.work_plan = self.data_well.work_plan
         self.dict_perforation = []
 
-        self.data, self.rowHeights, self.col_width, self.boundaries_dict = None, None, None, None
+        self.data, self.row_heights, self.col_width, self.boundaries_dict = None, None, None, None
         self.target_row_index = None
         self.target_row_index_cancel = None
         self.old_index = 0
@@ -158,8 +158,8 @@ class CorrectPlanWindow(WindowUnion):
 
             DopPlanWindow.work_with_excel(self, well_number, well_area, well_data_in_base, self.data_well.type_kr)
 
-            data_list.data, data_list.rowHeights, data_list.col_width, data_list.boundaries_dict = \
-                DopPlanWindow.change_pvr_in_bottom(self, self.data, self.rowHeights, self.col_width,
+            data_list.data, data_list.row_heights, data_list.col_width, data_list.boundaries_dict = \
+                DopPlanWindow.change_pvr_in_bottom(self, self.data, self.row_heights, self.col_width,
                                                    self.boundaries_dict)
 
             if well_number != '' and well_area != '':

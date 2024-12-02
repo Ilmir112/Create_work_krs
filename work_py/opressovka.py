@@ -170,13 +170,13 @@ class OpressovkaEK(WindowUnion):
 
         paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
         paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
-        pressure_zumph_combo = self.tabWidget.currentWidget().pressure_zumpf_question_QCombo.currentText()
+        pressureZUMPF_combo = self.tabWidget.currentWidget().pressure_zumpf_question_QCombo.currentText()
         if not paker_khost or not paker_depth:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
 
 
-        if pressure_zumph_combo == 'Да':
+        if pressureZUMPF_combo == 'Да':
             paker_depth_zumpf = self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()
             if paker_depth_zumpf != '':
                 paker_depth_zumpf = int(float(paker_depth_zumpf))
@@ -190,9 +190,9 @@ class OpressovkaEK(WindowUnion):
         else:
             paker_depth_zumpf = 0
 
-        if int(paker_khost) + int(paker_depth) > self.data_well.current_bottom and pressure_zumph_combo == 'Нет' \
+        if int(paker_khost) + int(paker_depth) > self.data_well.current_bottom and pressureZUMPF_combo == 'Нет' \
                 or int(paker_khost) + int(
-            paker_depth_zumpf) > self.data_well.current_bottom and pressure_zumph_combo == 'Да':
+            paker_depth_zumpf) > self.data_well.current_bottom and pressureZUMPF_combo == 'Да':
             QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
                                                                    f'ниже текущего забоя')
             return

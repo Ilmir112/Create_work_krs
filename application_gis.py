@@ -78,7 +78,7 @@ class TabPageSoPvr(TabPageUnion):
              'отбивка забоя', 'привязка', 'ВП', 'РГД по колонне', 'РГД по НКТ', 'Цем желонки'])
         self.ComboBoxGeophygist.currentTextChanged.connect(self.geophygist_data)
 
-        self.grid = QGridLayout(self)
+
 
         self.grid.addWidget(self.number_brigada_label, 7, 2)
         self.grid.addWidget(self.number_brigada_combo, 8, 2)

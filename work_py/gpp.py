@@ -22,7 +22,7 @@ class TabPageSoGrp(TabPageUnion):
         self.diameter_paker_labelType = QLabel("Диаметр ГПП", self)
         self.diameter_paker_edit = QLineEdit(self)
 
-        self.paker_depth_Label = QLabel("Глубина ГПП", self)
+        self.paker_depth_label = QLabel("Глубина ГПП", self)
         self.paker_depth_edit = QLineEdit(self)
         self.paker_depth_edit.setValidator(self.validator_int)
         self.paker_depth_edit.textChanged.connect(self.update_paker)
@@ -38,18 +38,18 @@ class TabPageSoGrp(TabPageUnion):
         self.otz_after_question_qcombo.currentTextChanged.connect(self.update_paker)
         self.otz_after_question_qcombo.addItems(['Да', 'Нет'])
 
-        self.grid_layout = QGridLayout(self)
+        # self.grid = QGridLayout(self)
 
-        self.grid_layout.addWidget(self.diameter_paker_labelType, 3, 1)
-        self.grid_layout.addWidget(self.diameter_paker_edit, 4, 1)
+        self.grid.addWidget(self.diameter_paker_labelType, 3, 1)
+        self.grid.addWidget(self.diameter_paker_edit, 4, 1)
 
-        self.grid_layout.addWidget(self.paker_depth_Label, 3, 3)
-        self.grid_layout.addWidget(self.paker_depth_edit, 4, 3)
+        self.grid.addWidget(self.paker_depth_label, 3, 3)
+        self.grid.addWidget(self.paker_depth_edit, 4, 3)
 
-        self.grid_layout.addWidget(self.current_depth_label, 3, 5)
-        self.grid_layout.addWidget(self.current_depth_edit, 4, 5)
-        self.grid_layout.addWidget(self.otz_after_question_Label, 3, 6)
-        self.grid_layout.addWidget(self.otz_after_question_qcombo, 4, 6)
+        self.grid.addWidget(self.current_depth_label, 3, 5)
+        self.grid.addWidget(self.current_depth_edit, 4, 5)
+        self.grid.addWidget(self.otz_after_question_Label, 3, 6)
+        self.grid.addWidget(self.otz_after_question_qcombo, 4, 6)
 
     def update_paker(self):
 
@@ -218,7 +218,7 @@ class GppWindow(WindowUnion):
              'Мастер КРС, представ. заказчика', 8],
             [None, None,
              f'Установить подъёмный агрегат на устье не менее 60т. Пусковой комиссией составить акт готовности '
-             f'подьемного агрегата и бригады для проведения ремонта скважины.',
+             f'подъемного агрегата и бригады для проведения ремонта скважины.',
              None, None, None, None, None, None, None,
              'Мастер КРС, представ. заказчика', 4.2],
             [f'смену объема  уд.весом {self.data_well.fluid_work} на циркуляцию '
@@ -270,7 +270,7 @@ class GppWindow(WindowUnion):
                     if 'Установить подъёмный агрегат на устье не менее 40т' in value:
                         new_value = QtWidgets.QTableWidgetItem(
                             f'Установить подъёмный агрегат на устье не менее 60т. '
-                            f'Пусковой комиссией составить акт готовности подьемного '
+                            f'Пусковой комиссией составить акт готовности подъемного '
                             f'агрегата и бригады для проведения ремонта скважины.')
 
                         self.table_widget.setItem(row, column, new_value)

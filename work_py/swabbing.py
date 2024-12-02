@@ -110,18 +110,18 @@ class TabPageSoSwab(TabPageUnion):
             self.plast_new_label = QLabel('индекс нового пласта', self)
             self.plast_new_combo = QLineEdit(self)
 
-        self.paker_depth_zumpf_Label = QLabel("Глубина посадки для ЗУМПФа", self)
+        self.paker_depth_zumpf_label = QLabel("Глубина посадки для ЗУМПФа", self)
         self.paker_depth_zumpf_edit = QLineEdit(self)
         self.paker_depth_zumpf_edit.setValidator(self.validator_int)
 
-        self.pressure_zumpf_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
-        self.pressure_zumpf_question_QCombo = QComboBox(self)
-        self.pressure_zumpf_question_QCombo.addItems(['Нет', 'Да'])
+        self.pressure_zumpf_question_label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
+        self.pressure_zumpf_question_combo = QComboBox(self)
+        self.pressure_zumpf_question_combo.addItems(['Нет', 'Да'])
 
 
         self.swab_true_edit_type.currentTextChanged.connect(self.swabTrueEdit_select)
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.addWidget(self.swab_true_label_type, 0, 0)
         self.grid.addWidget(self.swab_true_edit_type, 1, 0)
         self.grid.addWidget(self.plast_label, 0, 1)
@@ -142,9 +142,9 @@ class TabPageSoSwab(TabPageUnion):
         self.grid.addWidget(self.swab_volume_edit, 7, 2)
         self.grid.addWidget(self.depth_gauge_label, 6, 3)
         self.grid.addWidget(self.depth_gauge_combo, 7, 3)
-        self.grid.addWidget(self.pressure_zumpf_question_Label, 0, 6)
-        self.grid.addWidget(self.pressure_zumpf_question_QCombo, 1, 6)
-        self.grid.addWidget(self.paker_depth_zumpf_Label, 0, 7)
+        self.grid.addWidget(self.pressure_zumpf_question_label, 0, 6)
+        self.grid.addWidget(self.pressure_zumpf_question_combo, 1, 6)
+        self.grid.addWidget(self.paker_depth_zumpf_label, 0, 7)
         self.grid.addWidget(self.paker_depth_zumpf_edit, 1, 7)
 
         self.grid.addWidget(self.need_change_zgs_label, 9, 1)
@@ -169,9 +169,9 @@ class TabPageSoSwab(TabPageUnion):
         self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
         self.need_change_zgs_combo.setCurrentIndex(1)
         self.need_change_zgs_combo.setCurrentIndex(0)
-        self.pressure_zumpf_question_QCombo.currentTextChanged.connect(self.update_paker_need)
-        self.pressure_zumpf_question_QCombo.setCurrentIndex(1)
-        self.pressure_zumpf_question_QCombo.setCurrentIndex(0)
+        self.pressure_zumpf_question_combo.currentTextChanged.connect(self.update_paker_need)
+        self.pressure_zumpf_question_combo.setCurrentIndex(1)
+        self.pressure_zumpf_question_combo.setCurrentIndex(0)
 
     def update_paker_need(self, index):
         if index == 'Да':
@@ -187,10 +187,10 @@ class TabPageSoSwab(TabPageUnion):
 
             self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
 
-            self.grid.addWidget(self.paker_depth_zumpf_Label, 0, 7)
+            self.grid.addWidget(self.paker_depth_zumpf_label, 0, 7)
             self.grid.addWidget(self.paker_depth_zumpf_edit, 1, 7)
         elif index == 'Нет':
-            self.paker_depth_zumpf_Label.setParent(None)
+            self.paker_depth_zumpf_label.setParent(None)
             self.paker_depth_zumpf_edit.setParent(None)
 
     def update_change_fluid(self, index):
@@ -326,11 +326,11 @@ class TabPageSoSwab(TabPageUnion):
         paker_depth = self.pakerEdit.text()
 
         if self.swab_true_edit_type.currentText() not in ['однопакерная']:
-            self.pressure_zumpf_question_Label.setParent(None)
-            self.pressure_zumpf_question_QCombo.setParent(None)
+            self.pressure_zumpf_question_label.setParent(None)
+            self.pressure_zumpf_question_combo.setParent(None)
         else:
-            self.grid.addWidget(self.pressure_zumpf_question_Label, 2, 8)
-            self.grid.addWidget(self.pressure_zumpf_question_QCombo, 3, 8)
+            self.grid.addWidget(self.pressure_zumpf_question_label, 2, 8)
+            self.grid.addWidget(self.pressure_zumpf_question_combo, 3, 8)
 
         if self.swab_true_edit_type.currentText() in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
 
@@ -738,7 +738,7 @@ class SwabWindow(WindowUnion):
             need_change_zgs_combo = self.tabWidget.currentWidget().need_change_zgs_combo.currentText()
             depth_gauge_combo = self.tabWidget.currentWidget().depth_gauge_combo.currentText()
             paker_depth_zumpf = ''
-            pressure_zumph_combo = self.tabWidget.currentWidget().pressure_zumpf_question_QCombo.currentText()
+            pressure_zumph_combo = self.tabWidget.currentWidget().pressure_zumpf_question_combo.currentText()
 
             if pressure_zumph_combo == 'Да':                
                 paker_khost = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().khvostEdit.text())

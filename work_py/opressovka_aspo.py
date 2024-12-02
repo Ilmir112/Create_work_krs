@@ -21,11 +21,11 @@ class TabPageSo_aspo(TabPageUnion):
         self.diameter_paker_edit = QLineEdit(self)
         self.diameter_paker_edit.setValidator(self.validator)
 
-        self.paker_khost_Label = QLabel("Длина хвостовика", self)
+        self.paker_khost_label = QLabel("Длина хвостовика", self)
         self.paker_khost_edit = QLineEdit(self)
         self.paker_khost_edit.setValidator(self.validator)
 
-        self.paker_depth_Label = QLabel("Глубина посадки", self)
+        self.paker_depth_label = QLabel("Глубина посадки", self)
         self.paker_depth_edit = QLineEdit(self)
         self.paker_depth_edit.setValidator(self.validator)
         self.paker_depth_edit.textChanged.connect(self.update_paker)
@@ -39,16 +39,16 @@ class TabPageSo_aspo(TabPageUnion):
 
         self.paker_depth_edit.setText(str(int(paker_depth)))
 
-        self.grid_layout = QGridLayout(self)
+        # self.grid = QGridLayout(self)
 
-        self.grid_layout.addWidget(self.diameter_paker_labelType, 3, 1)
-        self.grid_layout.addWidget(self.diameter_paker_edit, 4, 1)
+        self.grid.addWidget(self.diameter_paker_labelType, 3, 1)
+        self.grid.addWidget(self.diameter_paker_edit, 4, 1)
 
-        self.grid_layout.addWidget(self.paker_khost_Label, 3, 2)
-        self.grid_layout.addWidget(self.paker_khost_edit, 4, 2)
+        self.grid.addWidget(self.paker_khost_label, 3, 2)
+        self.grid.addWidget(self.paker_khost_edit, 4, 2)
 
-        self.grid_layout.addWidget(self.paker_depth_Label, 3, 3)
-        self.grid_layout.addWidget(self.paker_depth_edit, 4, 3)
+        self.grid.addWidget(self.paker_depth_label, 3, 3)
+        self.grid.addWidget(self.paker_depth_edit, 4, 3)
 
     def update_paker(self):
 

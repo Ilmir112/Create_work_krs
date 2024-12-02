@@ -78,7 +78,7 @@ DB_CLASSIFICATION = 'databaseclassification'
 plast_all = []
 
 pause = True
-
+texts = ''
 costumer = 'ОАО "Башнефть"'
 contractor = 'ойл-сервис'
 DICT_CONTRACTOR = {
@@ -106,8 +106,8 @@ user = ['', '']
 
 data_in_base = False
 
-path_image = '_internal/'
-# path_image = ''
+# path_image = '_internal/'
+path_image = ''
 
 DICT_VOLUME_CHEMISTRY = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF': 0.0, 'NaOH': 0.0, 'ВТ СКО': 0.0,
                          'Глина': 0.0, 'растворитель': 0.0, 'уд.вес': 0.0,
@@ -115,7 +115,7 @@ DICT_VOLUME_CHEMISTRY = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF'
                          'РИР 2С': 0.0, 'РИР ОВП': 0.0, 'гидрофабизатор': 0.0}
 
 data = ''
-rowHeights = ''
+row_heights = ''
 data_well_is_True = False
 current_date = datetime.now().date()
 

@@ -44,7 +44,7 @@ class TabPageSoChange(TabPageUnion):
         self.type_absorbent = QComboBox()
         self.type_absorbent.addItems(['EVASORB марки 121', 'СНПХ-1200', 'ХИМТЕХНО 101 Марка А'])
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.addWidget(self.type_absorbent_label, 2, 1)
         self.grid.addWidget(self.type_absorbent, 3, 1)
 

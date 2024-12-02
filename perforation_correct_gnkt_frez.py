@@ -12,7 +12,7 @@ class TabPageSo(TabPageUnion):
         super().__init__(parent)
 
         manufacturer_list = ['НТЦ ЗЭРС', 'Зенит', 'Барбус']
-        self.grid = QGridLayout(self)
+
 
         self.labels_plast = {}
         self.dict_perforation = self.data_well.dict_perforation

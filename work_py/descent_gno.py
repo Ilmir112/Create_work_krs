@@ -1,12 +1,14 @@
 from typing import List
 
+from openpyxl.descriptors import String
+
 import data_list
 from abc import ABC, abstractmethod
 from work_py.alone_oreration import privyazka_nkt
-from .parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
-from .rationingKRS import descentNKT_norm, descent_sucker_pod
-from .calc_fond_nkt import CalcFond
-from .template_work import TemplateKrs
+from work_py.parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
+from work_py.rationingKRS import descentNKT_norm, descent_sucker_pod
+
+from work_py.template_work import TemplateKrs
 from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QPushButton
 
 
@@ -39,7 +41,7 @@ class TabPageGno(TabPageUnion):
 
         lift_key = self.select_gno()
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.addWidget(self.rgd_question_label, 4, 6)
         self.grid.addWidget(self.rgd_question_combo, 5, 6)
         self.grid.addWidget(self.gno_label, 4, 3)
@@ -94,6 +96,7 @@ class TabPageGno(TabPageUnion):
         return str_gno[:-3]
 
     def select_gno(self):
+        lift_key = ''
 
         if self.check_if_none(self.data_well.dict_pump_ecn["posle"]) != 'отсут' and \
                 self.check_if_none(self.data_well.dict_pump_shgn["posle"]) != 'отсут':
@@ -261,6 +264,7 @@ class DescentParent(ABC):
         super().__init__()
         self.current_widget = parent.current_widget
         self.data_well = parent.data_well
+        self.calc_fond_nkt = parent.calc_fond_nkt
 
         self.nkt_edit = self.current_widget.nkt_edit.text()
         self.sucker_edit = self.current_widget.sucker_edit.text()
@@ -280,7 +284,7 @@ class DescentParent(ABC):
         self.calc_fond_nkt_str = self.calc_fond_nkt(self.len_nkt, self.distance_between_nkt)
 
     @abstractmethod
-    def execute(self) -> List:
+    def execute(self) -> String:
         NotImplementedError('Не выбран метод реализации, метод должен быть переопределен')
 
     def jumping_after_sko(self):
@@ -326,31 +330,7 @@ class DescentParent(ABC):
         ]
         return gno_list
 
-    def calc_fond_nkt(self, len_nkt: str, distance_between_nkt: str) -> List:
 
-        # расчет необходимого давления опрессовки НКТ при спуске
-        static_level = self.data_well.static_level.get_value
-        fluid = float(self.data_well.fluid_work[:4].replace(',', '.').replace('г', ''))
-
-        pressure = 40
-
-        if self.data_well.dict_pump_ecn["posle"] != "0":
-            pressure = 50
-
-        calc = CalcFond(static_level, len_nkt, fluid, pressure, distance_between_nkt)
-        calc_fond_dict = calc.calc_pressure_list()
-        press_str = f'В случае не завоза новых или завоза не опрессованных НКТ, согласовать алгоритм ' \
-                    f'опрессовки с ЦДНГ,' \
-                    f' произвести спуск  фондовых НКТ с поинтервальной опрессовкой через ' \
-                    f'каждые {distance_between_nkt}м ' \
-                    f'с учетом статического уровня уровня на на глубине {static_level}м  по телефонограмме заказчика ' \
-                    f'в следующей последовательности:\n'
-        n = 0
-        for nkt, pressure in calc_fond_dict.items():
-            press_str += f'Опрессовать НКТ в интервале {n} - {int(nkt)} на давление {pressure}атм \n'
-            n = nkt
-
-        return press_str
 
     def append_note_6(self):
         work_list = [

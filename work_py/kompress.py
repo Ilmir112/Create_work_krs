@@ -50,7 +50,7 @@ class TabPageSoKompress(TabPageUnion):
         self.dictance_without_murt_edit = QLineEdit(self)
         self.dictance_without_murt_edit.setText(f'{200}')
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.addWidget(self.kompress_true_label, 0, 0)
         self.grid.addWidget(self.kompress_true_combo, 1, 0)
 

@@ -46,7 +46,7 @@ class TabPageSoClay(TabPageUnion):
         self.rir_question_combo = QComboBox(self)
         self.rir_question_combo.addItems(['Нет', 'Да'])
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
 
         self.grid.addWidget(self.purpose_of_clay_label, 2, 4)
         self.grid.addWidget(self.purpose_of_clay_combo, 3, 4)

@@ -55,7 +55,7 @@ class TabPageSo(TabPageUnion):
         self.category_Label = QLabel('По газовому фактору')
         self.calc_h2s_Label = QLabel('расчет поглотителя H2S')
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.addWidget(self.type_absorbent_label, 2, 1)
         self.grid.addWidget(self.type_absorbent, 3, 1)
         self.grid.addWidget(self.category_pressure_Label, 5, 1)

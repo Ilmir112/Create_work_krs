@@ -64,7 +64,7 @@ class TabPageSoPakerIzv(TabPageUnion):
         self.current_bottom_label = QLabel('Забой текущий')
         self.current_bottom_edit = QLineEdit(self)
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.setColumnMinimumWidth(1, 150)
 
         self.grid.addWidget(self.paker_type_label, 2, 1)

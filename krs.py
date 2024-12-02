@@ -53,7 +53,7 @@ class TabPageGno(TabPageUnion):
 
         self.gno_combo.setCurrentIndex(gno_list.index(lift_key))
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
 
         self.grid.addWidget(self.gno_label, 4, 3)
         self.grid.addWidget(self.gno_combo, 5, 3)

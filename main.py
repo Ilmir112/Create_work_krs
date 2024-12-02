@@ -113,7 +113,7 @@ class MyMainWindow(QMainWindow):
                     if 'Установить подъёмный агрегат на устье не менее 40т' in value:
                         new_value = QtWidgets.QTableWidgetItem(
                             f'Установить подъёмный агрегат на устье не менее 60т. '
-                            f'Пусковой комиссией составить акт готовности подьемного '
+                            f'Пусковой комиссией составить акт готовности подъемного '
                             f'агрегата и бригады для проведения ремонта скважины.')
                         table_widget.setItem(row, column, new_value)
 
@@ -383,7 +383,7 @@ class MyMainWindow(QMainWindow):
             data_list.pause = True
             self.pause_app()
 
-            self.ws = insert_data_new_excel_file(self, data_list.data, data_list.rowHeights, data_list.col_width,
+            self.ws = insert_data_new_excel_file(self, data_list.data, data_list.row_heights, data_list.col_width,
                                                  data_list.boundaries_dict)
 
             self.copy_pz(self.ws, self.table_widget, self.work_plan)
@@ -781,13 +781,13 @@ class MyMainWindow(QMainWindow):
                     border_styles[(cell.row, cell.column)] = cell.border
 
             table_widget.setColumnCount(count_col)
-            rowHeights_exit = [
+            row_heights_exit = [
                 sheet.row_dimensions[i + 1].height if sheet.row_dimensions[i + 1].height is not None else 18
                 for i in range(sheet.max_row)]
 
             for row in range(1, rows + 2):
                 if row > 1 and row < rows - 1:
-                    table_widget.setRowHeight(row, int(rowHeights_exit[row]))
+                    table_widget.setRowHeight(row, int(row_heights_exit[row]))
                 for col in range(1, count_col + 1):
                     if not sheet.cell(row=row, column=col).value is None:
                         if isinstance(sheet.cell(row=row, column=col).value, float) and row > 25:
@@ -1887,7 +1887,7 @@ class MyWindow(MyMainWindow):
             self.data_well.head_column_additional = ProtectedIsNonNone('не корректно')
             self.data_well.leakiness_count = 0
             self.data_well.bur_rastvor = ''
-            data_list.data, data_list.rowHeights, data_list.col_width, data_list.boundaries_dict = '', '', '', ''
+            data_list.data, data_list.row_heights, data_list.col_width, data_list.boundaries_dict = '', '', '', ''
             data_list.data_in_base = False
             self.data_well.well_volume_in_pz = []
             self.data_well.expected_pick_up = {}
@@ -1963,7 +1963,7 @@ class MyWindow(MyMainWindow):
             self.data_well.dict_sucker_rod = {}
             self.data_well.dict_sucker_rod_after = {}
             self.data_well.row_expected = []
-            data_list.rowHeights = []
+            data_list.row_heights = []
             self.data_well.plast_project = []
             self.data_well.plast_work = []
             self.data_well.leakiness_count = 0

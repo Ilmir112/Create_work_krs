@@ -5,8 +5,6 @@ import data_list
 
 from work_py.parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
 
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
-
 
 class TabPageSoSand(TabPageUnion):
     def __init__(self, parent=None):
@@ -58,7 +56,7 @@ class TabPageSoSand(TabPageUnion):
             self.plast_new_label = QLabel('индекс нового пласта', self)
             self.plast_new_combo = QLineEdit(self)
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
 
         self.grid.addWidget(self.current_label, 4, 3)
         self.grid.addWidget(self.current_edit, 5, 3)

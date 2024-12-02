@@ -1,14 +1,13 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QGridLayout, QLineEdit, QTabWidget, \
     QMainWindow, QPushButton
 
-import krs
-import data_list
-from gnkt_data.gnkt_data import gnkt_dict
-from main import MyMainWindow
-from .acid_paker import CheckableComboBox
-from .alone_oreration import well_volume
 
-from .rationingKRS import liftingNKT_norm, descentNKT_norm
+import data_list
+
+from work_py.acid_paker import CheckableComboBox
+from work_py.alone_oreration import well_volume
+
+from work_py.rationingKRS import liftingNKT_norm, descentNKT_norm
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
 
@@ -19,8 +18,8 @@ class TabPageDp(TabPageUnion):
         self.point_bottom_Label = QLabel("глубина нижней точки", self)
         self.point_bottom_edit = QLineEdit(self)
 
-        self.poins_sko_Label = QLabel("точки обработки", self)
-        self.poins_sko_edit = QLineEdit(self)
+        self.points_sko_Label = QLabel("точки обработки", self)
+        self.points_sko_edit = QLineEdit(self)
 
         plast_work = ['']
         plast_work.extend(self.data_well.plast_work)
@@ -42,7 +41,7 @@ class TabPageDp(TabPageUnion):
         self.acid_proc_edit.setClearButtonEnabled(True)
 
         self.acid_calcul_Label = QLabel("объем кислоты на погонный метр", self)
-        self.acid_calcul_Edit = QLineEdit(self)
+        self.acid_calcul_edit = QLineEdit(self)
 
         self.iron_label_type = QLabel("необходимость стабилизатора железа", self)
         self.iron_true_combo = QComboBox(self)
@@ -55,17 +54,17 @@ class TabPageDp(TabPageUnion):
         self.pressure_edit.setClearButtonEnabled(True)
         self.pressure_edit.setText(str(self.data_well.max_admissible_pressure.get_value))
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
 
         self.grid.addWidget(self.plast_label, 2, 1)
         self.grid.addWidget(self.plast_combo, 3, 1)
 
 
-        self.grid.addWidget(self.poins_sko_Label, 2, 2)
-        self.grid.addWidget(self.poins_sko_edit, 3, 2)
+        self.grid.addWidget(self.points_sko_Label, 2, 2)
+        self.grid.addWidget(self.points_sko_edit, 3, 2)
 
         self.grid.addWidget(self.acid_calcul_Label, 2, 3)
-        self.grid.addWidget(self.acid_calcul_Edit, 3, 3)
+        self.grid.addWidget(self.acid_calcul_edit, 3, 3)
 
         self.grid.addWidget(self.iron_label_type, 2, 4)
         self.grid.addWidget(self.iron_true_combo, 3, 4)
@@ -88,20 +87,20 @@ class TabPageDp(TabPageUnion):
         self.grid.addWidget(self.pressure_Label, 6, 5)
         self.grid.addWidget(self.pressure_edit, 7, 5)
 
-        self.acid_calcul_Edit.textChanged.connect(self.update_volume_points)
-        self.poins_sko_edit.textChanged.connect(self.update_volume_points)
+        self.acid_calcul_edit.textChanged.connect(self.update_volume_points)
+        self.points_sko_edit.textChanged.connect(self.update_volume_points)
 
     def update_volume_points(self):
-        acid_calcul = self.acid_calcul_Edit.text()
-        poins_sko = self.poins_sko_edit.text()
+        acid_calcul = self.acid_calcul_edit.text()
+        points_sko = self.points_sko_edit.text()
 
         if acid_calcul != '':
             acid_calcul = float(acid_calcul)
-            if all([char in "0123456789м., " for char in poins_sko.replace(' ', '')]):
-                bottom_point = max(list(map(int, poins_sko.replace('м', '').replace(',', '').split())))
-                poins_sko = len(poins_sko.replace('м', '').replace(',', '.').strip().split('.'))
+            if all([char in "0123456789м., " for char in points_sko.replace(' ', '')]):
+                bottom_point = max(list(map(int, points_sko.replace('м', '').replace(',', '').split())))
+                points_sko = len(points_sko.replace('м', '').replace(',', '.').strip().split('.'))
                 self.point_bottom_edit.setText(str(bottom_point))
-                volume = round(acid_calcul * float(poins_sko),1)
+                volume = round(acid_calcul * float(points_sko),1)
                 self.acid_volume_edit.setText(str(volume))
 
 
@@ -138,8 +137,8 @@ class GonsWindow(WindowUnion):
         acid_volume_edit = float(self.tabWidget.currentWidget().acid_volume_edit.text().replace(',', '.'))
         acid_proc_edit = int(self.tabWidget.currentWidget().acid_proc_edit.text().replace(',', '.'))
         bottom_point = self.tabWidget.currentWidget().point_bottom_edit.text()
-        acid_calcul_Edit = self.tabWidget.currentWidget().acid_calcul_Edit.text()
-        poins_sko_edit = self.tabWidget.currentWidget().poins_sko_edit.text()
+        acid_calcul_edit = self.tabWidget.currentWidget().acid_calcul_edit.text()
+        points_sko_edit = self.tabWidget.currentWidget().points_sko_edit.text()
         pressure_edit = int(self.tabWidget.currentWidget().pressure_edit.text())
         iron_true_combo = self.tabWidget.currentWidget().iron_true_combo.currentText()
         iron_volume_edit = self.tabWidget.currentWidget().iron_volume_edit.text()
@@ -147,13 +146,13 @@ class GonsWindow(WindowUnion):
         if int(bottom_point) >= self.data_well.current_bottom:
             QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
             return
-        if not acid_edit or not acid_volume_edit or not acid_proc_edit or not bottom_point or not acid_calcul_Edit \
-                or not poins_sko_edit or not pressure_edit:
+        if not acid_edit or not acid_volume_edit or not acid_proc_edit or not bottom_point or not acid_calcul_edit \
+                or not points_sko_edit or not pressure_edit:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
 
-        work_list = self.acidGons(plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, poins_sko_edit, bottom_point,
-                                  acid_calcul_Edit, pressure_edit, iron_true_combo, iron_volume_edit)
+        work_list = self.acidGons(plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, points_sko_edit, bottom_point,
+                                  acid_calcul_edit, pressure_edit, iron_true_combo, iron_volume_edit)
         self.populate_row(self.insert_index, work_list, self.table_widget)
         self.calculate_chemistry(acid_edit, acid_volume_edit)
         data_list.pause = False
@@ -164,8 +163,8 @@ class GonsWindow(WindowUnion):
                 # Закрываем основное окно при закрытии окна входа
         self.data_well.operation_window = None
         event.accept()  # Принимаем событие закрытия
-    def acidGons(self, plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, poins_sko_edit, bottom_point,
-                                  acid_calcul_Edit, pressure_edit, iron_true_combo, iron_volume_edit):
+    def acidGons(self, plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, points_sko_edit, bottom_point,
+                                  acid_calcul_edit, pressure_edit, iron_true_combo, iron_volume_edit):
         if iron_true_combo == 'Да':
             iron_str = f' с добавлением стабилизатор железа (Hi-Iron)  из расчета 10кг на 1тн ({iron_volume_edit}кг)'
         else:
@@ -179,10 +178,10 @@ class GonsWindow(WindowUnion):
          f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм.',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(bottom_point,1)],
-         [f' ГОНС пласта {plast_combo} (общий объем {acid_volume_edit}м3) в инт. {poins_sko_edit}м', None,
-          f'Провести ОПЗ пласта {plast_combo} силами СК Крезол по технологии ГОНС в инт. {poins_sko_edit} '
+         [f' ГОНС пласта {plast_combo} (общий объем {acid_volume_edit}м3) в инт. {points_sko_edit}м', None,
+          f'Провести ОПЗ пласта {plast_combo} силами СК Крезол по технологии ГОНС в инт. {points_sko_edit} '
           f'с закачкой {acid_edit} '
-          f'{acid_proc_edit}% в объеме по {acid_calcul_Edit}м3/точке (общий объем {acid_volume_edit}м3) при давлении '
+          f'{acid_proc_edit}% в объеме по {acid_calcul_edit}м3/точке (общий объем {acid_volume_edit}м3) при давлении '
           f'не более {pressure_edit}атм{iron_str} в присутствии '
           f'представителя сектора супервайзерского контроля за текущим и капитальным ремонтом скважин (ГОНС произвести '
           f'снизу-вверх).',

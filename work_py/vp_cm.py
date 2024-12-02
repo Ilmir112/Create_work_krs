@@ -33,7 +33,7 @@ class TabPageVp(TabPageUnion):
         if vp_depth != '':
             self.cement_vp_edit.setText(f'{int(float(vp_depth) - 3)}')
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.addWidget(self.need_question_Label, 4, 4)
         self.grid.addWidget(self.need_question_qcombo, 5, 4)
 

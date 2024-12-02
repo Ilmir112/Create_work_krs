@@ -68,7 +68,7 @@ class TabPageSoLar(TabPageUnion):
             ['НКТ', 'СБТ'])
         # self.nkt_select_combo.currentTextChanged.connect(self.update_nkt)
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.setColumnMinimumWidth(1, 150)
         self.grid.addWidget(self.nkt_str_label, 0, 2)
         self.grid.addWidget(self.nkt_str_combo, 1, 2)

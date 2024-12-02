@@ -1,12 +1,10 @@
-from PyQt5.QtGui import QDoubleValidator, QIntValidator
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
-    QMainWindow, QPushButton
+
+from PyQt5.QtWidgets import  QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QPushButton
 
 import data_list
-from main import MyMainWindow
-from .acid_paker import CheckableComboBox
-from .alone_oreration import volume_vn_ek
-from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
+
+from work_py.acid_paker import CheckableComboBox
+from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
 
 class TabPageSoBlock(TabPageUnion):
@@ -50,9 +48,9 @@ class TabPageSoBlock(TabPageUnion):
 
         self.type_of_block_processing_label = QLabel('Цель закачки блокпачки')
         self.type_of_block_processing_combo = QComboBox(self)
-        self.type_of_block_processing_combo.addItems(['для глушения', 'для нормалищации'])
+        self.type_of_block_processing_combo.addItems(['для глушения', 'для нормализации'])
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.addWidget(self.plast_label, 4, 2)
         self.grid.addWidget(self.plast_combo, 5, 2)
 
@@ -146,7 +144,7 @@ class BlockPackWindow(WindowUnion):
             current_edit = int(float(self.tabWidget.currentWidget().current_edit.text().replace(',', '.')))
             if current_edit >= self.data_well.bottom_hole_artificial.get_value:
                 QMessageBox.warning(self, 'Ошибка',
-                                    f'Необходимый забой-{current_edit}м ниже исскуственного '
+                                    f'Необходимый забой-{current_edit}м ниже искусственного '
                                     f'{self.data_well.bottom_hole_artificial.get_value}м')
                 return
             plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
@@ -309,7 +307,7 @@ class BlockPackWindow(WindowUnion):
                  f'{self.data_well.fluid_work}г/см3 '
                  f'в объеме {volume_zatrub}м3. '
                  f'Технологический отстой - 2 часа. Для предотвращения срыва блокирующей пачки, при проведении '
-                 f'спускоподъемных операций на скважине, запрещается превышать предельную нормативную скорость подъема '
+                 f'спуско-подъемных операций на скважине, запрещается превышать предельную нормативную скорость подъема '
                  f'подземного (глубинного) скважинного оборудования.',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, представитель ЦДНГ', 2.49],

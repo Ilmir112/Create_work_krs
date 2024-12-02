@@ -16,7 +16,7 @@ class TabPageSoCurator(TabPageUnion):
         curator_list = ['ГРР', 'ОР', 'ГТМ', 'ГО', 'ВНС']
         self.curator_combo.addItems(curator_list)
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.addWidget(self.curator_label, 2, 0)
         self.grid.addWidget(self.curator_combo, 3, 0)
 
