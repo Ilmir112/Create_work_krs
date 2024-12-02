@@ -1350,8 +1350,11 @@ class WellData(FindIndexPZ):
         if fname not in ['без загрузки']:
             # Вставка данных в таблицу
             for index_row, row in enumerate(sheet_angle.iter_rows(min_row=row_data, values_only=True)):
-                if str(row[depth_column]).replace(',', '').replace('.', '').isdigit():
-                    angle_data.append((row[depth_column], row[angle_column], row[curvature_column]))
+                if str(row[depth_column]).replace(',', '').replace('.', '').isdigit()\
+                        and row[depth_column] and row[angle_column] and row[curvature_column]:
+                    angle_data.append((float(str(row[depth_column]).replace(',', '.')),
+                                       float(str(row[angle_column]).replace(',', '.')),
+                                       float(str(row[curvature_column]).replace(',', '.'))))
         else:
             return []
         return angle_data

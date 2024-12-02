@@ -463,12 +463,12 @@ class TabPageSoAcid(TabPageUnion):
                 pass
 
             try:
-                self.expected_P_edit.setText(f'{self.data_well.expected_P}')
+                self.expected_P_edit.setText(f'{self.data_well.expected_pressure}')
             except Exception:
                 pass
 
             self.expected_Q_edit.setText(str(self.data_well.expected_Q))
-            self.expected_P_edit.setText(str(self.data_well.expected_P))
+            self.expected_P_edit.setText(str(self.data_well.expected_pressure))
 
             self.grid.addWidget(self.expected_Q_label, 10, 2)
             self.grid.addWidget(self.expected_Q_edit, 11, 2)

@@ -126,7 +126,7 @@ class PerforationWindow(WindowUnion):
 
     def closeEvent(self, event):
                 # Закрываем основное окно при закрытии окна входа
-        MyWindow.operation_window = None
+        self.data_well.operation_window = None
         event.accept()  # Принимаем событие закрытия
     def addPerfProject(self):
 

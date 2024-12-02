@@ -81,30 +81,29 @@ class TabPageUnion(QWidget):
         self.grid.addWidget(self.paker_depth_label, 1, 3)
         self.grid.addWidget(self.paker_depth_edit, 2, 3)
 
-        self.grid.addWidget(self.pressure_zumpf_question_label, 1, 5)
-        self.grid.addWidget(self.pressure_zumpf_question_combo, 2, 5)
-        self.grid.addWidget(self.need_privyazka_Label, 1, 4)
-        self.grid.addWidget(self.need_privyazka_q_combo, 2, 4)
-
-        
+        self.grid.addWidget(self.pressure_zumpf_question_label, 1, 4)
+        self.grid.addWidget(self.pressure_zumpf_question_combo, 2, 4)
+        self.grid.addWidget(self.need_privyazka_Label, 1, 6)
+        self.grid.addWidget(self.need_privyazka_q_combo, 2, 6)
 
     def update_paker_need(self, index):
-        if index == 'Да':
-            paker_depth_zumpf = None
+        if index == 'Нет':
+            self.paker_depth_zumpf_label.setParent(None)
+            self.paker_depth_zumpf_edit.setParent(None)
+        elif index == 'Да':
             if len(self.data_well.plast_work) != 0:
                 paker_depth_zumpf = int(self.data_well.perforation_roof + 10)
             else:
                 if self.data_well.dict_leakiness:
                     paker_depth_zumpf = int(max([float(nek.split('-')[0])+10
                                            for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()]))
+                else:
+                    paker_depth_zumpf = self.data_well.current_bottom-10
 
             self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
 
-            self.grid.addWidget(self.paker_depth_zumpf_label, 3, 6)
-            self.grid.addWidget(self.paker_depth_zumpf_edit, 4, 6)
-        elif index == 'Нет':
-            self.paker_depth_zumpf_label.setParent(None)
-            self.paker_depth_zumpf_edit.setParent(None)
+            self.grid.addWidget(self.paker_depth_zumpf_label, 1, 5)
+            self.grid.addWidget(self.paker_depth_zumpf_edit, 2, 5)
 
     def update_paker(self):
         paker_depth = self.paker_depth_edit.text()
@@ -462,9 +461,11 @@ class WindowUnion(MyMainWindow):
     def calculate_angle(max_depth_pvr, angle_data):
         tuple_angle = ()
         for depth, angle, _ in angle_data:
-            if abs(float(depth) - float(max_depth_pvr)) < 10:
+            asdfg = abs(float(depth) - float(max_depth_pvr))
+            if abs(float(depth) - float(max_depth_pvr)) < 20:
                 tuple_angle = depth, angle, f'Зенитный угол на глубине {depth}м равен {angle}гр'
-        return tuple_angle
+        if tuple_angle:
+            return tuple_angle
 
     def calc_work_fluid(self, fluid_work_insert):
         self.data_well.fluid = float(fluid_work_insert)

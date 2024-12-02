@@ -139,11 +139,11 @@ class TabPageSoRir(TabPageUnion):
         self.grid.addWidget(self.paker_depth_label, 1, 3)
         self.grid.addWidget(self.paker_depth_edit, 2, 3)
 
-        self.grid.addWidget(self.pressure_zumpf_question_label, 1, 4)
-        self.grid.addWidget(self.pressure_zumpf_question_combo, 2, 4)
-
-        self.grid.addWidget(self.need_privyazka_Label, 1, 6)
-        self.grid.addWidget(self.need_privyazka_q_combo, 2, 6)
+        # self.grid.addWidget(self.pressure_zumpf_question_label, 1, 4)
+        # self.grid.addWidget(self.pressure_zumpf_question_combo, 2, 4)
+        #
+        # self.grid.addWidget(self.need_privyazka_Label, 1, 6)
+        # self.grid.addWidget(self.need_privyazka_q_combo, 2, 6)
 
         self.grid.addWidget(self.need_change_zgs_label, 9, 2)
         self.grid.addWidget(self.need_change_zgs_combo, 10, 2)
@@ -686,7 +686,7 @@ class RirWindow(WindowUnion):
 
         volume_in_nkt, volume_in_ek = RirWindow.calc_buffer(self, roof_rir_edit, sole_rir_edit, dict_nkt)
 
-        uzmPero_list = [
+        uzm_pero_list = [
             [f' СПО пера до глубины {sole_rir_edit}м Опрессовать НКТ на 200атм', None,
              f'Спустить {RirWindow.pero_select(self, sole_rir_edit)}  на тНКТ{nkt_diam}м до глубины {sole_rir_edit}м с '
              f'замером, шаблонированием '
@@ -752,12 +752,12 @@ class RirWindow(WindowUnion):
              f'В случае головы ЦМ ниже планового РИР повторить с учетом корректировки мощности моста ',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.67],
-
         ]
+
         self.calculate_chemistry('цемент', volume_cement)
         if 'КР11' in self.data_well.type_kr and self.data_well.perforation_roof > roof_rir_edit:
             self.data_well.fluid_work = '1.18г/см3'
-            uzmPero_list.append([
+            uzm_pero_list.append([
                 f'{self.data_well.fluid_work} в объеме '
                 f'{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии',
                 None,
@@ -771,16 +771,16 @@ class RirWindow(WindowUnion):
         # print(plast_combo)
         if self.data_well.head_column.get_value == 0:
             if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:
-                uzmPero_list.pop(-1)
+                uzm_pero_list.pop(-1)
         else:
             if self.data_well.column_conductor_length.get_value > roof_rir_edit:
-                uzmPero_list.pop(-1)
+                uzm_pero_list.pop(-1)
 
         if need_change_zgs_combo == "Да":
             for row in Change_fluid_Window.fluid_change(self, plast_new_combo, fluid_new_edit,
                                                         pressure_new_edit):
-                uzmPero_list.append(row)
-            uzmPero_list.append([
+                uzm_pero_list.append(row)
+            uzm_pero_list.append([
                 None, None,
                 f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в '
                 f'объеме '
@@ -789,7 +789,7 @@ class RirWindow(WindowUnion):
                 None, None, None, None, None, None, None,
                 'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
         else:
-            uzmPero_list.append([
+            uzm_pero_list.append([
                 None, None,
                 f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в объеме '
                 f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
@@ -797,7 +797,7 @@ class RirWindow(WindowUnion):
                 None, None, None, None, None, None, None,
                 'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
         self.data_well.for_paker_list = None
-        return uzmPero_list
+        return uzm_pero_list
 
     def rir_with_pero(self, paker_need_combo, plast_combo,
                     roof_rir_edit, sole_rir_edit, volume_cement, need_change_zgs_combo='Нет', plast_new_combo='',
@@ -999,15 +999,15 @@ class RirWindow(WindowUnion):
 
         if self.data_well.column_additional is False or self.data_well.column_additional is True \
                 and sole_rir_edit < self.data_well.head_column_additional.get_value:
-            pero_select = f'{pero_combo_combo} + опрессовочное седло + НКТ{self.data_well.nkt_diam} 20м + репер'
+            pero_select = f'{pero_combo_combo} + НКТ{self.data_well.nkt_diam} 20м + репер'
 
         elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 \
                 and sole_rir_edit > self.data_well.head_column_additional.get_value:
-            pero_select = f'{pero_combo_combo} + опрессовочное седло + НКТ60мм 20м + репер + НКТ60мм L- ' \
+            pero_select = f'{pero_combo_combo} + НКТ60мм 20м + репер + НКТ60мм L- ' \
                           f'{round(sole_rir_edit - self.data_well.head_column_additional.get_value, 1)}м'
         elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110 \
                 and sole_rir_edit > self.data_well.head_column_additional.get_value:
-            pero_select = f'{pero_combo_combo} + опрессовочное седло + НКТ{self.data_well.nkt_diam}мм со снятыми фасками 20м + ' \
+            pero_select = f'{pero_combo_combo} + НКТ{self.data_well.nkt_diam}мм со снятыми фасками 20м + ' \
                           f'НКТ{self.data_well.nkt_diam}мм со снятыми фасками' \
                           f' L- {sole_rir_edit - self.data_well.head_column_additional.get_value}м'
         return pero_select
@@ -1015,7 +1015,7 @@ class RirWindow(WindowUnion):
     def need_paker(self, paker_need_combo, plast_combo, diameter_paker, paker_khost,
                    paker_depth, pressure_zumpf_question, rir_rpk_plast_true=False):
 
-        from .opressovka import OpressovkaEK
+        from work_py.opressovka import OpressovkaEK
 
         try:
             paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
@@ -1046,7 +1046,7 @@ class RirWindow(WindowUnion):
     def rir_paker(self, paker_need_combo, plast_combo,
                   roof_rir_edit, sole_rir_edit, pressure_zumpf_question='Не нужно',
                   diameter_paker=122, paker_khost=0, paker_depth=0):
-
+        
         rir_list = self.need_paker(paker_need_combo, plast_combo, diameter_paker, paker_khost,
                                    paker_depth, pressure_zumpf_question)
 

@@ -1032,7 +1032,7 @@ class TemplateKrs(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        MyWindow.operation_window = None
+        self.data_well.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
     def add_string(self):
@@ -1365,8 +1365,8 @@ class TemplateKrs(WindowUnion):
                     self.data_well.data_list[index][11] = template_ek
 
     def pero(self):
-        from .rir import RirWindow
-        from .drilling import Drill_window, TabPageSoDrill
+        from work_py.rir import RirWindow
+        from work_py.drilling import Drill_window, TabPageSoDrill
 
         pero_list = RirWindow.pero_select(self, self.data_well.current_bottom, 'перо + КОТ')
         if self.data_well.gips_in_well:
@@ -1374,8 +1374,8 @@ class TemplateKrs(WindowUnion):
         else:
             gips_str = ''
         gips_pero_list = [
-            [f'Спустить {pero_list[3:]}  на тНКТ{self.data_well.nkt_diam}мм', None,
-             f'Спустить {pero_list[3:]}  на тНКТ{self.data_well.nkt_diam}мм до глубины {self.data_well.current_bottom}м '
+            [f'Спустить {pero_list}  на тНКТ{self.data_well.nkt_diam}мм', None,
+             f'Спустить {pero_list}  на тНКТ{self.data_well.nkt_diam}мм до глубины {self.data_well.current_bottom}м '
              f'с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. '
              f' {gips_str} \n'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',

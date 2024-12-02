@@ -28,16 +28,16 @@ class TabPageSo(TabPageUnion):
         self.lineEditDopInformation = QLineEdit(self)
         self.lineEditDopInformation.setClearButtonEnabled(True)
 
-        grid = QGridLayout(self)
-        grid.addWidget(self.labelGeores, 0, 0)
-        grid.addWidget(self.labelType, 0, 1)
-        grid.addWidget(self.labelType2, 0, 2)
-        grid.addWidget(self.labelDopInformation, 0, 3)
+        # grid = QGridLayout(self)
+        self.grid.addWidget(self.labelGeores, 0, 0)
+        self.grid.addWidget(self.labelType, 0, 1)
+        self.grid.addWidget(self.labelType2, 0, 2)
+        self.grid.addWidget(self.labelDopInformation, 0, 3)
 
-        grid.addWidget(self.ComboBoxGeophygist, 1, 0)
-        grid.addWidget(self.lineedit_type, 1, 1)
-        grid.addWidget(self.lineedit_type2, 1, 2)
-        grid.addWidget(self.lineEditDopInformation, 1, 3)
+        self.grid.addWidget(self.ComboBoxGeophygist, 1, 0)
+        self.grid.addWidget(self.lineedit_type, 1, 1)
+        self.grid.addWidget(self.lineedit_type2, 1, 2)
+        self.grid.addWidget(self.lineEditDopInformation, 1, 3)
 
     def geophygist_data(self):
         if self.ComboBoxGeophygist.currentText() in ['Гироскоп', 'АКЦ', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ']:
@@ -184,12 +184,13 @@ class GeophysicWindow(WindowUnion):
         
         if self.data_well.angle_data:
             if self.data_well.max_angle.get_value > 45:
-                max_depth_pvr = max([float(self.tableWidget.item(row, 1).text()) for row in range(rows)])
+                max_depth_pvr = max([float(self.tableWidget.item(row, 2).text()) for row in range(rows)])
 
                 tuple_angle = self.calculate_angle(max_depth_pvr, self.data_well.angle_data)
-                if float(tuple_angle[0]) <= max_depth_pvr:
-                    cable_type_text = ' СОГЛАСОВАТЬ ЖЕСТКИЙ КАБЕЛЬ'
-                    angle_text = tuple_angle[2]
+                if tuple_angle:
+                    if float(tuple_angle[0]) <= max_depth_pvr:
+                        cable_type_text = ' СОГЛАСОВАТЬ ЖЕСТКИЙ КАБЕЛЬ'
+                        angle_text = tuple_angle[2]
         
         geophysical_research = [
             [" ", None,
