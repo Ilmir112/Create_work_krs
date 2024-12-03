@@ -578,21 +578,21 @@ def insert_data_well_dop_plan(self, data_well):
     self.data_well.depth_fond_paker_second_before = well_data_dict["оборудование"]["пакер2"]["глубина "]
     self.data_well.static_level = ProtectedIsDigit(well_data_dict["статика"])
     self.data_well.dinamic_level = ProtectedIsDigit(well_data_dict["динамика"])
-    try:
+    if 'После' in list(well_data_dict["НКТ"].keys()):
         self.data_well.dict_nkt_after = well_data_dict["НКТ"]['После']
         self.data_well.dict_nkt_before = well_data_dict["НКТ"]['До']
         self.data_well.dict_sucker_rod_after = well_data_dict["штанги"]['После']
         self.data_well.dict_sucker_rod = well_data_dict["штанги"]['До']
-    except Exception:
+    else:
         self.data_well.dict_nkt_after = well_data_dict["НКТ"]
         self.data_well.dict_nkt_before = well_data_dict["НКТ"]
         self.data_well.dict_sucker_rod_after = well_data_dict["штанги"]
         self.data_well.dict_sucker_rod = well_data_dict["штанги"]
-    self.data_well.Qoil = well_data_dict['ожидаемые']['нефть']
-    self.data_well.Qwater = well_data_dict['ожидаемые']['вода']
+    self.data_well.expected_oil = well_data_dict['ожидаемые']['нефть']
+    self.data_well.water_cut = well_data_dict['ожидаемые']['вода']
     self.data_well.percent_water = well_data_dict['ожидаемые']['обводненность']
     self.data_well.expected_pressure = well_data_dict['ожидаемые']['давление']
-    self.data_well.expected_Q = well_data_dict['ожидаемые']['приемистость']
+    self.data_well.expected_pickup = well_data_dict['ожидаемые']['приемистость']
 
     self.data_well.bottom_hole_drill = ProtectedIsDigit(well_data_dict['данные']['пробуренный забой'])
     self.data_well.bottom_hole_artificial = ProtectedIsDigit(well_data_dict['данные']['искусственный забой'])
@@ -604,13 +604,13 @@ def insert_data_well_dop_plan(self, data_well):
     self.data_well.curator = well_data_dict['куратор']
     self.data_well.region = well_data_dict['регион']
     self.data_well.cdng = ProtectedIsNonNone(well_data_dict['ЦДНГ'])
-    try:
+    if 'голова ЭК' in list(well_data_dict['ЭК'].keys()):
         self.data_well.head_column = ProtectedIsDigit(well_data_dict['ЭК']['голова ЭК'])
         self.data_well.diameter_doloto_ek = ProtectedIsDigit(well_data_dict['данные']['диаметр долото при бурении'])
-    except Exception as e:
+    else:
         self.data_well.head_column = ProtectedIsDigit(0)
         self.data_well.diameter_doloto_ek = ProtectedIsDigit(0)
-        print(f'отсутствуют данные в базе по голове хвостовика и диаметру долото {e}')
+        print(f'отсутствуют данные в базе по голове хвостовика и диаметру долото')
 
     self.data_well.data_well_dict = well_data_dict
     # QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")

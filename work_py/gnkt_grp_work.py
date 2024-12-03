@@ -853,13 +853,13 @@ class GnktModel(WindowUnion):
             column_add_shoe = ''
         if self.data_well.curator == 'ОР':
             expected_title = 'Ожидаемый приемистость скважины'
-            Qoil = f'{self.data_well.expected_Q}м3/сут'
-            Qwater = f'{self.data_well.expected_pressure}атм'
+            expected_oil = f'{self.data_well.expected_pickup}м3/сут'
+            water_cut = f'{self.data_well.expected_pressure}атм'
             proc_water = ''
         else:
             expected_title = 'Ожидаемый дебит скважины'
-            Qoil = f'{self.data_well.Qoil}т/сут'
-            Qwater = f'{self.data_well.Qwater}м3/сут'
+            expected_oil = f'{self.data_well.expected_oil}т/сут'
+            water_cut = f'{self.data_well.water_cut}м3/сут'
             proc_water = f'{self.data_well.percent_water}%'
 
         nkt = list(self.data_well.dict_nkt_before.keys())
@@ -1038,7 +1038,7 @@ class GnktModel(WindowUnion):
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Плотность рабочей жидкости',
              None, None, None, None, self.fluid_work_edit, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, expected_title, None,
-             None, None, None, Qoil, None, Qwater, None, proc_water, None],
+             None, None, None, expected_oil, None, water_cut, None, proc_water, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Максимальный угол наклона', None,
              None, None, None, self.data_well.max_angle.get_value, None, 'на глубине', None,
              self.data_well.max_angle_depth.get_value,

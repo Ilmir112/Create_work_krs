@@ -24,7 +24,7 @@ class TabPageSoKompress(TabPageUnion):
         self.depth_gauge_combo = QComboBox(self)
         self.depth_gauge_combo.addItems(['Нет', 'Да'])
 
-        self.khovst_label = QLabel("глубина воронки", self)
+        self.kvost_label = QLabel("глубина воронки", self)
         self.khvost_edit = QLineEdit(self)
         self.khvost_edit.setText(f'{self.data_well.perforation_roof - 100}')
 
@@ -56,7 +56,7 @@ class TabPageSoKompress(TabPageUnion):
 
         self.grid.addWidget(self.plast_label, 0, 1)
         self.grid.addWidget(self.plast_combo, 1, 1)
-        self.grid.addWidget(self.khovst_label, 0, 3)
+        self.grid.addWidget(self.kvost_label, 0, 3)
         self.grid.addWidget(self.khvost_edit, 1, 3)
 
         self.grid.addWidget(self.kompress_TypeLabel, 6, 2)
@@ -124,7 +124,7 @@ class KompressWindow(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        self.data_well.operation_window = None
+        data_list.operation_window  = None
         event.accept()  # Принимаем событие закрытия
 
     def add_work(self):

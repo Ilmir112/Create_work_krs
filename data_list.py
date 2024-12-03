@@ -103,6 +103,7 @@ nkt_mistake = False
 plan_correct_index = 0
 category_h2s_list = []
 user = ['', '']
+operation_window = None
 
 data_in_base = False
 

@@ -4,6 +4,8 @@ from openpyxl.descriptors import String
 
 import data_list
 from abc import ABC, abstractmethod
+
+from main import MyMainWindow
 from work_py.alone_oreration import privyazka_nkt
 from work_py.parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
 from work_py.rationingKRS import descentNKT_norm, descent_sucker_pod
@@ -54,7 +56,7 @@ class TabPageGno(TabPageUnion):
 
         self.need_juming_after_sko_label = QLabel('Нужно ли проводить промывку после СКО')
         self.need_juming_after_sko_combo = QComboBox(self)
-        self.need_juming_after_sko_combo.addItems(['Да', 'Нет'])
+        self.need_juming_after_sko_combo.addItems(['Нет', 'Да'])
         self.grid.addWidget(self.need_juming_after_sko_label, 4, 7)
         self.grid.addWidget(self.need_juming_after_sko_combo, 5, 7)
 
@@ -164,8 +166,9 @@ class GnoDescentWindow(WindowUnion):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def closeEvent(self, event):
+
         # Закрываем основное окно при закрытии окна входа
-        self.data_well.operation_window = None
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
     def check_descent_paker(self):

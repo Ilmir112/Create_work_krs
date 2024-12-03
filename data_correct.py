@@ -517,15 +517,15 @@ class TabPageSoCorrect(TabPageUnion):
 
         if self.curator_Combo.currentText() == 'ОР':
 
-            self.expected_Q_label = QLabel('Ожидаемая приемистость')
-            self.expected_Q_edit = FloatLineEdit(self)
+            self.expected_pickup_label = QLabel('Ожидаемая приемистость')
+            self.expected_pickup_edit = FloatLineEdit(self)
             try:
-                self.expected_Q_edit.setText(f'{self.data_well.expected_Q}')
-                # print(f'ожидаемая приемистисть{self.data_well.expected_Q}')
+                self.expected_pickup_edit.setText(f'{self.data_well.expected_pickup}')
+                # print(f'ожидаемая приемистисть{self.data_well.expected_pickup}')
             except:
                 pass
-            self.grid.addWidget(self.expected_Q_label, 25, 2)
-            self.grid.addWidget(self.expected_Q_edit, 26, 2)
+            self.grid.addWidget(self.expected_pickup_label, 25, 2)
+            self.grid.addWidget(self.expected_pickup_edit, 26, 2)
 
             self.expected_pressure_label = QLabel('Ожидаемое давление закачки')
             self.expected_pressure_edit = FloatLineEdit(self)
@@ -536,22 +536,22 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(self.expected_pressure_label, 25, 3)
             self.grid.addWidget(self.expected_pressure_edit, 26, 3)
         else:
-            self.Qwater_Label = QLabel('Дебит по жидкости')
-            self.Qwater_edit = FloatLineEdit(self)
+            self.water_cut_Label = QLabel('Дебит по жидкости')
+            self.water_cut_edit = FloatLineEdit(self)
             try:
-                self.Qwater_edit.setText(f'{self.data_well.Qwater}')
+                self.water_cut_edit.setText(f'{self.data_well.water_cut}')
             except:
                 pass
-            self.grid.addWidget(self.Qwater_Label, 25, 1)
-            self.grid.addWidget(self.Qwater_edit, 26, 1)
-            self.Qoil_Label = QLabel('Дебит по нефти')
-            self.Qoil_edit = FloatLineEdit(self)
+            self.grid.addWidget(self.water_cut_Label, 25, 1)
+            self.grid.addWidget(self.water_cut_edit, 26, 1)
+            self.expected_oil_Label = QLabel('Дебит по нефти')
+            self.expected_oil_edit = FloatLineEdit(self)
             try:
-                self.Qoil_edit.setText(f'{self.data_well.Qoil}')
+                self.expected_oil_edit.setText(f'{self.data_well.expected_oil}')
             except:
                 pass
-            self.grid.addWidget(self.Qoil_Label, 25, 2)
-            self.grid.addWidget(self.Qoil_edit, 26, 2)
+            self.grid.addWidget(self.expected_oil_Label, 25, 2)
+            self.grid.addWidget(self.expected_oil_edit, 26, 2)
             self.proc_water_Label = QLabel('Обводненность')
 
             self.proc_water_edit = FloatLineEdit(self)
@@ -605,27 +605,27 @@ class TabPageSoCorrect(TabPageUnion):
         except:
             pass
         try:
-            self.expected_Q_label.setParent(None)
+            self.expected_pickup_label.setParent(None)
         except:
             pass
         try:
-            self.expected_Q_edit.setParent(None)
+            self.expected_pickup_edit.setParent(None)
         except:
             pass
         try:
-            self.Qwater_Label.setParent(None)
+            self.water_cut_Label.setParent(None)
         except:
             pass
         try:
-            self.Qwater_edit.setParent(None)
+            self.water_cut_edit.setParent(None)
         except:
             pass
         try:
-            self.Qoil_Label.setParent(None)
+            self.expected_oil_Label.setParent(None)
         except:
             pass
         try:
-            self.Qoil_edit.setParent(None)
+            self.expected_oil_edit.setParent(None)
         except:
             pass
         try:
@@ -638,14 +638,14 @@ class TabPageSoCorrect(TabPageUnion):
             pass
 
         if self.curator_Combo.currentText() == 'ОР':
-            self.expected_Q_label = QLabel('Ожидаемая приемистость')
-            self.expected_Q_edit = FloatLineEdit(self)
+            self.expected_pickup_label = QLabel('Ожидаемая приемистость')
+            self.expected_pickup_edit = FloatLineEdit(self)
             try:
-                self.expected_Q_edit.setText(f'{self.data_well.expected_Q}')
+                self.expected_pickup_edit.setText(f'{self.data_well.expected_pickup}')
             except:
                 pass
-            self.grid.addWidget(self.expected_Q_label, 25, 4)
-            self.grid.addWidget(self.expected_Q_edit, 26, 4)
+            self.grid.addWidget(self.expected_pickup_label, 25, 4)
+            self.grid.addWidget(self.expected_pickup_edit, 26, 4)
 
             self.expected_pressure_label = QLabel('Ожидаемое давление закачки')
             self.expected_pressure_edit = FloatLineEdit(self)
@@ -653,22 +653,22 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(self.expected_pressure_label, 25, 5)
             self.grid.addWidget(self.expected_pressure_edit, 26, 5)
         else:
-            self.Qwater_Label = QLabel('Дебит по жидкости')
-            self.Qwater_edit = FloatLineEdit(self)
+            self.water_cut_Label = QLabel('Дебит по жидкости')
+            self.water_cut_edit = FloatLineEdit(self)
             try:
-                self.Qwater_edit.setText(f'{self.data_well.Qwater}')
+                self.water_cut_edit.setText(f'{self.data_well.water_cut}')
             except:
                 pass
-            self.grid.addWidget(self.Qwater_Label, 25, 1)
-            self.grid.addWidget(self.Qwater_edit, 26, 1)
-            self.Qoil_Label = QLabel('Дебит по нефти')
-            self.Qoil_edit = FloatLineEdit(self)
+            self.grid.addWidget(self.water_cut_Label, 25, 1)
+            self.grid.addWidget(self.water_cut_edit, 26, 1)
+            self.expected_oil_Label = QLabel('Дебит по нефти')
+            self.expected_oil_edit = FloatLineEdit(self)
             try:
-                self.Qoil_edit.setText(f'{self.data_well.Qoil}')
+                self.expected_oil_edit.setText(f'{self.data_well.expected_oil}')
             except:
                 pass
-            self.grid.addWidget(self.Qoil_Label, 25, 2)
-            self.grid.addWidget(self.Qoil_edit, 26, 2)
+            self.grid.addWidget(self.expected_oil_Label, 25, 2)
+            self.grid.addWidget(self.expected_oil_edit, 26, 2)
             self.proc_water_Label = QLabel('Обводненность')
 
             self.proc_water_edit = FloatLineEdit(self)
@@ -814,11 +814,11 @@ class DataWindow(WindowUnion):
         curator = str(self.current_widget.curator_Combo.currentText())
 
         if curator == 'ОР':
-            expected_Q_edit = self.current_widget.expected_Q_edit.text()
+            expected_pickup_edit = self.current_widget.expected_pickup_edit.text()
             expected_pressure_edit = self.current_widget.expected_pressure_edit.text()
         else:
-            Qwater_edit = self.current_widget.Qwater_edit.text()
-            Qoil_edit = self.current_widget.Qoil_edit.text()
+            water_cut_edit = self.current_widget.water_cut_edit.text()
+            expected_oil_edit = self.current_widget.expected_oil_edit.text()
             proc_water_edit = self.current_widget.proc_water_edit.text()
 
         a = self.current_widget.labels_nkt
@@ -1001,12 +1001,12 @@ class DataWindow(WindowUnion):
 
 
         if curator == 'ОР':
-            if self.ifNum(expected_Q_edit) is False or self.ifNum(expected_pressure_edit) is False:
+            if self.ifNum(expected_pickup_edit) is False or self.ifNum(expected_pressure_edit) is False:
                 QMessageBox.information(self, 'Внимание',
                                         'Не все поля в Ожидаемых показателях соответствуют значениям')
                 close_file = False
         else:
-            if self.ifNum(Qwater_edit) is False or self.ifNum(Qoil_edit) is False or \
+            if self.ifNum(water_cut_edit) is False or self.ifNum(expected_oil_edit) is False or \
                     self.ifNum(proc_water_edit) is False:
                 QMessageBox.information(self, 'Внимание',
                                         'Не все поля в Ожидаемых показателях соответствуют значениям')
@@ -1089,12 +1089,12 @@ class DataWindow(WindowUnion):
             self.data_well.level_cement_conductor = ProtectedIsDigit(self.check_if_none(level_cement_conductor))
             if curator == 'ОР':
                 self.data_well.expected_pressure= self.check_if_none(expected_pressure_edit)
-                self.data_well.expected_Q = self.check_if_none(expected_Q_edit)
-                self.data_well.expected_pick_up[self.data_well.expected_Q] = self.data_well.expected_pressure
+                self.data_well.expected_pickup = self.check_if_none(expected_pickup_edit)
+                self.data_well.expected_pick_up[self.data_well.expected_pickup] = self.data_well.expected_pressure
                 self.data_well.percent_water = 100
             else:
-                self.data_well.Qoil = self.check_if_none(Qoil_edit)
-                self.data_well.Qwater = self.check_if_none(Qwater_edit)
+                self.data_well.expected_oil = self.check_if_none(expected_oil_edit)
+                self.data_well.water_cut = self.check_if_none(water_cut_edit)
                 self.data_well.percent_water = int(self.check_if_none(proc_water_edit))
 
             if str(self.data_well.dict_pump_shgn["do"]) != '0' and len(
@@ -1184,11 +1184,11 @@ class DataWindow(WindowUnion):
                     "После": self.data_well.dict_sucker_rod_after
                 },
                 'ожидаемые': {
-                    'нефть': self.data_well.Qoil,
-                    'вода': self.data_well.Qwater,
+                    'нефть': self.data_well.expected_oil,
+                    'вода': self.data_well.water_cut,
                     'обводненность': self.data_well.percent_water,
                     'давление': self.data_well.expected_pressure,
-                    'приемистость': self.data_well.expected_Q
+                    'приемистость': self.data_well.expected_pickup
                 },
                 'данные': {
                     'пробуренный забой': self.data_well.bottom_hole_drill.get_value,

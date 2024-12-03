@@ -153,7 +153,7 @@ class VpWindow(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        self.data_well.operation_window = None
+        data_list.operation_window  = None
         event.accept()  # Принимаем событие закрытия
 
     def vp(self, vp_type_qcombo, vp_depth, cement_vp_edit, need_question_qcombo):

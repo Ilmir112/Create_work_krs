@@ -518,7 +518,7 @@ class GnktOpz(GnktModel):
              f'менее 6м3 или '
              f'при установившемся давлении закачки, но не более 1 часов. При недостижении запланированной '
              f'приёмистости '
-             f'{self.data_well.expected_Q}м3/сут при Р= {self.data_well.expected_pressure}атм дальнейшие работы производить '
+             f'{self.data_well.expected_pickup}м3/сут при Р= {self.data_well.expected_pressure}атм дальнейшие работы производить '
              f'по согласованию с Заказчиком. Составить Акт ',
              None, None, None, None, None, None, None,
              'Мастер ГНКТ, состав бригады, представитель Заказчика', 1.4],

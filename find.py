@@ -112,11 +112,11 @@ class FindIndexPZ(MyMainWindow):
         self.for_paker_list = False
         self.grp_plan = False
         self.angle_data = []
-        self.Qoil = 0
-        self.Qwater = 0
+        self.expected_oil = 0
+        self.water_cut = 0
         self.expected_pressure = 0
         self.appointment = ProtectedIsNonNone('')
-        self.expected_Q = 0
+        self.expected_pickup = 0
         self.sucker_rod_ind = ProtectedIsDigit(0)
         self.percent_water = 0
         self.expected_pick_up = {}
@@ -648,12 +648,12 @@ class WellFondData(FindIndexPZ):
 
                     elif value == 'Насос' and row[col + 2].value == 'типоразмер':
                         if row[col_do].value:
-                            if ('ЭЦН' in str(row[col_do].value).upper() or 'ВНН' in str(row[col_do].value).upper()):
+                            if 'ЭЦН' in str(row[col_do].value).upper() or 'ВНН' in str(row[col_do].value).upper():
                                 dict_pump_ecn["do"] = row[col_do].value
                                 if '/' in str(row[col_do].value):
                                     dict_pump_ecn["do"] = [ecn for ecn in row[col_do].value.split('/')
                                                            if 'ЭЦН' in ecn or 'ВНН' in ecn][0]
-                            elif ('НВ' in str(row[col_do].value).upper() or 'ШГН' in str(row[col_do].value).upper() or
+                            if ('НВ' in str(row[col_do].value).upper() or 'ШГН' in str(row[col_do].value).upper() or
                                   'НН' in str(row[col_do].value).upper()) or 'RH' in str(row[col_do].value).upper():
                                 dict_pump_shgn["do"] = row[col_do].value
                                 if '/' in str(row[col_do].value):
@@ -664,16 +664,15 @@ class WellFondData(FindIndexPZ):
                                 # print(dict_pump_ecn["do"])
 
                         if row[col_plan].value:
-                            if ('ЭЦН' in str(row[col_plan].value).upper() or 'ВНН' in str(
-                                    row[col_plan].value).upper()):
+                            if 'ЭЦН' in str(row[col_plan].value).upper() or 'ВНН' in str(row[col_plan].value).upper():
                                 dict_pump_ecn["posle"] = row[col_plan].value
                                 if '/' in str(row[col_plan].value):
                                     dict_pump_ecn["posle"] = [ecn for ecn in row[col_plan].value.split('/')
                                                               if 'ЭЦН' in ecn or 'ВНН' in ecn][0]
 
-                            elif ('НВ' in str(row[col_plan].value).upper() or
-                                  'ШГН' in str(row[col_plan].value).upper() or
-                                  'НН' in str(row[col_plan].value).upper()) or \
+                            if 'НВ' in str(row[col_plan].value).upper() or \
+                                    'ШГН' in str(row[col_plan].value).upper() or \
+                                    'НН' in str(row[col_plan].value).upper() or \
                                     'RHAM' in str(row[col_plan].value).upper():
                                 dict_pump_shgn["posle"] = row[col_plan].value
                                 if '/' in str(row[col_plan].value):
@@ -689,7 +688,6 @@ class WellFondData(FindIndexPZ):
                                 dict_pump_ecn_h["do"] = max(self.check_str_none(self.ws.cell(
                                     row=row_index + 4, column=col_do + 1).value))
                         if dict_pump_shgn["do"] != 0:
-
                             dict_pump_shgn_h["do"] = self.check_str_none(
                                 self.ws.cell(row=row_index + 4,
                                              column=col_do + 1).value)
@@ -917,9 +915,9 @@ class WellExpectedPickUp(FindIndexPZ):
                 if value:
 
                     if 'прием' in str(value).lower() or 'qж' in str(value).lower():
-                        self.expected_Q = row[col + 1].value
+                        self.expected_pickup = row[col + 1].value
 
-                        self.expected_Q = self.definition_is_none(self.expected_Q, row_index,
+                        self.expected_pickup = self.definition_is_none(self.expected_pickup, row_index,
                                                                   col + 1, 1)
 
                     if 'зак' in str(value).lower() or 'давл' in str(value).lower() or 'p' in str(value).lower():
@@ -928,15 +926,15 @@ class WellExpectedPickUp(FindIndexPZ):
                                                                          col + 1, 1)
 
                     if 'qж' in str(value).lower():
-                        self.Qwater = str(row[col + 1].value).strip().replace(' ', '').replace(
+                        self.water_cut = str(row[col + 1].value).strip().replace(' ', '').replace(
                             'м3/сут', '')
-                        self.Qwater = self.definition_is_none(
-                            self.Qwater,
+                        self.water_cut = self.definition_is_none(
+                            self.water_cut,
                             row_index, col + 1, 1)
 
                     if 'qн' in str(value).lower():
-                        self.Qoil = str(row[col + 1].value).replace(' ', '').replace('т/сут', '')
-                        self.Qoil = self.definition_is_none(self.Qoil,
+                        self.expected_oil = str(row[col + 1].value).replace(' ', '').replace('т/сут', '')
+                        self.expected_oil = self.definition_is_none(self.expected_oil,
                                                             row_index, col + 1, 1)
                     if 'воды' in str(value).lower() and "%" in str(value).lower():
                         try:
@@ -951,8 +949,8 @@ class WellExpectedPickUp(FindIndexPZ):
                             print(f'ошибка в определение')
 
             try:
-                if self.expected_Q and self.expected_pressure:
-                    self.expected_pick_up[self.expected_Q] = self.expected_pressure
+                if self.expected_pickup and self.expected_pressure:
+                    self.expected_pick_up[self.expected_pickup] = self.expected_pressure
             except Exception as e:
                 print(f'Ошибка в определении ожидаемых показателей {e}')
 

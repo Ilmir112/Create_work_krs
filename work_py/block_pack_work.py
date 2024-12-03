@@ -175,7 +175,7 @@ class BlockPackWindow(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        self.data_well.operation_window = None
+        data_list.operation_window  = None
         event.accept()  # Принимаем событие закрытия
 
     def block_pack_work(self, current_edit, pero_combo_combo,

@@ -96,7 +96,7 @@ class MyMainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.operation_window = None
+        data_list.operation_window = None
         self.table_schema = None
         self.table_widget = None
         self.table_title = None
@@ -130,17 +130,17 @@ class MyMainWindow(QMainWindow):
     # def move_window(self, x, y):
     #     self.move(x, y)
     def add_window(self, window):
-        if self.operation_window is None:
-            self.operation_window = window(self.data_well, self.table_widget)
-            self.operation_window.move(100, 100)
-            self.set_modal_window(self.operation_window)
+        if data_list.operation_window is None:
+            data_list.operation_window = window(self.data_well, self.table_widget)
+            data_list.operation_window.move(100, 100)
+            self.set_modal_window(data_list.operation_window)
 
             self.pause_app()
             data_list.pause = True
-            self.operation_window = None
+            data_list.operation_window = None
         else:
-            self.operation_window.close()  # Close window.
-            self.operation_window = None
+            data_list.operation_window.close()  # Close window.
+            data_list.operation_window = None
 
     @staticmethod
     def insert_image(ws, file, coordinate, width=200, height=180):
@@ -873,7 +873,7 @@ class MyWindow(MyMainWindow):
 
         self.initUI()
         self.login_window = None
-        self.operation_window = None
+        data_list.operation_window = None
         self.new_window = None
         self.raid_window = None
         self.leakage_window = None
@@ -1859,7 +1859,7 @@ class MyWindow(MyMainWindow):
             data_list.b_plan = 0
             data_list.pipes_ind = ProtectedIsDigit(0)
             data_list.sucker_rod_ind = ProtectedIsDigit(0)
-            self.data_well.expected_Q = 0
+            self.data_well.expected_pickup = 0
             self.data_well.expected_pressure= 0
             data_list.plast_select = ''
             self.data_well.dict_perforation = {}
@@ -2249,19 +2249,19 @@ class MyWindow(MyMainWindow):
     def geophysical_new_window(self):
         from work_py.geophysic import GeophysicWindow
         self.add_window(GeophysicWindow)
-        # if self.operation_window is None:
+        # if data_list.operation_window is None:
         #     
-        #     self.operation_window = GeophysicWindow(self.data_well, self.table_widget)
-        #     self.operation_window.setWindowTitle("Геофизические исследования")
-        #     self.set_modal_window(self.operation_window)
+        #     data_list.operation_window = GeophysicWindow(self.data_well, self.table_widget)
+        #     data_list.operation_window.setWindowTitle("Геофизические исследования")
+        #     self.set_modal_window(data_list.operation_window)
         #     self.pause_app()
         #     data_list.pause = True
-        #     self.operation_window = None  # Discard reference.
+        #     data_list.operation_window = None  # Discard reference.
         # 
         # 
         # else:
-        #     self.operation_window.close()  # Close window.
-        #     self.operation_window = None  # Discard reference.
+        #     data_list.operation_window.close()  # Close window.
+        #     data_list.operation_window = None  # Discard reference.
 
     def correct_perforation(self):
         from perforation_correct import PerforationCorrect
@@ -2410,10 +2410,10 @@ class MyWindow(MyMainWindow):
                                    f' {self.data_well.dinamic_level.get_value}м'
         if self.data_well.curator == 'ОР':
             ws4.cell(row=10,
-                     column=1).value = f'Ожид {self.data_well.expected_Q}м3/сут при Р-{self.data_well.expected_pressure}м3/сут'
+                     column=1).value = f'Ожид {self.data_well.expected_pickup}м3/сут при Р-{self.data_well.expected_pressure}м3/сут'
         else:
             ws4.cell(row=10,
-                     column=1).value = f'Qн {self.data_well.Qoil}т Qж- {self.data_well.Qwater}м3/сут'
+                     column=1).value = f'Qн {self.data_well.expected_oil}т Qж- {self.data_well.water_cut}м3/сут'
         ws4.cell(row=11,
                  column=1).value = f'макс угол {self.data_well.max_angle.get_value} на ' \
                                    f'{self.data_well.max_angle_depth.get_value}'

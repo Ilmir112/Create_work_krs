@@ -59,7 +59,7 @@ class TabPageSoSwab(TabPageUnion):
         else:
             self.pakerEdit.setText(f'{int(self.data_well.current_bottom - 40)}')
 
-        self.khovst_label = QLabel("Длина хвостовики", self)
+        self.kvost_label = QLabel("Длина хвостовики", self)
         self.khvostEdit = QLineEdit(self)
         self.khvostEdit.setValidator(self.validator_int)
         self.khvostEdit.setText(str(10))
@@ -128,7 +128,7 @@ class TabPageSoSwab(TabPageUnion):
         self.grid.addWidget(self.plast_combo, 1, 1)
         self.grid.addWidget(self.diameter_paker_labelType, 0, 2)
         self.grid.addWidget(self.diameter_paker_edit, 1, 2)
-        self.grid.addWidget(self.khovst_label, 0, 3)
+        self.grid.addWidget(self.kvost_label, 0, 3)
         self.grid.addWidget(self.khvostEdit, 1, 3)
         self.grid.addWidget(self.pakerLabel, 0, 4)
         self.grid.addWidget(self.pakerEdit, 1, 4)
@@ -382,7 +382,7 @@ class TabPageSoSwab(TabPageUnion):
             self.pakerLabel.setText('Глубина пакера')
             self.grid.addWidget(self.plast_label, 0, 1)
             self.grid.addWidget(self.plast_combo, 1, 1)
-            self.grid.addWidget(self.khovst_label, 0, 3)
+            self.grid.addWidget(self.kvost_label, 0, 3)
             self.grid.addWidget(self.khvostEdit, 1, 3)
             self.paker2Label.setParent(None)
             self.paker2Edit.setParent(None)
@@ -395,7 +395,7 @@ class TabPageSoSwab(TabPageUnion):
 
         elif self.swab_true_edit_type.currentText() == 'двухпакерная':
             self.pakerLabel.setText('Глубина нижнего пакера')
-            self.grid.addWidget(self.khovst_label, 0, 3)
+            self.grid.addWidget(self.kvost_label, 0, 3)
             self.grid.addWidget(self.khvostEdit, 1, 3)
             self.grid.addWidget(self.pakerLabel, 0, 4)
             self.grid.addWidget(self.plast_label, 0, 1)
@@ -411,7 +411,7 @@ class TabPageSoSwab(TabPageUnion):
         elif self.swab_true_edit_type.currentText() == 'воронка':
 
             self.pakerLabel.setText('Глубина воронки')
-            self.khovst_label.setParent(None)
+            self.kvost_label.setParent(None)
             self.khvostEdit.setParent(None)
             self.paker2Label.setParent(None)
             self.paker2Edit.setParent(None)
@@ -432,7 +432,7 @@ class TabPageSoSwab(TabPageUnion):
             # self.swab_type_combo.setParent(None)
             # self.swab_volume_edit.setParent(None)
 
-            self.khovst_label.setParent(None)
+            self.kvost_label.setParent(None)
             self.khvostEdit.setParent(None)
             self.pakerLabel.setParent(None)
             self.pakerEdit.setParent(None)
@@ -445,7 +445,7 @@ class TabPageSoSwab(TabPageUnion):
             self.grid.addWidget(self.paker2Label, 0, 5)
             self.grid.addWidget(self.paker2Edit, 1, 5)
 
-            self.grid.addWidget(self.khovst_label, 0, 3)
+            self.grid.addWidget(self.kvost_label, 0, 3)
             self.grid.addWidget(self.khvostEdit, 1, 3)
             self.grid.addWidget(self.pakerLabel, 0, 4)
             self.grid.addWidget(self.pakerEdit, 1, 4)
@@ -463,7 +463,7 @@ class TabPageSoSwab(TabPageUnion):
             self.swab_volume_edit.setParent(None)
             self.plast_label.setParent(None)
             self.plast_combo.setParent(None)
-            self.khovst_label.setParent(None)
+            self.kvost_label.setParent(None)
             self.khvostEdit.setParent(None)
             self.pakerLabel.setParent(None)
             self.pakerEdit.setParent(None)
@@ -515,7 +515,7 @@ class TabPageSoSwab(TabPageUnion):
         elif self.swab_true_edit_type.currentText() == 'Опрессовка снижением уровня на пакере с заглушкой':
             self.paker2Label.setText('Глубина Понижения уровня')
             self.paker2Edit.setText(f'{self.data_well.current_bottom - 250}')
-            self.grid.addWidget(self.khovst_label, 0, 3)
+            self.grid.addWidget(self.kvost_label, 0, 3)
             self.grid.addWidget(self.khvostEdit, 1, 3)
             self.grid.addWidget(self.pakerLabel, 0, 4)
             self.grid.addWidget(self.pakerEdit, 1, 4)
@@ -625,8 +625,8 @@ class SwabWindow(WindowUnion):
             if rows != 0:
                 QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
                 return
-            paker_khost = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().khvostEdit.text())
-            paker_depth = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().pakerEdit.text())
+            paker_khost = check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
+            paker_depth = check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
 
             if self.data_well.current_bottom < float(paker_khost + paker_depth) or \
                     0 < paker_khost + paker_depth < self.data_well.current_bottom is False:
@@ -650,9 +650,9 @@ class SwabWindow(WindowUnion):
 
 
         elif swab_true_edit_type in ['двухпакерная']:
-            paker_khost = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().khvostEdit.text())
-            paker_depth = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().pakerEdit.text())
-            paker2_depth = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().paker2Edit.text())
+            paker_khost = check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
+            paker_depth = check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
+            paker2_depth = check_if_none(self.tabWidget.currentWidget().paker2Edit.text())
             if self.check_true_depth_template(paker_depth) is False:
                 return
             if self.true_set_paker(paker_depth) is False:
@@ -683,7 +683,7 @@ class SwabWindow(WindowUnion):
             if rows != 0:
                 QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
                 return
-            paker_depth = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().pakerEdit.text())
+            paker_depth = check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
 
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(plast_combo))
@@ -708,8 +708,8 @@ class SwabWindow(WindowUnion):
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_opy)))
 
         elif swab_true_edit_type in ['Опрессовка снижением уровня на пакере с заглушкой']:
-            paker_depth = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().pakerEdit.text())
-            paker_khost = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().khvostEdit.text())
+            paker_depth = check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
+            paker_khost = check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
 
             if rows != 0:
                 QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
@@ -741,7 +741,7 @@ class SwabWindow(WindowUnion):
             pressure_zumph_combo = self.tabWidget.currentWidget().pressure_zumpf_question_combo.currentText()
 
             if pressure_zumph_combo == 'Да':                
-                paker_khost = AcidPakerWindow.check_if_none(self, self.tabWidget.currentWidget().khvostEdit.text())
+                paker_khost = check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
                 paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
                 if paker_depth_zumpf == '':
                     QMessageBox.warning(self, 'Ошибка', f'не введены глубина опрессовки ЗУМПФа')
@@ -977,7 +977,7 @@ class SwabWindow(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        self.data_well.operation_window = None
+        data_list.operation_window  = None
         event.accept()  # Принимаем событие закрытия
     def swabbing_opy_with_paker(self, diameter_paker, paker_khost, paker_depth, depth_opy):
         if 'Ойл' in data_list.contractor:

@@ -112,7 +112,7 @@ class PakerAspo(WindowUnion):
 
     def closeEvent(self, event):
                 # Закрываем основное окно при закрытии окна входа
-        self.data_well.operation_window = None
+        data_list.operation_window  = None
         event.accept()  # Принимаем событие закрытия
 
     # Добавление строк с опрессовкой ЭК

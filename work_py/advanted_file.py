@@ -482,19 +482,7 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                 # Проверка размеров изображения:
                 print(f"Размеры изображения: {image.size}")
 
-                file = f'{data_list.path_image}imageFiles/image_work/{coord}.png'
-
-                # # Преобразуем изображение в режим RGB
-                # image = image.convert('RGB')
-                try:
-                    image.save(file)
-                except FileNotFoundError as f:
-                    QMessageBox.warning(None, 'Ошибка', f'Не получилось вставить изображение {f}')
-                    continue
-
-                # Сохранение изображения в Excel файл:
-
-                self.insert_image(ws2, file, coord, width * 0.72, height * 0.48)
+                self.insert_image(ws2, image, coord, width * 0.72, height * 0.48)
 
             except ValueError as e:
                 print(f"Ошибка при вставке изображения: {type(e).__name__}\n\n{str(e)}")
