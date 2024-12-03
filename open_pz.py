@@ -52,7 +52,6 @@ class CreatePZ(MyMainWindow):
             if work_plan != 'plan_change':
                 for row_ind, row in enumerate(ws.iter_rows(values_only=True, max_col=13)):
                     ws.row_dimensions[row_ind].hidden = False
-
                     if 'ПЛАН РАБОТ' == row[1] \
                             and work_plan == 'dop_plan':
                         ws.cell(row=row_ind + 1, column=2).value = \
@@ -73,7 +72,7 @@ class CreatePZ(MyMainWindow):
                 self.show_info_message(check_str)
 
             if self.data_well.work_plan not in ['gnkt_frez', 'application_pvr',
-                                                'application_gis', 'gnkt_after_grp', 'gnkt_opz', 'plan_change']:
+                                                'application_gis', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz', 'plan_change']:
                 # print(f'план работ {self.data_well.work_plan}')
 
                 razdel = razdel_1(self, self.data_well.region, data_list.contractor)
@@ -248,7 +247,7 @@ class CreatePZ(MyMainWindow):
                              'Ответственный',
                              'Нормы времени \n мин/час.']]
 
-                        for i in range(1, len(work_list) + 1):  # Добавление  показатели после ремонта
+                        for i in range(1, len(work_list) + 1):  # Добавление показатели после ремонта
                             for j in range(1, 13):
                                 ws.cell(row=i + self.data_well.insert_index, column=j).font = Font(name='Arial Cyr',
                                                                                                    size=13,

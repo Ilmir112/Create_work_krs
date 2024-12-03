@@ -253,7 +253,7 @@ class TabPageUnion(QWidget):
 
 class TabWidgetUnion(QTabWidget):
     def __init__(self, parent=None):
-        super().__init__(parent)
+        super().__init__()
 
 
 class WindowUnion(MyMainWindow):

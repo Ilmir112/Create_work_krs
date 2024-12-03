@@ -943,7 +943,6 @@ class TemplateKrs(WindowUnion):
     def __init__(self, data_well, table_widget, parent=None):
         super().__init__(data_well)
 
-
         self.insert_index = data_well.insert_index
         self.tabWidget = TabWidget(self.data_well)
 

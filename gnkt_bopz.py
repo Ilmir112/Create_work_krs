@@ -83,7 +83,7 @@ class TabPageGnkt(TabPageUnion):
 
         self.fluid_project_edit.setValidator(self.validator_float)
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
 
         self.grid.addWidget(self.plast_label, 0, 1)
         self.grid.addWidget(self.plast_combo, 1, 1)

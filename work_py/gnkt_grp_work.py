@@ -1,25 +1,17 @@
-from PyQt5.QtGui import QIntValidator, QDoubleValidator
-
 import block_name
-
 import data_list
-
 from datetime import datetime
-
 from data_base.config_base import connection_to_database, GnktDatabaseWell
-
-from main import MyMainWindow
-
 from PyQt5.QtWidgets import QInputDialog, QTabWidget, QWidget, QApplication, QLabel, \
     QLineEdit, QGridLayout, QComboBox, QPushButton, QMessageBox
 from openpyxl.utils import get_column_letter
 from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict, read_database_gnkt
 from block_name import razdel_1
 from openpyxl.styles import PatternFill, Font, Alignment
-
 from work_py.acid_paker import CheckableComboBox
 from work_py.alone_oreration import well_volume
 from work_py.parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
+from PyQt5.QtGui import QIntValidator, QDoubleValidator
 
 
 class TabPageGnkt(TabPageUnion):
@@ -75,7 +67,7 @@ class TabPageGnkt(TabPageUnion):
         self.distance_pntzh_line = QLineEdit(self)
         self.distance_pntzh_line.setValidator(self.validator_int)
 
-        self.grid = QGridLayout(self)
+        # self.grid = QGridLayout(self)
         self.grid.addWidget(self.gnkt_number_label, 0, 2, 1, 5)
         self.grid.addWidget(self.gnkt_number_combo, 1, 2, 1, 5)
         self.grid.addWidget(self.length_gnkt_label, 2, 3)
@@ -98,21 +90,20 @@ class TabPageGnkt(TabPageUnion):
         self.grid.addWidget(self.fluid_edit, 5, 3)
         self.grid.addWidget(self.fluid_work_label, 4, 4)
         self.grid.addWidget(self.fluid_work_edit, 5, 4)
-        self.grid.addWidget(self.distance_pntzh_label, 4, 5)
-        self.grid.addWidget(self.distance_pntzh_line, 5, 5)
+        self.grid.addWidget(self.distance_pntzh_label, 4, 6)
+        self.grid.addWidget(self.distance_pntzh_line, 5, 6)
 
         self.acids_work_label = QLabel('Проведение ОПЗ')
         self.acids_work_combo = QComboBox(self)
         self.acids_work_combo.addItems(['Нет', 'Да'])
 
         if self.data_well.work_plan == 'gnkt_after_grp':
-
             self.osvoenie_label = QLabel('Необходимость освоения')
             self.osvoenie_combo = QComboBox(self)
             self.osvoenie_combo.addItems(['', 'Да', 'Нет'])
 
-            self.grid.addWidget(self.osvoenie_label, 4, 4)
-            self.grid.addWidget(self.osvoenie_combo, 5, 4)
+            self.grid.addWidget(self.osvoenie_label, 4, 5)
+            self.grid.addWidget(self.osvoenie_combo, 5, 5)
             self.grid.addWidget(self.acids_work_label, 6, 2)
             self.grid.addWidget(self.acids_work_combo, 7, 2)
 
@@ -121,8 +112,8 @@ class TabPageGnkt(TabPageUnion):
             self.need_frez_port_label = QLabel('Необходимость фрезерования портов')
             self.need_frez_port_combo = QComboBox(self)
             self.need_frez_port_combo.addItems(['', 'Нет', 'Да'])
-            self.grid.addWidget(self.need_frez_port_label, 4, 4)
-            self.grid.addWidget(self.need_frez_port_combo, 5, 4)
+            self.grid.addWidget(self.need_frez_port_label, 4, 5)
+            self.grid.addWidget(self.need_frez_port_combo, 5, 5)
             self.grid.addWidget(self.acids_work_label, 6, 2)
             self.grid.addWidget(self.acids_work_combo, 7, 2)
         else:
@@ -271,7 +262,7 @@ class GnktModel(WindowUnion):
         if self.work_plan in ['gnkt_bopz']:
             coordinate = 'F65'
             self.insert_image(ws, f'{data_list.path_image}imageFiles/schema_well/angle_well.png',
-                              coordinate, 265, 373)
+                              coordinate, 265, 430)
 
         elif self.work_plan in ['gnkt_after_grp', 'gnkt_opz']:
             coordinate_propant = 'F43'
@@ -863,9 +854,20 @@ class GnktModel(WindowUnion):
             proc_water = f'{self.data_well.percent_water}%'
 
         nkt = list(self.data_well.dict_nkt_before.keys())
+        voronka = sum(list(self.data_well.dict_nkt_before.values()))
+        if self.data_well.curator == 'ОР' and self.data_well.region == 'ТГМ':
+            length_paker = round(
+                float(self.data_well.depth_fond_paker_second_before["do"]) - float(
+                    self.data_well.depth_fond_paker_before["do"]), 1)
+            voronka = round(nkt_length + length_paker, 1)
+        voronka_str = ''
+        nkt_schema = ''
+        voronka_depth_str = ''
         if len(nkt) != 0:
+            voronka_str = 'Воронка'
+            voronka_depth_str = f'на гл.{voronka}м'
             nkt = nkt[0]
-
+            nkt_schema = f'НКТ {nkt_str}мм'
         wellhead_fittings = self.data_well.wellhead_fittings
         if self.data_well.work_plan == 'gnkt_after_grp':
 
@@ -884,12 +886,7 @@ class GnktModel(WindowUnion):
                 None,
                 None, None, None, f'Тек. забой: \n{self.data_well.current_bottom}м ', None]
         length_paker = 2
-        voronka = self.data_well.depth_fond_paker_before["do"]
-        if self.data_well.curator == 'ОР' and self.data_well.region == 'ТГМ':
-            length_paker = round(
-                float(self.data_well.depth_fond_paker_second_before["do"]) - float(
-                    self.data_well.depth_fond_paker_before["do"]), 1)
-            voronka = round(nkt_length + length_paker, 1)
+
         schema_well_list = [
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
@@ -921,7 +918,7 @@ class GnktModel(WindowUnion):
              None, None, None, None, 'л/п.м.', 'м3'],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Шахтное направление', None, None,
              "", None, None, "", "", '', None, None],
-            [None, None, None, None, None, None, None, None, None, f'НКТ {nkt_str}мм', None, None, 'Направление', None,
+            [None, None, None, None, None, None, None, None, None, nkt_schema, None, None, 'Направление', None,
              None,
              f'{self.data_well.column_direction_diameter.get_value}',
              self.data_well.column_direction_wall_thickness.get_value,
@@ -967,16 +964,16 @@ class GnktModel(WindowUnion):
             [None, None, None, None, None, None, None, None, None,
              f'на гл {self.data_well.depth_fond_paker_before["do"]}м',
              None, None,
-             'воронка', None, None, nkt, None,
+             voronka_str, None, None, nkt, None,
              None, voronka, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Данные о перфорации', None, None,
              None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, 'воронка', None, None, 'Пласт\nгоризонт', None,
+            [None, None, None, None, None, None, None, None, None, voronka_str, None, None, 'Пласт\nгоризонт', None,
              'Глубина пласта по вертикали', None, 'Интервал перфорации', None, None, None, 'вскрытия/\nотключения',
              'Рпл. атм', None],
-            [None, None, None, None, None, None, None, None, None, f'на гл.{voronka}м', None, None, None, None, None,
+            [None, None, None, None, None, None, None, None, None, voronka_depth_str, None, None, None, None, None,
              None, 'от', None, 'до', None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None],

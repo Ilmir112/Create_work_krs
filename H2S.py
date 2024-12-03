@@ -39,6 +39,14 @@ class CalculateH2s:
         except Exception:
             sucker_rod_l_19 = 0
 
+        if 'EVASORB' in self.data_well.fluid_work:
+            self.data_well.type_absorbent = 'EVASORB марки 121'
+        elif 'ХИМТЕХНО' in self.data_well.fluid_work:
+            self.data_well.type_absorbent = 'ХИМТЕХНО 101 Марка А'
+        elif 'СНПХ-1200' in self.data_well.fluid_work:
+            self.data_well.type_absorbent = 'СНПХ-1200'
+
+
         if self.data_well.type_absorbent == 'EVASORB марки 121':
             koeff_zapas = 1.05
         else:

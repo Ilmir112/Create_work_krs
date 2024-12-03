@@ -13,6 +13,8 @@ def gnkt_work(self, volume_gntk, fluid_work_insert):
         niz_nkt = self.data_well.depth_fond_paker_before["do"]
     else:
         niz_nkt = sum(self.data_well.dict_nkt_before.values())
+    if niz_nkt == 0:
+        niz_nkt = self.data_well.perforation_roof - 100
 
     gnkt_opz = [
         [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],

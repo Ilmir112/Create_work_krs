@@ -1814,7 +1814,7 @@ class WellCategory(FindIndexPZ):
                                     f'Скважина не найдена в классификаторе \n {type(e).__name__}\n\n{str(e)}')
 
         if self.work_plan not in ['gnkt_frez', 'application_pvr',
-                                  'application_gis', 'gnkt_after_grp', 'gnkt_opz', 'plan_change']:
+                                  'application_gis', 'gnkt_after_grp', 'gnkt_opz','gnkt_bopz', 'plan_change']:
             # print(f'план работ {self.work_plan}')
             delete_rows_pz(self, self.ws, self.cat_well_min, self.data_well_max, self.data_x_max)
             self.insert_index = self.data_well_max.get_value - self.cat_well_min.get_value + 19

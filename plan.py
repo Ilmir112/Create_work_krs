@@ -46,34 +46,37 @@ def head_ind(start, finish):
 
 
 def copy_true_ws(data_well, ws, ws2, head):
+
     for row_number, row in enumerate(ws[head]):
         for col_number, cell in enumerate(row):
-            if row_number == 0:
-                if col_number > 6:
-                    break
-                ws2.cell(row_number + 1, col_number + 1, cell.value)
 
-            if 'катег' in str(cell.value).lower() and 'план' not in str(cell.value).lower():
-                if data_well.work_plan not in ['krs', 'dop_plan', 'dop_plan_in_base', 'plan_change']:
-                    ws2.cell(row=row_number + 1, column=col_number + 1).alignment = Alignment(wrap_text=True,
-                                                                                              horizontal='left',
-                                                                                              vertical='center')
-            if type(cell.value) == float:
-                ws2.cell(row_number + 1, col_number + 1, round(cell.value, 5))
-            else:
-                ws2.cell(row_number + 1, col_number + 1, cell.value)
+            if cell.value:
+                if row_number == 0:
+                    if col_number > 6:
+                        break
+                    ws2.cell(row_number + 1, col_number + 1, cell.value)
 
-            if cell.has_style:
-                ws2.cell(row_number + 1, col_number + 1).font = copy(cell.font)
-                ws2.cell(row_number + 1, col_number + 1).fill = copy(cell.fill)
-                ws2.cell(row_number + 1, col_number + 1).border = copy(cell.border)
-                ws2.cell(row_number + 1, col_number + 1).number_format = copy(
-                    cell.number_format)
-                ws2.cell(row_number + 1, col_number + 1).protection = copy(
-                    cell.protection)
-                ws2.cell(row_number + 1, col_number + 1).alignment = copy(
-                    cell.alignment)
-                ws2.cell(row_number + 1, col_number + 1).quotePrefix = copy(
-                    cell.quotePrefix)
-                ws2.cell(row_number + 1, col_number + 1).pivotButton = copy(
-                    cell.pivotButton)
+                if 'катег' in str(cell.value).lower() and 'план' not in str(cell.value).lower():
+                    if data_well.work_plan not in ['krs', 'dop_plan', 'dop_plan_in_base', 'plan_change']:
+                        ws2.cell(row=row_number + 1, column=col_number + 1).alignment = Alignment(wrap_text=True,
+                                                                                                  horizontal='left',
+                                                                                                  vertical='center')
+                if type(cell.value) == float:
+                    ws2.cell(row_number + 1, col_number + 1, round(cell.value, 5))
+                else:
+                    ws2.cell(row_number + 1, col_number + 1, cell.value)
+
+                if cell.has_style:
+                    ws2.cell(row_number + 1, col_number + 1).font = copy(cell.font)
+                    ws2.cell(row_number + 1, col_number + 1).fill = copy(cell.fill)
+                    ws2.cell(row_number + 1, col_number + 1).border = copy(cell.border)
+                    ws2.cell(row_number + 1, col_number + 1).number_format = copy(
+                        cell.number_format)
+                    ws2.cell(row_number + 1, col_number + 1).protection = copy(
+                        cell.protection)
+                    ws2.cell(row_number + 1, col_number + 1).alignment = copy(
+                        cell.alignment)
+                    ws2.cell(row_number + 1, col_number + 1).quotePrefix = copy(
+                        cell.quotePrefix)
+                    ws2.cell(row_number + 1, col_number + 1).pivotButton = copy(
+                        cell.pivotButton)

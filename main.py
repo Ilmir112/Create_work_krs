@@ -220,6 +220,7 @@ class MyMainWindow(QMainWindow):
         if data_list.data_well_is_True is False:
             WellNkt.read_well(
                 self.data_well, self.data_well.pipes_ind.get_value, self.data_well.condition_of_wells.get_value)
+
             WellHistoryData.read_well(
                 self.data_well, self.data_well.data_pvr_max.get_value, self.data_well.data_fond_min.get_value)
             WellCondition.read_well(
@@ -347,20 +348,23 @@ class MyMainWindow(QMainWindow):
                 try:
                     self.read_pz(self.fname)
                     data_list.pause = True
-
                     self.data_well = self.read_excel_file()
                     read_pz = CreatePZ(self.data_well, self.ws, self)
-                    self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
+
+
                 except FileNotFoundError as f:
                     QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
                     self.pause_app()
 
             if self.work_plan in ['krs', 'dop_plan']:
+
+                self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
                 self.copy_pz(self.ws, self.table_widget, self.work_plan)
                 if self.work_plan == 'dop_plan':
                     self.rir_window = DopPlanWindow(self.data_well, self.table_widget)
                     self.set_modal_window(self.rir_window)
             elif self.work_plan in ['gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz']:
+
                 self.gnkt_data = GnktOsvWindow(self.ws,
                                                self.table_title, self.table_schema, self.table_widget,
                                                self.data_well)

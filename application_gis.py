@@ -664,7 +664,7 @@ class GisApplication(MyMainWindow):
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
             [None, 'Максимально ожидаемое давление на устье скважины', None, None, None, None, None, None, None, None,
-             None, None, None, None, None, None, None, None, None, self.data_well.max_admissible_pressure.value, None,
+             None, None, None, None, None, None, None, None, None, self.data_well.max_admissible_pressure.get_value, None,
              None, None, None, None, None, 'атм.', None,
              None, None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Расстояние до скважины', None, None, None, None, None, None, None, None, None, None, None, None,

@@ -5,9 +5,10 @@ from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QInputDialog, QTabWidget, QWidget, QApplication, \
     QLineEdit, QGridLayout, QComboBox, QMessageBox
 from openpyxl.workbook import Workbook
+from work_py.calculate_work_parametrs import volume_work, volume_nkt
 
 from data_base.config_base import connect_to_database
-from main import MyMainWindow
+
 
 import data_list
 from gnkt_data.gnkt_data import gnkt_dict, read_database_gnkt, insert_data_base_gnkt
@@ -43,7 +44,7 @@ class TabPageAll(TabPageUnion):
         pass
 
 
-class TabPageDp(TabPageAll):
+class TabPageDp(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.data_well = parent
@@ -118,6 +119,7 @@ class GnktOsvWindow(GnktModel):
         self.sheet = sheet
         self.data_gnkt = None
 
+
         self.work_with_excel()
 
         self.work_with_data_gnkt()
@@ -186,7 +188,8 @@ class GnktOsvWindow(GnktModel):
 
         self.ws_schema = self.wb_gnkt.active
 
-        self.data_gnkt = None
+
+
         self.wb_gnkt.sheetnames.insert(0, "Титульник")
         self.ws_title = self.wb_gnkt.create_sheet("Титульник", 0)
         self.ws_work = self.wb_gnkt.create_sheet("Ход работ", 2)
@@ -207,8 +210,12 @@ class GnktOsvWindow(GnktModel):
 
         block_gnvp_list = events_gnvp_frez(self, self.data_gnkt.distance_pntzh, float(fluid_work_insert))
 
+        niz_nkt = sum(self.data_well.dict_nkt_before.values())
+        if niz_nkt == 0:
+            niz_nkt = round(self.data_well.perforation_roof - 100, 0)
+
         if self.data_well.depth_fond_paker_before["do"] != 0:
-            niz_nkt = self.data_well.depth_fond_paker_before["do"]
+
             volume_str = f'Произвести перевод на тех жидкость расчетного удельного веса ' \
                          f'в объеме {self.calc_volume_jumping()}м3 (объем хвостовика + объем НКТ + 20 % запаса) ' \
                          f'с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ с выходом по малому затрубу. ' \
@@ -231,26 +238,29 @@ class GnktOsvWindow(GnktModel):
                             f'в устьевом оборудовании не более 0.5 м/мин.'
         elif self.data_well.dict_nkt_before:
 
-            niz_nkt = sum(self.data_well.dict_nkt_before.values())
-
-            volume_well_jumping = round(volume_jamming_well(self, self.data_well.current_bottom) * 1.2, 1)
-            volume_vn_nkt = round(volume_vn_nkt(self.data_well.dict_nkt_before) * 1.2, 1)
+            volume_well_jumping = round(volume_work(self.data_well) * 1.2, 1)
+            volume_vn_nkt = round(volume_nkt(self.data_well) * 1.2, 1)
             volume_well_at_shoe = round(volume_jamming_well(self, niz_nkt) * 1.2, 1) - volume_vn_nkt
             volume_current_shoe_nkt = round(volume_pod_nkt(self) * 1.2, 1) - volume_vn_nkt
 
             volume_str = 'Произвести замер избыточного давления в течении 2ч при условии заполнения ствола ствола ' \
-                         f'жидкостью уд.весом {self.data_well.fluid_work}. Произвести перерасчет забойного давления, Согласовать с заказчиком ' \
+                         f'жидкостью уд.весом {self.data_well.fluid_work}. Произвести перерасчет забойного ' \
+                         f'давления, Согласовать с заказчиком ' \
                          f'глушение скважин и необходимый удельный вес жидкости глушения, допустить КНК до ' \
                          f'{self.data_well.current_bottom}м. Произвести перевод на тех жидкость расчетного удельного веса ' \
                          f' в объеме {volume_well_jumping}м3 ' \
-                         '((объем ствола э/к + объем открытого ствола и минут объем НКТ  + 20 % запаса), вывести циркуляцию ' \
-                         'с большого затруба  с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ  с выходом циркуляции по большому затрубу до башмака ' \
+                         '((объем ствола э/к + объем открытого ствола и минут объем НКТ  + 20 % запаса),' \
+                         ' вывести циркуляцию ' \
+                         'с большого затруба  с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ  с выходом циркуляции по большому ' \
+                         'затрубу до башмака ' \
                          f'НКТ до гл. {niz_nkt}м в объеме открытого ствола {volume_current_shoe_nkt}м3. ' \
                          f'В башмаке НКТ Н={niz_nkt}м промыть до выхода жидкости ' \
                          f'глушения по большому затрубу в объеме {volume_well_at_shoe}м3. ' \
                          f'Заместить на жидкость глушения НКТ в объеме {volume_vn_nkt}м3.  ' \
-                         'Тех отстой 2ч. В случае отрицательного результата по глушению скважины произвести перерасчет ЖГС и ' \
-                         'повторить операцию. ПРИ ПРОВЕДЕНИИ ВЕСТИ ГЛУШЕНИЯ КОНТРОЛЬ ЗА БАЛАНСОМ МЕЖДУ ОБЪЕМОМ ЗАКАЧИВАЕМОЙ И ' \
+                         'Тех отстой 2ч. В случае отрицательного результата по глушению скважины произвести' \
+                         ' перерасчет ЖГС и ' \
+                         'повторить операцию. ПРИ ПРОВЕДЕНИИ ВЕСТИ ГЛУШЕНИЯ КОНТРОЛЬ ЗА БАЛАНСОМ МЕЖДУ ОБЪЕМОМ ' \
+                         'ЗАКАЧИВАЕМОЙ И ' \
                          'ВЫХОДЯЩЕЙ ЖИДКОСТЬЮ'
 
             up_gnkt_str = f'Скорость спуска по интервалам:\n' \
@@ -267,29 +277,32 @@ class GnktOsvWindow(GnktModel):
             f'в устьевом оборудовании не более 0.5 м/мин.'
 
         else:
-            niz_nkt = sum(self.data_well.dict_nkt_before.values())
-
-            volume_well_jumping = round(volume_jamming_well(self, self.data_well.current_bottom) * 1.2, 1)
+            volume_well_jumping = round(volume_work(self.data_well) * 1.2, 1)
 
             volume_str = f'Произвести замер избыточного давления в течении 2ч при условии заполнения ствола ствола ' \
-                         f'жидкостью уд.весом {self.data_well.fluid_work}. Произвести перерасчет забойного давления, Согласовать с заказчиком ' \
+                         f'жидкостью уд.весом {self.data_well.fluid_work}. Произвести перерасчет забойного ' \
+                         f'давления, Согласовать с заказчиком ' \
                          f'глушение скважин и необходимый удельный вес жидкости глушения, допустить КНК до ' \
-                         f'{self.data_well.current_bottom}м. Произвести перевод на тех жидкость расчетного удельного веса ' \
-                         f' в объеме {volume_well_jumping}м3 ' \
+                         f'{self.data_well.current_bottom}м. Произвести перевод на тех жидкость ' \
+                         f'расчетного удельного веса ' \
+                         f' в объеме {volume_well_jumping:.1f}м3 ' \
                          f'(объем ствола э/к  + 20 % запаса), вывести циркуляцию ' \
                          f'с большого затруба  с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ.  ' \
-                         'Тех отстой 2ч. В случае отрицательного результата по глушению скважины произвести перерасчет ЖГС и ' \
-                         'повторить операцию. ПРИ ПРОВЕДЕНИИ ВЕСТИ ГЛУШЕНИЯ КОНТРОЛЬ ЗА БАЛАНСОМ МЕЖДУ ОБЪЕМОМ ЗАКАЧИВАЕМОЙ И ' \
+                         'Тех отстой 2ч. В случае отрицательного результата по глушению скважины' \
+                         ' произвести перерасчет ЖГС и ' \
+                         'повторить операцию. ПРИ ПРОВЕДЕНИИ ВЕСТИ ГЛУШЕНИЯ КОНТРОЛЬ ЗА БАЛАНСОМ ' \
+                         'МЕЖДУ ОБЪЕМОМ ЗАКАЧИВАЕМОЙ И ' \
                          'ВЫХОДЯЩЕЙ ЖИДКОСТЬЮ'
 
             up_gnkt_str = f'Скорость спуска по интервалам:\n' \
                           f'в устьевом оборудовании не более 0.5м/мин;\n' \
-                          f'в интервале 2 -{self.data_well.perforation_roof - 10}-{self.data_well.current_bottom}м не более 2-5 м/мин;' \
-                          f'в интервале {self.data_well.perforation_roof - 10}-{self.data_well.current_bottom}м не более 2м/мин;'
+                          f'в интервале 2 -{self.data_well.perforation_roof - 100:.0f}м' \
+                          f'в интервале {self.data_well.perforation_roof - 10:.0f}-{self.data_well.current_bottom}м ' \
+                          f'не более 2м/мин;'
 
             down_gntk_str = f'Скорость подъёма по интервалам:\n' \
-                            f'в интервале забой-{self.data_well.perforation_roof - 10}м не более 10 м/мин;\n' \
-                            f'в интервале {self.data_well.perforation_roof - 10}-2м не более 15-20 м/мин;\n' \
+                            f'в интервале забой-{self.data_well.perforation_roof - 100:.0f}м не более 10 м/мин;\n' \
+                            f'в интервале {self.data_well.perforation_roof - 100:.0f}-2м не более 15-20 м/мин;\n' \
                             f'в устьевом оборудовании не более 0.5 м/мин.'
 
         gnkt_opz = [
@@ -357,10 +370,10 @@ class GnktOsvWindow(GnktModel):
              'Мастер ГНКТ', 2],
             [None, 13,
              f'При закрытой центральной задвижке фондовой арматуры опрессовать ГНКТ и все '
-             f'нагнетательные линии на {round(self.data_well.max_admissible_pressure.value * 1.5, 1)}атм. '
+             f'нагнетательные линии на {round(self.data_well.max_admissible_pressure.get_value * 1.5, 1)}атм. '
              f'Опрессовать ПВО, обратные клапана и выкидную линию от '
              f'устья скважины до желобной ёмкости (надёжно закрепить, оборудовать дроссельными задвижками) '
-             f'опрессовать на {self.data_well.max_admissible_pressure.value}атм с выдержкой 30мин. '
+             f'опрессовать на {self.data_well.max_admissible_pressure.get_value}атм с выдержкой 30мин. '
              f'Опрессовку ПВО зафиксировать в вахтовом журнале. Установить на малом и большом затрубе '
              f'технологический манометр. Провести УТЗ и инструктаж. Опрессовку проводить в присутствии мастера, '
              f'бурильщика, машиниста подъемника и представителя супервайзерской службы. Получить разрешение на '
@@ -373,7 +386,6 @@ class GnktOsvWindow(GnktModel):
             [None, f'СПУСК ГНКТ В СКВАЖИНУ', None,
              None, None, None, None, None, None, None,
              None, None],
-
             [None, 22, f'Открыв скважину и записав число оборотов задвижки – зафиксировать дату и время. '
                        f'Спустить КНК-1 в скважину с ПЕРИОДИЧЕСКОЙ прокачкой рабочей жидкостью и проверкой веса на '
                        f'подъём до получения посадки с целью определения глубины "головы" проппанта.',

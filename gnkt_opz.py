@@ -11,7 +11,7 @@ from krs import GnoWindow
 from work_py.acid_paker import CheckableComboBox
 
 from work_py.gnkt_grp_work import GnktModel
-from work_py.parent_work import TabWidgetUnion
+from work_py.parent_work import TabWidgetUnion, TabPageUnion
 
 
 class TabPageGnkt(QWidget):

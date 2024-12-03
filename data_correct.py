@@ -5,7 +5,6 @@ from find import FindIndexPZ
 import data_list
 import re
 
-
 from perforation_correct import FloatLineEdit
 from work_py.parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
 
@@ -720,7 +719,6 @@ class DataWindow(WindowUnion):
     def __init__(self, data_well: FindIndexPZ):
         super(DataWindow, self).__init__(data_well)
 
-
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.setWindowModality(QtCore.Qt.ApplicationModal)  # Устанавливаем модальность окна
@@ -836,7 +834,7 @@ class DataWindow(WindowUnion):
                     self.data_well.dict_nkt_before[key.text()] = self.check_if_none(int(float(value.text())))
 
         if all([pump for pump in [self.ifNum(dict_pump_ecn_posle), self.ifNum(paker2_posle),
-                                    self.ifNum(dict_pump_shgn_posle), self.ifNum(paker_posle)]]):
+                                  self.ifNum(dict_pump_shgn_posle), self.ifNum(paker_posle)]]):
 
             voronka_question = QMessageBox.question(self, 'Внимание',
                                                     'Программа определила что в скважине '
@@ -859,7 +857,6 @@ class DataWindow(WindowUnion):
                 if key.text() != '' and value.text() != '':
                     self.data_well.dict_sucker_rod_after[key.text()] = self.check_if_none(int(float(value.text())))
 
-
         question = QMessageBox.question(self, 'выбор куратора', f'Куратор ремонта сектор {curator}, верно ли?')
         if question == QMessageBox.StandardButton.No:
             return
@@ -871,14 +868,13 @@ class DataWindow(WindowUnion):
             QMessageBox.information(self, 'Внимание', 'Не все поля в данных колонне соответствуют значениям')
             close_file = False
 
-
         if float(bottomhole_artificial) > 10000 or float(bottomhole_drill) > 10000:
             QMessageBox.information(self, 'Внимание', 'Забой не корректный')
             close_file = False
 
         if any([self.ifNum(data_well) is False for data_well in
-                  [column_additional_diameter, column_additional_wall_thickness,
-                   shoe_column_additional, head_column_additional]]) and self.data_well.column_additional:
+                [column_additional_diameter, column_additional_wall_thickness,
+                 shoe_column_additional, head_column_additional]]) and self.data_well.column_additional:
             QMessageBox.information(self, 'Внимание', 'Не все поля в доп колонне соответствуют значениям')
             close_file = False
 
@@ -906,12 +902,10 @@ class DataWindow(WindowUnion):
             QMessageBox.information(self, 'Внимание', 'Не все поля в спущенном оборудовании соответствуют значениям')
             close_file = False
 
-
         if self.ifNum(column_direction_diameter) is False \
                 or self.ifNum(column_direction_wall_thickness) is False \
                 or self.ifNum(column_direction_length) is False \
                 or self.ifNum(level_cement_direction) is False:
-
             QMessageBox.information(self, 'Внимание', 'Не все поля в Направлении соответствуют значениям')
             close_file = False
         if self.ifNum(column_conductor_diameter) is False \
@@ -919,13 +913,12 @@ class DataWindow(WindowUnion):
                 or self.ifNum(column_conductor_length) is False \
                 or self.ifNum(column_direction_length) is False \
                 or self.ifNum(level_cement_conductor) is False:
-
             QMessageBox.information(self, 'Внимание', 'Не все поля в кондукторе соответствуют значениям')
             close_file = False
 
         if any(['НВ' in dict_pump_shgn_do.upper(), 'ШГН' in dict_pump_shgn_do.upper(),
-                  'НН' in dict_pump_shgn_do.upper(), dict_pump_shgn_do == 'отсут',
-                  'RH' in dict_pump_shgn_do.upper()]) is False \
+                'НН' in dict_pump_shgn_do.upper(), dict_pump_shgn_do == 'отсут',
+                'RH' in dict_pump_shgn_do.upper()]) is False \
                 or any(['НВ' in dict_pump_shgn_posle.upper(), 'ШГН' in dict_pump_shgn_posle.upper(),
                         'НН' in dict_pump_shgn_posle.upper(), dict_pump_shgn_posle == 'отсут',
                         'RHAM' in dict_pump_shgn_do]) is False \
@@ -941,7 +934,6 @@ class DataWindow(WindowUnion):
                 or (paker2_posle != 'отсут' and depth_fond_paker2_posle == 'отсут') \
                 or any(['ЭЦН' in dict_pump_ecn_do.upper(), 'ВНН' in dict_pump_ecn_do.upper(),
                         dict_pump_ecn_do == 'отсут']) is False:
-
             QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
             close_file = False
         if isinstance(self.ifNum(head_column_additional), str):
@@ -954,9 +946,6 @@ class DataWindow(WindowUnion):
                 QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
                 close_file = False
 
-
-
-
         if (data_list.nkt_mistake is True and len(self.data_well.dict_nkt_before) == 0):
             QMessageBox.information(self, 'Внимание',
                                     'При вызванной ошибке НКТ до ремонта не может быть пустым')
@@ -966,8 +955,8 @@ class DataWindow(WindowUnion):
                                     'При вызванной ошибке НКТ после ремонта не может быть пустым')
             close_file = False
 
-
         if self.data_well.column_additional:
+
             if int(float(column_additional_diameter)) >= float(column_type):
                 QMessageBox.information(self, 'Внимание', 'Ошибка в диаметре доп колонны')
                 close_file = False
@@ -982,6 +971,14 @@ class DataWindow(WindowUnion):
             if int(float(str(head_column_additional).replace(',', '.'))) < 10:
                 msg = QMessageBox.question(self, 'Внимание', 'доп колонна начинается с устья?')
                 if msg == QMessageBox.StandardButton.Yes:
+                    column_direction_length = column_conductor_length
+                    column_direction_diameter = column_conductor_diameter
+                    column_direction_wall_thickness = column_conductor_wall_thickness
+                    level_cement_direction = level_cement_conductor
+                    column_conductor_length = shoe_column
+                    column_conductor_diameter = column_type
+                    column_conductor_wall_thickness = column_wall_thickness
+
                     shoe_column = shoe_column_additional
                     column_type = column_additional_diameter
                     column_wall_thickness = column_additional_wall_thickness
@@ -997,8 +994,6 @@ class DataWindow(WindowUnion):
                              'КР7-3  Проведение ГГРП',
                              'КР7-4  Проведение ГПП']:
             self.data_well.grp_plan = True
-
-
 
         if curator == 'ОР':
             if self.ifNum(expected_pickup_edit) is False or self.ifNum(expected_pressure_edit) is False:
@@ -1088,7 +1083,7 @@ class DataWindow(WindowUnion):
                 self.check_if_none(column_conductor_length))
             self.data_well.level_cement_conductor = ProtectedIsDigit(self.check_if_none(level_cement_conductor))
             if curator == 'ОР':
-                self.data_well.expected_pressure= self.check_if_none(expected_pressure_edit)
+                self.data_well.expected_pressure = self.check_if_none(expected_pressure_edit)
                 self.data_well.expected_pickup = self.check_if_none(expected_pickup_edit)
                 self.data_well.expected_pick_up[self.data_well.expected_pickup] = self.data_well.expected_pressure
                 self.data_well.percent_water = 100
@@ -1220,8 +1215,6 @@ class DataWindow(WindowUnion):
 
             data_list.pause = False
             self.close()
-
-
 
     def check_if_none(self, value):
         if value is None or 'отс' in str(value).lower() or value == '-' or str(value) == '0':
