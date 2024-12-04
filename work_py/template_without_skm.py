@@ -295,14 +295,13 @@ class TabPageSo(TabPageUnion):
                                    f'+ шаблон-{first_template}мм ' \
                                    f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_template_second}м + ' \
                                    f'шаблон-{template_second}мм L-{length_template_second}м '
+
                     self.data_well.template_depth = math.ceil(self.data_well.current_bottom - 2 -
                                                                       int(dictance_template_first) - int(
                         dictance_template_second) -
                                                                       int(length_template_first))
                     self.data_well.template_depth_addition = math.ceil(
-                        self.data_well.current_bottom - 2 -
-                        int(dictance_template_first) - int(
-                            dictance_template_second))
+                        self.data_well.current_bottom - float(dictance_template_first) - float(dictance_template_second))
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.' \
                                    f'{self.data_well.template_depth_addition}м, ' \
@@ -318,8 +317,8 @@ class TabPageSo(TabPageUnion):
                 self.data_well.template_depth = math.ceil(
                     self.data_well.current_bottom - int(dictance_template_second) -
                     int(length_template_first))
-                self.data_well.template_depth_addition = math.ceil(
-                    self.data_well.current_bottom)
+
+                self.data_well.template_depth_addition = round(self.data_well.current_bottom, 1)
 
                 skm_teml_str = f'шаблон-{first_template}мм до гл.{self.data_well.template_depth_addition}м, ' \
                                f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
@@ -332,13 +331,11 @@ class TabPageSo(TabPageUnion):
                                    f'L-{length_template_first}м' \
                                    f' + НКТ{nkt_pod} + шаблон-{template_second}мм ' \
                                    f'L-{length_template_second}м '
-                    self.data_well.template_depth = math.ceil(self.data_well.current_bottom - 2 -
-                                                                      int(dictance_template_first) - int(
-                        dictance_template_second) -
-                                                                      int(length_template_first))
+                    self.data_well.template_depth = math.ceil(
+                        self.data_well.current_bottom - 2 - float(dictance_template_first) - float(dictance_template_second) - float(length_template_first))
                     self.data_well.template_depth_addition = math.ceil(
                         self.data_well.current_bottom - 2 -
-                        int(dictance_template_first) - int(
+                        float(dictance_template_first) - float(
                             dictance_template_second))
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.' \

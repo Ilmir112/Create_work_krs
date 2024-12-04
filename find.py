@@ -1404,7 +1404,7 @@ class WellPerforation(FindIndexPZ):
                     elif 'удлине'.lower() in str(column).lower():
                         # print(f'удл {col_index}')
                         col_udlin_index = col_index - 1
-                    elif 'Рпл,атм'.lower() in str(column).lower().strip():
+                    elif 'Рпл' in str(column) and 'атм' in str(column) :
                         col_pressure_index = col_index - 1
                     elif 'замера' in str(column).lower():
                         col_date_pressure_index = col_index - 1
@@ -1811,7 +1811,9 @@ class WellCategory(FindIndexPZ):
                                                      f'по газовому фактору {categoty_gf} категории\n')
             except Exception as e:
                 QMessageBox.warning(self, 'Ошибка',
-                                    f'Скважина не найдена в классификаторе \n {type(e).__name__}\n\n{str(e)}')
+                                    f'Скважина {self.well_number.get_value} '
+                                    f'{self.well_area.get_value} не найдена в классификаторе. '
+                                    f'Необходимо проверить соответствие данных с классификатором')
 
         if self.work_plan not in ['gnkt_frez', 'application_pvr',
                                   'application_gis', 'gnkt_after_grp', 'gnkt_opz','gnkt_bopz', 'plan_change']:

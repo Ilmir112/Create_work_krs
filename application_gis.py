@@ -410,17 +410,17 @@ class GisApplication(MyMainWindow):
                             nkt_edit, nkt_shoe_edit,
                             nkt_com_edit, paker_type, paker_depth, fluid, note_to_gis):
 
-        column_data = f'{self.data_well.column_diameter.value}мм x {self.data_well.column_wall_thickness.value} в инт ' \
+        column_data = f'{self.data_well.column_diameter.value}мм x {self.data_well.column_wall_thickness.get_value} в инт ' \
                       f'0-{self.data_well.shoe_column.value}м'
         if self.data_well.column_additional:
             column_data_add = f'{self.data_well.column_additional_diameter.value}мм x ' \
-                              f'{self.data_well.column_additional_wall_thickness.value} в инт ' \
-                          f'{self.data_well.head_column_additional.value}-{self.data_well.shoe_column_additional.value}м'
+                              f'{self.data_well.column_additional_wall_thickness.get_value} в инт ' \
+                          f'{self.data_well.head_column_additional.get_value}-{self.data_well.shoe_column_additional.get_value}м'
         else:
             column_data_add = ''
         pressure = self.data_well.dict_category[list(self.data_well.dict_category.keys())[0]]['по давлению'].data_pressure
 
-        conductor = f'{self.data_well.column_conductor_diameter.value}мм x {self.data_well.column_conductor_wall_thickness.value} в инт ' \
+        conductor = f'{self.data_well.column_conductor_diameter.value}мм x {self.data_well.column_conductor_wall_thickness.get_value} в инт ' \
                       f'0-{self.data_well.column_conductor_length.value}м'
         if nkt_edit != '':
             nkt_edit_vn = float(nkt_edit) - 2 * 5.5

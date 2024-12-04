@@ -333,7 +333,7 @@ class WorkDatabaseWell:
             if data_well.work_plan_change == 'krs':
                 string_work = 'ПР изм'
             else:
-                string_work = f'ДП№{data_well["number_dp"]} изм '
+                string_work = f'ДП№{data_well.number_dp} изм '
 
         elif data_well.work_plan == 'gnkt_bopz':
             string_work = 'ГНКТ БОПЗ ВНС'

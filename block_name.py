@@ -297,7 +297,9 @@ def razdel_1(self, region, contractor):
             for row in range(len(podp_bvo)):
                 for col in range(len(podp_bvo[row])):
                     razdel_1[row + 9][col] = podp_bvo[row][col]
-        if 1 in [cat_P_1, category_h2s_list, cat_gaz] or \
+        asde = self.data_well.category_pressure_list, 1 in self.data_well.category_pressure_list
+        if 1 in self.data_well.category_pressure_list or 1 in self.data_well.category_h2s_list or \
+                '1' in self.data_well.category_gaz_factor_percent or \
                 self.data_well.curator == 'ВНС':
             self.data_well.category_pvo = 1
             self.data_well.bvo = True

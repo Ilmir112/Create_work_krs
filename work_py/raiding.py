@@ -99,7 +99,7 @@ class TabPageSo_raid(TabPageUnion):
         self.raid_select_combo.setCurrentIndex(1)
 
         if self.data_well.column_additional is False or \
-                (self.data_well.column_additional and self.data_well.current_bottom < self.data_well.head_column_additional.value):
+                (self.data_well.column_additional and self.data_well.current_bottom < self.data_well.head_column_additional.get_value):
             self.raid_select_combo.setCurrentIndex(0)
         else:
 
@@ -183,10 +183,10 @@ class Raid(WindowUnion):
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
-        self.tableWidget = QTableWidget(0, 3)
+        self.tableWidget = QTableWidget(0, 2)
         self.tableWidget.setHorizontalHeaderLabels(
-            ["Кровля", "Подошва", "необходимость райбирования"])
-        for i in range(3):
+            ["Кровля", "Подошва"])
+        for i in range(2):
             self.tableWidget.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
 
         self.tableWidget.setSortingEnabled(True)
@@ -215,11 +215,11 @@ class Raid(WindowUnion):
         sole_raid = self.tabWidget.currentWidget().sole_raid_line.text().replace(',', '.')
         ryber_key = self.tabWidget.currentWidget().raid_select_combo.currentText()
 
-        raid_True_combo = QComboBox(self)
-        raid_True_combo.addItems(
-            ['нужно', 'не нужно'])
+        # raid_True_combo = QComboBox(self)
+        # raid_True_combo.addItems(
+        #     ['нужно', 'не нужно'])
         index_raid_True = self.tabWidget.currentWidget().raid_True_combo.currentIndex()
-        raid_True_combo.setCurrentIndex(index_raid_True)
+        # raid_True_combo.setCurrentIndex(index_raid_True)
 
         if not roof_raid or not sole_raid:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
@@ -243,7 +243,7 @@ class Raid(WindowUnion):
 
         self.tableWidget.setItem(rows, 0, QTableWidgetItem(roof_raid))
         self.tableWidget.setItem(rows, 1, QTableWidgetItem(sole_raid))
-        self.tableWidget.setCellWidget(rows, 2, raid_True_combo)
+        # self.tableWidget.setCellWidget(rows, 2, raid_True_combo)
 
         self.tableWidget.setSortingEnabled(True)
 

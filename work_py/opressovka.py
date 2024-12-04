@@ -16,62 +16,6 @@ class TabPageSo(TabPageUnion):
         self.validator = QDoubleValidator(0.0, 80000.0, 2)
         self.view_paker_work()
 
-        # self.diameter_paker_labelType = QLabel("Диаметр пакера", self)
-        # self.diameter_paker_edit = QLineEdit(self)
-        #
-        # self.paker_khost_Label = QLabel("Длина хвостовика", self)
-        # self.paker_khost_edit = QLineEdit(self)
-        # self.paker_khost_edit.setValidator(self.validator)
-        #
-        # self.paker_depth_Label = QLabel("Глубина посадки", self)
-        # self.paker_depth_edit = QLineEdit(self)
-        # self.paker_depth_edit.setValidator(self.validator)
-        # self.paker_depth_edit.textChanged.connect(self.update_paker)
-        #
-        # self.need_privyazka_Label = QLabel("Привязка оборудования", self)
-        # self.need_privyazka_q_combo = QComboBox()
-        # self.need_privyazka_q_combo.addItems(['Нет', 'Да'])
-        # paker_depth = None
-        # if len(self.data_well.plast_work) != 0:
-        #     paker_depth = self.data_well.perforation_roof - 20
-        # else:
-        #     # print(self.data_well.dict_perforation)
-        #     if self.data_well.dict_leakiness:
-        #
-        #         paker_depth = min([float(nek.split('-')[0]) - 10
-        #                                for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()])
-        # try:
-        #     self.paker_depth_edit.setText(str(int(paker_depth)))
-        # except Exception:
-        #     pass
-        #
-        #
-        # self.paker_depth_zumpf_Label = QLabel("Глубина посадки для ЗУМПФа", self)
-        # self.paker_depth_zumpf_edit = QLineEdit(self)
-        # self.paker_depth_zumpf_edit.setValidator(self.validator)
-        #
-        # self.pressure_zumpf_question_Label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
-        # self.pressure_zumpf_question_combo = QComboBox(self)
-        # self.pressure_zumpf_question_combo.currentTextChanged.connect(self.update_paker_need)
-        #
-        # self.pressure_zumpf_question_combo.addItems(['Нет', 'Да'])
-        #
-        # self.grid_layout = QGridLayout(self)
-        #
-        # self.grid_layout.addWidget(self.diameter_paker_labelType, 3, 1)
-        # self.grid_layout.addWidget(self.diameter_paker_edit, 4, 1)
-        #
-        # self.grid_layout.addWidget(self.paker_khost_Label, 3, 2)
-        # self.grid_layout.addWidget(self.paker_khost_edit, 4, 2)
-        #
-        # self.grid_layout.addWidget(self.paker_depth_Label, 3, 3)
-        # self.grid_layout.addWidget(self.paker_depth_edit, 4, 3)
-        #
-        # self.grid_layout.addWidget(self.pressure_zumpf_question_Label, 3, 5)
-        # self.grid_layout.addWidget(self.pressure_zumpf_question_combo, 4, 5)
-        # self.grid_layout.addWidget(self.need_privyazka_Label, 3, 4)
-        # self.grid_layout.addWidget(self.need_privyazka_q_combo, 4, 4)
-
 
 class TabWidget(TabWidgetUnion):
     def __init__(self, parent):
@@ -90,10 +34,10 @@ class OpressovkaEK(WindowUnion):
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
 
-        self.tableWidget = QTableWidget(0, 3)
+        self.tableWidget = QTableWidget(0, 1)
         self.tableWidget.setHorizontalHeaderLabels(
-            ["хвост", "посадка пакера"])
-        for i in range(3):
+            ["посадка пакера"])
+        for i in range(1):
             self.tableWidget.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
 
         self.buttonAdd = QPushButton('Добавить записи в таблицу')
@@ -115,7 +59,7 @@ class OpressovkaEK(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window  = None
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
     def add_row_table(self):
@@ -158,8 +102,8 @@ class OpressovkaEK(WindowUnion):
         rows = self.tableWidget.rowCount()
         self.tableWidget.insertRow(rows)
 
-        self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(paker_khost)))
-        self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_depth)))
+        # self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(paker_khost)))
+        self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(paker_depth)))
 
         self.tableWidget.setSortingEnabled(False)
 
@@ -190,7 +134,7 @@ class OpressovkaEK(WindowUnion):
             return
         elif rows == 1:
             for row in range(rows):
-                paker_depth = self.tableWidget.item(row, 1)
+                paker_depth = self.tableWidget.item(row, 0)
                 paker_depth = int(float(paker_depth.text()))
 
             work_list = OpressovkaEK.paker_list(self, diameter_paker, paker_khost, paker_depth,
@@ -198,11 +142,11 @@ class OpressovkaEK(WindowUnion):
         else:
             depth_paker_list = []
             for row in range(rows):
-                paker_depth = self.tableWidget.item(row, 1)
-                depth_paker_list.append(int(float(paker_depth.text())))
-                pressure_zumpf_question = self.tableWidget.item(row, 2)
+                paker_depth = self.tableWidget.item(row, 0).text()
+                depth_paker_list.append(int(float(paker_depth)))
+
             work_list = OpressovkaEK.interval_pressure_testing(self, paker_khost, diameter_paker,
-                                                               depth_paker_list, pressure_zumpf_question,
+                                                               depth_paker_list, pressure_zumpf_question_combo,
                                                                paker_depth_zumpf)
 
         self.populate_row(self.insert_index, work_list, self.table_widget)
@@ -371,8 +315,7 @@ class OpressovkaEK(WindowUnion):
         for sole in sorted(leakness_list):
             if paker_depth > sole:
                 self.tableWidget.insertRow(rows)
-                self.tableWidget.setItem(rows, 0, QTableWidgetItem(''))
-                self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(int(sole))))
+                self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(int(sole))))
         self.tableWidget.setSortingEnabled(True)
         self.tableWidget.sortItems(1)
 
@@ -418,19 +361,22 @@ class OpressovkaEK(WindowUnion):
                                          reverse=False)
         else:
             dict_leakinest_keys = []
-
-        for plast in self.data_well.plast_all:
-            dict_leakinest_keys.append(
-                f'{self.data_well.dict_perforation[plast]["кровля"]}-{self.data_well.dict_perforation[plast]["подошва"]}')
-
+        plasts_keys = []
         for ind_nek, pakerNEK in enumerate(depth_paker_list[1:]):
-            nek_count = ''
+            for plast in self.data_well.plast_all:
+                if f'{self.data_well.dict_perforation[plast]["кровля"]}-{self.data_well.dict_perforation[plast]["подошва"]}' not in plasts_keys:
+                    plasts_keys.append(
+                        f'{self.data_well.dict_perforation[plast]["кровля"]}-{self.data_well.dict_perforation[plast]["подошва"]}')
+
+                nek_count = ''
+                for nek in plasts_keys:
+                    if f'инт. {nek}' not in nek_count:
+                        if int(float(nek.split('-')[0])) < pakerNEK:
+                            nek_count += f'инт. {nek}, '
             for nek in dict_leakinest_keys:
-                if int(float(nek.split('-')[0])) < pakerNEK:
-                    nek_count += f'{nek}, '
-            for nek in dict_leakinest_keys:
-                if int(float(nek.split('-')[0])) < pakerNEK:
-                    nek_count += f'{nek}, '
+                if f'НЭК {nek}' not in nek_count:
+                    if int(float(nek.split('-')[0])) < pakerNEK:
+                        nek_count += f'НЭК {nek}, '
 
             pressureNEK_list = [
                 [f'При герметичности колонны:  Допустить пакер до глубины {paker_depth}м', None,
@@ -438,7 +384,7 @@ class OpressovkaEK(WindowUnion):
                  None, None, None, None, None, None, None,
                  'мастер КРС', descentNKT_norm(pakerNEK - paker_depth, 1.2)],
                 [f'Опрессовать в инт 0-{pakerNEK}м на Р={self.data_well.max_admissible_pressure.get_value}атм', None,
-                 f'{nkt_opress_list[1]}. Посадить пакер. Опрессовать эксплуатационную колонну в '
+                 f'{nkt_opress_list[1]} Посадить пакер. Опрессовать эксплуатационную колонну в '
                  f'интервале {pakerNEK}-0м на Р={self.data_well.max_admissible_pressure.get_value}атм'
                  f' в течение 30 минут в присутствии представителя заказчика, составить акт.',
                  None, None, None, None, None, None, None,
@@ -446,7 +392,7 @@ class OpressovkaEK(WindowUnion):
                 [f'Насыщение 5м3. Определение Q при Р-{self.data_well.max_admissible_pressure.get_value}', None,
                  f'ПРИ НЕГЕРМЕТИЧНОСТИ: \nПроизвести насыщение скважины в объеме 5м3 по '
                  f'затрубному пространству. Определить приемистость '
-                 f'НЭК {nek_count[:-2]} при Р-{self.data_well.max_admissible_pressure.get_value}'
+                 f'{nek_count} при Р-{self.data_well.max_admissible_pressure.get_value}'
                  f'атм по затрубному пространству'
                  f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль '
                  f'за отдачей жидкости '

@@ -909,7 +909,7 @@ class AcidPakerWindow(WindowUnion):
             self.Qplast_after_edit = self.tabWidget.currentWidget().Qplast_after_edit.currentText()
             self.expected_pickup = self.tabWidget.currentWidget().expected_pickup_edit.text()
             self.expected_pressure = self.tabWidget.currentWidget().expected_pressure_edit.text()
-            if self.expected_pressurenot in [None, 'None', '', '-', 'атм']:
+            if self.expected_pressure not in [None, 'None', '', '-', 'атм']:
                 self.expected_pressure = int(float(self.expected_pressure))
             self.pressure_three = self.tabWidget.currentWidget().pressure_three_edit.text()
 
@@ -1579,15 +1579,15 @@ class AcidPakerWindow(WindowUnion):
                 paker_khost > self.data_well.head_column_additional.get_value:
 
             self.paker_select = f'{swab_layout} 2" + НКТ{nkt_pod}' \
-                                f'{round(self.data_well.head_column_additional.value - paker_khost, 0)}м ' \
+                                f'{round(self.data_well.head_column_additional.get_value - paker_khost, 0)}м ' \
                                 f' {mtg_str}'
             self.paker_short = f'{swab_layout} 2" + НКТ{nkt_pod}' \
-                               f'{round(self.data_well.head_column_additional.value - paker_khost, 0)}м ' \
+                               f'{round(self.data_well.head_column_additional.get_value - paker_khost, 0)}м ' \
                                f' {mtg_str}'
             self.dict_nkt = {
-                nkt_diam: round(self.data_well.head_column_additional.value - paker_khost, 0),
+                nkt_diam: round(self.data_well.head_column_additional.get_value - paker_khost, 0),
                 nkt_pod: float(paker_khost) - round(
-                    self.data_well.head_column_additional.value - self.data_well.current_bottom, 0)}
+                    self.data_well.head_column_additional.get_value - self.data_well.current_bottom, 0)}
 
         paker_list = [
             [f' СПО {self.paker_short} до глубины {paker_khost}м', None,

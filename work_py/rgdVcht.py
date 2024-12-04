@@ -43,11 +43,11 @@ def rgd_without_paker(self):
          f'при открытой затрубной задвижке',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГИС', 20]]
-    ori = QMessageBox.question(self, 'ОРИ', 'Нужна ли интерпретация?')
+    ori = QMessageBox.question(None, 'ОРИ', 'Нужна ли интерпретация?')
     if ori == QMessageBox.StandardButton.Yes:
 
         ori = f'Интерпретация данных ГИС'
-        rgd_list.append([f'ОРИ', None,ori,
+        rgd_list.append([f'ОРИ', None, ori,
                          None, None, None, None, None, None, None,
                          'Мастер КРС, подрядчик по ГИС', 8])
         rgd_list.append([None, None,

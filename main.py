@@ -2253,19 +2253,6 @@ class MyWindow(MyMainWindow):
     def geophysical_new_window(self):
         from work_py.geophysic import GeophysicWindow
         self.add_window(GeophysicWindow)
-        # if data_list.operation_window is None:
-        #     
-        #     data_list.operation_window = GeophysicWindow(self.data_well, self.table_widget)
-        #     data_list.operation_window.setWindowTitle("Геофизические исследования")
-        #     self.set_modal_window(data_list.operation_window)
-        #     self.pause_app()
-        #     data_list.pause = True
-        #     data_list.operation_window = None  # Discard reference.
-        # 
-        # 
-        # else:
-        #     data_list.operation_window.close()  # Close window.
-        #     data_list.operation_window = None  # Discard reference.
 
     def correct_perforation(self):
         from perforation_correct import PerforationCorrect
@@ -2396,13 +2383,13 @@ class MyWindow(MyMainWindow):
                 for interval in self.data_well.dict_perforation_short[plast]["интервал"]:
                     plast_str += f'{plast[:4]} :{interval[0]}- {interval[1]} (изол)\n'
             try:
-                a = self.data_well.dict_perforation_short
+
                 filter_list_pressure = list(
                     filter(lambda x: type(x) in [int, float],
                            list(self.data_well.dict_perforation_short[plast]["давление"])))
                 # print(f'фильтр -{filter_list_pressure}')
                 if filter_list_pressure:
-                    pressur_set.add(f'{plast[:4]} - {filter_list_pressure}')
+                    pressur_set.add(f'{plast[:4]} - {filter_list_pressure[0]}')
             except Exception as e:
                 QMessageBox.warning(self, 'Ошибка', f'Ошибка вставки давления в краткое описание {e}')
 
