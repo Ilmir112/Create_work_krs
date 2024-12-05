@@ -21,7 +21,7 @@ class TabPageSoWith(TabPageUnion):
         validator = QDoubleValidator(0.0, 80000.0, 2)
 
         self.template_labelType = QLabel("Вид компоновки ПСШ", self)
-        self.template_Combo = QComboBox(self)
+        self.template_combo = QComboBox(self)
 
         self.privyazka_question_Label = QLabel("Нужно ли привязывать компоновку", self)
         self.privyazka_question_QCombo = QComboBox(self)
@@ -47,9 +47,9 @@ class TabPageSoWith(TabPageUnion):
         self.sole_skm_line.setClearButtonEnabled(True)
         self.sole_skm_line.setValidator(validator)
 
-        self.SKM_type_label = QLabel("Тип скрепера", self)
-        self.SKM_type_Combo = QComboBox(self)
-        self.SKM_type_Combo.addItems(['', 'СГМ'])
+        self.skm_type_label = QLabel("Тип скрепера", self)
+        self.skm_type_combo = QComboBox(self)
+        self.skm_type_combo.addItems(['', 'СГМ'])
 
 
         self.current_bottom_label = QLabel('Забой текущий')
@@ -64,16 +64,16 @@ class TabPageSoWith(TabPageUnion):
         self.grid.addWidget(self.current_bottom_edit, 9, 3)
 
         self.template_str_Label = QLabel("строка с СГМ", self)
-        self.template_str_Edit = QLineEdit(self)
+        self.template_str_edit = QLineEdit(self)
 
         self.grid.addWidget(self.template_str_Label, 11, 1, 1, 8)
-        self.grid.addWidget(self.template_str_Edit, 12, 1, 1, 8)
+        self.grid.addWidget(self.template_str_edit, 12, 1, 1, 8)
 
         self.skm_teml_str_Label = QLabel("глубины спуска шаблонов", self)
-        self.skm_teml_str_Edit = QLineEdit(self)
+        self.skm_teml_str_edit = QLineEdit(self)
 
         self.grid.addWidget(self.skm_teml_str_Label, 13, 1, 1, 8)
-        self.grid.addWidget(self.skm_teml_str_Edit, 14, 1, 1, 8)
+        self.grid.addWidget(self.skm_teml_str_edit, 14, 1, 1, 8)
 
 
 
@@ -93,26 +93,26 @@ class TabPageSoWith(TabPageUnion):
         self.skm_edit.editingFinished.connect(self.update_template)
 
         self.current_bottom_edit.editingFinished.connect(self.update_template)
-        self.SKM_type_Combo.currentTextChanged.connect(self.update_template)
-        self.SKM_type_Combo.setCurrentIndex(1)
+        self.skm_type_combo.currentTextChanged.connect(self.update_template)
+        self.skm_type_combo.setCurrentIndex(1)
 
     def definition_template_work(self, current_bottom):
         if self.data_well.column_additional is False or \
                 (self.data_well.column_additional and current_bottom < self.data_well.head_column_additional.get_value):
             self.template_select_list = ['', 'СГМ ЭК', 'СГМ открытый ствол']
 
-            self.template_Combo.addItems(self.template_select_list)
+            self.template_combo.addItems(self.template_select_list)
 
             template_key = self.definition_pssh(current_bottom)
-            self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
+            self.template_combo.setCurrentIndex(self.template_select_list.index(template_key))
 
             self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
-            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
+            self.grid.addWidget(self.template_combo, 2, 2, 2, 8)
 
             self.grid.addWidget(self.skm_label, 4, 5)
             self.grid.addWidget(self.skm_edit, 5, 5)
-            self.grid.addWidget(self.SKM_type_label, 4, 6)
-            self.grid.addWidget(self.SKM_type_Combo, 5, 6)
+            self.grid.addWidget(self.skm_type_label, 4, 6)
+            self.grid.addWidget(self.skm_type_combo, 5, 6)
 
 
 
@@ -120,18 +120,18 @@ class TabPageSoWith(TabPageUnion):
             self.template_select_list = ['', 'СГМ в основной колонне',
                                          'СГМ в доп колонне + открытый ствол',
                                          'СГМ в доп колонне']
-            self.template_Combo.addItems(self.template_select_list)
+            self.template_combo.addItems(self.template_select_list)
             template_key = self.definition_pssh(current_bottom)
             # print(template_key)
-            self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
+            self.template_combo.setCurrentIndex(self.template_select_list.index(template_key))
 
             self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
-            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
+            self.grid.addWidget(self.template_combo, 2, 2, 2, 8)
 
             self.grid.addWidget(self.skm_label, 4, 6)
             self.grid.addWidget(self.skm_edit, 5, 6)
-            self.grid.addWidget(self.SKM_type_label, 4, 7)
-            self.grid.addWidget(self.SKM_type_Combo, 5, 7)
+            self.grid.addWidget(self.skm_type_label, 4, 7)
+            self.grid.addWidget(self.skm_type_combo, 5, 7)
 
 
     def definition_pssh(self, current_bottom):
@@ -154,45 +154,45 @@ class TabPageSoWith(TabPageUnion):
         return template_key
 
     def update_template(self):
-        SKM_type = self.SKM_type_Combo.currentText()
+        skm_type = self.skm_type_combo.currentText()
         current_bottom = self.current_bottom_edit.text()
         if current_bottom != '':
             self.data_well.current_bottom = float(current_bottom)
         template_str = ''
         if self.skm_edit.text() != '':
             skm = self.skm_edit.text()
-        if self.template_Combo.currentText() == 'СГМ ЭК':
+        if self.template_combo.currentText() == 'СГМ ЭК':
             self.skm_edit.setText(str(self.data_well.column_diameter.get_value))
-            template_str = f'{SKM_type}-{skm} + НКТ + репер'
+            template_str = f'{skm_type}-{skm} + НКТ + репер'
 
             self.data_well.skm_depth = self.data_well.current_bottom
 
-        elif self.template_Combo.currentText() == 'СГМ открытый ствол':
+        elif self.template_combo.currentText() == 'СГМ открытый ствол':
             self.skm_edit.setText(self.data_well.column_diameter)
 
             template_str = f'заглушка + НКТ{self.data_well.nkt_diam}мм ' \
-                           f'{current_bottom - self.data_well.shoe_column.get_value +10}м + {SKM_type}-{skm} + НКТ + репер'
+                           f'{current_bottom - self.data_well.shoe_column.get_value +10}м + {skm_type}-{skm} + НКТ + репер'
 
-        elif self.template_Combo.currentText() == 'СГМ в доп колонне':
+        elif self.template_combo.currentText() == 'СГМ в доп колонне':
             self.skm_edit.setText(self.data_well.column_additional_diameter.get_value)
 
-            template_str = f'{SKM_type}-{skm} + НКТ{self.data_well.nkt_diam} ' \
+            template_str = f'{skm_type}-{skm} + НКТ{self.data_well.nkt_diam} ' \
                            f'{current_bottom - self.data_well.head_column_additional.get_value +10} + НКТ + репер'
 
             self.data_well.skm_depth = current_bottom
-        elif self.template_Combo.currentText() == 'СГМ в основной колонне':
+        elif self.template_combo.currentText() == 'СГМ в основной колонне':
             self.skm_edit.setText(self.data_well.column_additional_diameter)
 
-            template_str = f'{SKM_type}-{skm} + НКТ{self.data_well.nkt_diam} ' \
+            template_str = f'{skm_type}-{skm} + НКТ{self.data_well.nkt_diam} ' \
                            f'{self.data_well.current_bottom - self.data_well.head_column_additional.get_value +10} + НКТ + репер'
 
             self.data_well.skm_depth = current_bottom
 
 
-        skm_teml_str = f'{SKM_type}-{skm} до глубины {self.data_well.skm_depth}м'
+        skm_teml_str = f'{skm_type}-{skm} до глубины {self.data_well.skm_depth}м'
 
-        self.template_str_Edit.setText(template_str)
-        self.skm_teml_str_Edit.setText(skm_teml_str)
+        self.template_str_edit.setText(template_str)
+        self.skm_teml_str_edit.setText(skm_teml_str)
 
 
 
@@ -256,7 +256,7 @@ class TemplateKrs(WindowUnion):
                                               f'Глубина СКМ на {self.data_well.skm_depth}м не позволяет скреперовать в '
                                               f'{roof_skm}-{sole_skm}м')
                 return
-        template_key = self.tabWidget.currentWidget().template_Combo.currentText()
+        template_key = self.tabWidget.currentWidget().template_combo.currentText()
 
         if not roof_skm or not sole_skm:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
@@ -295,7 +295,7 @@ class TemplateKrs(WindowUnion):
     def add_string(self):
         from .advanted_file import skm_interval
 
-        template_key = str(self.tabWidget.currentWidget().template_Combo.currentText())
+        template_key = str(self.tabWidget.currentWidget().template_combo.currentText())
         skm_interval = skm_interval(self, template_key)
 
 
@@ -309,8 +309,8 @@ class TemplateKrs(WindowUnion):
 
     def add_work(self):
 
-        template_str = str(self.tabWidget.currentWidget().template_str_Edit.text())
-        template_key = str(self.tabWidget.currentWidget().template_Combo.currentText())
+        template_str = str(self.tabWidget.currentWidget().template_str_edit.text())
+        template_key = str(self.tabWidget.currentWidget().template_combo.currentText())
 
 
 

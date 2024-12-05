@@ -493,23 +493,23 @@ class TabPageSoSwab(TabPageUnion):
             self.template_second_need_combo = QComboBox(self)
             self.template_second_need_combo.addItems(['Да', 'Нет'])
             self.template_second_Label = QLabel("диаметр шаблона", self)
-            self.template_second_Edit = QLineEdit(self)
-            self.template_second_Edit.setValidator(self.validator_int)
-            self.template_second_Edit.setText(str(template_second))
+            self.template_second_edit = QLineEdit(self)
+            self.template_second_edit.setValidator(self.validator_int)
+            self.template_second_edit.setText(str(template_second))
 
             self.length_template_second_Label = QLabel("длина шаблона", self)
-            self.length_template_second_Edit = QLineEdit(self)
-            self.length_template_second_Edit.setValidator(self.validator_int)
-            self.length_template_second_Edit.setText('4')
+            self.length_template_second_edit = QLineEdit(self)
+            self.length_template_second_edit.setValidator(self.validator_int)
+            self.length_template_second_edit.setText('4')
 
             self.grid.addWidget(self.template_second_need_label, 3, 2)
             self.grid.addWidget(self.template_second_need_combo, 4, 2)
 
             self.grid.addWidget(self.template_second_Label, 3, 3)
-            self.grid.addWidget(self.template_second_Edit, 4, 3)
+            self.grid.addWidget(self.template_second_edit, 4, 3)
 
             self.grid.addWidget(self.length_template_second_Label, 3, 4)
-            self.grid.addWidget(self.length_template_second_Edit, 4, 4)
+            self.grid.addWidget(self.length_template_second_edit, 4, 4)
 
 
         elif self.swab_true_edit_type.currentText() == 'Опрессовка снижением уровня на пакере с заглушкой':
@@ -694,7 +694,7 @@ class SwabWindow(WindowUnion):
         elif swab_true_edit_type in ['Опрессовка снижением уровня на шаблоне']:
 
             self.data_well.template_length = \
-                float(self.tabWidget.currentWidget().length_template_second_Edit.text())
+                float(self.tabWidget.currentWidget().length_template_second_edit.text())
             # self.data_well.template_length_addition = length_template_first
             if rows != 0:
                 QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
@@ -957,13 +957,13 @@ class SwabWindow(WindowUnion):
                                                 'Не введены данные для расчета поглотителя сероводорода')
                             return
 
-                template_second_Edit = self.tabWidget.currentWidget().template_second_Edit.text()
-                length_template_second_Edit = self.tabWidget.currentWidget().length_template_second_Edit.text()
+                template_second_edit = self.tabWidget.currentWidget().template_second_edit.text()
+                length_template_second_edit = self.tabWidget.currentWidget().length_template_second_edit.text()
 
                 paker2_depth = int(float(self.tableWidget.item(row, 1).text()))
                 work_list = self.swabbing_opy(
                     paker2_depth, fluid_new_edit, need_change_zgs_combo,
-                    plast_new_combo, pressure_new_edit, template_second_Edit, length_template_second_Edit,
+                    plast_new_combo, pressure_new_edit, template_second_edit, length_template_second_edit,
                     template_second_need_combo)
             elif swab_true_edit_type == 'Опрессовка снижением уровня на пакере с заглушкой':
                 paker2_depth = int(float(self.tableWidget.item(row, 3).text()))

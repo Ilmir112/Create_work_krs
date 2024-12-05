@@ -2,6 +2,7 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QPushButton
 
 import data_list
+from work_py.calculate_work_parametrs import volume_work
 
 from work_py.parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
 
@@ -201,10 +202,10 @@ class PeroWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 4],
             [
-                f'Промывка уд.весом {self.data_well.fluid_work_short} в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ',
+                f'Промывка уд.весом {self.data_well.fluid_work_short} в объеме {volume_work(self.data_well)* 1.5:.1f}м3 ',
                 None,
                 f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work} при расходе жидкости '
-                f'6-8 л/сек в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. '
+                f'6-8 л/сек в присутствии представителя Заказчика в объеме {volume_work(self.data_well)* 1.5:.1f}м3. '
                 f'ПРИ ПРОМЫВКЕ НЕ '
                 f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {self.data_well.max_admissible_pressure.get_value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
                 f'НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',

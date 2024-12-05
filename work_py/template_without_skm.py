@@ -5,6 +5,7 @@ import data_list
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QTabWidget, QWidget, QLabel, QComboBox, QMainWindow, QLineEdit, \
     QGridLayout, QPushButton, QBoxLayout, QApplication
 
+from work_py.calculate_work_parametrs import volume_work
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 
@@ -20,37 +21,37 @@ class TabPageSo(TabPageUnion):
         validator = QDoubleValidator(0.0, 80000.0, 2)
 
         self.template_labelType = QLabel("Вид компоновки шаблона", self)
-        self.template_Combo = QComboBox(self)
+        self.template_combo = QComboBox(self)
 
         self.template_str_Label = QLabel("строчка с шаблонами", self)
-        self.template_str_Edit = QLineEdit(self)
+        self.template_str_edit = QLineEdit(self)
 
         self.skm_teml_str_Label = QLabel("глубины спуска шаблонов", self)
-        self.skm_teml_str_Edit = QLineEdit(self)
+        self.skm_teml_str_edit = QLineEdit(self)
 
         self.template_first_Label = QLabel("диаметр первого шаблона", self)
-        self.template_first_Edit = QLineEdit(self)
-        self.template_first_Edit.setValidator(validator)
+        self.template_first_edit = QLineEdit(self)
+        self.template_first_edit.setValidator(validator)
 
         self.length_template_first_Label = QLabel("длина первого шаблона", self)
-        self.length_template_first_Edit = QLineEdit(self)
-        self.length_template_first_Edit.setValidator(validator)
+        self.length_template_first_edit = QLineEdit(self)
+        self.length_template_first_edit.setValidator(validator)
 
         self.dictance_template_first_Label = QLabel("расстояние", self)
-        self.dictance_template_first_Edit = QLineEdit(self)
-        self.dictance_template_first_Edit.setValidator(validator)
+        self.dictance_template_first_edit = QLineEdit(self)
+        self.dictance_template_first_edit.setValidator(validator)
 
         self.template_second_Label = QLabel("диаметр второго шаблона", self)
-        self.template_second_Edit = QLineEdit(self)
-        self.template_second_Edit.setValidator(validator)
+        self.template_second_edit = QLineEdit(self)
+        self.template_second_edit.setValidator(validator)
 
         self.length_template_second_Label = QLabel("длина второго шаблона", self)
-        self.length_template_second_Edit = QLineEdit(self)
-        self.length_template_second_Edit.setValidator(validator)
+        self.length_template_second_edit = QLineEdit(self)
+        self.length_template_second_edit.setValidator(validator)
 
         self.dictance_template_second_Label = QLabel("расстояние-2", self)
-        self.dictance_template_second_Edit = QLineEdit(self)
-        self.dictance_template_second_Edit.setValidator(validator)
+        self.dictance_template_second_edit = QLineEdit(self)
+        self.dictance_template_second_edit.setValidator(validator)
 
         self.current_bottom_label = QLabel('Забой текущий')
         self.current_bottom_edit = QLineEdit(self)
@@ -84,7 +85,7 @@ class TabPageSo(TabPageUnion):
         if self.data_well.plast_work:
             self.kot_question_qcombo.setCurrentIndex(1)
 
-        self.template_Combo.currentTextChanged.connect(self.update_template_edit)
+        self.template_combo.currentTextChanged.connect(self.update_template_edit)
 
         if self.data_well.count_template == 0:
             self.note_question_qcombo.setCurrentIndex(1)
@@ -97,51 +98,51 @@ class TabPageSo(TabPageUnion):
             first_template, template_second = TabPageSoWith.template_diam_ek(self)
             self.template_select_list = ['шаблон ЭК с хвостом', 'шаблон открытый ствол', 'шаблон без хвоста']
 
-            self.template_Combo.addItems(self.template_select_list)
+            self.template_combo.addItems(self.template_select_list)
             template_key = self.definition_pssh()
-            self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
+            self.template_combo.setCurrentIndex(self.template_select_list.index(template_key))
 
             self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
-            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
+            self.grid.addWidget(self.template_combo, 2, 2, 2, 8)
             self.grid.addWidget(self.template_first_Label, 4, 2)
-            self.grid.addWidget(self.template_first_Edit, 5, 2)
+            self.grid.addWidget(self.template_first_edit, 5, 2)
             self.grid.addWidget(self.length_template_first_Label, 4, 3)
-            self.grid.addWidget(self.length_template_first_Edit, 5, 3)
+            self.grid.addWidget(self.length_template_first_edit, 5, 3)
             self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
-            self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.dictance_template_first_edit, 5, 4)
 
             self.grid.addWidget(self.template_second_Label, 4, 7)
-            self.grid.addWidget(self.template_second_Edit, 5, 7)
+            self.grid.addWidget(self.template_second_edit, 5, 7)
             self.grid.addWidget(self.length_template_second_Label, 4, 8)
-            self.grid.addWidget(self.length_template_second_Edit, 5, 8)
-            self.dictance_template_second_Edit.setParent(None)
+            self.grid.addWidget(self.length_template_second_edit, 5, 8)
+            self.dictance_template_second_edit.setParent(None)
             self.dictance_template_second_Label.setParent(None)
 
         else:
             first_template, template_second = TabPageSoWith.template_diam_additional_ek(self)
             self.template_select_list = ['шаблон ДП с хвостом', 'шаблон ДП открытый ствол', 'шаблон ДП без хвоста']
-            self.template_Combo.addItems(self.template_select_list)
+            self.template_combo.addItems(self.template_select_list)
             template_key = self.definition_pssh()
 
-            self.template_Combo.setCurrentIndex(self.template_select_list.index(template_key))
+            self.template_combo.setCurrentIndex(self.template_select_list.index(template_key))
 
             self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
-            self.grid.addWidget(self.template_Combo, 2, 2, 2, 8)
+            self.grid.addWidget(self.template_combo, 2, 2, 2, 8)
             self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
-            self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
+            self.grid.addWidget(self.dictance_template_first_edit, 5, 2)
 
             self.grid.addWidget(self.template_first_Label, 4, 3)
-            self.grid.addWidget(self.template_first_Edit, 5, 3)
+            self.grid.addWidget(self.template_first_edit, 5, 3)
 
             self.grid.addWidget(self.length_template_first_Label, 4, 4)
-            self.grid.addWidget(self.length_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.length_template_first_edit, 5, 4)
 
             self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
-            self.grid.addWidget(self.dictance_template_second_Edit, 5, 5)
+            self.grid.addWidget(self.dictance_template_second_edit, 5, 5)
             self.grid.addWidget(self.template_second_Label, 4, 6)
-            self.grid.addWidget(self.template_second_Edit, 5, 6)
+            self.grid.addWidget(self.template_second_edit, 5, 6)
             self.grid.addWidget(self.length_template_second_Label, 4, 7)
-            self.grid.addWidget(self.length_template_second_Edit, 5, 7)
+            self.grid.addWidget(self.length_template_second_edit, 5, 7)
 
         self.grid.addWidget(self.current_bottom_label, 8, 3)
         self.grid.addWidget(self.current_bottom_edit, 9, 3)
@@ -162,22 +163,22 @@ class TabPageSo(TabPageUnion):
         self.grid.addWidget(self.kot_question_qcombo, 9, 8)
 
         self.grid.addWidget(self.template_str_Label, 13, 1, 1, 8)
-        self.grid.addWidget(self.template_str_Edit, 14, 1, 1, 8)
+        self.grid.addWidget(self.template_str_edit, 14, 1, 1, 8)
 
         self.grid.addWidget(self.skm_teml_str_Label, 15, 1, 1, 8)
-        self.grid.addWidget(self.skm_teml_str_Edit, 16, 1, 1, 8)
+        self.grid.addWidget(self.skm_teml_str_edit, 16, 1, 1, 8)
 
-        self.template_first_Edit.setText(str(first_template))
-        self.template_second_Edit.setText(str(template_second))
+        self.template_first_edit.setText(str(first_template))
+        self.template_second_edit.setText(str(template_second))
 
-        self.length_template_first_Edit.setText(str(2))
+        self.length_template_first_edit.setText(str(2))
 
-        self.template_first_Edit.textChanged.connect(self.update_template)
-        self.length_template_second_Edit.textChanged.connect(self.update_template)
-        self.template_second_Edit.textChanged.connect(self.update_template)
-        self.dictance_template_second_Edit.textChanged.connect(self.update_template)
-        self.dictance_template_first_Edit.textChanged.connect(self.update_template)
-        self.length_template_first_Edit.textChanged.connect(self.update_template)
+        self.template_first_edit.textChanged.connect(self.update_template)
+        self.length_template_second_edit.textChanged.connect(self.update_template)
+        self.template_second_edit.textChanged.connect(self.update_template)
+        self.dictance_template_second_edit.textChanged.connect(self.update_template)
+        self.dictance_template_first_edit.textChanged.connect(self.update_template)
+        self.length_template_first_edit.textChanged.connect(self.update_template)
         self.kot_question_qcombo.currentTextChanged.connect(self.update_template)
 
 
@@ -221,21 +222,21 @@ class TabPageSo(TabPageUnion):
         first_template, length_template_first, template_second, dictance_template_first, dictance_template_second \
             = '', '', '', '', ''
 
-        if self.template_first_Edit.text() != '':
-            first_template = self.template_first_Edit.text()
-        if self.length_template_first_Edit.text() != '':
-            length_template_first = self.length_template_first_Edit.text()
-        if self.template_second_Edit.text() != '':
-            template_second = self.template_second_Edit.text()
-        if self.length_template_second_Edit.text() != '':
-            length_template_second = self.length_template_second_Edit.text()
+        if self.template_first_edit.text() != '':
+            first_template = self.template_first_edit.text()
+        if self.length_template_first_edit.text() != '':
+            length_template_first = self.length_template_first_edit.text()
+        if self.template_second_edit.text() != '':
+            template_second = self.template_second_edit.text()
+        if self.length_template_second_edit.text() != '':
+            length_template_second = self.length_template_second_edit.text()
 
-        if self.dictance_template_first_Edit.text() != '':
-            dictance_template_first = int(float(self.dictance_template_first_Edit.text()))
+        if self.dictance_template_first_edit.text() != '':
+            dictance_template_first = int(float(self.dictance_template_first_edit.text()))
         else:
             dictance_template_first = ''
-        if self.dictance_template_second_Edit.text() != '':
-            dictance_template_second = int(float(self.dictance_template_second_Edit.text()))
+        if self.dictance_template_second_edit.text() != '':
+            dictance_template_second = int(float(self.dictance_template_second_edit.text()))
         else:
             dictance_template_second = ''
         current_bottom = float(self.current_bottom_edit.text())
@@ -257,7 +258,7 @@ class TabPageSo(TabPageUnion):
             if 'Ойл' in data_list.contractor and len(self.data_well.plast_work) != 0:
                 kot_str = '+ КОТ-50'
 
-            if self.template_Combo.currentText() == 'шаблон ЭК с хвостом':
+            if self.template_combo.currentText() == 'шаблон ЭК с хвостом':
                 if dictance_template_second != '':
                     template_str = f'перо {kot_str} + шаблон-{int(first_template)}мм ' \
                                    f'L-{int(length_template_first)}м + НКТ{nkt_diam}м ' \
@@ -271,7 +272,7 @@ class TabPageSo(TabPageUnion):
                     skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
 
-            elif self.template_Combo.currentText() == 'шаблон без хвоста':
+            elif self.template_combo.currentText() == 'шаблон без хвоста':
                 if dictance_template_second is not None:
                     template_str = f'перо {kot_str} + шаблон-{template_second}мм L-{length_template_second}м '
                     self.data_well.template_depth = self.data_well.current_bottom
@@ -279,9 +280,9 @@ class TabPageSo(TabPageUnion):
 
 
 
-            elif self.template_Combo.currentText() == 'шаблон открытый ствол':
+            elif self.template_combo.currentText() == 'шаблон открытый ствол':
                 if dictance_template_second is not None:
-                    self.template_first_Edit.setText('фильтр направление')
+                    self.template_first_edit.setText('фильтр направление')
                     template_str = f'фильтр-направление {kot_str} + НКТ{nkt_diam}м {dictance_template_first}м  ' \
                                    f'шаблон-{template_second}мм L-{length_template_second}м '
                     self.data_well.template_depth = int(
@@ -289,7 +290,7 @@ class TabPageSo(TabPageUnion):
 
                     skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
-            elif self.template_Combo.currentText() == 'шаблон ДП с хвостом':
+            elif self.template_combo.currentText() == 'шаблон ДП с хвостом':
                 if dictance_template_second is not None:
                     template_str = f'обточная муфта + {kot_str} НКТ{nkt_pod} {dictance_template_first}м ' \
                                    f'+ шаблон-{first_template}мм ' \
@@ -307,7 +308,7 @@ class TabPageSo(TabPageUnion):
                                    f'{self.data_well.template_depth_addition}м, ' \
                                    f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
-            elif self.template_Combo.currentText() == 'шаблон ДП без хвоста':
+            elif self.template_combo.currentText() == 'шаблон ДП без хвоста':
 
                 template_str = f'обточная муфта {kot_str} + ' \
                                f'шаблон-{first_template}мм L-{length_template_first}м + ' \
@@ -324,7 +325,7 @@ class TabPageSo(TabPageUnion):
                                f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
 
-            elif self.template_Combo.currentText() == 'шаблон ДП открытый ствол':
+            elif self.template_combo.currentText() == 'шаблон ДП открытый ствол':
                 if dictance_template_second is not None:
                     template_str = f'фильтр направление L-2м {kot_str} + НКТ{nkt_pod} {dictance_template_first}м ' \
                                    f'  + шаблон-{first_template}мм ' \
@@ -342,8 +343,8 @@ class TabPageSo(TabPageUnion):
                                    f'{self.data_well.template_depth_addition}м, ' \
                                    f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
             if dictance_template_second != "":
-                self.template_str_Edit.setText(template_str)
-                self.skm_teml_str_Edit.setText(skm_teml_str)
+                self.template_str_edit.setText(template_str)
+                self.skm_teml_str_edit.setText(skm_teml_str)
 
     def update_template_edit(self, index):
 
@@ -365,38 +366,38 @@ class TabPageSo(TabPageUnion):
 
         current_bottom = float(self.current_bottom_edit.text())
 
-        self.template_first_Edit.setText(str(first_template))
-        self.template_second_Edit.setText(str(template_second))
+        self.template_first_edit.setText(str(first_template))
+        self.template_second_edit.setText(str(template_second))
         # self.skm_edit.setText(str(self.data_well.column_diameter.get_value))
-        self.dictance_template_second_Edit.setText(str(10))
+        self.dictance_template_second_edit.setText(str(10))
 
         roof_plast, roof_add_column_plast = TabPageSoWith.definition_roof_not_raiding(self, current_bottom)
         dictance_template_first = int(self.data_well.current_bottom - roof_plast + 5)
         # print(f'дистанция первая {dictance_template_first}')
-        self.dictance_template_first_Edit.setText(str(dictance_template_first))
+        self.dictance_template_first_edit.setText(str(dictance_template_first))
 
         length_template_first, length_template_second = (
             TabPageSoWith.definition_ecn_true(self, self.data_well.dict_pump_ecn_depth["posle"]))
-        self.length_template_first_Edit.setText(length_template_first)
-        self.length_template_second_Edit.setText(str(length_template_second))
+        self.length_template_first_edit.setText(length_template_first)
+        self.length_template_second_edit.setText(str(length_template_second))
 
-        first_template = self.template_first_Edit.text()
-        template_second = int(self.template_second_Edit.text())
-        length_template_first = int(self.length_template_first_Edit.text())
+        first_template = self.template_first_edit.text()
+        template_second = int(self.template_second_edit.text())
+        length_template_first = int(self.length_template_first_edit.text())
 
-        dictance_template_first = int(self.dictance_template_first_Edit.text())
+        dictance_template_first = int(self.dictance_template_first_edit.text())
 
-        length_template_second = int(self.length_template_second_Edit.text())
-        dictance_template_second = int(self.dictance_template_second_Edit.text())
+        length_template_second = int(self.length_template_second_edit.text())
+        dictance_template_second = int(self.dictance_template_second_edit.text())
 
         self.template_first_Label.setParent(None)
-        self.template_first_Edit.setParent(None)
+        self.template_first_edit.setParent(None)
         self.length_template_first_Label.setParent(None)
-        self.length_template_first_Edit.setParent(None)
+        self.length_template_first_edit.setParent(None)
 
         self.dictance_template_first_Label.setParent(None)
-        self.dictance_template_first_Edit.setParent(None)
-        self.dictance_template_second_Edit.setParent(None)
+        self.dictance_template_first_edit.setParent(None)
+        self.dictance_template_second_edit.setParent(None)
 
         if self.data_well.column_additional or \
                 (
@@ -404,14 +405,14 @@ class TabPageSo(TabPageUnion):
             nkt_pod = '60мм' if self.data_well.column_additional_diameter.get_value < 110 else '73мм со снятыми фасками'
 
         if index == 'шаблон ЭК с хвостом':
-            self.dictance_template_second_Edit.setParent(None)
+            self.dictance_template_second_edit.setParent(None)
             self.dictance_template_second_Label.setParent(None)
             self.grid.addWidget(self.template_first_Label, 4, 2)
-            self.grid.addWidget(self.template_first_Edit, 5, 2)
+            self.grid.addWidget(self.template_first_edit, 5, 2)
             self.grid.addWidget(self.length_template_first_Label, 4, 3)
-            self.grid.addWidget(self.length_template_first_Edit, 5, 3)
+            self.grid.addWidget(self.length_template_first_edit, 5, 3)
             self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
-            self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.dictance_template_first_edit, 5, 4)
 
             template_str = f'перо {kot_str} + шаблон-{first_template}мм L-2м + НКТ{nkt_diam}мм ' \
                            f'{dictance_template_first}м ' \
@@ -425,9 +426,9 @@ class TabPageSo(TabPageUnion):
 
 
         elif index == 'шаблон без хвоста':
-            self.dictance_template_second_Edit.setParent(None)
+            self.dictance_template_second_edit.setParent(None)
             self.dictance_template_second_Label.setParent(None)
-            self.dictance_template_first_Edit.setParent(None)
+            self.dictance_template_first_edit.setParent(None)
             self.dictance_template_first_Label.setParent(None)
 
             template_str = f'перо {kot_str} + шаблон-{template_second}мм L-{length_template_second}м '
@@ -437,19 +438,19 @@ class TabPageSo(TabPageUnion):
         elif index == 'шаблон открытый ствол':
 
             self.grid.addWidget(self.template_first_Label, 4, 2)
-            self.grid.addWidget(self.template_first_Edit, 5, 2)
+            self.grid.addWidget(self.template_first_edit, 5, 2)
             # self.grid.addWidget(self.length_template_first_Label, 4, 3)
-            # self.grid.addWidget(self.length_template_first_Edit, 5, 3)
+            # self.grid.addWidget(self.length_template_first_edit, 5, 3)
             self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
-            self.grid.addWidget(self.dictance_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.dictance_template_first_edit, 5, 4)
             # self.grid.addWidget(self.length_template_second_Label, 4, 9)
-            # self.grid.addWidget(self.length_template_second_Edit, 5, 9)
+            # self.grid.addWidget(self.length_template_second_edit, 5, 9)
 
-            self.template_first_Edit.setText('фильтр направление')
-            self.dictance_template_first_Edit.setText(str(dictance_template_first))
-            self.dictance_template_second_Edit.setText(str(10))
-            dictance_template_first = int(self.dictance_template_first_Edit.text())
-            dictance_template_second = int(self.dictance_template_second_Edit.text())
+            self.template_first_edit.setText('фильтр направление')
+            self.dictance_template_first_edit.setText(str(dictance_template_first))
+            self.dictance_template_second_edit.setText(str(10))
+            dictance_template_first = int(self.dictance_template_first_edit.text())
+            dictance_template_second = int(self.dictance_template_second_edit.text())
 
             template_str = f'фильтр-направление L-2 {kot_str}+ НКТ{nkt_diam}м {dictance_template_first}м +' \
                            f'шаблон-{template_second}мм L-{length_template_second}м '
@@ -460,22 +461,22 @@ class TabPageSo(TabPageUnion):
         elif index == 'шаблон ДП с хвостом':
 
             self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
-            self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
+            self.grid.addWidget(self.dictance_template_first_edit, 5, 2)
             self.grid.addWidget(self.template_first_Label, 4, 3)
-            self.grid.addWidget(self.template_first_Edit, 5, 3)
+            self.grid.addWidget(self.template_first_edit, 5, 3)
             self.grid.addWidget(self.length_template_first_Label, 4, 4)
-            self.grid.addWidget(self.length_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.length_template_first_edit, 5, 4)
             self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
-            self.grid.addWidget(self.dictance_template_second_Edit, 5, 5)
+            self.grid.addWidget(self.dictance_template_second_edit, 5, 5)
             self.grid.addWidget(self.length_template_second_Label, 4, 8)
-            self.grid.addWidget(self.length_template_second_Edit, 5, 8)
+            self.grid.addWidget(self.length_template_second_edit, 5, 8)
 
             dictance_template_first = int(self.data_well.current_bottom - roof_add_column_plast + 5)
-            self.dictance_template_first_Edit.setText(str(dictance_template_first))
+            self.dictance_template_first_edit.setText(str(dictance_template_first))
             dictance_template_second = int(
                 roof_add_column_plast - self.data_well.head_column_additional.get_value - int(
-                    self.length_template_first_Edit.text()) + 5)
-            self.dictance_template_second_Edit.setText(str(dictance_template_second))
+                    self.length_template_first_edit.text()) + 5)
+            self.dictance_template_second_edit.setText(str(dictance_template_second))
 
             template_str = f'обточная муфта {kot_str} + НКТ{nkt_pod} {dictance_template_first}м ' \
                            f' + шаблон-{first_template}мм ' \
@@ -489,24 +490,24 @@ class TabPageSo(TabPageUnion):
                            f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
         elif index == 'шаблон ДП без хвоста':
-            self.dictance_template_first_Edit.setParent(None)
+            self.dictance_template_first_edit.setParent(None)
             self.dictance_template_first_Label.setParent(None)
             self.grid.addWidget(self.template_first_Label, 4, 2)
-            self.grid.addWidget(self.template_first_Edit, 5, 2)
+            self.grid.addWidget(self.template_first_edit, 5, 2)
             self.grid.addWidget(self.length_template_first_Label, 4, 3)
-            self.grid.addWidget(self.length_template_first_Edit, 5, 3)
+            self.grid.addWidget(self.length_template_first_edit, 5, 3)
             self.grid.addWidget(self.dictance_template_second_Label, 4, 6)
-            self.grid.addWidget(self.dictance_template_second_Edit, 5, 6)
+            self.grid.addWidget(self.dictance_template_second_edit, 5, 6)
             self.grid.addWidget(self.template_second_Label, 4, 7)
-            self.grid.addWidget(self.template_second_Edit, 5, 7)
+            self.grid.addWidget(self.template_second_edit, 5, 7)
             self.grid.addWidget(self.length_template_second_Label, 4, 8)
-            self.grid.addWidget(self.length_template_second_Edit, 5, 8)
+            self.grid.addWidget(self.length_template_second_edit, 5, 8)
 
             dictance_template_second = int(
                 self.data_well.current_bottom - self.data_well.head_column_additional.get_value
                 - int(length_template_first) + 5)
-            self.dictance_template_second_Edit.setText(str(dictance_template_second))
-            dictance_template_second = int(self.dictance_template_second_Edit.text())
+            self.dictance_template_second_edit.setText(str(dictance_template_second))
+            dictance_template_second = int(self.dictance_template_second_edit.text())
 
             template_str = f'обточная муфта {kot_str} + шаблон-{first_template}мм L-{length_template_first}м + ' \
                            f'НКТ{nkt_pod} {dictance_template_second}м + шаблон-{template_second}мм ' \
@@ -525,24 +526,24 @@ class TabPageSo(TabPageUnion):
         elif index == 'шаблон ДП открытый ствол':
 
             self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
-            self.grid.addWidget(self.dictance_template_first_Edit, 5, 2)
+            self.grid.addWidget(self.dictance_template_first_edit, 5, 2)
             self.grid.addWidget(self.template_first_Label, 4, 3)
-            self.grid.addWidget(self.template_first_Edit, 5, 3)
+            self.grid.addWidget(self.template_first_edit, 5, 3)
             self.grid.addWidget(self.length_template_first_Label, 4, 4)
-            self.grid.addWidget(self.length_template_first_Edit, 5, 4)
+            self.grid.addWidget(self.length_template_first_edit, 5, 4)
             self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
-            self.grid.addWidget(self.dictance_template_second_Edit, 5, 5)
+            self.grid.addWidget(self.dictance_template_second_edit, 5, 5)
             self.grid.addWidget(self.length_template_second_Label, 4, 8)
-            self.grid.addWidget(self.length_template_second_Edit, 5, 8)
+            self.grid.addWidget(self.length_template_second_edit, 5, 8)
 
             dictance_template_first = int(self.data_well.current_bottom - roof_add_column_plast + 5)
-            self.dictance_template_first_Edit.setText(str(dictance_template_first))
-            dictance_template_first = int(self.dictance_template_first_Edit.text())
+            self.dictance_template_first_edit.setText(str(dictance_template_first))
+            dictance_template_first = int(self.dictance_template_first_edit.text())
 
             dictance_template_second = int(
                 roof_add_column_plast - self.data_well.head_column_additional.get_value - int(
-                    self.length_template_first_Edit.text()) + 5)
-            self.dictance_template_second_Edit.setText(str(dictance_template_second))
+                    self.length_template_first_edit.text()) + 5)
+            self.dictance_template_second_edit.setText(str(dictance_template_second))
 
             template_str = f'фильтр направление {kot_str}+ НКТ{nkt_pod} {dictance_template_first}м ' \
                            f' + шаблон-{first_template}мм L-{length_template_first}м' \
@@ -555,12 +556,12 @@ class TabPageSo(TabPageUnion):
             skm_teml_str = f'шаблон-{first_template}мм до гл.{self.data_well.template_depth_addition}м, ' \
                            f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
-        self.template_str_Edit.setText(template_str)
-        self.skm_teml_str_Edit.setText(skm_teml_str)
+        self.template_str_edit.setText(template_str)
+        self.skm_teml_str_edit.setText(skm_teml_str)
 
         if 'ПОМ' in str(self.data_well.paker_before["posle"]).upper() and \
                 '122' in str(self.data_well.paker_before["posle"]):
-            self.template_second_Edit.setText(str(126))
+            self.template_second_edit.setText(str(126))
 
     def definition_ecn_true(self, depth_ecn):
 
@@ -611,19 +612,19 @@ class TemplateWithoutSkm(WindowUnion):
 
     def add_work(self):
 
-        distance_second = int(self.tabWidget.currentWidget().dictance_template_second_Edit.text())
-        distance_first = int(self.tabWidget.currentWidget().dictance_template_first_Edit.text())
-        template_str = str(self.tabWidget.currentWidget().template_str_Edit.text())
-        template = str(self.tabWidget.currentWidget().template_Combo.currentText())
-        template_length = int(float(self.tabWidget.currentWidget().length_template_second_Edit.text()))
+        distance_second = int(self.tabWidget.currentWidget().dictance_template_second_edit.text())
+        distance_first = int(self.tabWidget.currentWidget().dictance_template_first_edit.text())
+        template_str = str(self.tabWidget.currentWidget().template_str_edit.text())
+        template = str(self.tabWidget.currentWidget().template_combo.currentText())
+        template_length = int(float(self.tabWidget.currentWidget().length_template_second_edit.text()))
         if self.data_well.column_additional:
-            template_length_addition = int(float(self.tabWidget.currentWidget().length_template_first_Edit.text()))
+            template_length_addition = int(float(self.tabWidget.currentWidget().length_template_first_edit.text()))
         if self.data_well.column_additional is False or (
                 self.data_well.column_additional is True and float(
             self.data_well.head_column_additional.get_value) >= self.data_well.current_bottom):
-            template_diameter = int(self.tabWidget.currentWidget().template_second_Edit.text())
+            template_diameter = int(self.tabWidget.currentWidget().template_second_edit.text())
         else:
-            template_diameter = int(self.tabWidget.currentWidget().template_first_Edit.text())
+            template_diameter = int(self.tabWidget.currentWidget().template_first_edit.text())
         # print(f'проблема ЭК {self.data_well.problem_with_ek_diameter}')
         if (template_diameter >= int(self.data_well.problem_with_ek_diameter) - 2
                 and self.data_well.template_depth > int(self.data_well.problem_with_ek_depth)):
@@ -642,7 +643,7 @@ class TemplateWithoutSkm(WindowUnion):
             if self.data_well.template_depth >= self.data_well.head_column_additional.get_value:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже головы хвостовика')
                 return
-            # if self.template_Combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне' and\
+            # if self.template_combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне' and\
             #         self.data_well.skm_depth >= self.data_well.head_column_additional.get_value:
             #     QMessageBox.warning(self, "ВНИМАНИЕ", 'СКМ спускается ниже головы хвостовика')
             #     return
@@ -731,16 +732,16 @@ class TemplateWithoutSkm(WindowUnion):
              f'пространство. Реагирование 2 часа.',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 4],
-            [f'Промыть в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3',
+            [f'Промыть в объеме {volume_work(self.data_well) * 1.5:.1f}м3',
              None,
              f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work} '
              f'при расходе жидкости 6-8 л/сек '
-             f'в присутствии представителя Заказчика в объеме {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. ПРИ '
+             f'в присутствии представителя Заказчика в объеме {volume_work(self.data_well) * 1.5:.1f}м3. ПРИ '
              f'ПРОМЫВКЕ НЕ ПРЕВЫШАТЬ ДАВЛЕНИЕ {self.data_well.max_admissible_pressure.get_value}АТМ,'
              f' ДОПУСТИМАЯ ОСЕВАЯ '
              f'НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
              None, None, None, None, None, None, None,
-             'Мастер КРС, представитель ЦДНГ', well_volume_norm(TemplateKrs.well_volume(self) * 1.5)],
+             'Мастер КРС, представитель ЦДНГ', well_volume_norm(volume_work(self.data_well) * 1.5)],
             [
                 f'Приподнять до глубины {round(float(current_bottom) - 20, 1)}м. Тех отстой 2ч. Определение '
                 f'текущего забоя',
@@ -884,12 +885,12 @@ class TemplateWithoutSkm(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5],
             [f'Промывка уд.весом {self.data_well.fluid_work_short} в объеме'
-             f' {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ',
+             f' {volume_work(self.data_well) * 1.5:.1f}м3 ',
              None,
              f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work} '
              f'при расходе жидкости '
              f'6-8 л/сек в присутствии представителя Заказчика в объеме '
-             f'{round(TemplateKrs.well_volume(self) * 1.5, 1)}м3. ПРИ ПРОМЫВКЕ НЕ '
+             f'{volume_work(self.data_well) * 1.5:.1f}м3. ПРИ ПРОМЫВКЕ НЕ '
              f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {self.data_well.max_admissible_pressure.get_value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
              f'НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
              None, None, None, None, None, None, None,

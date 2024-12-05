@@ -956,33 +956,44 @@ class DataWindow(WindowUnion):
             close_file = False
 
         if self.data_well.column_additional:
+            asdedf = [self.check_str_isdigit(column_additional_diameter),
+                   self.check_str_isdigit(head_column_additional),
+                   self.check_str_isdigit(shoe_column_additional),
+                   self.check_str_isdigit(column_additional_wall_thickness)]
+            if all([self.check_str_isdigit(column_additional_diameter),
+                   self.check_str_isdigit(head_column_additional),
+                   self.check_str_isdigit(shoe_column_additional),
+                   self.check_str_isdigit(column_additional_wall_thickness)]):
 
-            if int(float(column_additional_diameter)) >= float(column_type):
-                QMessageBox.information(self, 'Внимание', 'Ошибка в диаметре доп колонны')
+                if int(float(column_additional_diameter)) >= float(column_type):
+                    QMessageBox.information(self, 'Внимание', 'Ошибка в диаметре доп колонны')
+                    close_file = False
+
+                if any([70 > float(column_additional_diameter), float(column_additional_diameter) > 150,
+                        5 > float(column_additional_wall_thickness), float(column_additional_wall_thickness) > 13,
+                        5 > float(column_conductor_wall_thickness), float(column_conductor_wall_thickness) > 13,
+                        5 > float(column_wall_thickness), float(column_wall_thickness) > 13]):
+                    QMessageBox.information(self, 'Внимание', 'Проверьте толщину колонны')
+                    close_file = False
+
+                if int(float(str(head_column_additional).replace(',', '.'))) < 10:
+                    msg = QMessageBox.question(self, 'Внимание', 'доп колонна начинается с устья?')
+                    if msg == QMessageBox.StandardButton.Yes:
+                        column_direction_length = column_conductor_length
+                        column_direction_diameter = column_conductor_diameter
+                        column_direction_wall_thickness = column_conductor_wall_thickness
+                        level_cement_direction = level_cement_conductor
+                        column_conductor_length = shoe_column
+                        column_conductor_diameter = column_type
+                        column_conductor_wall_thickness = column_wall_thickness
+
+                        shoe_column = shoe_column_additional
+                        column_type = column_additional_diameter
+                        column_wall_thickness = column_additional_wall_thickness
+                        self.data_well.column_additional = False
+            else:
+                QMessageBox.warning(self, 'Ошибка', 'Ошибка в доп колонне')
                 close_file = False
-
-            if any([70 > float(column_additional_diameter), float(column_additional_diameter) > 150,
-                    5 > float(column_additional_wall_thickness), float(column_additional_wall_thickness) > 13,
-                    5 > float(column_conductor_wall_thickness), float(column_conductor_wall_thickness) > 13,
-                    5 > float(column_wall_thickness), float(column_wall_thickness) > 13]):
-                QMessageBox.information(self, 'Внимание', 'Проверьте толщину колонны')
-                close_file = False
-
-            if int(float(str(head_column_additional).replace(',', '.'))) < 10:
-                msg = QMessageBox.question(self, 'Внимание', 'доп колонна начинается с устья?')
-                if msg == QMessageBox.StandardButton.Yes:
-                    column_direction_length = column_conductor_length
-                    column_direction_diameter = column_conductor_diameter
-                    column_direction_wall_thickness = column_conductor_wall_thickness
-                    level_cement_direction = level_cement_conductor
-                    column_conductor_length = shoe_column
-                    column_conductor_diameter = column_type
-                    column_conductor_wall_thickness = column_wall_thickness
-
-                    shoe_column = shoe_column_additional
-                    column_type = column_additional_diameter
-                    column_wall_thickness = column_additional_wall_thickness
-                    self.data_well.column_additional = False
 
         if type_kr_combo in ['КР13-1  Подготовительные работы к ГРП (ПР)',
                              'КР13-2  Освоение скважины после ГРП (ЗР)',

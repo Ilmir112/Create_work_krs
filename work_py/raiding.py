@@ -6,10 +6,12 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdi
 
 import data_list
 from main import MyMainWindow
-from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
+from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
-from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
-from .advanted_file import change_true_raid
+from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from work_py.advanted_file import change_true_raid
+from work_py.calculate_work_parametrs import volume_work
+
 
 
 
@@ -395,12 +397,12 @@ class Raid(WindowUnion):
              f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
-            [f'Промывка уд.весом {self.data_well.fluid_work[:6]}  в объеме {round(TemplateKrs.well_volume(self) * 2, 1)}м3',
+            [f'Промывка уд.весом {self.data_well.fluid_work[:6]} в объеме {volume_work(self.data_well) * 2:.1f}м3',
              None,
              f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work}  '
-             f'в присутствии представителя заказчика в объеме {round(TemplateKrs.well_volume(self) * 2, 1)}м3. Составить акт.',
+             f'в присутствии представителя заказчика в объеме {volume_work(self.data_well) * 2:.1f}м3. Составить акт.',
              None, None, None, None, None, None, None,
-             'мастер КРС, предст. заказчика', well_volume_norm(TemplateKrs.well_volume(self))],
+             'мастер КРС, предст. заказчика', well_volume_norm(volume_work(self.data_well) * 2)],
             [None, None,
              f'Поднять {ryber_str} на НКТ{nkt_diam}м с глубины {current_str}м с доливом скважины в '
              f'объеме {round(self.data_well.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.data_well.fluid_work}',
@@ -487,12 +489,12 @@ class Raid(WindowUnion):
              f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
-            [f'Промывка уд.весом {self.data_well.fluid_work[:6]}  в объеме {round(TemplateKrs.well_volume(self) * 2, 1)}м3',
+            [f'Промывка уд.весом {self.data_well.fluid_work[:6]}  в объеме {volume_work(self.data_well) * 2:.1f}м3',
              None,
              f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work}  '
-             f'в присутствии представителя заказчика в объеме {round(TemplateKrs.well_volume(self) * 2, 1)}м3. Составить акт.',
+             f'в присутствии представителя заказчика в объеме {volume_work(self.data_well) * 2:.1f}м3. Составить акт.',
              None, None, None, None, None, None, None,
-             'мастер КРС, предст. заказчика', well_volume_norm(TemplateKrs.well_volume(self))],
+             'мастер КРС, предст. заказчика', well_volume_norm(volume_work(self.data_well) * 2)],
             [None, None,
              f'Поднять  {ryber_str} на СБТ{nkt_diam}м с глубины {current_str}м с доливом скважины в '
              f'объеме {round(self.data_well.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.data_well.fluid_work}',

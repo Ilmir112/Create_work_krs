@@ -39,7 +39,7 @@ def skm_interval(self, template):
 
         for plast in self.data_well.plast_all:
             for interval in self.data_well.dict_perforation[plast]['интервал']:
-                if interval[1] < self.data_well.current_bottom:
+                if interval[1] <= self.data_well.current_bottom:
                     perforating_intervals.append(list(interval))
 
         interval_raid.extend(remove_overlapping_intervals(self, perforating_intervals))

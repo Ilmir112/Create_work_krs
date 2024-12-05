@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QInputDialog, QWidget, QLabel, QComboBox, QLineEdit,
 
 import data_list
 from main import MyMainWindow
+from .calculate_work_parametrs import volume_work
 from .parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
 from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 from .template_work import TemplateKrs
@@ -239,15 +240,15 @@ class KompressWindow(WindowUnion):
              f' с целью недопущения попадания кислоты в систему сбора. (Протокол №095-ПП от 19.10.2015г).',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', None],
-            [f'Промывка скважины  не менее {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3', None,
+            [f'Промывка скважины  не менее {volume_work(self.data_well)* 1.5:.1f}м3', None,
              f' При наличии избыточного давления: '
              f'произвести промывку скважину обратной промывкой ' \
              f'по круговой циркуляции  жидкостью уд.весом {self.data_well.fluid_work} при расходе '
              f'жидкости не ' \
-             f'менее 6-8 л/сек в объеме не менее {round(TemplateKrs.well_volume(self) * 1.5, 1)}м3 ' \
+             f'менее 6-8 л/сек в объеме не менее {volume_work(self.data_well)* 1.5:.1f}м3 ' \
              f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.Составить акт.',
              None, None, None, None, None, None, None,
-             'Мастер КРС', well_volume_norm(TemplateKrs.well_volume(self))],
+             'Мастер КРС', well_volume_norm(volume_work(self.data_well)* 1.5)],
             [f'выполнить снятие КВУ в течение часа с интервалом 15 минут',
              None,
              f'Перед подъемом подземного оборудования, после проведённых работ по освоению выполнить снятие КВУ в '

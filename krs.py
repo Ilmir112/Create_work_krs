@@ -157,10 +157,12 @@ class TabPageGno(TabPageUnion):
             if float(list(self.data_well.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
                 fluid_p = list(self.data_well.dict_perforation[plast]['рабочая жидкость'])[0]
         fluid_list.append(fluid_p)
-        if max(fluid_list) <= 1.18:
+        if max(fluid_list) <= 1.16:
 
-            if start_date <= current_date <= end_date and max(fluid_list) <= 1.18:
-                fluid_max = 1.18
+            if start_date <= current_date <= end_date and max(fluid_list) <= 1.18 and \
+                    self.data_well.region in ['КГМ', 'АГМ', 'ИГМ']:
+
+                fluid_max = 1.16
             else:
                 fluid_max = max(fluid_list)
         else:
@@ -429,11 +431,11 @@ class GnoParent(ABC):
              f'При изменении '
              f'уровня в скважине от первоначально замеренного на 100м и более метров в сторону уменьшения или '
              f'возрастания, '
-             f'необходимо скорректировать объем долива идобиться стабилизации уровня в скважине. Если по данным '
+             f'необходимо скорректировать объем долива и добиться стабилизации уровня в скважине. Если по данным '
              f'замера уровень в '
-             f'скважине растет, необходимо выполнить повторноеглушение скважины, сделав перерасчет плотности '
+             f'скважине растет, необходимо выполнить повторное глушение скважины, сделав перерасчет плотности '
              f'жидкости глушения в '
-             f'соответствии суточненными геологической службой данными по пластовому давлению.',
+             f'соответствии с уточненными геологической службой данными по пластовому давлению.',
              None, None, None, None, None, None, None,
              ' Мастер КРС.', 1.5]
         ]
@@ -469,6 +471,9 @@ class GnoParent(ABC):
                                                           f"(объем колонны от пакера до устья уд.весом"
                                                           f" {self.data_well.fluid_work}. Техостой 2ч."])
 
+        work_hard_fluid_list = self.calculate_hard_fluid()
+        if work_hard_fluid_list:
+            krs_begin.extend(work_hard_fluid_list)
         return krs_begin
 
     def well_jamming(self):
@@ -521,14 +526,14 @@ class GnoParent(ABC):
         elif self.without_damping_true is False and self.lift_key in ['ОРД']:
             well_jamming_str = f'Произвести закачку в затрубное пространство тех жидкости уд.весом ' \
                                f'{self.data_well.fluid_work_short} в ' \
-                               f'объеме {round(well_volume - well_volume(self, self.data_well.depth_fond_paker_before["do"]), 1)}м3 ' \
+                               f'объеме {round(volume_nkt_ustie, 1)}м3 ' \
                                f'на поглощение при давлении не более ' \
                                f'{self.data_well.max_admissible_pressure.get_value}атм. Закрыть ' \
                                f'затрубное пространство. Закрыть скважину на стабилизацию не менее 2 часов. ' \
                                f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)'
             well_jamming_short = f'Глушение в затруб уд.весом {self.data_well.fluid_work_short} в ' \
                                  f'объеме ' \
-                                 f'{round(well_volume(self, self.data_well.depth_fond_paker_before["do"]), 1)}м3 '
+                                 f'{round(volume_nkt_ustie, 1)}м3 '
         elif self.without_damping_true is False and self.lift_key in ['НН', 'НВ', 'ЭЦН']:
             well_jamming_str = f'Произвести глушение скважины в объеме {self.volume_well_jamming}м3 тех ' \
                                f'жидкостью уд.весом {self.data_well.fluid_work}' \
@@ -585,6 +590,52 @@ class GnoParent(ABC):
 
             # print([well_jamming_str, well_jamming_list2, well_jamming_short])
         return [well_jamming_str, well_jamming_list2, well_jamming_short]
+
+    def calculate_hard_fluid(self):
+        current_date = data_list.current_date
+        if current_date.month > 4:
+            start_date = datetime(current_date.year, 12, 1).date()
+            end_date = datetime(current_date.year + 1, 4, 1).date()
+        else:
+            start_date = datetime(current_date.year - 1, 12, 1).date()
+            end_date = datetime(current_date.year, 4, 1).date()
+        work_list = []
+        if start_date <= current_date <= end_date and float(self.fluid) <= 1.18:
+            volume_hard_fluid = self.volume_well_jamming * float(self.fluid) / 1.18
+
+            work_list = [
+                [None, None,
+                f'Согласно методических указаний № П2-05.01 М-0037 ЮЛ-305 ВЕРСИЯ 1 по определению ЖГ в зимнее время '
+                f'в связи с рисками с замерзанием пресной жидкости при проведении глушения скважин '
+                f'жидкостью с расчетными параметрами  плотности жидкости склонной к замерзанию и необходимостью '
+                f'исключения прекращения , промывки и долива связанными допускается применение жидкости повышенной '
+                f'плотности не позволяющей проведения работ без ее замерзания с ближайшего пункта налива. ',
+                None, None,
+                None, None, None, None, None,
+                'Мастер КРС', None],
+                [None, None,
+                 f'Если расчетная плотность меньше плотности жидкости, находящейся на ближайшем пункте набора, при '
+                 f'таких условиях применять в работе жидкость той плотности которая есть в наличии на ближайшем '
+                 f'пункте набора. Объем закачки определяется исходя из требуемого гидростатического давления '
+                 f'(при соблюдении условий предотвращения возможного ГНВП) и определяется по формуле 6.2 мероприятий: \n'
+                 f'Vжг = ((Рпл*(1+П)*106 / ρ (пнсв)*9,81 ) + L) * V1м.эк - Vнкт мет -Vшт \n'
+                 f'и составляет {volume_hard_fluid:.1f}м3 при использовании жидкости на ближайшем пункте набора'
+                 f' удельным весом 1,18г/см3',
+                 None, None,
+                 None, None, None, None, None,
+                 'Мастер КРС', None],
+                [None, None,
+                 f'Если по результату прослеживания за изменением уровня жидкости в процессе проведения глушения и '
+                 f'при ПО обнаруживается падение уровня на 100 и более метров, тогда при ведении ремонтных работ и '
+                 f'при проведении промывки скважины, необходимо работы вести с установкой БСГ на перфорированный '
+                 f'интервал скважины от забоя до уровня 50-150 метров над верхними отверстиями перфорации с продавкой '
+                 f'на давление поглощения но не выше максимально допустимого давления на эксплуатационную колонну '
+                 f'по дополнительному плану работ',
+                 None, None,
+                 None, None, None, None, None,
+                 'Мастер КРС', None],
+            ]
+        return work_list
 
 
 class LiftPaker(GnoParent):
@@ -883,7 +934,7 @@ class LiftOrd(GnoParent):
              f'(вес подвески ({round(weigth_pipe(self.data_well.dict_nkt_before), 1)}т) + 20%). '
              f'ПРИМЕЧАНИЕ: При отрицательном '
              f'результате согласовать с УСРСиСТ ступенчатое увеличение '
-             f'нагрузки до 28т ( страг нагрузка НКТ по паспорту),  при необходимости  с '
+             f'нагрузки до 28т (страг нагрузка НКТ по паспорту),  при необходимости  с '
              f'противодавлением в НКТ '
              f'(время на прибытие СТП ЦА 320 + АЦ не более 4 часов). Общие время на расхаживание - не более 6 '
              f'часов, через 5 часов '
@@ -896,7 +947,7 @@ class LiftOrd(GnoParent):
              self.well_jamming_str[0],
              None, None, None, None, None, None, None,
              'Мастер КРС, представ заказчика',
-             [str(well_jamming_norm(self.well_jamming_str)) if self.without_damping_true is False else None][0]],
+             [str(well_jamming_norm(self.volume_well_jamming)) if self.without_damping_true is False else None][0]],
             [None, None,
              self.well_jamming_str[1],
              None, None, None, None, None, None, None,
@@ -916,14 +967,14 @@ class LiftOrd(GnoParent):
                        "подъёмного агрегата для ремонта скважины."]),
              None, None, None, None, None, None, None,
              'Мастер КРС', 2.8],
-            [self.parent.pvo_gno(self.data_well.category_pvo)[1], None,
-             self.parent.pvo_gno(self.data_well.category_pvo)[0], None, None,
+            [self.pvo_gno(self.data_well.category_pvo)[1], None,
+             self.pvo_gno(self.data_well.category_pvo)[0], None, None,
              None, None, None, None, None,
              ''.join([
                  'Мастер КРС, представ-ли ПАСФ и '
                  'Заказчика, Пуск. ком' if self.data_well.category_pvo == 1 else 'Мастер КРС, представ-ли  Заказчика']),
              [4.21 if 'схеме №1' in str(
-                 self.parent.pvo_gno(self.data_well.category_pvo)[0]) else 0.23 + 0.3 + 0.83 + 0.67 + 0.14][0]],
+                 self.pvo_gno(self.data_well.category_pvo)[0]) else 0.23 + 0.3 + 0.83 + 0.67 + 0.14][0]],
             [None, None,
              f'Опрессовку ПВО проводить после каждого монтажа. (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ).',
              None, None,
@@ -1670,7 +1721,7 @@ class LiftPumpNn(GnoParent):
             [None, None,
              f'{lifting_unit(self)}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
-            [f'поднять плунжен', None,
+            [f'поднять плунжер', None,
              f'Сорвать  плунжер. (зафиксировать вес при срыве). Обвязать устье скважины согласно схемы №3 '
              f'утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
@@ -1753,6 +1804,8 @@ class LiftPumpNn(GnoParent):
              None, None, None, None, None,
              'Мастер КРС', liftingGNO(self.data_well.dict_nkt_before)],
         ]
+
+
         return lift_pump_nn
 
 
@@ -1858,3 +1911,7 @@ class LiftEcnWith2Paker(GnoParent):
                 'Мастер КРС', round(liftingGNO(self.data_well.dict_nkt_before) * 1.2, 2)],
         ]
         return lift_ecn_with_2paker
+
+
+
+

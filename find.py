@@ -12,11 +12,8 @@ from openpyxl.utils import column_index_from_string
 from openpyxl.workbook import Workbook
 from openpyxl.utils.cell import get_column_letter
 from openpyxl_image_loader import SheetImageLoader
-
 from main import ExcelWorker, MyMainWindow, MyWindow
-
 from plan import delete_rows_pz
-
 from data_list import ProtectedIsDigit, ProtectedIsNonNone
 
 
@@ -28,6 +25,7 @@ class FindIndexPZ(MyMainWindow):
 
         self.perforation_sole = 5000
         self.number_dp = 0
+        self.operation_window = None
         self.fluid_work = None
         self.nkt_template = None
         self.nkt_diam = None
@@ -35,6 +33,7 @@ class FindIndexPZ(MyMainWindow):
         self.old_version = False
         self.region = None
         self.fluid = ''
+        self.insert_index = 0
         self.curator = None
         self.data_well_max = ProtectedIsDigit(0)
         self.plan_correct_index = ProtectedIsDigit(0)
@@ -1667,6 +1666,7 @@ class WellPerforation(FindIndexPZ):
 class WellCategory(FindIndexPZ):
 
     def read_well(self, begin_index, cancel_index):
+
         if data_list.data_in_base is False:
             try:
                 for row in range(begin_index, cancel_index):

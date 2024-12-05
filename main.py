@@ -96,7 +96,7 @@ class MyMainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        data_list.operation_window = None
+
         self.table_schema = None
         self.table_widget = None
         self.table_title = None
@@ -130,17 +130,17 @@ class MyMainWindow(QMainWindow):
     # def move_window(self, x, y):
     #     self.move(x, y)
     def add_window(self, window):
-        if data_list.operation_window is None:
-            data_list.operation_window = window(self.data_well, self.table_widget)
-            data_list.operation_window.move(100, 100)
-            self.set_modal_window(data_list.operation_window)
-
-            self.pause_app()
+        if self.data_well.operation_window is None:
             data_list.pause = True
-            data_list.operation_window = None
+            self.data_well.operation_window = window(self.data_well, self.table_widget)
+            self.data_well.operation_window.move(100, 100)
+            self.set_modal_window(self.data_well.operation_window)
+            self.pause_app()
+
+            self.data_well.operation_window = None
         else:
-            data_list.operation_window.close()  # Close window.
-            data_list.operation_window = None
+            self.data_well.operation_window.close()  # Close window.
+            self.data_well.operation_window = None
 
     @staticmethod
     def insert_image(ws, file, coordinate, width=200, height=180):
@@ -877,7 +877,8 @@ class MyWindow(MyMainWindow):
 
         self.initUI()
         self.login_window = None
-        data_list.operation_window = None
+        # self.data_well.operation_window =
+        self.skm_depth =0
         self.new_window = None
         self.raid_window = None
         self.leakage_window = None
