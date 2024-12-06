@@ -25,7 +25,7 @@ class FindIndexPZ(MyMainWindow):
 
         self.perforation_sole = 5000
         self.number_dp = 0
-        self.operation_window = None
+
         self.fluid_work = None
         self.nkt_template = None
         self.nkt_diam = None

@@ -11,7 +11,7 @@ from datetime import datetime
 
 from PyQt5 import QtWidgets
 
-from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QHeaderView, QVBoxLayout,  QWidget, \
+from PyQt5.QtWidgets import QMessageBox, QTableWidgetItem, QLineEdit, QHeaderView, QVBoxLayout, QWidget, \
     QTableWidget
 
 from openpyxl import load_workbook
@@ -261,7 +261,6 @@ class ClassifierWell(MyMainWindow):
                                                 elif 'Площадь' == value:
                                                     area_column = col
 
-
                                 for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
                                     if index_row > area_row:
                                         well_number = row[well_column]
@@ -395,7 +394,6 @@ class ClassifierWell(MyMainWindow):
             QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
 
 
-
 def connect_to_db(name_base, folder_base):
     # Получаем текущий каталог приложения
     current_dir = os.path.dirname(__file__)
@@ -407,9 +405,6 @@ def connect_to_db(name_base, folder_base):
     db_path = os.path.join(db_folder, name_base)
 
     return db_path
-
-
-
 
 
 def excel_in_json(self, sheet):
@@ -432,7 +427,6 @@ def excel_in_json(self, sheet):
                 if all(cell is None for cell in row[:32]) is False:
                     if any([cell.value == "ИТОГО:" for cell in row[:4]]):
                         index_end_copy = row_index
-
                         break
                     for cell in row[:32]:
                         # Получение значения и стилей
@@ -599,7 +593,8 @@ def insert_data_well_dop_plan(self, data_well):
     self.data_well.max_angle = ProtectedIsDigit(well_data_dict['данные']['максимальный угол'])
     self.data_well.max_angle_depth = ProtectedIsDigit(well_data_dict['данные']['глубина'])
     self.data_well.max_expected_pressure = ProtectedIsDigit(well_data_dict['данные']['максимальное ожидаемое давление'])
-    self.data_well.max_admissible_pressure = ProtectedIsDigit(well_data_dict['данные']['максимальное допустимое давление'])
+    self.data_well.max_admissible_pressure = ProtectedIsDigit(
+        well_data_dict['данные']['максимальное допустимое давление'])
 
     self.data_well.curator = well_data_dict['куратор']
     self.data_well.region = well_data_dict['регион']
@@ -616,7 +611,6 @@ def insert_data_well_dop_plan(self, data_well):
     # QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
 
     # definition_plast_work(self)
-
 
 
 def round_cell(data):
@@ -735,9 +729,11 @@ def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_di
 
         elif any(['ПЛАН РАБОТ' in str(col.value).upper() for col in row[:4]]) and self.data_well.work_plan not in [
             'plan_change']:
-            sheet_new.cell(row=index_row + 1, column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {self.data_well.number_dp}'
+            sheet_new.cell(row=index_row + 1,
+                           column=2).value = f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {self.data_well.number_dp}'
 
-        elif any(['ИТОГО:' in str(col.value).upper() for col in row[:4]]) and self.data_well.work_plan in ['plan_change']:
+        elif any(['ИТОГО:' in str(col.value).upper() for col in row[:4]]) and self.data_well.work_plan in [
+            'plan_change']:
             index_delete = index_row + 2
             data_list.gns_ind2 = index_row + 2
 

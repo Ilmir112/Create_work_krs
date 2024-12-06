@@ -59,10 +59,11 @@ class OpressovkaEK(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window = None
+        data_list.operation_window =None
         event.accept()  # Принимаем событие закрытия
 
     def add_row_table(self):
+
         self.current_widget = self.tabWidget.currentWidget()
 
         paker_khost = int(float(self.current_widget.paker_khost_edit.text()))

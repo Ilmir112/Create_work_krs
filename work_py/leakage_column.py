@@ -31,7 +31,7 @@ class TabPageSoLeakage(TabPageUnion):
         # grid = QGridLayout(self)
         self.grid.addWidget(self.roof_leakage_label, 0, 0)
         self.grid.addWidget(self.sole_leakage_label, 0, 1)
-        grid.addWidget(self.insulation_label, 0, 2)
+        self.grid.addWidget(self.insulation_label, 0, 2)
 
         self.grid.addWidget(self.roof_leakage_line, 1, 0)
         self.grid.addWidget(self.sole_leakage_line, 1, 1)

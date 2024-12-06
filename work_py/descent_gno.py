@@ -168,7 +168,7 @@ class GnoDescentWindow(WindowUnion):
     def closeEvent(self, event):
 
         # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window = None
+        data_list.operation_window =None
         event.accept()  # Принимаем событие закрытия
 
     def check_descent_paker(self):

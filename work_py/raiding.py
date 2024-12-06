@@ -322,9 +322,8 @@ class Raid(WindowUnion):
         self.tableWidget.removeRow(row)
 
     def closeEvent(self, event):
-
-                # Закрываем основное окно при закрытии окна входа
-        MyMainWindow.operation_window = None
+        # Закрываем основное окно при закрытии окна входа
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
     def raidingColumn(self, raiding_interval_tuple, ryber_key):
         from .template_work import TemplateKrs

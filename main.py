@@ -104,6 +104,20 @@ class MyMainWindow(QMainWindow):
         self.perforation_correct_window2 = None
         self.work_plan = None
 
+    @staticmethod
+    def check_if_none(value):
+        if isinstance(value, int) or isinstance(value, float):
+            return int(value)
+
+        elif str(value).replace('.', '').replace(',', '').isdigit():
+            if str(round(float(value.replace(',', '.')), 1))[-1] == 0:
+                # print(str(round(float(value.replace(',', '.')), 1)))
+                return int(float(value.replace(',', '.')))
+            else:
+                return float(value.replace(',', '.'))
+        else:
+            return 0
+
     def check_gpp_upa(self, table_widget):
         for row in range(table_widget.rowCount()):
             for column in range(table_widget.columnCount()):
@@ -130,17 +144,17 @@ class MyMainWindow(QMainWindow):
     # def move_window(self, x, y):
     #     self.move(x, y)
     def add_window(self, window):
-        if self.data_well.operation_window is None:
+        if self.operation_window is None:
             data_list.pause = True
-            self.data_well.operation_window = window(self.data_well, self.table_widget)
-            self.data_well.operation_window.move(100, 100)
-            self.set_modal_window(self.data_well.operation_window)
+            self.operation_window = window(self.data_well, self.table_widget)
+            self.operation_window.move(100, 100)
+            self.set_modal_window(self.operation_window)
             self.pause_app()
 
-            self.data_well.operation_window = None
+            self.operation_window = None
         else:
-            self.data_well.operation_window.close()  # Close window.
-            self.data_well.operation_window = None
+            self.operation_window.close()  # Close window.
+            self.operation_window = None
 
     @staticmethod
     def insert_image(ws, file, coordinate, width=200, height=180):
@@ -644,25 +658,25 @@ class MyMainWindow(QMainWindow):
                 check_true = True
                 return int(depth)
 
-        for interval in self.data_well.ribbing_interval:
-            if float(interval[0]) <= float(depth) <= float(interval[1]):
-                check_ribbing = True
-        if check_true is False and check_ribbing is False:
+        # for interval in self.data_well.ribbing_interval:
+        #     if float(interval[0]) <= float(depth) <= float(interval[1]):
+        #         check_ribbing = True
+        if check_true is False:# and check_ribbing is False:
             QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
                                 f'Проверка посадки показала, что пакер сажается не '
                                 f'в интервал скреперования {self.data_well.skm_interval}, и '
-                                f'райбирования {self.data_well.ribbing_interval} \n'
+                                # f'райбирования {self.data_well.ribbing_interval} \n'
                                 f'Нужно скорректировать интервалы скреперования ')
             return False
-        if check_true is True and check_ribbing is False:
-            false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
-                                                  f'Проверка посадки показала, что пакер сажается не '
-                                                  f'в интервал скреперования {self.data_well.skm_interval}, '
-                                                  f'но сажается в интервал райбирования '
-                                                  f'райбирования {self.data_well.ribbing_interval} \n'
-                                                  f'Продолжить?')
-            if false_question == QMessageBox.StandardButton.No:
-                return False
+        # if check_true is True and check_ribbing is False:
+        #     false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
+        #                                           f'Проверка посадки показала, что пакер сажается не '
+        #                                           f'в интервал скреперования {self.data_well.skm_interval}, '
+        #                                           f'но сажается в интервал райбирования '
+        #                                           f'райбирования {self.data_well.ribbing_interval} \n'
+        #                                           f'Продолжить?')
+        #     if false_question == QMessageBox.StandardButton.No:
+        #         return False
 
     def true_set_paker(self, depth):
 
@@ -877,7 +891,7 @@ class MyWindow(MyMainWindow):
 
         self.initUI()
         self.login_window = None
-        # self.data_well.operation_window =
+        self.operation_window = None
         self.skm_depth =0
         self.new_window = None
         self.raid_window = None
@@ -1830,33 +1844,11 @@ class MyWindow(MyMainWindow):
             self.table_widget.resizeColumnsToContents()
             self.table_widget = None
             self.tabWidget = None
-            self.data_well.stabilizator_need = False
-            self.data_well.column_head_m = ''
-            self.data_well.date_drilling_cancel = ''
-            self.data_well.date_drilling_run = ''
-            self.data_well.wellhead_fittings = ''
-            self.data_well.dict_perforation_short = {}
-            self.data_well.plast_work_short = []
-            self.table_widget = None
-            self.data_well.norm_of_time = 0
-            self.data_well.gips_in_well = False
-            self.data_well.grp_plan = False
-            self.data_well.bottom = 0
-            self.data_well.bottom_hole_drill = ProtectedIsNonNone(0)
-            self.data_well.open_trunk_well = False
-            self.data_well.norm_of_time = 0
+
             data_list.lift_ecn_can = False
             data_list.pause = True
-            self.data_well.check_data_in_pz = []
-
-            self.data_well.curator = '0'
-
-            self.data_well.column_additional_passability = False
-            self.data_well.template_depth = 0
-
-            self.data_well.gnkt_length = 0
             data_list.diameter_length = 0
-            self.data_well.iznos = 0
+
             data_list.pipe_mileage = 0
             data_list.pipe_fatigue = 0
             data_list.pvo = 0
@@ -1864,123 +1856,39 @@ class MyWindow(MyMainWindow):
             data_list.b_plan = 0
             data_list.pipes_ind = ProtectedIsDigit(0)
             data_list.sucker_rod_ind = ProtectedIsDigit(0)
-            self.data_well.expected_pickup = 0
-            self.data_well.expected_pressure= 0
+
             data_list.plast_select = ''
-            self.data_well.dict_perforation = {}
-            self.data_well.dict_perforation_project = {}
-            self.data_well.itog_ind_min = 0
-            self.data_well.category_pvo = 2
-            self.data_well.gaz_factor_percent = []
             data_list.paker_layout = 0
-            self.data_well.ribbing_interval = []
-            self.data_well.column_direction_diameter = ProtectedIsNonNone('не корректно')
-            self.data_well.column_direction_wall_thickness = ProtectedIsNonNone('не корректно')
-            self.data_well.column_direction_length = ProtectedIsNonNone('не корректно')
-            self.data_well.column_conductor_diameter = ProtectedIsNonNone('не корректно')
-            self.data_well.column_conductor_wall_thickness = ProtectedIsNonNone('не корректно')
-            self.data_well.column_conductor_length = ProtectedIsNonNone('не корректно')
-            self.data_well.column_additional_diameter = ProtectedIsNonNone('не корректно')
-            self.data_well.column_additional_wall_thickness = ProtectedIsNonNone('не корректно')
-            self.data_well.head_column_additional = ProtectedIsNonNone('не корректно')
-            self.data_well.shoe_column_additional = ProtectedIsNonNone('не корректно')
-            self.data_well.column_diameter = ProtectedIsNonNone('не корректно')
-            self.data_well.column_wall_thickness = ProtectedIsNonNone('не корректно')
-            self.data_well.shoe_column = ProtectedIsNonNone('не корректно')
-            self.data_well.bottom_hole_artificial = ProtectedIsNonNone(5000)
-            self.data_well.max_expected_pressure = ProtectedIsNonNone('не корректно')
-            self.data_well.head_column_additional = ProtectedIsNonNone('не корректно')
-            self.data_well.leakiness_count = 0
-            self.data_well.bur_rastvor = ''
             data_list.data, data_list.row_heights, data_list.col_width, data_list.boundaries_dict = '', '', '', ''
             data_list.data_in_base = False
-            self.data_well.well_volume_in_pz = []
-            self.data_well.expected_pick_up = {}
-            self.data_well.current_bottom = 0
-            self.data_well.emergency_bottom = self.data_well.current_bottom
-            self.data_well.fluid_work = 0
-            self.data_well.groove_diameter = ''
-            self.data_well.static_level = ProtectedIsNonNone('не корректно')
-            self.data_well.dinamic_level = ProtectedIsNonNone('не корректно')
-            data_list.work_perforations_approved = False
-            self.data_well.dict_leakiness = {}
-            self.data_well.leakiness = False
-            self.data_well.emergency_well = False
-
-            self.data_well.emergency_count = 0
             data_list.DICT_VOLUME_CHEMISTRY = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF': 0.0, 'NaOH': 0.0,
                                                'ВТ СКО': 0.0,
                                                'Глина': 0.0, 'растворитель': 0.0, 'уд.вес': 0.0,
                                                'песок': 0.0, 'РПК': 0.0, 'РПП': 0.0, "извлекаемый пакер": 0.0,
                                                "ЕЛАН": 0.0,
                                                'РИР 2С': 0.0, 'РИР ОВП': 0.0, 'гидрофабизатор': 0.0}
-            self.data_well.skm_interval = []
+
             data_list.work_perforations = []
             data_list.work_perforations_dict = {}
-            self.data_well.paker_before = {"do": 0, "posle": 0}
-            self.data_well.column_additional = False
-            self.data_well.well_number = ProtectedIsNonNone('')
-            self.data_well.well_area = ProtectedIsNonNone('')
+
             data_list.values = []
             data_list.dop_work_list = None
-            self.data_well.depth_fond_paker_before = {"do": 0, "posle": 0}
-            self.data_well.paker_second_before = {"do": 0, "posle": 0}
-            self.data_well.depth_fond_paker_second_before = {"do": 0, "posle": 0}
-            self.data_well.perforation_roof = 50000
-            self.data_well.data_x_min = 0
-            self.data_well.perforation_roof = 0
-            self.data_well.dict_pump_shgn = {"do": '0', "posle": '0'}
-            self.data_well.dict_pump_ecn = {"do": '0', "posle": '0'}
-            self.data_well.dict_pump_shgn_depth = {"do": '0', "posle": '0'}
-            self.data_well.dict_pump_ecn_depth = {"do": '0', "posle": '0'}
+
             data_list.dict_pump = {"do": '0', "posle": '0'}
-            self.data_well.leakiness_interval = []
+
             data_list.dict_pump_h = {"do": 0, "posle": 0}
-            self.data_well.insert_index = 0
-            self.data_well.insert_index2 = 0
-            self.data_well.image_data = []
-            self.data_well.current_bottom_second = 5000
+
             data_list.len_razdel_1 = 0
-            self.data_well.count_template = 0
             data_list.data_well_is_True = False
-            self.data_well.category_pressure = []
             data_list.countAcid = 0
-            self.data_well.first_pressure = ProtectedIsDigit(0)
             data_list.swab_type_comboIndex = 1
             data_list.swab_true_edit_type = 1
-            self.data_well.data_x_max = ProtectedIsDigit(0)
-            self.data_well.drilling_interval = []
-            self.data_well.max_angle = 0
             data_list.pakerTwoSKO = False
             data_list.privyazkaSKO = 0
-            self.data_well.value_h2s_percent = []
-            self.data_well.category_h2s_list = []
-            self.data_well.dict_perforation_short = {}
-            self.data_well.value_h2s_mg = []
             data_list.lift_key = 0
-            self.data_well.max_admissible_pressure = ProtectedIsNonNone(0)
-            self.data_well.region = ''
-            self.data_well.for_paker_list = False
-            self.data_well.dict_nkt_before = {}
-            self.data_well.dict_nkt_after = {}
-            self.data_well.data_well_max = ProtectedIsNonNone(0)
             data_list.data_pvr_max = ProtectedIsNonNone(0)
-            self.data_well.dict_sucker_rod = {}
-            self.data_well.dict_sucker_rod_after = {}
-            self.data_well.row_expected = []
             data_list.row_heights = []
-            self.data_well.plast_project = []
-            self.data_well.plast_work = []
-            self.data_well.leakiness_count = 0
-            self.data_well.plast_all = []
             data_list.condition_of_wells = ProtectedIsNonNone(0)
-            self.data_well.cat_well_min = ProtectedIsNonNone(0)
-            self.data_well.bvo = False
-            self.data_well.old_version = False
-            self.data_well.image_list = []
-            self.data_well.problem_with_ek = False
-            self.data_well.problem_with_ek_depth = self.data_well.current_bottom
-            self.data_well.problem_with_ek_diameter = 220
             path = f"{data_list.path_image}/imageFiles/image_work"[1:]
             try:
                 for file in os.listdir(path):

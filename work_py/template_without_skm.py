@@ -754,7 +754,7 @@ class TemplateWithoutSkm(WindowUnion):
 
         ]
         if abs(self.data_well.perforation_sole - current_bottom) > 10:
-            list_template_ek.pop(-2)
+            list_template_ek.pop(-1)
 
         if self.kot_question_qcombo == 'Да' and self.data_well.count_template == 0:
             list_template_ek.insert(-1, ['опрессовать тНКТ на 150атм', None,
@@ -862,7 +862,7 @@ class TemplateWithoutSkm(WindowUnion):
         else:
             list_template_ek = list_template_ek
         if solvent_question == 'Нет':
-            list_template_ek.pop(1)
+            list_template_ek.pop(2)
         else:
             self.calculate_chemistry('растворитель', solvent_volume_edit)
         if self.data_well.head_column.get_value != 0:

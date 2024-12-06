@@ -17,13 +17,13 @@ class TabPageSoLar(TabPageUnion):
         raid_type_list = ['ЭЦН', 'пакер', 'НКТ']
         self.po_type_combo.addItems(raid_type_list)
 
-        self.lar_diameter_label = QLabel("Диаметр ловителя", self)
-        self.lar_diameter_line = QLineEdit(self)
-
-        self.lar_type_label = QLabel("Тип ловителя", self)
-        self.lar_type_combo = QComboBox(self)
-        raid_type_list = ['ОВ', 'ВТ', 'метчик', 'колокол']
-        self.lar_type_combo.addItems(raid_type_list)
+        # self.lar_diameter_label = QLabel("Диаметр ловителя", self)
+        # self.lar_diameter_line = QLineEdit(self)
+        #
+        # self.lar_type_label = QLabel("Тип ловителя", self)
+        # self.lar_type_combo = QComboBox(self)
+        # raid_type_list = ['ОВ', 'ВТ', 'метчик', 'колокол']
+        # self.lar_type_combo.addItems(raid_type_list)
 
         self.nkt_select_label = QLabel("компоновка НКТ", self)
         self.nkt_select_combo = QComboBox(self)
@@ -35,7 +35,7 @@ class TabPageSoLar(TabPageUnion):
         else:
             self.nkt_select_combo.setCurrentIndex(1)
 
-        self.emergency_bottom_label = QLabel("аварийный забой", self)
+        self.emergency_bottom_label = QLabel("Предварительная глубина отстрела", self)
         self.emergency_bottom_line = QLineEdit(self)
         self.emergency_bottom_line.setClearButtonEnabled(True)
 
@@ -89,9 +89,6 @@ class TabPageSoLar(TabPageUnion):
             self.emergency_bottom_line.setText(f'{self.data_well.emergency_bottom}')
 
 
-
-
-
 class TabWidget(TabWidgetUnion):
     def __init__(self, parent):
         super().__init__()
@@ -120,15 +117,16 @@ class EmergencyPo(WindowUnion):
         vbox.addWidget(self.buttonadd_work, 3, 0)
 
     def closeEvent(self, event):
-                # Закрываем основное окно при закрытии окна входа
+        # Закрываем основное окно при закрытии окна входа
         data_list.operation_window  = None
         event.accept()  # Принимаем событие закрытия
+
     def add_work(self):
         po_str_combo = self.tabWidget.currentWidget().po_type_combo.currentText()
         nkt_str_combo = self.tabWidget.currentWidget().nkt_str_combo.currentText()
-        lar_diameter_line = self.tabWidget.currentWidget().lar_diameter_line.text()
+        # lar_diameter_line = self.tabWidget.currentWidget().lar_diameter_line.text()
         nkt_key = self.tabWidget.currentWidget().nkt_select_combo.currentText()
-        lar_type_combo = self.tabWidget.currentWidget().lar_type_combo.currentText()
+        # lar_type_combo = self.tabWidget.currentWidget().lar_type_combo.currentText()
         emergency_bottom_line = self.tabWidget.currentWidget().emergency_bottom_line.text().replace(',', '')
         bottom_line = self.tabWidget.currentWidget().bottom_line.text().replace(',', '')
         if bottom_line != '':
@@ -157,8 +155,7 @@ class EmergencyPo(WindowUnion):
                                       'Не корректно выбрана компоновка для основной колонны')
             return
 
-        raid_list = self.emergency_sticking(po_str_combo, lar_diameter_line, nkt_key, lar_type_combo,
-                                           emergency_bottom_line, bottom_line)
+        raid_list = self.emergency_sticking(po_str_combo, nkt_key, emergency_bottom_line, bottom_line)
         self.data_well.current_bottom = bottom_line
 
         self.populate_row(self.insert_index, raid_list, self.table_widget)
@@ -166,8 +163,7 @@ class EmergencyPo(WindowUnion):
         self.close()
 
 
-    def emergency_sticking(self, emergence_type, lar_diameter_line, nkt_key, lar_type_combo,
-                      emergency_bottom_line, bottom_line):
+    def emergency_sticking(self, emergence_type, nkt_key, emergency_bottom_line):
         from work_py.emergency_lar import EmergencyLarWork
         from work_py.emergencyWork import emergency_hook, magnet_select
 
@@ -188,7 +184,7 @@ class EmergencyPo(WindowUnion):
              'Мастер, подрядчик по ГИС', 8],
             [None, None,
              f'По согласованию с аварийной службой супервайзинга, произвести ПВР - отстрел прихваченной части компоновки '
-             f'НКТ с помощью ЗТК-С-54 (2 заряда) (или аналогичным ТРК).'
+             f'НКТ с помощью ЗТК-С-54 (2 заряда) (или аналогичным ТРК). (Предварительно на глубине {emergency_bottom_line}'
              f'Работы производить по техническому проекту на ПВР, согласованному с Заказчиком. ЗАДАЧА 2.9.3',
              None, None, None, None, None, None, None,
              'Мастер, подрядчик по ГИС', 5],
@@ -214,7 +210,7 @@ class EmergencyPo(WindowUnion):
 
         seal_list = [
             [f'СПо печати', None,
-              f'Спустить с замером торцевую печать {magnet_select(self, "НКТ")} до аварийная головы с замером.'
+              f'Спустить с замером торцевую печать {magnet_select(self, nkt_key)} до аварийная головы с замером.'
               f' (При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
               None, None, None, None, None, None, None,
               'мастер КРС', descentNKT_norm(self.data_well.current_bottom, 1.2)],

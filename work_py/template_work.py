@@ -1054,16 +1054,16 @@ class TemplateKrs(WindowUnion):
 
         if self.data_well.column_additional:
             template_length_addition = int(float(self.current_widget.length_template_first_edit.text()))
-        if self.data_well.skm_depth > self.data_well.perforation_roof:
-            question = QMessageBox.question(self, 'Проверка глубины СКМ',
-                                            f'Согласно указания главного инженера СКМ (на глубине '
-                                            f'{self.data_well.skm_depth}м) не должен '
-                                            f'спускаться ниже кровли перфорации {self.data_well.perforation_roof}м,'
-                                            ' если даже интервал перфорации отрайбирован, Каждый спуск ниже кровли '
-                                            'ИП должен '
-                                            'быть согласован с заказчиком письменной телефонограммой, продолжить?')
-            if question == QMessageBox.StandardButton.No:
-                return
+        # if self.data_well.skm_depth > self.data_well.perforation_roof:
+        #     question = QMessageBox.question(self, 'Проверка глубины СКМ',
+        #                                     f'Согласно указания главного инженера СКМ (на глубине '
+        #                                     f'{self.data_well.skm_depth}м) не должен '
+        #                                     f'спускаться ниже кровли перфорации {self.data_well.perforation_roof}м,'
+        #                                     ' если даже интервал перфорации отрайбирован, Каждый спуск ниже кровли '
+        #                                     'ИП должен '
+        #                                     'быть согласован с заказчиком письменной телефонограммой, продолжить?')
+        #     if question == QMessageBox.StandardButton.No:
+        #         return
         if self.data_well.column_additional is False or \
                 (self.data_well.column_additional is True and
                  float(self.data_well.head_column_additional.get_value) >= self.data_well.current_bottom):
@@ -1308,7 +1308,7 @@ class TemplateKrs(WindowUnion):
             list_template_ek = list_template_ek
 
         if solvent_question == 'Нет':
-            list_template_ek.pop(2)
+            list_template_ek.pop(3)
         else:
             self.calculate_chemistry('растворитель', solvent_volume_edit)
 

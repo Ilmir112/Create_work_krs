@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, \
 import data_list
 from H2S import calv_h2s
 
+
 from work_py.alone_oreration import well_volume
 from main import MyMainWindow
 from work_py.change_fluid import Change_fluid_Window
@@ -598,7 +599,6 @@ class SwabWindow(WindowUnion):
         vbox.addWidget(self.buttonadd_work, 3, 0, 1, 0)
 
     def add_string(self):
-        from work_py.acid_paker import AcidPakerWindow
 
         swab_true_edit_type = self.tabWidget.currentWidget().swab_true_edit_type.currentText()
         plast_combo = self.tabWidget.currentWidget().plast_combo.combo_box.currentText()
@@ -625,8 +625,8 @@ class SwabWindow(WindowUnion):
             if rows != 0:
                 QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
                 return
-            paker_khost = check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
-            paker_depth = check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
+            paker_khost = self.check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
+            paker_depth = self.check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
 
             if self.data_well.current_bottom < float(paker_khost + paker_depth) or \
                     0 < paker_khost + paker_depth < self.data_well.current_bottom is False:
@@ -650,9 +650,9 @@ class SwabWindow(WindowUnion):
 
 
         elif swab_true_edit_type in ['двухпакерная']:
-            paker_khost = check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
-            paker_depth = check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
-            paker2_depth = check_if_none(self.tabWidget.currentWidget().paker2Edit.text())
+            paker_khost = self.check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
+            paker_depth = self.check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
+            paker2_depth = self.check_if_none(self.tabWidget.currentWidget().paker2Edit.text())
             if self.check_true_depth_template(paker_depth) is False:
                 return
             if self.true_set_paker(paker_depth) is False:
@@ -683,7 +683,7 @@ class SwabWindow(WindowUnion):
             if rows != 0:
                 QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
                 return
-            paker_depth = check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
+            paker_depth = self.check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
 
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(plast_combo))
@@ -708,8 +708,8 @@ class SwabWindow(WindowUnion):
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_opy)))
 
         elif swab_true_edit_type in ['Опрессовка снижением уровня на пакере с заглушкой']:
-            paker_depth = check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
-            paker_khost = check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
+            paker_depth = self.check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
+            paker_khost = self.check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
 
             if rows != 0:
                 QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
@@ -741,7 +741,7 @@ class SwabWindow(WindowUnion):
             pressure_zumph_combo = self.tabWidget.currentWidget().pressure_zumpf_question_combo.currentText()
 
             if pressure_zumph_combo == 'Да':                
-                paker_khost = check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
+                paker_khost = self.check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
                 paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
                 if paker_depth_zumpf == '':
                     QMessageBox.warning(self, 'Ошибка', f'не введены глубина опрессовки ЗУМПФа')

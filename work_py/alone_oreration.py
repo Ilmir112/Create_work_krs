@@ -42,8 +42,8 @@ def kot_work(self, current_bottom=0):
         [f'статической уровень {self.data_well.static_level.get_value}', None,
          f'При отсутствии циркуляции:\n'
          f'Спустить {kot_select(self, current_bottom)} на НКТ{self.data_well.nkt_diam}мм до глубины'
-         f' {current_bottom}м'
-         f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм.',
+         f' {current_bottom}м '
+         f'с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм.',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(current_bottom, 1)],
         [f'{kot_select(self, current_bottom)} до H-{current_bottom} закачкой обратной промывкой', None,
@@ -366,7 +366,7 @@ def calculation_fluid_work(data_well, vertical, pressure):
             isinstance(pressure, float) or isinstance(pressure, int)):
 
         # print(vertical, pressure)
-        stock_ratio = 0.1 if float(vertical) <= 1200 else 0.05
+        stock_ratio = 0.1 if float(vertical) <= 1200 else 0.
 
         fluid_work_calculate = round(float(str(pressure)) * (1 + stock_ratio) / float(vertical) / 0.0981, 2)
 

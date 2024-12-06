@@ -718,18 +718,7 @@ class TabWidget(TabWidgetUnion):
         self.addTab(TabPageSoAcid(tableWidget, parent), 'Кислотная обработка')
 
 
-def check_if_none(value):
-    if isinstance(value, int) or isinstance(value, float):
-        return int(value)
 
-    elif str(value).replace('.', '').replace(',', '').isdigit():
-        if str(round(float(value.replace(',', '.')), 1))[-1] == 0:
-            # print(str(round(float(value.replace(',', '.')), 1)))
-            return int(float(value.replace(',', '.')))
-        else:
-            return float(value.replace(',', '.'))
-    else:
-        return 0
 
 
 class AcidPakerWindow(WindowUnion):
@@ -808,8 +797,8 @@ class AcidPakerWindow(WindowUnion):
         rows = self.tableWidget.rowCount()
 
         if paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
-            paker_khost = check_if_none(self.tabWidget.currentWidget().paker_khost.text())
-            paker_depth = check_if_none(self.tabWidget.currentWidget().paker_depth.text())
+            paker_khost = self.check_if_none(self.tabWidget.currentWidget().paker_khost.text())
+            paker_depth = self.check_if_none(self.tabWidget.currentWidget().paker_depth.text())
 
             if self.data_well.current_bottom < float(paker_khost + paker_depth) or \
                     0 < paker_khost + paker_depth < self.data_well.current_bottom is False:
@@ -836,9 +825,9 @@ class AcidPakerWindow(WindowUnion):
 
             self.tableWidget.setSortingEnabled(False)
         elif paker_layout_combo in ['двухпакерная', 'двухпакерная, упорные']:
-            paker_khost = check_if_none((self.tabWidget.currentWidget().paker_khost.text()))
-            paker_depth = int(check_if_none(self.tabWidget.currentWidget().paker_depth.text()))
-            paker2_depth = int(check_if_none(self.tabWidget.currentWidget().paker2_depth.text()))
+            paker_khost = self.check_if_none((self.tabWidget.currentWidget().paker_khost.text()))
+            paker_depth = int(self.check_if_none(self.tabWidget.currentWidget().paker_depth.text()))
+            paker2_depth = int(self.check_if_none(self.tabWidget.currentWidget().paker2_depth.text()))
             if self.check_true_depth_template(paker_depth) is False:
                 return
             if self.true_set_paker(paker_depth) is False:
@@ -867,7 +856,7 @@ class AcidPakerWindow(WindowUnion):
             self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(acid_proc_edit)))
             self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(acid_volume_edit)))
         elif paker_layout_combo in ['воронка']:
-            paker_depth = int(check_if_none(self.tabWidget.currentWidget().paker_depth.text()))
+            paker_depth = int(self.check_if_none(self.tabWidget.currentWidget().paker_depth.text()))
 
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(plast_combo))
@@ -916,7 +905,7 @@ class AcidPakerWindow(WindowUnion):
             pressure_zumph_combo = self.tabWidget.currentWidget().pressure_zumpf_question_combo.currentText()
 
             if pressure_zumph_combo == 'Да':
-                paker_khost = check_if_none(self.tabWidget.currentWidget().paker_khost.text())
+                paker_khost = self.check_if_none(self.tabWidget.currentWidget().paker_khost.text())
                 paker_depth_zumpf = self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()
 
                 if paker_depth_zumpf == '':
