@@ -214,7 +214,7 @@ class GnktOsvWindow(GnktModel):
         if niz_nkt == 0:
             niz_nkt = round(self.data_well.perforation_roof - 100, 0)
 
-        if self.data_well.depth_fond_paker_before["do"] != 0:
+        if self.data_well.depth_fond_paker_before["before"] != 0:
 
             volume_str = f'Произвести перевод на тех жидкость расчетного удельного веса ' \
                          f'в объеме {self.calc_volume_jumping()}м3 (объем хвостовика + объем НКТ + 20 % запаса) ' \
@@ -691,10 +691,10 @@ class GnktOsvWindow(GnktModel):
     def calc_volume_jumping(self):
         from work_py.alone_oreration import volume_vn_ek, volume_vn_nkt, volume_jamming_well
 
-        if self.data_well.depth_fond_paker_before["do"] != '0':
+        if self.data_well.depth_fond_paker_before["before"] != '0':
 
             volume = round((volume_vn_ek(self, self.data_well.current_bottom) *
-                            (self.data_well.current_bottom - self.data_well.depth_fond_paker_before["do"]) / 1000 +
+                            (self.data_well.current_bottom - self.data_well.depth_fond_paker_before["before"]) / 1000 +
                             volume_vn_nkt(self.data_well.dict_nkt_before)) * 1.2, 1)
         else:
             volume = volume_jamming_well(self.data_well.current_bottom)

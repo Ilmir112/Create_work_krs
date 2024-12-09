@@ -8,9 +8,9 @@ from krs import GnoWindow
 def gnkt_work(self, volume_gntk, fluid_work_insert):
 
     fluid_work, self.data_well.fluid_work_short = self.calc_work_fluid(fluid_work_insert)
-    aaa = self.data_well.depth_fond_paker_before["do"]
-    if self.data_well.depth_fond_paker_before["do"] != '0':
-        niz_nkt = self.data_well.depth_fond_paker_before["do"]
+    aaa = self.data_well.depth_fond_paker_before["before"]
+    if self.data_well.depth_fond_paker_before["before"] != '0':
+        niz_nkt = self.data_well.depth_fond_paker_before["before"]
     else:
         niz_nkt = sum(self.data_well.dict_nkt_before.values())
     if niz_nkt == 0:
@@ -386,11 +386,11 @@ def gnkt_work(self, volume_gntk, fluid_work_insert):
 
 def calc_volume_jumping(self):
     from work_py.alone_oreration import volume_vn_ek, volume_vn_nkt
-    if self.data_well.depth_fond_paker_before["do"] != '0':
+    if self.data_well.depth_fond_paker_before["before"] != '0':
         volume = round((volume_vn_ek(self, self.data_well.current_bottom) *
-                        (self.data_well.current_bottom - self.data_well.depth_fond_paker_before["do"]) / 1000 +
+                        (self.data_well.current_bottom - self.data_well.depth_fond_paker_before["before"]) / 1000 +
                         volume_vn_nkt(self.data_well.dict_nkt_before) *
-                        self.data_well.depth_fond_paker_before["do"] / 1000) * 1.2, 1)
+                        self.data_well.depth_fond_paker_before["before"] / 1000) * 1.2, 1)
     else:
         volume = work_py.alone_oreration.volume_jamming_well(self.data_well.current_bottom)
     return volume

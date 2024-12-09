@@ -137,8 +137,7 @@ class UpdateChecker(QWidget):
             # Получение текущей версии из файла
             self.current_version = self.get_current_version()
             UpdateChecker.window_close = False
-            dd = self.current_version
-            vvrb =self.get_current_version()
+
             if self.current_version == self.latest_version:
                 self.version_label.setText(f"Текущая версия: {self.current_version}")
                 self.close()

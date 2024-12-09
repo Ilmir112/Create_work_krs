@@ -17,10 +17,10 @@ def skm_interval(self, template):
         sgm_true = True
 
     interval_raid = []
-    if self.data_well.paker_before["posle"] != 0:
+    if self.data_well.paker_before["after"] != 0:
         interval_raid.append(
-            [float(self.data_well.depth_fond_paker_before["posle"]) - 20,
-             float(self.data_well.depth_fond_paker_before["posle"]) + 20])
+            [float(self.data_well.depth_fond_paker_before["after"]) - 20,
+             float(self.data_well.depth_fond_paker_before["after"]) + 20])
 
     if self.data_well.dict_leakiness:
         for nek in list(self.data_well.dict_leakiness['НЭК']['интервал'].keys()):
@@ -120,15 +120,15 @@ def remove_overlapping_intervals(self, perforating_intervals, skm_interval=None)
     if skm_interval is None:
         # print(f' перфорация_ {perforating_intervals}')
         skipping_intervals = []
-        if self.data_well.paker_before["posle"] != 0:
-            if self.data_well.skm_depth > self.data_well.depth_fond_paker_before["posle"] + 20:
+        if self.data_well.paker_before["after"] != 0:
+            if self.data_well.skm_depth > self.data_well.depth_fond_paker_before["after"] + 20:
                 skipping_intervals.append(
-                    [float(self.data_well.depth_fond_paker_before["posle"]) - 70,
-                     float(self.data_well.depth_fond_paker_before["posle"]) + 20])
+                    [float(self.data_well.depth_fond_paker_before["after"]) - 70,
+                     float(self.data_well.depth_fond_paker_before["after"]) + 20])
                 # print(f'1 {skipping_intervals}')
-            elif self.data_well.skm_depth > self.data_well.depth_fond_paker_before["posle"]:
+            elif self.data_well.skm_depth > self.data_well.depth_fond_paker_before["after"]:
                 skipping_intervals.append(
-                    [float(self.data_well.depth_fond_paker_before["posle"]) - 20, self.data_well.skm_depth])
+                    [float(self.data_well.depth_fond_paker_before["after"]) - 20, self.data_well.skm_depth])
                 # print(f'2 {skipping_intervals}')
 
         if self.data_well.dict_leakiness:

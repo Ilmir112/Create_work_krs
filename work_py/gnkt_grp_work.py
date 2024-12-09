@@ -250,7 +250,7 @@ class GnktModel(WindowUnion):
 
     def insert_image_schema(self, ws):
 
-        if self.data_well.paker_before["do"] != 0:
+        if self.data_well.paker_before["before"] != 0:
             coordinate_nkt_with_paker = 'F6'
             self.insert_image(ws, f'{data_list.path_image}imageFiles/schema_well/НКТ с пакером.png',
                               coordinate_nkt_with_paker, 100, 510)
@@ -284,7 +284,7 @@ class GnktModel(WindowUnion):
 
 
                     try:
-                        if roof_plast > self.data_well.depth_fond_paker_before["do"] and \
+                        if roof_plast > self.data_well.depth_fond_paker_before["before"] and \
                                 roof_plast < self.data_well.current_bottom and count_insert <= 5:
                             interval_str = f'{plast} \n {roof_plast}-{sole_plast}'
                             coordinate_pvr = f'F{43 + n}'
@@ -633,7 +633,7 @@ class GnktModel(WindowUnion):
         self.volume_gntk = round(float(self.data_well.length_gnkt_edit) * 0.74 / 1000, 1)
 
         depth_fond_paker_do = sum(map(int, list(self.data_well.dict_nkt_before.values())))
-        if self.data_well.depth_fond_paker_before["do"] == 0:
+        if self.data_well.depth_fond_paker_before["before"] == 0:
             self.depth_fond_paker_do = sum(list(self.data_well.dict_nkt_before.values()))
             # print(depth_fond_paker_do)
             if self.depth_fond_paker_do >= self.data_well.current_bottom:
@@ -641,7 +641,7 @@ class GnktModel(WindowUnion):
                                                                  'Введите Глубины башмака НКТ', 500,
                                                                  0, self.data_well.current_bottom)
         else:
-            self.depth_fond_paker_do = self.data_well.depth_fond_paker_before["do"]
+            self.depth_fond_paker_do = self.data_well.depth_fond_paker_before["before"]
 
         opz = []
         volume_sko = 0
@@ -743,9 +743,9 @@ class GnktModel(WindowUnion):
         koef_anomal = []
         for ind, plast_ind in enumerate(self.data_well.plast_work):
 
-            if self.data_well.paker_before['do'] != 0:
+            if self.data_well.paker_before["before"] != 0:
                 if self.data_well.dict_perforation[plast_ind]['кровля'] > \
-                        self.data_well.depth_fond_paker_before['do']:
+                        self.data_well.depth_fond_paker_before["before"]:
                         if pressure != 0:
                             pressure.append(max(list(map(
                                 float, self.data_well.dict_perforation[plast_ind]["давление"]))))
@@ -857,8 +857,8 @@ class GnktModel(WindowUnion):
         voronka = sum(list(self.data_well.dict_nkt_before.values()))
         if self.data_well.curator == 'ОР' and self.data_well.region == 'ТГМ':
             length_paker = round(
-                float(self.data_well.depth_fond_paker_second_before["do"]) - float(
-                    self.data_well.depth_fond_paker_before["do"]), 1)
+                float(self.data_well.depth_fond_paker_second_before["before"]) - float(
+                    self.data_well.depth_fond_paker_before["before"]), 1)
             voronka = round(nkt_length + length_paker, 1)
         voronka_str = ''
         nkt_schema = ''
@@ -954,15 +954,15 @@ class GnktModel(WindowUnion):
             [None, None, None, None, None, None, None, None, None, None, None, None, 'колонна НКТ', None, None, nkt_str,
              nkt_widht_str, vn_str, length_nkt, None, None, volume_vn_str, volume_str],
             [None, None, None, None, None, None, None, None, None, None, None, None,
-             f'{self.data_well.paker_before["do"]}',
+             f'{self.data_well.paker_before["before"]}',
              None, None, None, None,
-             50, self.data_well.depth_fond_paker_before["do"],
-             round(self.data_well.depth_fond_paker_before["do"] + length_paker, 1),
+             50, self.data_well.depth_fond_paker_before["before"],
+             round(self.data_well.depth_fond_paker_before["before"] + length_paker, 1),
              length_paker, None, None],
             [None, None, None, None, None, None, None, None, None, 'пакер', None, None, 'без патрубка', None, None,
              None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None,
-             f'на гл {self.data_well.depth_fond_paker_before["do"]}м',
+             f'на гл {self.data_well.depth_fond_paker_before["before"]}м',
              None, None,
              voronka_str, None, None, nkt, None,
              None, voronka, None, None, None, None],
@@ -1101,11 +1101,11 @@ class GnktModel(WindowUnion):
 
         if self.data_well.work_plan == 'gnkt_bopz':
             schema_well_list.append(list_gnkt_bopz)
-        if self.data_well.paker_before["do"] == 0:
+        if self.data_well.paker_before["before"] == 0:
             schema_well_list[21] = [None, None, None, None, None, None, None, None, None, None,
                                     None, None,
                                     'воронка', None, None, nkt, None,
-                                    None, self.data_well.depth_fond_paker_before["do"], None, None, None, None]
+                                    None, self.data_well.depth_fond_paker_before["before"], None, None, None, None]
             schema_well_list[20] = [None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                                     None,
                                     None, None, None, None, None, None, None, None]
@@ -1128,9 +1128,9 @@ class GnktModel(WindowUnion):
                     self.data_well.img_pvr_list = \
                         [(plast, self.data_well.dict_perforation[plast]['интервал'])]
                     izol = 'рабочий'
-                if self.data_well.paker_before["do"] != 0:
+                if self.data_well.paker_before["before"] != 0:
                     if self.data_well.dict_perforation[plast]['кровля'] < \
-                            self.data_well.depth_fond_paker_before["do"]:
+                            self.data_well.depth_fond_paker_before["before"]:
                         izol = 'над пакером'
                 try:
                     vertikal_1 = self.data_well.dict_perforation[plast]['вертикаль'][index]

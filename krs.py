@@ -35,6 +35,10 @@ class TabPageGno(TabPageUnion):
                                 f'Объем скважины указанный в ПЗ -{self.data_well.well_volume_in_pz}м3 '
                                 f'не совпадает '
                                 f'с расчетным {volume_well_jamming}м3')
+
+            self.data_well.check_data_in_pz.append(f'Ошибка в расчете объема глушения:\nОбъем скважины указанный в ПЗ -'
+                                                    f'{self.data_well.well_volume_in_pz[0]}м3 не совпадает '
+                                                    f'с расчетным {volume_well_jamming}м3')
             volume_well_jamming, _ = QInputDialog.getDouble(self,
                                                            "корректный объем",
                                                            'Введите корректный объем', volume_well_jamming, 1, 80, 1)
@@ -71,6 +75,8 @@ class TabPageGno(TabPageUnion):
                          'Дпаш', 'Дкын', 'C1rd-bb-tl', 'Ctl']:
                 self.surfactant_hydrofabizer_combo.setCurrentIndex(1)
 
+
+
         self.gno_combo.currentTextChanged.connect(self.update_select_gno)
 
     def update_select_gno(self, index):
@@ -88,41 +94,41 @@ class TabPageGno(TabPageUnion):
 
     def select_gno(self, data_well):
         lift_key = ''
-        if self.check_if_none(data_well.dict_pump_ecn["do"]) != 'отсут' and \
-                self.check_if_none(data_well.dict_pump_shgn["do"]) != 'отсут':
+        if self.check_if_none(data_well.dict_pump_ecn["before"]) != 'отсут' and \
+                self.check_if_none(data_well.dict_pump_shgn["before"]) != 'отсут':
             lift_key = 'ОРД'
-        elif self.check_if_none(data_well.dict_pump_ecn["do"]) != 'отсут' and \
-                self.check_if_none(data_well.paker_before["do"]) == 'отсут':
+        elif self.check_if_none(data_well.dict_pump_ecn["before"]) != 'отсут' and \
+                self.check_if_none(data_well.paker_before["before"]) == 'отсут':
             lift_key = 'ЭЦН'
-        elif self.check_if_none(data_well.dict_pump_ecn["do"]) != 'отсут' and \
-                self.check_if_none(data_well.paker_before["do"]) != 'отсут':
+        elif self.check_if_none(data_well.dict_pump_ecn["before"]) != 'отсут' and \
+                self.check_if_none(data_well.paker_before["before"]) != 'отсут':
             lift_key = 'ЭЦН с пакером'
-        elif self.check_if_none(data_well.dict_pump_shgn["do"]) != 'отсут' and \
-                data_well.dict_pump_shgn["do"].upper() != 'НН' \
-                and self.check_if_none(data_well.paker_before["do"]) == 'отсут':
+        elif self.check_if_none(data_well.dict_pump_shgn["before"]) != 'отсут' and \
+                data_well.dict_pump_shgn["before"].upper() != 'НН' \
+                and self.check_if_none(data_well.paker_before["before"]) == 'отсут':
             lift_key = 'НВ'
-        elif self.check_if_none(data_well.dict_pump_shgn["do"]) != 'отсут' and \
-                self.check_if_none(data_well.dict_pump_shgn["do"]).upper() != 'НН' \
-                and self.check_if_none(data_well.paker_before["do"]) != 'отсут':
+        elif self.check_if_none(data_well.dict_pump_shgn["before"]) != 'отсут' and \
+                self.check_if_none(data_well.dict_pump_shgn["before"]).upper() != 'НН' \
+                and self.check_if_none(data_well.paker_before["before"]) != 'отсут':
             lift_key = 'НВ с пакером'
-        elif 'НН' in self.check_if_none(data_well.dict_pump_shgn["do"]).upper() \
-                and self.check_if_none(data_well.paker_before["do"]) == 'отсут':
+        elif 'НН' in self.check_if_none(data_well.dict_pump_shgn["before"]).upper() \
+                and self.check_if_none(data_well.paker_before["before"]) == 'отсут':
             lift_key = 'НН'
-        elif 'НН' in self.check_if_none(data_well.dict_pump_shgn["do"]).upper() and \
-                self.check_if_none(self.check_if_none(data_well.paker_before["do"])) != 'отсут':
+        elif 'НН' in self.check_if_none(data_well.dict_pump_shgn["before"]).upper() and \
+                self.check_if_none(self.check_if_none(data_well.paker_before["before"])) != 'отсут':
             lift_key = 'НН с пакером'
-        elif self.check_if_none(data_well.dict_pump_shgn["do"]) == 'отсут' and \
-                self.check_if_none(data_well.paker_before["do"]) == 'отсут' \
-                and self.check_if_none(data_well.dict_pump_ecn["do"]) == 'отсут':
+        elif self.check_if_none(data_well.dict_pump_shgn["before"]) == 'отсут' and \
+                self.check_if_none(data_well.paker_before["before"]) == 'отсут' \
+                and self.check_if_none(data_well.dict_pump_ecn["before"]) == 'отсут':
             lift_key = 'воронка'
 
         elif '89' in data_well.dict_nkt_before.keys() and '48' in data_well.dict_nkt_before.keys() and \
                 self.check_if_none(
-                    data_well.paker_before["do"]) != 'отсут':
+                    data_well.paker_before["before"]) != 'отсут':
             lift_key = 'ОРЗ'
-        elif self.check_if_none(data_well.dict_pump_shgn["do"]) == 'отсут' and \
-                self.check_if_none(data_well.paker_before["do"]) != 'отсут' \
-                and self.check_if_none(data_well.dict_pump_ecn["do"]) == 'отсут':
+        elif self.check_if_none(data_well.dict_pump_shgn["before"]) == 'отсут' and \
+                self.check_if_none(data_well.paker_before["before"]) != 'отсут' \
+                and self.check_if_none(data_well.dict_pump_ecn["before"]) == 'отсут':
             lift_key = 'пакер'
         return lift_key
 
@@ -198,8 +204,16 @@ class GnoWindow(WindowUnion):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-
         from work_py.advanted_file import definition_plast_work
+
+        if len(self.data_well.check_data_in_pz) != 0:
+            check_str = ''
+            for ind, check_data in enumerate(self.data_well.check_data_in_pz):
+                if check_data not in check_str:
+                    check_str += f'{ind + 1}. {check_data} \n'
+            self.show_info_message(self.data_well, check_str)
+
+
         self.current_widget = self.tabWidget.currentWidget()
         try:
             self.lift_key = self.current_widget.gno_combo.currentText()
@@ -296,7 +310,7 @@ class GnoParent(ABC):
         self.without_damping_true = self.data_well.without_damping
         self.well_jamming_str = self.well_jamming()
 
-        self.well_jamming_ord = volume_jamming_well(self, float(self.data_well.depth_fond_paker_before["do"]))
+        self.well_jamming_ord = volume_jamming_well(self, float(self.data_well.depth_fond_paker_before["before"]))
         self.sucker_pod_jamming = "".join([
             " " if self.without_damping_true is True else f"Приподнять штангу. Произвести глушение в "
                                                           f"затрубное пространство в объеме{self.well_jamming_ord}м3 "
@@ -458,13 +472,13 @@ class GnoParent(ABC):
 
         kvostovika_length = round(
             self.length_nkt - float(
-                self.data_well.depth_fond_paker_before["do"]), 1)
+                self.data_well.depth_fond_paker_before["before"]), 1)
 
         self.kvostovik = f' + хвостовиком {kvostovika_length}м ' if self.data_well.region == 'ТГМ' and \
                                                                     kvostovika_length > 0.001 else ''
 
         # экземпляр функции расчета глушения
-        well_jamming_ord = volume_jamming_well(self, float(self.data_well.depth_fond_paker_before["do"]))
+        well_jamming_ord = volume_jamming_well(self, float(self.data_well.depth_fond_paker_before["before"]))
         self.sucker_pod_jamming = "".join([
             " " if self.without_damping_true is True else f"Приподнять штангу. Произвести глушение в "
                                                           f"затрубное пространство в объеме{well_jamming_ord}м3 "
@@ -660,7 +674,7 @@ class LiftPaker(GnoParent):
         return work_list
 
     def lifting_paker(self):
-        kvostovika_length = round(self.length_nkt - float(self.data_well.depth_fond_paker_before["do"]), 1)
+        kvostovika_length = round(self.length_nkt - float(self.data_well.depth_fond_paker_before["before"]), 1)
 
         kvostovik = f' + хвостовиком {kvostovika_length}м ' if self.data_well.region == 'ТГМ' and \
                                                                kvostovika_length > 0.001 else ''
@@ -747,11 +761,11 @@ class LiftPaker(GnoParent):
              f'Провести практическое обучение вахт по сигналу ВЫБРОС.', None, None,
              None, None, None, None, None,
              None, None],
-            [f'Поднять  пакер {self.data_well.paker_before["do"]} с глубины '
-             f'{self.data_well.depth_fond_paker_before["do"]}м',
+            [f'Поднять  пакер {self.data_well.paker_before["before"]} с глубины '
+             f'{self.data_well.depth_fond_paker_before["before"]}м',
              None,
-             f'Поднять  пакер {self.data_well.paker_before["do"]} с глубины '
-             f'{self.data_well.depth_fond_paker_before["do"]}м '
+             f'Поднять  пакер {self.data_well.paker_before["before"]} с глубины '
+             f'{self.data_well.depth_fond_paker_before["before"]}м '
              f'{kvostovik}'
              f'на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд.'
              f' весом {self.data_well.fluid_work}  '
@@ -880,7 +894,7 @@ class LiftOrz(GnoParent):
                  f'с контролем АСПО на стенках НКТ.',
                  None, None,
                  None, None, None, None, None,
-                 'Мастер КРС', round(liftingNKT_norm(self.data_well.depth_fond_paker_before["do"], 1.3), 2)],
+                 'Мастер КРС', round(liftingNKT_norm(self.data_well.depth_fond_paker_before["before"], 1.3), 2)],
             ]
         return lift_orz
 
@@ -907,14 +921,14 @@ class LiftOrd(GnoParent):
             [None, None,
              f'{lifting_unit(self)}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
-            [f'подьем {self.data_well.dict_pump_shgn["do"]}', None,
-             f'Сорвать насос штанговый насос {self.data_well.dict_pump_shgn["do"]}(зафиксировать вес при срыве).'
+            [f'подьем {self.data_well.dict_pump_shgn["before"]}', None,
+             f'Сорвать насос штанговый насос {self.data_well.dict_pump_shgn["before"]}(зафиксировать вес при срыве).'
              f' Обвязать устье скважины согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
              f'{self.data_well.max_admissible_pressure.get_value}атм. '
              f'{self.sucker_pod_jamming}'
-             f'Поднять на штангах насос с гл. {self.data_well.dict_pump_shgn_depth["do"]}м с доливом тех жидкости '
+             f'Поднять на штангах насос с гл. {self.data_well.dict_pump_shgn_depth["before"]}м с доливом тех жидкости '
              f'уд.весом {self.data_well.fluid_work} '
              f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве '
              f'насосов (не более 8 тн), без учета веса '
@@ -991,9 +1005,9 @@ class LiftOrd(GnoParent):
              f'Провести практическое обучение вахт по сигналу ВЫБРОС.', None, None,
              None, None, None, None, None,
              None, 1.2],
-            [f'Поднять  {self.data_well.dict_pump_ecn["do"]} с пакером {self.data_well.paker_before["do"]}',
+            [f'Поднять  {self.data_well.dict_pump_ecn["before"]} с пакером {self.data_well.paker_before["before"]}',
              None,
-             f'Поднять  {self.data_well.dict_pump_ecn["do"]} с пакером {self.data_well.paker_before["do"]} с '
+             f'Поднять  {self.data_well.dict_pump_ecn["before"]} с пакером {self.data_well.paker_before["before"]} с '
              f'глубины {round(self.length_nkt, 1)}м (компоновка НКТ {self.nkt_diam_fond} '
              f'на поверхность '
              f'с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд.'
@@ -1136,7 +1150,7 @@ class LiftPumpNnWithPaker(GnoParent):
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
              f'{self.data_well.max_admissible_pressure.get_value}атм. Спуском одной штанги заловить конус. '
              f'{sucker_jamming}м3. Техостой 2ч. '
-             f'Поднять на штангах плунжер с гл. {int(self.data_well.dict_pump_shgn_depth["do"])}м с доливом тех '
+             f'Поднять на штангах плунжер с гл. {int(self.data_well.dict_pump_shgn_depth["before"])}м с доливом тех '
              f'жидкости уд.весом {self.data_well.fluid_work} '
              f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве '
              f'насосов (не более 8 тн), без учета веса '
@@ -1215,11 +1229,11 @@ class LiftPumpNnWithPaker(GnoParent):
              None, None, None, None, None,
              None, 1.2],
             [
-                f'Поднять  насос {self.data_well.dict_pump_shgn["do"]} с пакером '
-                f'{self.data_well.paker_before["do"]}',
+                f'Поднять  насос {self.data_well.dict_pump_shgn["before"]} с пакером '
+                f'{self.data_well.paker_before["before"]}',
                 None,
-                f'Поднять  насос {self.data_well.dict_pump_shgn["do"]} с пакером '
-                f'{self.data_well.paker_before["do"]} с глубины '
+                f'Поднять  насос {self.data_well.dict_pump_shgn["before"]} с пакером '
+                f'{self.data_well.paker_before["before"]} с глубины '
                 f'{round(self.length_nkt, 1)}м '
                 f'(компоновка НКТ{self.nkt_diam_fond}) на '
                 f'поверхность с '
@@ -1258,15 +1272,15 @@ class LiftPumpNvWithPaker(GnoParent):
             [None, None,
              f'{lifting_unit(self)}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
-            [f'Поднять насос {self.data_well.dict_pump_shgn["do"]}', None,
-             f'Сорвать насос {self.data_well.dict_pump_shgn["do"]} (зафиксировать вес при срыве). '
+            [f'Поднять насос {self.data_well.dict_pump_shgn["before"]}', None,
+             f'Сорвать насос {self.data_well.dict_pump_shgn["before"]} (зафиксировать вес при срыве). '
              f'Обвязать устье скважины '
              f'согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). '
              f'Опрессовать ПВО на {self.data_well.max_admissible_pressure.get_value}атм. '
              f'{"".join([" " if self.without_damping_true is True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_nkt(self)}м3. Техостой 2ч."])}'
-             f' Поднять на штангах насос с гл. {float(self.data_well.dict_pump_shgn_depth["do"])}м с '
+             f' Поднять на штангах насос с гл. {float(self.data_well.dict_pump_shgn_depth["before"])}м с '
              f'доливом тех жидкости уд.весом {self.data_well.fluid_work} '
              f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  '
              f'насосов (не более 8 тн), без учета веса '
@@ -1343,8 +1357,8 @@ class LiftPumpNvWithPaker(GnoParent):
              f'Провести практическое обучение вахт по сигналу ВЫБРОС.', None, None,
              None, None, None, None, None,
              None, 1.2],
-            [f'Поднять  З.О. с пакером {self.data_well.paker_before["do"]}', None,
-             f'Поднять  замковую опору с пакером {self.data_well.paker_before["do"]} с глубины'
+            [f'Поднять  З.О. с пакером {self.data_well.paker_before["before"]}', None,
+             f'Поднять  замковую опору с пакером {self.data_well.paker_before["before"]} с глубины'
              f' {round(self.length_nkt, 1)}м  (компоновка НКТ{self.nkt_diam_fond}) на '
              f'поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {self.data_well.fluid_work}  '
              f'в объеме {round(round(self.length_nkt, 1) * 1.12 / 1000, 1)}м3 с '
@@ -1452,9 +1466,9 @@ class LiftEcnWithPaker(GnoParent):
              f'Провести практическое обучение вахт по сигналу ВЫБРОС.', None, None,
              None, None, None, None, None,
              None, 1.2],
-            [f'Поднять  {self.data_well.dict_pump_ecn["do"]} с пакером {self.data_well.paker_before["do"]}',
+            [f'Поднять  {self.data_well.dict_pump_ecn["before"]} с пакером {self.data_well.paker_before["before"]}',
              None,
-             f'Поднять  {self.data_well.dict_pump_ecn["do"]} с пакером {self.data_well.paker_before["do"]}'
+             f'Поднять  {self.data_well.dict_pump_ecn["before"]} с пакером {self.data_well.paker_before["before"]}'
              f'с глубины {round(self.length_nkt, 1)}м (компоновка НКТ{self.nkt_diam_fond}) '
              f'на поверхность с замером, накручиванием '
              f'колпачков с доливом скважины тех.жидкостью уд. весом {self.data_well.fluid_work}  '
@@ -1553,10 +1567,10 @@ class LiftEcn(GnoParent):
              None, None, None, None, None,
              None, 1.2],
             [
-                f'Поднять  {self.data_well.dict_pump_ecn["do"]} с глубины {round(self.data_well.dict_pump_ecn_depth["do"], 1)}м',
+                f'Поднять  {self.data_well.dict_pump_ecn["before"]} с глубины {round(self.data_well.dict_pump_ecn_depth["before"], 1)}м',
                 None,
-                f'Поднять  {self.data_well.dict_pump_ecn["do"]} с глубины '
-                f'{round(self.data_well.dict_pump_ecn_depth["do"], 1)}м '
+                f'Поднять  {self.data_well.dict_pump_ecn["before"]} с глубины '
+                f'{round(self.data_well.dict_pump_ecn_depth["before"], 1)}м '
                 f'на поверхность с замером, накручиванием колпачков с доливом скважины '
                 f'тех.жидкостью уд. весом {self.data_well.fluid_work}  '
                 f'в объеме {round(round(self.length_nkt, 1) * 1.12 / 1000, 1)}м3 с '
@@ -1602,15 +1616,15 @@ class LiftPumpNv(GnoParent):
             [None, None,
              f'{lifting_unit(self)}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
-            [f'Поднять {self.data_well.dict_pump_shgn["do"]} с гл. '
-             f'{self.data_well.dict_pump_shgn_depth["do"]}м', None,
-             f'Сорвать насос {self.data_well.dict_pump_shgn["do"]} (зафиксировать вес при срыве). '
+            [f'Поднять {self.data_well.dict_pump_shgn["before"]} с гл. '
+             f'{self.data_well.dict_pump_shgn_depth["before"]}м', None,
+             f'Сорвать насос {self.data_well.dict_pump_shgn["before"]} (зафиксировать вес при срыве). '
              f'Обвязать устье скважины '
              f'согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
              f'{self.data_well.max_admissible_pressure.get_value}атм. Поднять на штангах насос '
-             f'с гл. {int(self.data_well.dict_pump_shgn_depth["do"])}м с доливом тех жидкости уд.весом '
+             f'с гл. {int(self.data_well.dict_pump_shgn_depth["before"])}м с доливом тех жидкости уд.весом '
              f'{self.data_well.fluid_work} '
              f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  насосов (не более 8 тн), '
              f'без учета веса '
@@ -1729,7 +1743,7 @@ class LiftPumpNn(GnoParent):
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
              f'{self.data_well.max_admissible_pressure.get_value}атм. Заловить конус спуском одной '
              f'штанги. Поднять на штангах плунжер с гл. '
-             f'{float(self.data_well.dict_pump_shgn_depth["do"])}м с доливом тех '
+             f'{float(self.data_well.dict_pump_shgn_depth["before"])}м с доливом тех '
              f'жидкости уд.весом {self.data_well.fluid_work} '
              f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  насосов '
              f'(не более 8 тн), без учета веса '
@@ -1795,8 +1809,8 @@ class LiftPumpNn(GnoParent):
              f'Провести практическое обучение вахт по сигналу ВЫБРОС.', None, None,
              None, None, None, None, None,
              None, 1.2],
-            [f'Поднять  {self.data_well.dict_pump_shgn["do"]}', None,
-             f'Поднять  {self.data_well.dict_pump_shgn["do"]} с глубины {round(self.data_well.dict_pump_shgn_depth["do"], 1)}м '
+            [f'Поднять  {self.data_well.dict_pump_shgn["before"]}', None,
+             f'Поднять  {self.data_well.dict_pump_shgn["before"]} с глубины {round(self.data_well.dict_pump_shgn_depth["before"], 1)}м '
              f'(компоновка НКТ{self.nkt_diam_fond}) на поверхность с замером, накручиванием колпачков с доливом скважины '
              f'тех.жидкостью уд. весом {self.data_well.fluid_work}  '
              f'в объеме {round(round(self.length_nkt, 1) * 1.12 / 1000, 1)}м3 с контролем АСПО '
@@ -1896,11 +1910,11 @@ class LiftEcnWith2Paker(GnoParent):
              None, None, None, None, None,
              None, 1.2],
             [
-                f'Поднять {self.data_well.dict_pump_ecn["do"]} с глубины'
-                f' {round(self.data_well.dict_pump_ecn_depth["do"], 1)}м',
+                f'Поднять {self.data_well.dict_pump_ecn["before"]} с глубины'
+                f' {round(self.data_well.dict_pump_ecn_depth["before"], 1)}м',
                 None,
-                f'Поднять  {self.data_well.dict_pump_ecn["do"]} с глубины '
-                f'{round(self.data_well.dict_pump_ecn_depth["do"], 1)}м '
+                f'Поднять  {self.data_well.dict_pump_ecn["before"]} с глубины '
+                f'{round(self.data_well.dict_pump_ecn_depth["before"], 1)}м '
                 f' на поверхность с замером, '
                 f'накручиванием колпачков с доливом скважины '
                 f'тех.жидкостью уд. весом {self.data_well.fluid_work}  '

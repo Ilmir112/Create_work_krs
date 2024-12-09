@@ -105,6 +105,12 @@ class MyMainWindow(QMainWindow):
         self.work_plan = None
 
     @staticmethod
+    def show_info_message(data_well, message):
+        from work_py.check_in_pz import CustomMessageBox
+
+        dialog = CustomMessageBox(data_well, message)
+        dialog.exec_()  # Открываем диалоговое окно в модальном режиме
+    @staticmethod
     def check_if_none(value):
         if isinstance(value, int) or isinstance(value, float):
             return int(value)
@@ -1874,9 +1880,9 @@ class MyWindow(MyMainWindow):
             data_list.values = []
             data_list.dop_work_list = None
 
-            data_list.dict_pump = {"do": '0', "posle": '0'}
+            data_list.dict_pump = {"before": '0', "after": '0'}
 
-            data_list.dict_pump_h = {"do": 0, "posle": 0}
+            data_list.dict_pump_h = {"before": 0, "after": 0}
 
             data_list.len_razdel_1 = 0
             data_list.data_well_is_True = False
@@ -2239,46 +2245,46 @@ class MyWindow(MyMainWindow):
         ws4.cell(row=1, column=1).value = self.data_well.well_number.get_value
         ws4.cell(row=2, column=1).value = self.data_well.well_area.get_value
 
-        if self.data_well.dict_pump_shgn["do"] != 0 and self.data_well.dict_pump_ecn["do"] == 0 and \
-                self.data_well.paker_before["do"] == 0:
+        if self.data_well.dict_pump_shgn["before"] != 0 and self.data_well.dict_pump_ecn["before"] == 0 and \
+                self.data_well.paker_before["before"] == 0:
             ws4.cell(row=3,
-                     column=1).value = f'{self.data_well.dict_pump_shgn["do"]} -на гл. ' \
-                                       f'{self.data_well.dict_pump_shgn_depth["do"]}м'
-        elif self.data_well.dict_pump_shgn["do"] == 0 and self.data_well.dict_pump_ecn["do"] != 0 and \
-                self.data_well.paker_before["do"] == 0:
+                     column=1).value = f'{self.data_well.dict_pump_shgn["before"]} -на гл. ' \
+                                       f'{self.data_well.dict_pump_shgn_depth["before"]}м'
+        elif self.data_well.dict_pump_shgn["before"] == 0 and self.data_well.dict_pump_ecn["before"] != 0 and \
+                self.data_well.paker_before["before"] == 0:
             ws4.cell(row=3,
-                     column=1).value = f'{self.data_well.dict_pump_ecn["do"]} -на гл. ' \
-                                       f'{self.data_well.dict_pump_ecn_depth["do"]}м'
-        elif self.data_well.dict_pump_shgn["do"] == 0 and self.data_well.dict_pump_ecn["do"] != 0 and \
-                self.data_well.paker_before["do"] != 0:
+                     column=1).value = f'{self.data_well.dict_pump_ecn["before"]} -на гл. ' \
+                                       f'{self.data_well.dict_pump_ecn_depth["before"]}м'
+        elif self.data_well.dict_pump_shgn["before"] == 0 and self.data_well.dict_pump_ecn["before"] != 0 and \
+                self.data_well.paker_before["before"] != 0:
             ws4.cell(row=3,
-                     column=1).value = f'{self.data_well.dict_pump_ecn["do"]} -на гл.' \
-                                       f' {self.data_well.dict_pump_ecn_depth["do"]}м \n' \
-                                       f'{self.data_well.paker_before["do"]} на ' \
-                                       f'{self.data_well.depth_fond_paker_before["do"]}м'
-        elif self.data_well.dict_pump_shgn["do"] != 0 and self.data_well.dict_pump_ecn["do"] == 0 and \
-                self.data_well.paker_before["do"] != 0:
+                     column=1).value = f'{self.data_well.dict_pump_ecn["before"]} -на гл.' \
+                                       f' {self.data_well.dict_pump_ecn_depth["before"]}м \n' \
+                                       f'{self.data_well.paker_before["before"]} на ' \
+                                       f'{self.data_well.depth_fond_paker_before["before"]}м'
+        elif self.data_well.dict_pump_shgn["before"] != 0 and self.data_well.dict_pump_ecn["before"] == 0 and \
+                self.data_well.paker_before["before"] != 0:
             ws4.cell(row=3,
-                     column=1).value = f'{self.data_well.dict_pump_shgn["do"]} -на гл. ' \
-                                       f'{self.data_well.dict_pump_shgn_depth["do"]}м \n' \
-                                       f'{self.data_well.paker_before["do"]} на ' \
-                                       f'{self.data_well.depth_fond_paker_before["do"]}м'
-        elif self.data_well.dict_pump_shgn["do"] == 0 and self.data_well.dict_pump_ecn["do"] == 0 and \
-                self.data_well.paker_before["do"] != 0:
-            ws4.cell(row=3, column=1).value = f'{self.data_well.paker_before["do"]} на ' \
-                                              f'{self.data_well.depth_fond_paker_before["do"]}м'
-        elif self.data_well.dict_pump_shgn["do"] == 0 and self.data_well.dict_pump_ecn["do"] == 0 and \
-                self.data_well.paker_before["do"] == 0:
+                     column=1).value = f'{self.data_well.dict_pump_shgn["before"]} -на гл. ' \
+                                       f'{self.data_well.dict_pump_shgn_depth["before"]}м \n' \
+                                       f'{self.data_well.paker_before["before"]} на ' \
+                                       f'{self.data_well.depth_fond_paker_before["before"]}м'
+        elif self.data_well.dict_pump_shgn["before"] == 0 and self.data_well.dict_pump_ecn["before"] == 0 and \
+                self.data_well.paker_before["before"] != 0:
+            ws4.cell(row=3, column=1).value = f'{self.data_well.paker_before["before"]} на ' \
+                                              f'{self.data_well.depth_fond_paker_before["before"]}м'
+        elif self.data_well.dict_pump_shgn["before"] == 0 and self.data_well.dict_pump_ecn["before"] == 0 and \
+                self.data_well.paker_before["before"] == 0:
             ws4.cell(row=3, column=1).value = " "
-        elif self.data_well.dict_pump_shgn["do"] != 0 and self.data_well.dict_pump_ecn["do"] != 0 and \
-                self.data_well.paker_before["do"] != 0:
+        elif self.data_well.dict_pump_shgn["before"] != 0 and self.data_well.dict_pump_ecn["before"] != 0 and \
+                self.data_well.paker_before["before"] != 0:
             ws4.cell(row=3,
-                     column=1).value = f'{self.data_well.dict_pump_shgn["do"]} -на гл.' \
-                                       f' {self.data_well.dict_pump_shgn_depth["do"]}м \n' \
-                                       f'{self.data_well.dict_pump_ecn["do"]} -на гл. ' \
-                                       f'{self.data_well.dict_pump_ecn_depth["do"]}м \n' \
-                                       f'{self.data_well.paker_before["do"]} на ' \
-                                       f'{self.data_well.depth_fond_paker_before["do"]}м '
+                     column=1).value = f'{self.data_well.dict_pump_shgn["before"]} -на гл.' \
+                                       f' {self.data_well.dict_pump_shgn_depth["before"]}м \n' \
+                                       f'{self.data_well.dict_pump_ecn["before"]} -на гл. ' \
+                                       f'{self.data_well.dict_pump_ecn_depth["before"]}м \n' \
+                                       f'{self.data_well.paker_before["before"]} на ' \
+                                       f'{self.data_well.depth_fond_paker_before["before"]}м '
         plast_str = ''
         pressur_set = set()
         # print(f'После {self.data_well.dict_perforation_short}')

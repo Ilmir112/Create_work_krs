@@ -195,11 +195,10 @@ class GnktBopz(GnktModel):
         vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-
-
     def add_work(self):
         try:
             self.roof_plast = float(self.tabWidget.currentWidget().roof_edit.text())
+            self.sole_plast = float(self.tabWidget.currentWidget().sole_edit.text())
             self.sole_plast = float(self.tabWidget.currentWidget().sole_edit.text())
             self.drilling_contractor_combo = self.tabWidget.currentWidget().drilling_contractor_combo.currentText()
             self.need_drilling_mud_combo = str(self.tabWidget.currentWidget().need_drilling_mud_combo.currentText())

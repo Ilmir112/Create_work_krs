@@ -336,14 +336,12 @@ class TabPageSoWith(TabPageUnion):
                     skm_teml_str = f'{skm_type}-{skm} до глубины {self.data_well.skm_depth}м, ' \
                                    f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
-
-
             elif self.template_combo.currentText() == 'ПСШ без хвоста':
                 if self.data_well.current_bottom - self.data_well.perforation_roof < 15:
                     self.dictance_template_second_edit.setText('1')
                     dictance_template_second = self.dictance_template_second_edit.text()
                 # if dictance_template_second is not None:
-                template_str = f'перо {kot_str}+ {skm_type}-{skm} + НКТ{nkt_diam}мм {dictance_template_second}м ' \
+                template_str = f'перо {kot_str}+ {skm_type}-{skm} + НКТ{nkt_diam}мм {dictance_template_second:.0f}м ' \
                                f' + шаблон-{template_second}мм L-{length_template_second}м '
                 self.data_well.template_depth = math.ceil(current_bottom - int(dictance_template_second))
                 self.data_well.skm_depth = self.data_well.template_depth + int(dictance_template_second)
@@ -354,8 +352,8 @@ class TabPageSoWith(TabPageUnion):
                 # if dictance_template_second is not None:
                 self.template_first_edit.setText('фильтр направление')
                 template_str = f'фильтр-направление L {length_template_first}м {kot_str} + НКТ{nkt_diam}мм ' \
-                               f'{dictance_template_first}м ' \
-                               f'+ {skm_type}-{skm} +  НКТ{nkt_diam}мм {dictance_template_second}м + ' \
+                               f'{dictance_template_first:.0f}м ' \
+                               f'+ {skm_type}-{skm} +  НКТ{nkt_diam}мм {dictance_template_second:.0f}м + ' \
                                f'шаблон-{template_second}мм L-{length_template_second}м '
                 self.data_well.template_depth = int(current_bottom - int(dictance_template_first) -
                                                     int(dictance_template_second) - int(length_template_first))
@@ -367,9 +365,9 @@ class TabPageSoWith(TabPageUnion):
             elif self.template_combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне':
                 if dictance_template_second != '' and dictance_template_first != '' and dictance_three != '':
                     template_str = f'обточная муфта {kot_str} + ' \
-                                   f'НКТ{nkt_pod}  + {dictance_template_first}м + шаблон-{first_template}мм ' \
+                                   f'НКТ{nkt_pod}  + {dictance_template_first:.0f}м + шаблон-{first_template}мм ' \
                                    f'L-{length_template_first}м + ' \
-                                   f'НКТ{nkt_pod} {dictance_template_second}м + НКТ{nkt_diam} {dictance_three}м + ' \
+                                   f'НКТ{nkt_pod} {dictance_template_second:.0f}м + НКТ{nkt_diam} {dictance_three}м + ' \
                                    f'{skm_type}-{skm} + шаблон-{template_second}мм L-{length_template_second}м '
 
                     self.data_well.template_depth_addition = current_bottom - int(dictance_template_first)
@@ -388,8 +386,8 @@ class TabPageSoWith(TabPageUnion):
                 if dictance_three != '' and dictance_template_second != '' and dictance_template_first != '' and \
                         length_template_first != '' and first_template != '' and template_second != '' \
                         and length_template_second != '':
-                    template_str = f'обточная муфта {kot_str}+ НКТ{nkt_pod} {dictance_template_first}м ' \
-                                   f'+ {skm_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м  +' \
+                    template_str = f'обточная муфта {kot_str}+ НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
+                                   f'+ {skm_type}-{skm} + НКТ{nkt_pod} {dictance_template_second:.0f}м  +' \
                                    f' шаблон-{first_template}мм ' \
                                    f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_three}м + ' \
                                    f'шаблон-{template_second}мм L-{length_template_second}м '
@@ -413,7 +411,7 @@ class TabPageSoWith(TabPageUnion):
                 if dictance_three != '' and dictance_template_second != '' and dictance_template_first != '' and \
                         length_template_first != '' and first_template != '' and template_second != '' \
                         and length_template_second != '':
-                    template_str = f'обточная муфта {kot_str} + {skm_type}-{skm} + НКТ{nkt_pod} {dictance_template_second} + ' \
+                    template_str = f'обточная муфта {kot_str} + {skm_type}-{skm} + НКТ{nkt_pod} {dictance_template_second:.0f} + ' \
                                    f' шаблон-{first_template}мм L-{length_template_first}м + ' \
                                    f'НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
                                    f'L-{length_template_second}м '
@@ -433,8 +431,8 @@ class TabPageSoWith(TabPageUnion):
                 if dictance_three != '' and dictance_template_second != '' and dictance_template_first != '' and \
                         length_template_first != '' and first_template != '' and template_second != '' \
                         and length_template_second != '':
-                    template_str = f'фильтр направление L-2м {kot_str} + НКТ{nkt_pod} {dictance_template_first}м ' \
-                                   f'+ {skm_type}-{skm} + НКТ{nkt_pod} {dictance_template_second}м + ' \
+                    template_str = f'фильтр направление L-2м {kot_str} + НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
+                                   f'+ {skm_type}-{skm} + НКТ{nkt_pod} {dictance_template_second:.0f}м + ' \
                                    f' шаблон-{first_template}мм ' \
                                    f'L-{length_template_first}м' \
                                    f' + НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
@@ -480,8 +478,8 @@ class TabPageSoWith(TabPageUnion):
                 first_template, template_second = self.template_diam_additional_ek()
                 # print(f'диаметры шаблонов {first_template, template_second}')
 
-            if 'ПОМ' in str(self.data_well.paker_before["posle"]).upper() and '122' in str(
-                    self.data_well.paker_before["posle"]):
+            if 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and '122' in str(
+                    self.data_well.paker_before["after"]):
                 self.template_second_edit.setText(str(126))
 
             self.template_first_edit.setText(str(int(first_template)))
@@ -494,7 +492,7 @@ class TabPageSoWith(TabPageUnion):
             self.dictance_template_first_edit.setText(str(int(dictance_template_first)))
 
             length_template_first, length_template_second = self.definition_ecn_true(
-                self.data_well.dict_pump_ecn_depth["posle"])
+                self.data_well.dict_pump_ecn_depth["after"])
             self.length_template_first_edit.setText(length_template_first)
             self.length_template_second_edit.setText(str(length_template_second))
 
@@ -525,8 +523,8 @@ class TabPageSoWith(TabPageUnion):
             if index == 'ПСШ ЭК':
                 template_str = f'перо {kot_str} + шаблон-{first_template}мм L-{length_template_first}м + ' \
                                f'НКТ{nkt_diam}мм ' \
-                               f'{dictance_template_first}м + {skm_type}-{skm} +  ' \
-                               f'НКТ{nkt_diam}мм {dictance_template_second}м  +  шаблон-{template_second}мм ' \
+                               f'{dictance_template_first:.0f}м + {skm_type}-{skm} +  ' \
+                               f'НКТ{nkt_diam}мм {dictance_template_second:.0f}м  +  шаблон-{template_second}мм ' \
                                f'L-{length_template_second}м '
 
                 # print(f'строка шаблона {template_str}')
@@ -547,7 +545,7 @@ class TabPageSoWith(TabPageUnion):
 
 
             elif index == 'ПСШ без хвоста':
-                template_str = f'перо {kot_str} + {skm_type}-{skm} + {dictance_template_second}м ' \
+                template_str = f'перо {kot_str} + {skm_type}-{skm} + {dictance_template_second:.0f}м ' \
                                f'НКТ{nkt_diam}м + шаблон-{template_second}мм L-{length_template_second}м '
                 self.data_well.template_depth = math.ceil(current_bottom - int(dictance_template_second))
                 self.data_well.skm_depth = current_bottom
@@ -565,8 +563,8 @@ class TabPageSoWith(TabPageUnion):
                 dictance_template_first = int(float(self.dictance_template_first_edit.text()))
                 dictance_template_second = int(float(self.dictance_template_second_edit.text()))
 
-                template_str = f'фильтр-направление {kot_str} + НКТ{nkt_diam}мм {dictance_template_first}м ' \
-                               f'+ {skm_type}-{skm} + {dictance_template_second}м НКТ{nkt_diam}мм + ' \
+                template_str = f'фильтр-направление {kot_str} + НКТ{nkt_diam}мм {dictance_template_first:.0f}м ' \
+                               f'+ {skm_type}-{skm} + {dictance_template_second:.0f}м НКТ{nkt_diam}мм + ' \
                                f'шаблон-{template_second}мм L-{length_template_second}м '
                 self.data_well.template_depth = int(float(
                     current_bottom - dictance_template_first - dictance_template_second))
@@ -594,7 +592,7 @@ class TabPageSoWith(TabPageUnion):
                 dictance_template_first = int(float(self.dictance_template_first_edit.text()))
                 dictance_template_second = int(float(current_bottom - dictance_template_first1 - \
                                                length_template_first - self.data_well.head_column_additional.get_value + 5))
-                self.dictance_template_second_edit.setText(str(dictance_template_second))
+                self.dictance_template_second_edit.setText(str(int(float(dictance_template_second))))
 
                 self.length_template_second_edit.setText(str(length_template_second))
 
@@ -604,9 +602,9 @@ class TabPageSoWith(TabPageUnion):
                 self.dictance_three_edit.setText(str(dictance_template_three))
 
                 template_str = f'обточная муфта {kot_str} + ' \
-                               f'НКТ{nkt_pod} + {dictance_template_first}м + шаблон-{first_template}мм ' \
+                               f'НКТ{nkt_pod} + {dictance_template_first:.0f}м + шаблон-{first_template}мм ' \
                                f'L-{length_template_first}м + ' \
-                               f'НКТ{nkt_pod} {dictance_template_second}м +' \
+                               f'НКТ{nkt_pod} {dictance_template_second:.0f}м +' \
                                f'{skm_type}-{skm} + НКТ{nkt_diam} {dictance_template_three}м + ' \
                                f' шаблон-{template_second}мм L-{length_template_second}м '
 
@@ -645,8 +643,8 @@ class TabPageSoWith(TabPageUnion):
 
                 self.dictance_three_edit.setText(str(dictance_template_three))
 
-                template_str = f'обточная муфта {kot_str} + НКТ{nkt_pod} {dictance_template_first}м ' \
-                               f'+ {skm_type}-{skm}  + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
+                template_str = f'обточная муфта {kot_str} + НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
+                               f'+ {skm_type}-{skm}  + НКТ{nkt_pod} {dictance_template_second:.0f}м + шаблон-{first_template}мм ' \
                                f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_template_three}м + ' \
                                f'шаблон-{template_second}мм L-{length_template_second}м '
 
@@ -684,7 +682,7 @@ class TabPageSoWith(TabPageUnion):
                 skm = str(self.data_well.column_additional_diameter.get_value)
                 self.skm_edit.setText(skm)
                 dictance_template_second = 10
-                self.dictance_template_second_edit.setText(str(dictance_template_second))
+                self.dictance_template_second_edit.setText(str(int(float(dictance_template_second))))
 
                 dictance_template_three = round((current_bottom - dictance_template_first - \
                                                  dictance_template_second - length_template_first) - roof_plast + 10,
@@ -692,7 +690,7 @@ class TabPageSoWith(TabPageUnion):
 
                 self.dictance_three_edit.setText(str(dictance_template_three))
 
-                template_str = f'обточная муфта {kot_str} + {skm_type}-{skm}  НКТ{nkt_pod} {dictance_template_second} + ' \
+                template_str = f'обточная муфта {kot_str} + {skm_type}-{skm}  НКТ{nkt_pod} {dictance_template_second:.0f} + ' \
                                f'шаблон-{first_template}мм L-{length_template_first}м + ' \
                                f'НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
                                f'L-{length_template_second}м '
@@ -727,8 +725,8 @@ class TabPageSoWith(TabPageUnion):
                                                 0)
                 self.dictance_three_edit.setText(str(dictance_template_three))
 
-                template_str = f'фильтр направление L-2м {kot_str} + НКТ{nkt_pod} {dictance_template_first}м ' \
-                               f'+ {skm_type}-{skm}  + НКТ{nkt_pod} {dictance_template_second}м + ' \
+                template_str = f'фильтр направление L-2м {kot_str} + НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
+                               f'+ {skm_type}-{skm}  + НКТ{nkt_pod} {dictance_template_second:.0f}м + ' \
                                f'шаблон-{first_template}мм ' \
                                f'L-{length_template_first}м' \
                                f' + НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
@@ -759,23 +757,23 @@ class TabPageSoWith(TabPageUnion):
 
     def definition_ecn_true(self, depth_ecn):
 
-        if self.data_well.column_additional is False and self.data_well.dict_pump_ecn["posle"] != 0 and \
+        if self.data_well.column_additional is False and self.data_well.dict_pump_ecn["after"] != 0 and \
                 self.data_well.column_diameter.get_value > 168:
             return "4", "4"
-        elif self.data_well.column_additional is False and self.data_well.dict_pump_ecn["posle"] != 0:
+        elif self.data_well.column_additional is False and self.data_well.dict_pump_ecn["after"] != 0:
             return "4", "30"
         elif self.data_well.column_additional is False and self.data_well.max_angle.get_value > 45:
             return "4", "10"
-        elif self.data_well.column_additional is True and self.data_well.dict_pump_ecn["posle"] != 0 \
+        elif self.data_well.column_additional is True and self.data_well.dict_pump_ecn["after"] != 0 \
                 and self.data_well.column_additional_diameter.get_value < 170:
-            if self.data_well.dict_pump_ecn["posle"] != 0 and float(
+            if self.data_well.dict_pump_ecn["after"] != 0 and float(
                     depth_ecn) < self.data_well.head_column_additional.get_value and \
                     self.data_well.column_diameter.get_value > 168:
                 return "4", "4"
-            elif self.data_well.dict_pump_ecn["posle"] != 0 and \
+            elif self.data_well.dict_pump_ecn["after"] != 0 and \
                     float(depth_ecn) < self.data_well.head_column_additional.get_value:
                 return "4", "30"
-            elif self.data_well.dict_pump_ecn["posle"] != 0 and \
+            elif self.data_well.dict_pump_ecn["after"] != 0 and \
                     float(depth_ecn) >= self.data_well.head_column_additional.get_value:
                 return "30", "4"
 
@@ -788,7 +786,7 @@ class TabPageSoWith(TabPageUnion):
         else:
             return "4", "4"
 
-            # print(f' ЭЦН длина" {data_list.lift_ecn_can, data_list.lift_ecn_can_addition, "ЭЦН" in str(data_list.dict_pump["posle"][0]).upper()}')
+            # print(f' ЭЦН длина" {data_list.lift_ecn_can, data_list.lift_ecn_can_addition, "ЭЦН" in str(data_list.dict_pump["after"][0]).upper()}')
 
     def definition_roof_not_raiding(self, current_bottom):
 
@@ -876,8 +874,8 @@ class TabPageSoWith(TabPageUnion):
         for diam, diam_internal in template_first_diam_dict.items():
             if diam_internal[0] <= diam_internal_ek <= diam_internal[1]:
                 template_first_diam = diam
-        if 'ПОМ' in str(self.data_well.paker_before["posle"]).upper() and '122' in str(
-                self.data_well.paker_before["posle"]):
+        if 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and '122' in str(
+                self.data_well.paker_before["after"]):
             template_second_diam = 126
         return (template_first_diam, template_second_diam)
 
@@ -914,8 +912,8 @@ class TabPageSoWith(TabPageUnion):
             if diam_internal[0] <= diam_internal_ek_addition <= diam_internal[1]:
                 # print(diam_internal[0] <= diam_internal_ek_addition <= diam_internal[1], diam_internal[0],diam_internal_ek_addition,diam_internal[1])
                 template_first_diam = diam
-        if 'ПОМ' in str(self.data_well.paker_before["posle"]).upper() and '122' in str(
-                self.data_well.paker_before["posle"]):
+        if 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and '122' in str(
+                self.data_well.paker_before["after"]):
             template_second_diam = 126
 
         try:
@@ -1399,7 +1397,7 @@ class TemplateKrs(WindowUnion):
             else:
                 downhole_motor = 'Д-76'
 
-            if self.data_well.dict_pump_shgn["do"] != 0 and self.data_well.paker_before["do"] == 0:
+            if self.data_well.dict_pump_shgn["before"] != 0 and self.data_well.paker_before["before"] == 0:
                 gips_pero_list = [gips_pero_list[-1]]
                 drill_list = Drill_window.drilling_nkt(self,
                                                        [(self.data_well.current_bottom, 'гипсовых отложений')],

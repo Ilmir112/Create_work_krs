@@ -283,7 +283,7 @@ class TabPageSo(TabPageUnion):
             elif self.template_combo.currentText() == 'шаблон открытый ствол':
                 if dictance_template_second is not None:
                     self.template_first_edit.setText('фильтр направление')
-                    template_str = f'фильтр-направление {kot_str} + НКТ{nkt_diam}м {dictance_template_first}м  ' \
+                    template_str = f'фильтр-направление {kot_str} + НКТ{nkt_diam}м {dictance_template_first:.0f}м  ' \
                                    f'шаблон-{template_second}мм L-{length_template_second}м '
                     self.data_well.template_depth = int(
                         self.data_well.current_bottom - int(dictance_template_first))
@@ -292,9 +292,9 @@ class TabPageSo(TabPageUnion):
 
             elif self.template_combo.currentText() == 'шаблон ДП с хвостом':
                 if dictance_template_second is not None:
-                    template_str = f'обточная муфта + {kot_str} НКТ{nkt_pod} {dictance_template_first}м ' \
+                    template_str = f'обточная муфта + {kot_str} НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
                                    f'+ шаблон-{first_template}мм ' \
-                                   f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_template_second}м + ' \
+                                   f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_template_second:.0f}м + ' \
                                    f'шаблон-{template_second}мм L-{length_template_second}м '
 
                     self.data_well.template_depth = math.ceil(self.data_well.current_bottom - 2 -
@@ -312,7 +312,7 @@ class TabPageSo(TabPageUnion):
 
                 template_str = f'обточная муфта {kot_str} + ' \
                                f'шаблон-{first_template}мм L-{length_template_first}м + ' \
-                               f'НКТ{nkt_pod} {dictance_template_second}м + шаблон-{template_second}мм ' \
+                               f'НКТ{nkt_pod} {dictance_template_second:.0f}м + шаблон-{template_second}мм ' \
                                f'L-{length_template_second}м '
 
                 self.data_well.template_depth = math.ceil(
@@ -327,7 +327,7 @@ class TabPageSo(TabPageUnion):
 
             elif self.template_combo.currentText() == 'шаблон ДП открытый ствол':
                 if dictance_template_second is not None:
-                    template_str = f'фильтр направление L-2м {kot_str} + НКТ{nkt_pod} {dictance_template_first}м ' \
+                    template_str = f'фильтр направление L-2м {kot_str} + НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
                                    f'  + шаблон-{first_template}мм ' \
                                    f'L-{length_template_first}м' \
                                    f' + НКТ{nkt_pod} + шаблон-{template_second}мм ' \
@@ -373,11 +373,11 @@ class TabPageSo(TabPageUnion):
 
         roof_plast, roof_add_column_plast = TabPageSoWith.definition_roof_not_raiding(self, current_bottom)
         dictance_template_first = int(self.data_well.current_bottom - roof_plast + 5)
-        # print(f'дистанция первая {dictance_template_first}')
+        # print(f'дистанция первая {dictance_template_first:.0f}')
         self.dictance_template_first_edit.setText(str(dictance_template_first))
 
         length_template_first, length_template_second = (
-            TabPageSoWith.definition_ecn_true(self, self.data_well.dict_pump_ecn_depth["posle"]))
+            TabPageSoWith.definition_ecn_true(self, self.data_well.dict_pump_ecn_depth["after"]))
         self.length_template_first_edit.setText(length_template_first)
         self.length_template_second_edit.setText(str(length_template_second))
 
@@ -415,7 +415,7 @@ class TabPageSo(TabPageUnion):
             self.grid.addWidget(self.dictance_template_first_edit, 5, 4)
 
             template_str = f'перо {kot_str} + шаблон-{first_template}мм L-2м + НКТ{nkt_diam}мм ' \
-                           f'{dictance_template_first}м ' \
+                           f'{dictance_template_first:.0f}м ' \
                            f'+  НКТ{nkt_diam}мм + шаблон-{template_second}мм' \
                            f' L-{length_template_second}м '
 
@@ -452,7 +452,7 @@ class TabPageSo(TabPageUnion):
             dictance_template_first = int(self.dictance_template_first_edit.text())
             dictance_template_second = int(self.dictance_template_second_edit.text())
 
-            template_str = f'фильтр-направление L-2 {kot_str}+ НКТ{nkt_diam}м {dictance_template_first}м +' \
+            template_str = f'фильтр-направление L-2 {kot_str}+ НКТ{nkt_diam}м {dictance_template_first:.0f}м +' \
                            f'шаблон-{template_second}мм L-{length_template_second}м '
             self.data_well.template_depth = int(roof_plast - 5)
 
@@ -478,9 +478,9 @@ class TabPageSo(TabPageUnion):
                     self.length_template_first_edit.text()) + 5)
             self.dictance_template_second_edit.setText(str(dictance_template_second))
 
-            template_str = f'обточная муфта {kot_str} + НКТ{nkt_pod} {dictance_template_first}м ' \
+            template_str = f'обточная муфта {kot_str} + НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
                            f' + шаблон-{first_template}мм ' \
-                           f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_template_second}м + ' \
+                           f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_template_second:.0f}м + ' \
                            f'шаблон-{template_second}мм L-{length_template_second}м '
             self.data_well.template_depth = math.ceil(
                 roof_add_column_plast - 5 - length_template_first - dictance_template_second)
@@ -510,7 +510,7 @@ class TabPageSo(TabPageUnion):
             dictance_template_second = int(self.dictance_template_second_edit.text())
 
             template_str = f'обточная муфта {kot_str} + шаблон-{first_template}мм L-{length_template_first}м + ' \
-                           f'НКТ{nkt_pod} {dictance_template_second}м + шаблон-{template_second}мм ' \
+                           f'НКТ{nkt_pod} {dictance_template_second:.0f}м + шаблон-{template_second}мм ' \
                            f'L-{length_template_second}м '
 
             self.data_well.template_depth = math.ceil(
@@ -545,9 +545,9 @@ class TabPageSo(TabPageUnion):
                     self.length_template_first_edit.text()) + 5)
             self.dictance_template_second_edit.setText(str(dictance_template_second))
 
-            template_str = f'фильтр направление {kot_str}+ НКТ{nkt_pod} {dictance_template_first}м ' \
+            template_str = f'фильтр направление {kot_str}+ НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
                            f' + шаблон-{first_template}мм L-{length_template_first}м' \
-                           f' + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{template_second}мм ' \
+                           f' + НКТ{nkt_pod} {dictance_template_second:.0f}м + шаблон-{template_second}мм ' \
                            f'L-{length_template_second}м '
             self.data_well.template_depth = math.ceil(
                 roof_add_column_plast - 5 - length_template_first - dictance_template_second)
@@ -559,22 +559,22 @@ class TabPageSo(TabPageUnion):
         self.template_str_edit.setText(template_str)
         self.skm_teml_str_edit.setText(skm_teml_str)
 
-        if 'ПОМ' in str(self.data_well.paker_before["posle"]).upper() and \
-                '122' in str(self.data_well.paker_before["posle"]):
+        if 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and \
+                '122' in str(self.data_well.paker_before["after"]):
             self.template_second_edit.setText(str(126))
 
     def definition_ecn_true(self, depth_ecn):
 
-        if self.data_well.column_additional is False and self.data_well.dict_pump_ecn["posle"] != 0:
+        if self.data_well.column_additional is False and self.data_well.dict_pump_ecn["after"] != 0:
             return "2", "30"
         elif self.data_well.column_additional is False and self.data_well.max_angle.get_value > 45:
             return "2", "10"
-        elif self.data_well.column_additional is True and self.data_well.dict_pump_ecn["posle"] != 0:
-            if self.data_well.dict_pump_ecn["posle"] != 0 and \
+        elif self.data_well.column_additional is True and self.data_well.dict_pump_ecn["after"] != 0:
+            if self.data_well.dict_pump_ecn["after"] != 0 and \
                     float(depth_ecn) < self.data_well.head_column_additional.get_value:
                 return "2", "30"
 
-            elif self.data_well.dict_pump_ecn["posle"] != 0 and \
+            elif self.data_well.dict_pump_ecn["after"] != 0 and \
                     float(depth_ecn) >= self.data_well.head_column_additional.get_value:
                 return "30", "4"
             elif self.data_well.max_angle.get_value > 45:
@@ -919,7 +919,7 @@ class TemplateWithoutSkm(WindowUnion):
         ]
         if self.data_well.gips_in_well is True:
 
-            if self.data_well.dict_pump_shgn["do"] != 0:
+            if self.data_well.dict_pump_shgn["before"] != 0:
 
                 gips_pero_list = [gips_pero_list[-1]]
                 from .drilling import Drill_window

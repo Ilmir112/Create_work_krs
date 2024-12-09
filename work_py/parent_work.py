@@ -269,7 +269,7 @@ class WindowUnion(MyMainWindow):
 
         pressure = 40
 
-        if self.data_well.dict_pump_ecn["posle"] != "0":
+        if self.data_well.dict_pump_ecn["after"] != "0":
             pressure = 50
 
         calc = CalcFond(static_level, len_nkt, fluid, pressure, distance_between_nkt)

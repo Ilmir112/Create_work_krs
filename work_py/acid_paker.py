@@ -1527,8 +1527,8 @@ class AcidPakerWindow(WindowUnion):
         ]
         for plast in list(self.data_well.dict_perforation.keys()):
             for interval in self.data_well.dict_perforation[plast]['интервал']:
-                if abs(float(interval[1] - float(self.data_well.depth_fond_paker_before["posle"]))) < 10 or abs(
-                        float(interval[0] - float(self.data_well.depth_fond_paker_before["posle"]))) < 10:
+                if abs(float(interval[1] - float(self.data_well.depth_fond_paker_before["after"]))) < 10 or abs(
+                        float(interval[0] - float(self.data_well.depth_fond_paker_before["after"]))) < 10:
                     if privyazka_nkt(self)[0] not in paker_list:
                         paker_list.insert(1, privyazka_nkt(self)[0])
         if depth_gauge_combo == 'Да':

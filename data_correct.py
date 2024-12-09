@@ -154,89 +154,89 @@ class TabPageSoCorrect(TabPageUnion):
 
         self.pump_SHGN_do_Label = QLabel('Штанговый насос')
         self.pump_SHGN_do_edit_type = QLineEdit(self)
-        self.pump_SHGN_do_edit_type.setText(f'{self.ifNone(self.data_well.dict_pump_shgn["do"])}')
+        self.pump_SHGN_do_edit_type.setText(f'{self.ifNone(self.data_well.dict_pump_shgn["before"])}')
 
         self.pump_SHGN_depth_do_Label = QLabel('Глубина штангового насоса')
         self.pump_SHGN_depth_do_edit_type = FloatLineEdit(self)
         if self.pump_SHGN_do_edit_type.text() != 'отсут':
             self.pump_SHGN_depth_do_edit_type.setText(
-                f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.dict_pump_shgn_depth["do"]))}')
+                f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.dict_pump_shgn_depth["before"]))}')
         else:
             self.pump_SHGN_depth_do_edit_type.setText('отсут')
 
         self.pump_SHGN_posle_Label = QLabel('Плановый штанговый насос')
         self.pump_SHGN_posle_edit_type = QLineEdit(self)
-        self.pump_SHGN_posle_edit_type.setText(f'{self.ifNone(self.data_well.dict_pump_shgn["posle"])}')
+        self.pump_SHGN_posle_edit_type.setText(f'{self.ifNone(self.data_well.dict_pump_shgn["after"])}')
 
         self.pump_SHGN_depth_posle_Label = QLabel('Плановая глубина спуска насоса')
         self.pump_SHGN_depth_posle_edit_type = FloatLineEdit(self)
         if self.pump_SHGN_posle_edit_type.text() != 'отсут':
             self.pump_SHGN_depth_posle_edit_type.setText(
-                f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.dict_pump_shgn_depth["posle"]))}')
+                f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.dict_pump_shgn_depth["after"]))}')
         else:
             self.pump_SHGN_depth_posle_edit_type.setText('отсут')
 
         self.pump_ECN_do_Label = QLabel('Спущенный ЭЦН')
         self.pump_ECN_do_edit_type = QLineEdit(self)
-        self.pump_ECN_do_edit_type.setText(f'{self.ifNone(self.data_well.dict_pump_ecn["do"])}')
+        self.pump_ECN_do_edit_type.setText(f'{self.ifNone(self.data_well.dict_pump_ecn["before"])}')
 
         self.pump_ECN_depth_do_Label = QLabel('Глубина спуска ЭЦН')
         self.pump_ECN_depth_do_edit_type = FloatLineEdit(self)
         if self.pump_ECN_do_edit_type.text() != 'отсут':
             self.pump_ECN_depth_do_edit_type.setText(
-                f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.dict_pump_ecn_depth["do"]))}')
+                f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.dict_pump_ecn_depth["before"]))}')
         else:
             self.pump_ECN_depth_do_edit_type.setText('отсут')
 
         self.pump_ECN_posle_Label = QLabel('Плановый ЭЦН на спуск')
         self.pump_ECN_posle_edit_type = QLineEdit(self)
-        self.pump_ECN_posle_edit_type.setText(f'{self.ifNone(self.data_well.dict_pump_ecn["posle"])}')
+        self.pump_ECN_posle_edit_type.setText(f'{self.ifNone(self.data_well.dict_pump_ecn["after"])}')
 
         self.pump_ECN_depth_posle_Label = QLabel('Плановая глубина спуска ЭЦН')
         self.pump_ECN_depth_posle_edit_type = FloatLineEdit(self)
         if self.pump_ECN_posle_edit_type.text() != 'отсут':
             self.pump_ECN_depth_posle_edit_type.setText(
-                f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.dict_pump_ecn_depth["posle"]))}')
+                f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.dict_pump_ecn_depth["after"]))}')
         else:
             self.pump_ECN_depth_posle_edit_type.setText('отсут')
 
         self.paker_do_Label = QLabel('Спущенный пакер')
         self.paker_do_edit_type = QLineEdit(self)
-        self.paker_do_edit_type.setText(f'{self.ifNone(self.data_well.paker_before["do"])}')
+        self.paker_do_edit_type.setText(f'{self.ifNone(self.data_well.paker_before["before"])}')
 
         self.paker_depth_do_Label = QLabel('Глубина спуска пакера')
         self.paker_depth_do_edit_type = FloatLineEdit(self)
         self.paker_depth_do_edit_type.setText(
-            f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.depth_fond_paker_before["do"]))}')
+            f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.depth_fond_paker_before["before"]))}')
 
         self.paker_posle_Label = QLabel('пакер на спуск')
         self.paker_posle_edit_type = QLineEdit(self)
-        self.paker_posle_edit_type.setText(f'{self.ifNone(self.data_well.paker_before["posle"])}')
+        self.paker_posle_edit_type.setText(f'{self.ifNone(self.data_well.paker_before["after"])}')
 
         self.paker_depth_posle_Label = QLabel('Глубина спуска пакера')
         self.paker_depth_posle_edit_type = FloatLineEdit(self)
         self.paker_depth_posle_edit_type.setText(
-            f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.depth_fond_paker_before["posle"]))}')
+            f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.depth_fond_paker_before["after"]))}')
 
         self.paker2_do_Label = QLabel('Спущенный пакер')
         self.paker2_do_edit_type = QLineEdit(self)
-        self.paker2_do_edit_type.setText(f'{self.ifNone(self.data_well.paker_second_before["do"])}')
+        self.paker2_do_edit_type.setText(f'{self.ifNone(self.data_well.paker_second_before["before"])}')
 
         self.paker2_depth_do_Label = QLabel('Глубина спуска пакера')
         self.paker2_depth_do_edit_type = FloatLineEdit(self)
         self.paker2_depth_do_edit_type.setText(self.remove_non_numeric_chars(
-            self.ifNone(str(self.data_well.depth_fond_paker_second_before["do"]))))
+            self.ifNone(str(self.data_well.depth_fond_paker_second_before["before"]))))
 
         self.paker2_posle_Label = QLabel('пакер на спуск')
         self.paker2_posle_edit_type = QLineEdit(self)
-        # print(self.data_well.paker_second_before[self.ifNone("posle")])
-        self.paker2_posle_edit_type.setText(str(self.ifNone(self.data_well.paker_second_before["posle"])))
+        # print(self.data_well.paker_second_before[self.ifNone("after")])
+        self.paker2_posle_edit_type.setText(str(self.ifNone(self.data_well.paker_second_before["after"])))
 
         self.paker2_depth_posle_Label = QLabel('Глубина спуска пакера')
         self.paker2_depth_posle_edit_type = FloatLineEdit(self)
         self.paker2_depth_posle_edit_type.setText(
-            self.remove_non_numeric_chars(self.ifNone(str(self.data_well.depth_fond_paker_second_before["posle"]))))
-        # print(f' насос спуск {data_list.pdict_pump["posle"]}')
+            self.remove_non_numeric_chars(self.ifNone(str(self.data_well.depth_fond_paker_second_before["after"]))))
+        # print(f' насос спуск {data_list.pdict_pump["after"]}')
 
         self.static_level_Label = QLabel('Статический уровень в скважине')
         self.static_level_edit_type = FloatLineEdit(self)
@@ -1057,25 +1057,25 @@ class DataWindow(WindowUnion):
                 self.check_if_none(max_admissible_pressure))
 
             # print(f'макс {self.data_well.max_expected_pressure.get_value}')
-            self.data_well.dict_pump_shgn["do"] = self.check_if_none(dict_pump_shgn_do)
-            self.data_well.dict_pump_shgn_depth["do"] = self.check_if_none(dict_pump_shgn_h_do)
-            self.data_well.dict_pump_shgn_depth["posle"] = self.check_if_none(dict_pump_shgn_h_posle)
-            self.data_well.dict_pump_shgn["posle"] = self.check_if_none(dict_pump_shgn_posle)
+            self.data_well.dict_pump_shgn["before"] = self.check_if_none(dict_pump_shgn_do)
+            self.data_well.dict_pump_shgn_depth["before"] = self.check_if_none(dict_pump_shgn_h_do)
+            self.data_well.dict_pump_shgn_depth["after"] = self.check_if_none(dict_pump_shgn_h_posle)
+            self.data_well.dict_pump_shgn["after"] = self.check_if_none(dict_pump_shgn_posle)
 
-            self.data_well.dict_pump_ecn["do"] = self.check_if_none(dict_pump_ecn_do)
-            self.data_well.dict_pump_ecn_depth["do"] = self.check_if_none(dict_pump_ecn_h_do)
-            self.data_well.dict_pump_ecn["posle"] = self.check_if_none(dict_pump_ecn_posle)
-            self.data_well.dict_pump_ecn_depth["posle"] = self.check_if_none(dict_pump_ecn_h_posle)
+            self.data_well.dict_pump_ecn["before"] = self.check_if_none(dict_pump_ecn_do)
+            self.data_well.dict_pump_ecn_depth["before"] = self.check_if_none(dict_pump_ecn_h_do)
+            self.data_well.dict_pump_ecn["after"] = self.check_if_none(dict_pump_ecn_posle)
+            self.data_well.dict_pump_ecn_depth["after"] = self.check_if_none(dict_pump_ecn_h_posle)
 
-            self.data_well.paker_before["do"] = self.check_if_none(paker_do)
-            self.data_well.depth_fond_paker_before["do"] = self.check_if_none(depth_fond_paker_do)
-            self.data_well.paker_before["posle"] = self.check_if_none(paker_posle)
-            self.data_well.depth_fond_paker_before["posle"] = self.check_if_none(depth_fond_paker_posle)
+            self.data_well.paker_before["before"] = self.check_if_none(paker_do)
+            self.data_well.depth_fond_paker_before["before"] = self.check_if_none(depth_fond_paker_do)
+            self.data_well.paker_before["after"] = self.check_if_none(paker_posle)
+            self.data_well.depth_fond_paker_before["after"] = self.check_if_none(depth_fond_paker_posle)
 
-            self.data_well.paker_second_before["do"] = self.check_if_none(paker2_do)
-            self.data_well.depth_fond_paker_second_before["do"] = self.check_if_none(depth_fond_paker2_do)
-            self.data_well.paker_second_before["posle"] = self.check_if_none(paker2_posle)
-            self.data_well.depth_fond_paker_second_before["posle"] = self.check_if_none(depth_fond_paker2_posle)
+            self.data_well.paker_second_before["before"] = self.check_if_none(paker2_do)
+            self.data_well.depth_fond_paker_second_before["before"] = self.check_if_none(depth_fond_paker2_do)
+            self.data_well.paker_second_before["after"] = self.check_if_none(paker2_posle)
+            self.data_well.depth_fond_paker_second_before["after"] = self.check_if_none(depth_fond_paker2_posle)
             self.data_well.static_level = ProtectedIsDigit(self.check_if_none(static_level))
             self.data_well.dinamic_level = ProtectedIsDigit(self.check_if_none(dinamic_level))
 
@@ -1103,20 +1103,20 @@ class DataWindow(WindowUnion):
                 self.data_well.water_cut = self.check_if_none(water_cut_edit)
                 self.data_well.percent_water = int(self.check_if_none(proc_water_edit))
 
-            if str(self.data_well.dict_pump_shgn["do"]) != '0' and len(
+            if str(self.data_well.dict_pump_shgn["before"]) != '0' and len(
                     self.data_well.dict_sucker_rod) == 0:
-                assdf = str(self.data_well.dict_pump_shgn["do"]), len(self.data_well.dict_sucker_rod), \
+                assdf = str(self.data_well.dict_pump_shgn["before"]), len(self.data_well.dict_sucker_rod), \
                         self.data_well.dict_sucker_rod
                 QMessageBox.warning(self, 'ОШИБКА',
-                                    f'при спущенном насосе {self.data_well.dict_pump_shgn["do"]} '
+                                    f'при спущенном насосе {self.data_well.dict_pump_shgn["before"]} '
                                     f'не указаны штанги, либо не корректно прочитаны данные ')
                 self.pause_app()
 
                 return
-            if str(self.data_well.dict_pump_shgn["posle"]) != '0' and len(
+            if str(self.data_well.dict_pump_shgn["after"]) != '0' and len(
                     self.data_well.dict_sucker_rod_after) == 0:
                 QMessageBox.warning(self, 'ОШИБКА',
-                                    f'при плановом насосе {self.data_well.dict_pump_shgn["do"]} '
+                                    f'при плановом насосе {self.data_well.dict_pump_shgn["before"]} '
                                     f'не указаны штанги, либо не корректно прочитаны данные ')
                 self.pause_app()
 
@@ -1207,16 +1207,16 @@ class DataWindow(WindowUnion):
                 }
             }
 
-            if str(self.data_well.paker_before['posle']).lower() not in ['0', 0, '-', 'отсут', '', None]:
+            if str(self.data_well.paker_before["before"]).lower() not in ['0', 0, '-', 'отсут', '', None]:
 
                 try:
 
                     paker_diameter = TabPageSo.paker_diameter_select(self, float(
-                        self.data_well.depth_fond_paker_before['posle']))
-                    if str(paker_diameter) not in str(self.data_well.paker_before['posle']):
+                        self.data_well.depth_fond_paker_before["before"]))
+                    if str(paker_diameter) not in str(self.data_well.paker_before["before"]):
                         self.data_well.check_data_in_pz.append(
                             f'Не корректно указан диаметр фондового пакера в карте спуска '
-                            f'ремонта {self.data_well.paker_before["posle"].split("/")[0]} требуется пакер '
+                            f'ремонта {self.data_well.paker_before["after"].split("/")[0]} требуется пакер '
                             f'диаметром {paker_diameter}')
 
                 except Exception as e:

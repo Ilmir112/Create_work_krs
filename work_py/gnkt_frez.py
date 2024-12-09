@@ -339,7 +339,7 @@ class WorkWithGnkt(GnktModel):
              '' if nkt == 0 else f'{length_nkt - 2.6}м', None, '' if nkt == 0 else f'{3}м', None, None, None, None,
              None, None, None, None, 'Макс. ожидаемое Р на устье скв.', None, None, None, None, None, None, None, 92.8,
              None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, '' if nkt == 0 else f'стингер {self.data_well.paker_before["do"]}',
+            [None, None, None, None, None, None, '' if nkt == 0 else f'стингер {self.data_well.paker_before["before"]}',
              None, None, None,
              None, None,
              None, None,
@@ -535,12 +535,12 @@ class WorkWithGnkt(GnktModel):
         from cdng import events_gnvp_frez
         if self.data_well.column_additional:
             if sum(list(self.data_well.dict_nkt_before.values())) != 0 and \
-                    abs(self.data_well.depth_fond_paker_before["do"] - self.data_well.head_column_additional.get_value) > 30:
+                    abs(self.data_well.depth_fond_paker_before["before"] - self.data_well.head_column_additional.get_value) > 30:
                 ntk_true = True
                 paker_true = False
                 nkt_length = round(sum(list(self.data_well.dict_nkt_before.values())), 0)
             elif sum(list(self.data_well.dict_nkt_before.values())) != 0 and \
-                    abs(self.data_well.depth_fond_paker_before["do"] - self.data_well.head_column_additional.get_value) < 30:
+                    abs(self.data_well.depth_fond_paker_before["before"] - self.data_well.head_column_additional.get_value) < 30:
                 ntk_true = True
                 paker_true = True
                 nkt_length = round(sum(list(self.data_well.dict_nkt_before.values())), 0)
@@ -551,7 +551,7 @@ class WorkWithGnkt(GnktModel):
                 nkt_length = 0
         else:
             if sum(list(self.data_well.dict_nkt_before.values())) != 0 and \
-                    self.data_well.depth_fond_paker_before["do"] != 0:
+                    self.data_well.depth_fond_paker_before["before"] != 0:
                 ntk_true = True
                 paker_true = True
                 nkt_length = round(sum(list(self.data_well.dict_nkt_before.values())), 0)
@@ -1145,7 +1145,7 @@ class WorkWithGnkt(GnktModel):
                            f'веса в объеме {volume_first}м3 (объем подпакерного пространства + затруб + 20% запас), ' \
                            f'вывести циркуляцию с большого затруба  с ПРОТЯЖКОЙ ГНКТ СНИЗУ ВВЕРХ  с выходом ' \
                            f'циркуляции по большому затрубу до башмака НКТ до гл. ' \
-                           f'{self.data_well.depth_fond_paker_before["do"]}м ' \
+                           f'{self.data_well.depth_fond_paker_before["before"]}м ' \
                            f'В башмаке НКТ промыть до выхода жидкости глушения по малому затрубу в объеме ' \
                            f'{round(volume_nkt(self.data_well.dict_nkt_before), 1)}м3 с одновременным подъемом ГНКТ. Тех отстой 2ч.' \
                            f' В случае отрицательного результата по глушению скважины произвести перерасчет ЖГС и ' \

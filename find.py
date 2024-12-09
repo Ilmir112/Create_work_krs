@@ -137,21 +137,21 @@ class FindIndexPZ(MyMainWindow):
         self.well_oilfield = ProtectedIsNonNone("")
         self.inventory_number = ProtectedIsNonNone("")
         self.cdng = ProtectedIsNonNone("")
-        self.paker_before = {"do": 0, "posle": 0}
-        self.depth_fond_paker_before = {"do": 0, "posle": 0}
-        self.paker_second_before = {"do": 0, "posle": 0}
-        self.depth_fond_paker_second_before = {"do": 0, "posle": 0}
-        self.dict_pump_shgn = {"do": 0, "posle": 0}
-        self.dict_pump_ecn = {"do": 0, "posle": 0}
-        self.dict_pump_shgn_depth = {"do": 0, "posle": 0}
-        self.dict_pump_ecn_depth = {"do": 0, "posle": 0}
+        self.paker_before = {"before": 0, "after": 0}
+        self.depth_fond_paker_before = {"before": 0, "after": 0}
+        self.paker_second_before = {"before": 0, "after": 0}
+        self.depth_fond_paker_second_before = {"before": 0, "after": 0}
+        self.dict_pump_shgn = {"before": 0, "after": 0}
+        self.dict_pump_ecn = {"before": 0, "after": 0}
+        self.dict_pump_shgn_depth = {"before": 0, "after": 0}
+        self.dict_pump_ecn_depth = {"before": 0, "after": 0}
         self.dict_sucker_rod = {}
         self.gis_list = []
         self.pvr_row_list = []
         self.dict_nkt_before = {}
         self.dict_nkt_after = {}
         self.dict_sucker_rod_after = {}
-        self.dict_pump = {"do": 0, "posle": 0}
+        self.dict_pump = {"before": 0, "after": 0}
         self.column_head_m = ''
         self.wellhead_fittings = ''
         self.groove_diameter = ''
@@ -511,13 +511,9 @@ class WellNkt(FindIndexPZ):
                     elif key is not None and row >= a_plan:
                         dict_nkt_po[key] = dict_nkt_po.get(
                             key, 0) + round(self.check_str_none(value), 1)
-                # print(f'индекс a_plan {dict_nkt}')
-            # data_list.shoe_nkt = float(sum(dict_nkt.values()))
-        # except Exception:
-        #     data_list.nkt_mistake = True
-        #     QMessageBox.warning(self, 'Ошибка', 'Программа не смогла определить диаметры и длину НКТ')
         self.dict_nkt_before = dict_nkt
         self.dict_nkt_after = dict_nkt_po
+
 
 
 class WellSuckerRod(FindIndexPZ):
@@ -600,15 +596,15 @@ class WellFondData(FindIndexPZ):
 
     def read_well(self, begin_index, cancel_index):
 
-        paker_do = {"do": 0, "posle": 0}
-        depth_fond_paker_do = {"do": 0, "posle": 0}
-        paker2_do = {"do": 0, "posle": 0}
-        depth_fond_paker2_do = {"do": 0, "posle": 0}
-        dict_pump_shgn = {"do": '0', "posle": '0'}
-        dict_pump_ecn = {"do": '0', "posle": '0'}
-        dict_pump_shgn_h = {"do": '0', "posle": '0'}
-        dict_pump_ecn_h = {"do": '0', "posle": '0'}
-        dict_pump = {"do": '0', "posle": '0'}
+        paker_do = {"before": 0, "after": 0}
+        depth_fond_paker_do = {"before": 0, "after": 0}
+        paker2_do = {"before": 0, "after": 0}
+        depth_fond_paker2_do = {"before": 0, "after": 0}
+        dict_pump_shgn = {"before": '0', "after": '0'}
+        dict_pump_ecn = {"before": '0', "after": '0'}
+        dict_pump_shgn_h = {"before": '0', "after": '0'}
+        dict_pump_ecn_h = {"before": '0', "after": '0'}
+        dict_pump = {"before": '0', "after": '0'}
         data_list.old_index = 1
         wellhead_fittings = ''
         column_head_m = ''
@@ -634,108 +630,112 @@ class WellFondData(FindIndexPZ):
 
                     if 'Пакер' in str(value) and 'типоразмер' in str(row[col + 2].value):
                         if '/' in str(row[col_do].value):
-                            paker_do["do"] = str(row[col_do].value).split('/')[0]
-                            paker2_do["do"] = str(row[col_do].value).split('/')[1]
+                            paker_do["before"] = str(row[col_do].value).split('/')[0]
+                            paker2_do["before"] = str(row[col_do].value).split('/')[1]
                         else:
-                            paker_do["do"] = row[col_do].value
+                            paker_do["before"] = row[col_do].value
 
                         if '/' in str(row[col_plan].value):
-                            paker_do["posle"] = str(row[col_plan].value).split('/')[0]
-                            paker2_do["posle"] = str(row[col_plan].value).split('/')[1]
+                            paker_do["after"] = str(row[col_plan].value).split('/')[0]
+                            paker2_do["after"] = str(row[col_plan].value).split('/')[1]
                         else:
-                            paker_do["posle"] = row[col_plan].value
+                            paker_do["after"] = row[col_plan].value
 
                     elif value == 'Насос' and row[col + 2].value == 'типоразмер':
                         if row[col_do].value:
                             if 'ЭЦН' in str(row[col_do].value).upper() or 'ВНН' in str(row[col_do].value).upper():
-                                dict_pump_ecn["do"] = row[col_do].value
+                                dict_pump_ecn["before"] = row[col_do].value
                                 if '/' in str(row[col_do].value):
-                                    dict_pump_ecn["do"] = [ecn for ecn in row[col_do].value.split('/')
+                                    dict_pump_ecn["before"] = [ecn for ecn in row[col_do].value.split('/')
                                                            if 'ЭЦН' in ecn or 'ВНН' in ecn][0]
                             if ('НВ' in str(row[col_do].value).upper() or 'ШГН' in str(row[col_do].value).upper() or
                                   'НН' in str(row[col_do].value).upper()) or 'RH' in str(row[col_do].value).upper():
-                                dict_pump_shgn["do"] = row[col_do].value
+                                dict_pump_shgn["before"] = row[col_do].value
                                 if '/' in str(row[col_do].value):
-                                    dict_pump_shgn["do"] = [ecn for ecn in row[col_do].value.split('/')
+                                    dict_pump_shgn["before"] = [ecn for ecn in row[col_do].value.split('/')
                                                             if 'НВ' in ecn or 'НН' in ecn or
                                                             'ШГН' in ecn or 'RH' in ecn][0]
 
-                                # print(dict_pump_ecn["do"])
+                                # print(dict_pump_ecn["before"])
 
                         if row[col_plan].value:
                             if 'ЭЦН' in str(row[col_plan].value).upper() or 'ВНН' in str(row[col_plan].value).upper():
-                                dict_pump_ecn["posle"] = row[col_plan].value
+                                dict_pump_ecn["after"] = row[col_plan].value
                                 if '/' in str(row[col_plan].value):
-                                    dict_pump_ecn["posle"] = [ecn for ecn in row[col_plan].value.split('/')
+                                    dict_pump_ecn["after"] = [ecn for ecn in row[col_plan].value.split('/')
                                                               if 'ЭЦН' in ecn or 'ВНН' in ecn][0]
 
                             if 'НВ' in str(row[col_plan].value).upper() or \
                                     'ШГН' in str(row[col_plan].value).upper() or \
                                     'НН' in str(row[col_plan].value).upper() or \
                                     'RHAM' in str(row[col_plan].value).upper():
-                                dict_pump_shgn["posle"] = row[col_plan].value
+                                dict_pump_shgn["after"] = row[col_plan].value
                                 if '/' in str(row[col_plan].value):
-                                    dict_pump_shgn["posle"] = [ecn for ecn in row[col_plan].value.split('/')
+                                    dict_pump_shgn["after"] = [ecn for ecn in row[col_plan].value.split('/')
                                                                if 'НВ' in ecn or 'НН' in ecn or
                                                                'ШГН' in ecn or 'RHAM' in ecn][0]
 
-                        if dict_pump_ecn["do"] != 0:
-                            dict_pump_ecn_h["do"] = self.check_str_none(
+                        if dict_pump_ecn["before"] != 0:
+                            dict_pump_ecn_h["before"] = self.check_str_none(
                                 self.ws.cell(row=row_index + 4,
                                              column=col_do + 1).value)
                             if '/' in str(self.ws.cell(row=row_index + 4, column=col_do + 1).value):
-                                dict_pump_ecn_h["do"] = max(self.check_str_none(self.ws.cell(
+                                dict_pump_ecn_h["before"] = max(self.check_str_none(self.ws.cell(
                                     row=row_index + 4, column=col_do + 1).value))
-                        if dict_pump_shgn["do"] != 0:
-                            dict_pump_shgn_h["do"] = self.check_str_none(
+                        if dict_pump_shgn["before"] != 0:
+                            dict_pump_shgn_h["before"] = self.check_str_none(
                                 self.ws.cell(row=row_index + 4,
                                              column=col_do + 1).value)
                             if '/' in str(self.ws.cell(row=row_index + 4, column=col_do + 1).value):
-                                dict_pump_shgn_h["do"] = min(self.check_str_none(self.ws.cell(
+                                dict_pump_shgn_h["before"] = min(self.check_str_none(self.ws.cell(
                                     row=row_index + 4, column=col_do + 1).value))
-                        if dict_pump_ecn["posle"] != 0:
-                            dict_pump_ecn_h["posle"] = self.check_str_none(self.ws.cell(row=row_index + 4,
+                        if dict_pump_ecn["after"] != 0:
+                            dict_pump_ecn_h["after"] = self.check_str_none(self.ws.cell(row=row_index + 4,
                                                                                         column=col_plan + 1).value)
                             if '/' in str(self.ws.cell(row=row_index + 4, column=col_plan + 1).value):
-                                dict_pump_ecn_h["posle"] = max(
+                                dict_pump_ecn_h["after"] = max(
                                     self.check_str_none(self.ws.cell(row=row_index + 4,
                                                                      column=col_plan + 1).value))
-                        if dict_pump_shgn["posle"] != 0:
-                            dict_pump_shgn_h["posle"] = self.check_str_none(
+                        if dict_pump_shgn["after"] != 0:
+                            dict_pump_shgn_h["after"] = self.check_str_none(
                                 self.ws.cell(row=row_index + 4,
                                              column=col_plan + 1).value)
                             if '/' in str(self.ws.cell(row=row_index + 4, column=col_plan + 1).value):
-                                dict_pump_shgn_h["posle"] = min(
+                                dict_pump_shgn_h["after"] = min(
                                     self.check_str_none(self.ws.cell(row=row_index + 4,
                                                                      column=col_plan + 1).value))
 
                     elif value == 'Н посадки, м':
                         try:
-                            if paker_do["do"] != 0:
-                                depth_fond_paker_do["do"] = \
+                            if paker_do["before"] != 0:
+                                depth_fond_paker_do["before"] = \
                                     self.check_str_none(row[col_do].value)[0]
-                                depth_fond_paker2_do["do"] = \
+                                depth_fond_paker2_do["before"] = \
                                     self.check_str_none(row[col_do].value)[1]
                         except Exception:
-                            if paker_do["do"] != 0:
-                                depth_fond_paker_do["do"] = row[col_do].value
+                            if paker_do["before"] != 0:
+                                depth_fond_paker_do["before"] = row[col_do].value
                         try:
-                            if paker_do["posle"] != 0:
-                                depth_fond_paker_do["posle"] = \
+                            if paker_do["after"] != 0:
+                                depth_fond_paker_do["after"] = \
                                     self.check_str_none(row[col_plan].value)[0]
-                                depth_fond_paker2_do["posle"] = \
+                                depth_fond_paker2_do["after"] = \
                                     self.check_str_none(row[col_plan].value)[1]
                         except Exception:
-                            if paker_do["posle"] != 0:
-                                depth_fond_paker_do["posle"] = row[col_plan].value
+                            if paker_do["after"] != 0:
+                                depth_fond_paker_do["after"] = row[col_plan].value
 
         if wellhead_fittings in [None, '']:
-            self.check_data_in_pz.append('Не указан тип устьевой арматуры\n')
+            self.check_data_in_pz.append('Не указан тип устьевой арматуры\n '
+                                         'Нарушен п. 9.1.9 инструкции БНД по предупреждению ГНВП №ПЗ-05 И-102089 ЮЛ-305')
         if column_head_m in [None, '']:
-            self.check_data_in_pz.append('Не указан тип Колонной головки или завод-изготовитель\n')
+            self.check_data_in_pz.append('Не указан тип Колонной головки или завод-изготовитель \n'
+                                         'Нарушен п. 9.1.9 инструкции БНД по предупреждению ГНВП №ПЗ-05 И-102089 ЮЛ-305')
         if groove_diameter in [None, '']:
             self.check_data_in_pz.append(
                 'Не указан Диаметр канавки устьевой арматуры или тип резьбы\n ')
+
+
 
         self.paker_before = paker_do
         self.depth_fond_paker_before = depth_fond_paker_do
@@ -887,7 +887,8 @@ class WellCondition(FindIndexPZ):
             self.check_data_in_pz.append('не указано статический уровень')
         if self.pressure_mkp.get_value in [None, 'не корректно', '-', 'нет', 'отсут']:
             self.check_data_in_pz.append(
-                'не указано наличие наличие устройство замера давления и наличие давления в МКП')
+                'не указано наличие наличие устройство замера давления и наличие давления в МКП \n'
+                'Нарушен п. 9.1.9 инструкции БНД по предупреждению ГНВП №ПЗ-05 И-102089 ЮЛ-305')
 
         if self.leakiness_count != 0:
             leakiness_quest = QMessageBox.question(self, 'нарушение колонны',
@@ -1238,6 +1239,30 @@ class WellData(FindIndexPZ):
         if self.level_cement_column.get_value in ['не корректно', None, '']:
             self.check_data_in_pz.append('не указан уровень цемент за колонной\n')
 
+        if self.dict_pump_shgn['before'] not in ['0', 0] and self.dict_pump_shgn_depth['before'] not in ['0', 0]:
+            adwdr = abs(sum(list(self.dict_sucker_rod.values())) - self.dict_pump_shgn_depth['before'])
+            if abs(sum(list(self.dict_sucker_rod.values())) - self.dict_pump_shgn_depth['before']) > 10:
+                QMessageBox.warning(self, 'Ошибка', f'Длина штанг {sum(list(self.dict_sucker_rod.values()))}м '
+                                                    f'до ремонта не равно глубине насоса '
+                                                    f'{self.dict_pump_shgn_depth["before"]}м \n')
+                self.check_data_in_pz.append(f'Ошибка в карте спуска: Длина штанг {sum(list(self.dict_sucker_rod.values()))}м '
+                                                    f'до ремонта не равно глубине насоса '
+                                                    f'{self.dict_pump_shgn_depth["before"]}м \n')
+
+        if self.dict_pump_shgn['after'] not in ['0', 0] and self.dict_pump_shgn_depth['after'] not in ['0', 0]:
+            if abs(sum(list(self.dict_sucker_rod_after.values())) - self.dict_pump_shgn_depth['after']) > 10:
+                QMessageBox.warning(self, 'Ошибка', f'Длина штанг {sum(list(self.dict_sucker_rod_after.values()))}м '
+                                                    f'после ремонта не равно глубине насоса '
+                                                    f'{self.dict_pump_shgn_depth["before"]}м')
+                self.check_data_in_pz.append(f'Ошибка в карте спуска: \nОшибка в карте спуска: Длина штанг {sum(list(self.dict_sucker_rod.values()))}м '
+                                                    f'после ремонта не равно глубине насоса '
+                                                    f'{self.dict_pump_shgn_depth["before"]}м')
+        if sum(list(self.dict_nkt_before.values())) > self.current_bottom:
+            QMessageBox.warning(self, 'Ошибка', f'Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
+                                                f'до ремонта больше текущего забоя {self.current_bottom}м')
+            self.check_data_in_pz.append(f'Ошибка в карте спуска: Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
+                                         f'до ремонта больше текущего забоя {self.current_bottom}м')
+
         if self.max_angle.get_value > 45 or 'gnkt' in self.work_plan:
             angle_true_question = QMessageBox.question(self,
                                                        'Зенитный угол',
@@ -1248,35 +1273,15 @@ class WellData(FindIndexPZ):
                 self.angle_data = WellData.read_angle_well()
                 if self.angle_data is None:
                     self.pause_app()
+        
 
-        if type(self.column_diameter.get_value) in [float, int]:
-            # if str(self.paker_before["do"]).lower() not in ['0', 0, '-', 'отсут', '', 'none', None]:
-            #
-            #     if '/' in str(self.depth_fond_paker_before["do"]):
-            #         paker_diameter = TabPageSo.paker_diameter_select(
-            #             self, str(self.depth_fond_paker_before["do"]).split('/')[0])
-            #         if paker_diameter not in self.paker_before["do"]:
-            #             self.check_data_in_pz.append(
-            #                 f'Не корректно указан диаметр фондового пакера в карте спуска '
-            #                 f'ремонта {str(self.paker_before["do"]).split("/")[0]} требуется пакер '
-            #                 f'диаметром {paker_diameter}мм')
-            #     else:
-            #         if self.depth_fond_paker_before["do"] != 0:
-            #             paker_diameter = TabPageSo.paker_diameter_select(self,
-            #                                                              self.depth_fond_paker_before["do"])
-            #             if str(paker_diameter) not in self.paker_before["do"]:
-            #                 self.check_data_in_pz.append(
-            #                     f'Не корректно указан диаметр фондового пакера в карте спуска '
-            #                     f'ремонта {self.paker_before["do"]} требуется пакер '
-            #                     f'диаметром {paker_diameter}мм')
-
-            if self.dict_pump_ecn["do"] != '0' and self.dict_pump_shgn["do"] != '0':
-                if self.paker_before["do"] in ['0', None, 0]:
+            if self.dict_pump_ecn["before"] != '0' and self.dict_pump_shgn["before"] != '0':
+                if self.paker_before["before"] in ['0', None, 0]:
                     self.check_data_in_pz.append(
                         f'В план заказе не указано посадка пакера при спущенной компоновке ОРД ')
-            if self.dict_pump_ecn['posle'] != '0' and \
-                    self.dict_pump_shgn['posle'] != '0':
-                if self.paker_before["do"] in ['0', None, 0]:
+            if self.dict_pump_ecn["before"] != '0' and \
+                    self.dict_pump_shgn["before"] != '0':
+                if self.paker_before["before"] in ['0', None, 0]:
                     self.check_data_in_pz.append(
                         f'В план заказе не указано посадка пакера при cпуске ОРД ')
 
@@ -1625,20 +1630,21 @@ class WellPerforation(FindIndexPZ):
 
                     if self.category_pressure == 3:
                         if difference.days > 90:
-                            self.check_data_in_pz.append(
+                            self.check_data_in_pz.append('Согласно требований инструкций БНД № П3-05 И-102089 ЮЛ-305 версия 2 '
                                 f'замер по пласту {plast} не соответствует регламенту '
                                 f'для скважин 3-й категории не более 3 месяцев до '
                                 f'начала ремонта')
                     elif self.category_pressure == 2:
                         if difference.days > 30:
                             self.check_data_in_pz.append(
-                                f'замер по пласту {plast} не соответствует регламенту '
+
+                                f'Согласно требований инструкций БНД № П3-05 И-102089 ЮЛ-305 версия 2  замер по пласту {plast} не соответствует регламенту '
                                 f'для скважин 3-й категории не более 1 месяца до '
                                 f'начала ремонта')
                     elif self.category_pressure == 1:
                         if difference.days > 3:
                             self.check_data_in_pz.append(
-                                f'замер по пласту {plast} не соответствует регламенту '
+                                f'Согласно требований инструкций БНД № П3-05 И-102089 ЮЛ-305 версия 2  замер по пласту {plast} не соответствует регламенту '
                                 f'для скважин 3-й категории не более 3 дней до '
                                 f'начала ремонта')
                 except Exception:
@@ -1691,7 +1697,11 @@ class WellCategory(FindIndexPZ):
                                         self.value_h2s_percent.append(0)
                                         if self.ws.cell(row=row - 1, column=col - 2).value not in ['3', 3]:
                                             self.check_data_in_pz.append(
-                                                'Не указано значение сероводорода в процентах')
+                                                'Не указано значение сероводорода в процентах. \nСогласно п.4 '
+                                                'Распоряжения от 11.04.2022г об утверждении методики расчета '
+                                                'расходной нормы нейтрализатора сероводорода необходимо обеспечить '
+                                                'в план-заказах на ТиКРС двух параметров по содержанию сероводороду '
+                                                'объемного (в %) и массового в мг/дм3 (мг/л) \n')
                                     else:
                                         self.value_h2s_percent.append(
                                             float(str(self.ws.cell(row=row, column=col - 1).value).replace(',', '.')))

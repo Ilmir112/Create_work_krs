@@ -350,7 +350,7 @@ class GnktOpz(GnktModel):
             volume_rast_edit = self.volume_rast_edit
 
         depth_fond_paker_do = sum(map(int, list(self.data_well.dict_nkt_before.values())))
-        if self.data_well.depth_fond_paker_before["do"] == 0:
+        if self.data_well.depth_fond_paker_before["before"] == 0:
             self.depth_fond_paker_do = sum(list(self.data_well.dict_nkt_before.values()))
             # print(depth_fond_paker_do)
             if self.depth_fond_paker_do >= self.data_well.current_bottom:
@@ -358,7 +358,7 @@ class GnktOpz(GnktModel):
                                                                  'Введите Глубины башмака НКТ', 500,
                                                                  0, self.data_well.current_bottom)
         else:
-            self.depth_fond_paker_do = self.data_well.depth_fond_paker_before["do"]
+            self.depth_fond_paker_do = self.data_well.depth_fond_paker_before["before"]
 
         gnkt_opz = [
             [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None],
@@ -554,7 +554,7 @@ class GnktOpz(GnktModel):
 
         opz = self.work_opz_gnkt(acid_info)
         n = 17
-        if self.data_well.depth_fond_paker_before["do"] != 0:  # вставка строк при наличии пакера
+        if self.data_well.depth_fond_paker_before["before"] != 0:  # вставка строк при наличии пакера
             gnkt_opz.insert(7, paker_opr)
             n += 1
 
