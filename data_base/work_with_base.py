@@ -563,13 +563,38 @@ def insert_data_well_dop_plan(self, data_well):
     self.data_well.head_column_additional = ProtectedIsDigit(well_data_dict["допколонна"]["голова"])
     self.data_well.curator = well_data_dict["куратор"]
     self.data_well.dict_pump_shgn = well_data_dict["оборудование"]["ШГН"]["тип"]
+    if 'do' in list(self.data_well.dict_pump_shgn.keys()):
+        self.data_well.dict_pump_shgn['before'] = self.data_well.dict_pump_shgn['do']
+        self.data_well.dict_pump_shgn['after'] = self.data_well.dict_pump_shgn['posle']
     self.data_well.dict_pump_shgn_depth = well_data_dict["оборудование"]["ШГН"]["глубина "]
+    if 'do' in list(self.data_well.dict_pump_shgn_depth.keys()):
+        self.data_well.dict_pump_shgn_depth['before'] = self.data_well.dict_pump_shgn_depth['do']
+        self.data_well.dict_pump_shgn_depth['after'] = self.data_well.dict_pump_shgn_depth['posle']
     self.data_well.dict_pump_ecn = well_data_dict["оборудование"]["ЭЦН"]["тип"]
+    if 'do' in list(self.dict_pump_ecn.keys()):
+        self.data_well.data_well.dict_pump_ecn['before'] = self.data_well.dict_pump_ecn['do']
+        self.data_well.dict_pump_ecn['after'] = self.data_well.dict_pump_ecn['posle']
     self.data_well.dict_pump_ecn_depth = well_data_dict["оборудование"]["ЭЦН"]["глубина "]
+    if 'do' in list(self.data_well.dict_pump_ecn.keys()):
+        self.data_well.dict_pump_ecn_depth['before'] = self.data_well.dict_pump_ecn_depth['do']
+        self.data_well.dict_pump_ecn_depth['after'] = self.data_well.dict_pump_ecn_depth['posle']
     self.data_well.paker_before = well_data_dict["оборудование"]["пакер"]["тип"]
+    if 'do' in list(self.data_well.paker_before.keys()):
+        self.data_well.paker_before['before'] = self.data_well.paker_before['do']
+        self.data_well.paker_before['after'] = self.data_well.paker_before['posle']
     self.data_well.depth_fond_paker_before = well_data_dict["оборудование"]["пакер"]["глубина "]
+    if 'do' in list(self.data_well.depth_fond_paker_before.keys()):
+        self.data_well.depth_fond_paker_before['before'] = self.data_well.depth_fond_paker_before['do']
+        self.data_well.depth_fond_paker_before['after'] = self.data_well.depth_fond_paker_before['posle']
+
     self.data_well.paker_second_before = well_data_dict["оборудование"]["пакер2"]["тип"]
+    if 'do' in list(self.data_well.paker_second_before.keys()):
+        self.data_well.paker_second_before['before'] = self.data_well.paker_second_before['do']
+        self.data_well.paker_second_before['after'] = self.data_well.paker_second_before['posle']
     self.data_well.depth_fond_paker_second_before = well_data_dict["оборудование"]["пакер2"]["глубина "]
+    if 'do' in list(self.depth_fond_paker_second_before.keys()):
+        self.data_well.depth_fond_paker_second_before['before'] = self.data_well.depth_fond_paker_second_before['do']
+        self.data_well.depth_fond_paker_second_before['after'] = self.data_well.depth_fond_paker_second_before['posle']
     self.data_well.static_level = ProtectedIsDigit(well_data_dict["статика"])
     self.data_well.dinamic_level = ProtectedIsDigit(well_data_dict["динамика"])
     if 'После' in list(well_data_dict["НКТ"].keys()):
