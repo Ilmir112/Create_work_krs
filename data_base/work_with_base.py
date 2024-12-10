@@ -572,7 +572,7 @@ def insert_data_well_dop_plan(self, data_well):
         self.data_well.dict_pump_shgn_depth['after'] = self.data_well.dict_pump_shgn_depth['posle']
     self.data_well.dict_pump_ecn = well_data_dict["оборудование"]["ЭЦН"]["тип"]
     if 'do' in list(self.data_well.dict_pump_ecn.keys()):
-        self.data_well.data_well.dict_pump_ecn['before'] = self.data_well.dict_pump_ecn['do']
+        self.data_well.dict_pump_ecn['before'] = self.data_well.dict_pump_ecn['do']
         self.data_well.dict_pump_ecn['after'] = self.data_well.dict_pump_ecn['posle']
     self.data_well.dict_pump_ecn_depth = well_data_dict["оборудование"]["ЭЦН"]["глубина "]
     if 'do' in list(self.data_well.dict_pump_ecn_depth.keys()):

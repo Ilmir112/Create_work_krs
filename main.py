@@ -181,12 +181,10 @@ class MyMainWindow(QMainWindow):
     def read_excel_file(self):
         from find import FindIndexPZ
         from work_py.leakage_column import LeakageWindow
-        from category_correct import CategoryWindow
 
         from find import WellNkt, WellPerforation, WellCondition, WellHistoryData, WellName, WellCategory, \
             WellFondData, WellSuckerRod, WellExpectedPickUp, WellData
 
-        self.dict_category = {}
         # Запуск основного класса и всех дочерних классов в одной строке
         self.data_well = FindIndexPZ(self.ws, self.work_plan, self)
         self.data_well.work_plan = self.work_plan
@@ -358,7 +356,7 @@ class MyMainWindow(QMainWindow):
         from work_py.gnkt_frez import WorkWithGnkt
         from find import FindIndexPZ
 
-        if self.work_plan in ['krs', 'dop_plan', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz', 'gnkt_frez']:
+        if self.work_plan in ['krs', 'dop_plan', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz', 'gnkt_frez', 'prs']:
             QMessageBox.information(self, 'ВНИМАНИЕ', 'Для корректного прочтения план заказа, план заказ должен быть '
                                                       'пересохранен в формат .xlsx (КНИГА EXCEL, '
                                                       'excel версия от 2010г и выше)')
@@ -370,7 +368,6 @@ class MyMainWindow(QMainWindow):
                     data_list.pause = True
                     self.data_well = self.read_excel_file()
                     read_pz = CreatePZ(self.data_well, self.ws, self)
-
 
                 except FileNotFoundError as f:
                     QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
@@ -1200,6 +1197,10 @@ class MyWindow(MyMainWindow):
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
+        elif action == self.create_GNKT_frez and self.table_widget is None:
+            self.work_plan = 'prs'
+            self.tableWidgetOpen(self.work_plan)
+            self.ws = self.open_read_excel_file_pz()
 
 
 
