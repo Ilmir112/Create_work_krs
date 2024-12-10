@@ -148,7 +148,6 @@ class TabPageDp(TabPageUnion):
         self.grid.addWidget(self.work_label, 25, 1)
         self.grid.addWidget(self.work_edit, 26, 1, 2, 4)
 
-
         self.well_number_edit.editingFinished.connect(self.update_well)
         try:
             self.well_area_edit.setText(f'{self.data_well.well_area.get_value}')
@@ -157,6 +156,21 @@ class TabPageDp(TabPageUnion):
             # self.well_number_edit.setEnabled(False)
         except Exception:
             pass
+        if self.work_plan in 'dop_plan':
+            if self.data_well.column_additional:
+                self.template_depth_addition_label = QLabel('Глубина спуска шаблона в доп колонне')
+                self.template_depth_addition_edit = QLineEdit(self)
+                self.template_depth_addition_edit.setValidator(self.validator_float)
+                self.template_depth_addition_edit.setText(str(self.data_well.template_depth_addition))
+
+                self.template_length_addition_label = QLabel('Длина шаблона в доп колонне')
+                self.template_length_addition_edit = QLineEdit(self)
+                self.template_length_addition_edit.setValidator(self.validator_float)
+                self.template_length_addition_edit.setText(str(self.data_well.template_length_addition))
+                self.grid.addWidget(self.template_depth_addition_label, 6, 4)
+                self.grid.addWidget(self.template_depth_addition_edit, 7, 4)
+                self.grid.addWidget(self.template_length_addition_label, 6, 5)
+                self.grid.addWidget(self.template_length_addition_edit, 7, 5)
 
         # self.well_area_edit.textChanged.connect(self.update_well)
 

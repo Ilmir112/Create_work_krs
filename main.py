@@ -376,21 +376,21 @@ class MyMainWindow(QMainWindow):
                     QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
                     self.pause_app()
 
-            if self.work_plan in ['krs', 'dop_plan']:
+                if self.work_plan in ['krs', 'dop_plan']:
 
-                self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
-                self.copy_pz(self.ws, self.table_widget, self.work_plan)
-                if self.work_plan == 'dop_plan':
-                    self.rir_window = DopPlanWindow(self.data_well, self.table_widget)
-                    self.set_modal_window(self.rir_window)
-            elif self.work_plan in ['gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz']:
+                    self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
+                    self.copy_pz(self.ws, self.table_widget, self.work_plan)
+                    if self.work_plan == 'dop_plan':
+                        self.rir_window = DopPlanWindow(self.data_well, self.table_widget)
+                        self.set_modal_window(self.rir_window)
+                elif self.work_plan in ['gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz']:
 
-                self.gnkt_data = GnktOsvWindow(self.ws,
-                                               self.table_title, self.table_schema, self.table_widget,
-                                               self.data_well)
-            elif self.work_plan == 'gnkt_frez':
-                self.gnkt_data = WorkWithGnkt(self.ws, self.table_title, self.table_schema, self.table_widget,
-                                              self.data_well)
+                    self.gnkt_data = GnktOsvWindow(self.ws,
+                                                   self.table_title, self.table_schema, self.table_widget,
+                                                   self.data_well)
+                elif self.work_plan == 'gnkt_frez':
+                    self.gnkt_data = WorkWithGnkt(self.ws, self.table_title, self.table_schema, self.table_widget,
+                                                  self.data_well)
         elif self.work_plan in ['plan_change', 'dop_plan_in_base']:
             data_list.data_in_base = True
             self.data_well = FindIndexPZ
