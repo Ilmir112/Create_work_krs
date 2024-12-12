@@ -216,8 +216,10 @@ class FindIndexPZ(MyMainWindow):
         self.data_fond_min = ProtectedIsDigit(0)
         self.data_pvr_min = ProtectedIsDigit(0)
         self.well_volume_in_pz = []
-
-        self.read_pz()
+        if self.work_plan not in ['prs']:
+            self.read_pz()
+        else:
+            self.read_pz_prs()
 
     def read_pz(self):
         cat_well_min = []
@@ -249,7 +251,7 @@ class FindIndexPZ(MyMainWindow):
             elif any(['Ожидаемые показатели после' in str(col) for col in row]):
                 self.data_x_min = ProtectedIsDigit(row_ind)
                 # print(f' индекс Ожидаемые показатели {self.data_x_min}')
-            elif '11. Эксплуатационные горизонты и интервалы перфорации:' in row:
+            elif any(['эксплуатационные горизонты и интервалы перфорации' in str(col).lower() for col in row]):
                 self.data_pvr_min = ProtectedIsDigit(row_ind)
             elif 'Оборудование скважины ' in row:
                 self.data_fond_min = ProtectedIsDigit(row_ind)
@@ -272,6 +274,161 @@ class FindIndexPZ(MyMainWindow):
                 self.pipes_ind = ProtectedIsDigit(row_ind + 1)
 
             elif 'ШТАНГИ' == str(row[1]).upper():
+                self.sucker_rod_ind = ProtectedIsDigit(row_ind + 1)
+
+
+            elif any(['II. История эксплуатации скважины' in str(col) for col in row]):
+                self.data_pvr_max = ProtectedIsDigit(row_ind)
+
+            elif 'III. Состояние скважины к началу ремонта ' in row:
+                self.condition_of_wells = ProtectedIsDigit(row_ind)
+
+
+            for col, value in enumerate(row):
+                if value is not None and col <= 12:
+                    if 'сужен' in str(value).lower() or 'не проход' in str(value).lower() or \
+                            'дорн' in str(value).lower() or 'пластырь' in str(value).lower():
+                        self.problem_with_ek = True
+                        self.problem_with_ek = True
+
+                    if 'гипс' in str(value).lower() or 'гидратн' in str(value).lower():
+                        self.gips_in_well = True
+
+        if self.cat_well_max.get_value == 0:
+            QMessageBox.warning(self, 'Ошибка', 'Не корректный файл excel, либо отсутствует строка с '
+                                                'текстом ПЛАН-ЗАКАЗ или ПЛАН-РАБОТ')
+            self.pause_app()
+            return
+
+        if self.cat_well_min.get_value == 0:
+            QMessageBox.warning(self, 'индекс начала копирования',
+                                'Программа не смогла определить строку начала копирования, нужно '
+                                'добавить "Категория скважины" в ПЗ для определения начала копирования')
+            self.pause_app()
+            return
+        if self.data_well_max.get_value == 0:
+            QMessageBox.warning(self, 'индекс окончания копирования',
+                                'Программа не смогла определить строку с IX. Мероприятия по предотвращению аварий '
+                                'нужно добавить "IX. Мероприятия по предотвращению аварии" в ПЗ')
+            self.pause_app()
+            return
+        if self.data_well_min.get_value == 0:
+            QMessageBox.warning(self, 'индекс начала строки после план заказ',
+                                'Программа не смогла найти начала строку с названием "План работ" или "план заказ"')
+            self.pause_app()
+            return
+
+        if self.sucker_rod_none:
+            if self.sucker_rod_ind.get_value == 0:
+                sucker_mes = QMessageBox.question(self, 'ШТАНГИ', 'Программа определелила, что в скважине '
+                                                                  'отсутствуют штанги, корректно ли это?')
+                if sucker_mes == QMessageBox.StandardButton.Yes:
+                    self.sucker_rod_ind = ProtectedIsDigit(0)
+                else:
+                    QMessageBox.information(self, 'ШТАНГИ', 'Нужно добавить "ШТАНГИ" в таблицу?')
+                    self.pause_app()
+                    return
+
+        if self.data_x_min.get_value == 0:
+            QMessageBox.warning(self, 'индекс начала копирования ожидаемых показателей',
+                                'Программа не смогла определить строку начала копирования ожидаемых показателей')
+            self.pause_app()
+            return
+
+        if self.data_pvr_max.get_value == 0:
+            QMessageBox.warning(self, 'индекс историю',
+                                'Программа не смогла найти "II. История эксплуатации скважины"')
+            self.pause_app()
+            return
+
+        if self.pipes_ind.get_value == 0:
+            QMessageBox.warning(self, 'индекс начала строки с НКТ',
+                                'Программа не смогла найти строку с НКТ, необходимо проверить столбец В')
+            self.pause_app()
+            return
+        if self.data_pvr_min.get_value == 0:
+            QMessageBox.warning(self, 'индекс начала начала ПВР', 'Программа не смогла найти индекс начала ПВР')
+            self.pause_app()
+            return
+        if self.data_fond_min.get_value == 0:
+            QMessageBox.warning(self, 'индекс начала строки с таблицей фондового оборудования',
+                                'Программа не смогла найти строку с таблицей фондового оборудования')
+            self.pause_app()
+            return
+        if self.type_kr == '':
+            QMessageBox.information(self, 'Вид ГТМ', 'Приложение не смогло найти тип КР, '
+                                                     'необходимо внести вручную')
+        if self.condition_of_wells.get_value == 0:
+            QMessageBox.warning(
+                self, 'индекс копирования',
+                'Программа не смогла определить строку n\ III. Состояние скважины к началу ремонта ')
+            self.pause_app()
+            return
+        if self.type_kr in ['', None]:
+            self.check_data_in_pz.append('Не указан Вид и категория ремонта, его шифр\n')
+
+        if self.work_plan != 'plan_change':
+            self.row_expected = []
+            for j in range(self.data_x_min.get_value,
+                           self.data_x_max.get_value):  # Ожидаемые показатели после ремонта
+                lst = []
+                for i in range(0, 12):
+                    lst.append(self.ws.cell(row=j + 1, column=i + 1).value)
+                self.row_expected.append(lst)
+
+    def read_pz_prs(self):
+        cat_well_min = []
+        image_loader = None
+        try:
+            # Копирование изображения
+            image_loader = SheetImageLoader(self.ws)
+
+        except Exception as e:
+            QMessageBox.warning(None, 'Ошибка', f'Ошибка в копировании изображений {e}')
+
+        for row_ind, row in enumerate(self.ws.iter_rows(values_only=True, max_row=300, max_col=20)):
+            self.ws.row_dimensions[row_ind].hidden = False
+            if self.cat_well_min.get_value != 0:
+                if self.data_x_max.get_value < row_ind and image_loader:
+                    self.work_with_img(image_loader, row_ind)
+
+            if 'Категория скважины' in row:
+                cat_well_min.append(row_ind + 1)
+                self.cat_well_min = ProtectedIsDigit(min(cat_well_min))  # индекс начала категории
+
+            elif any(['план-заказ' in str(col).lower() or 'план работ' in str(col).lower() for col in row]) \
+                    and row_ind < 50:
+                self.cat_well_max = ProtectedIsDigit(row_ind)
+                self.data_well_min = ProtectedIsDigit(row_ind + 1)
+            elif any(['стабилизатор' in str(col).lower() and 'желез' in str(col).lower() for col in row]):
+                self.data_well.stabilizator_need = True
+
+            elif any(['Ожидаемые показатели после' in str(col) for col in row]):
+                self.data_x_min = ProtectedIsDigit(row_ind)
+                # print(f' индекс Ожидаемые показатели {self.data_x_min}')
+            elif '9. Эксплуатационные горизонты и интервалы перфорации:' in row:
+                self.data_pvr_min = ProtectedIsDigit(row_ind)
+            elif 'Оборудование скважины ' in row:
+                self.data_fond_min = ProtectedIsDigit(row_ind)
+
+            elif any(['VIII. Вид и категория ремонта, его шифр' in str(col) for col in row]):
+                type_kr = self.ws.cell(row=row_ind + 2, column=1).value
+                n = 1
+                while type_kr is None and n != 8:
+                    type_kr = self.ws.cell(row=row_ind + 2, column=1 + n).value
+                    n += 1
+                self.type_kr = type_kr
+
+            elif any(['IX. Мероприятия по предотвращению' in str(col) for col in row]) or \
+                    any(['IX. Мероприятия по предотвращению аварий, инцидентов и осложнений::' in str(col) for col in
+                         row]):
+
+                self.data_well_max = ProtectedIsDigit(row_ind)
+
+            elif 'НКТ' == str(row[0]).upper():
+                self.pipes_ind = ProtectedIsDigit(row_ind + 1)
+
+            elif 'ШТАНГИ' == str(row[0]).upper():
                 self.sucker_rod_ind = ProtectedIsDigit(row_ind + 1)
 
             elif ('ХI Планируемый объём работ:' in row or
@@ -335,11 +492,7 @@ class FindIndexPZ(MyMainWindow):
                     return
 
         if self.data_x_max.get_value == 0:
-            QMessageBox.warning(self, 'индекс окончания копирования ожидаемых показателей',
-                                'Программа не смогла определить строку окончания копирования'
-                                ' ожидаемых показателей "ХI Планируемый объём работ"')
-            self.pause_app()
-            return
+            self.data_x_max = ProtectedIsDigit(self.data_x_min.get_value + 2)
 
         if self.data_x_min.get_value == 0:
             QMessageBox.warning(self, 'индекс начала копирования ожидаемых показателей',
@@ -490,8 +643,8 @@ class WellNkt(FindIndexPZ):
         a_plan = 0
         data_list.nkt_mistake = False
         for row in range(begin_index, cancel_index):  # словарь количества НКТ и метраж
-            if 'план' in str(self.ws.cell(row=row, column=3).value).lower() or str(
-                    self.ws.cell(row=row, column=3).value).lower() == 'после ремонта':
+            if 'план' in str(self.ws.cell(row=row, column=2).value).lower() or str(
+                    self.ws.cell(row=row, column=2).value).lower() == 'карта спуска (планируемое)':
                 a_plan = row
         if a_plan == 0:
             QMessageBox.warning(self, 'Индекс планового НКТ',
@@ -533,9 +686,8 @@ class WellSuckerRod(FindIndexPZ):
         b_plan = 0
         if self.sucker_rod_ind.get_value != 0:
             for row in range(begin_index, cancel_index):  # словарь количества штанг и метраж
-                if 'план' in str(self.ws.cell(row=row, column=3).value) or str(
-                        self.ws.cell(row=row, column=3).value).lower() == 'план' \
-                        or str(self.ws.cell(row=row, column=3).value).lower() == 'после ремонта':
+                if str(self.ws.cell(row=row, column=2).value).lower() == 'план' \
+                        or str(self.ws.cell(row=row, column=2).value).lower() == 'карта спуска (планируемое)':
                     b_plan = row
 
             if b_plan == 0 and self.sucker_rod_none is True:

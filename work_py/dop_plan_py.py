@@ -422,6 +422,8 @@ class DopPlanWindow(WindowUnion):
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddProject, 3, 1)
 
+        self.perforation_list = []
+
     def add_row_table(self):
 
         current_widget = self.tabWidget.currentWidget()
@@ -440,9 +442,13 @@ class DopPlanWindow(WindowUnion):
             QMessageBox.warning(self, 'Ошибка', 'Не введены все данные')
             return
         udlin = round(float(self.roof_edit) - float(vertical_line), 1)
+        if len(self.perforation_list) == 0:
+            QMessageBox.warning(self, 'Ошибка', 'Нужно сначало добавить проектные интервалы перфорации')
+            return
+
         if [self.plast_line, vertical_line, self.roof_edit, self.sole_edit, self.date_pvr_edit, self.count_pvr_edit,
-            self.type_pvr_edit, self.pressure_pvr_edit, self.date_pressure_edit] not in self.dict_perforation:
-            self.dict_perforation.append(
+            self.type_pvr_edit, self.pressure_pvr_edit, self.date_pressure_edit] not in self.perforation_list:
+            self.perforation_list.append(
                 [self.plast_line, vertical_line, self.roof_edit, self.sole_edit, self.date_pvr_edit,
                  self.count_pvr_edit,
                  self.type_pvr_edit, self.pressure_pvr_edit, self.date_pressure_edit])
@@ -473,7 +479,6 @@ class DopPlanWindow(WindowUnion):
         table_in_base_combo = str(current_widget.well_data_in_base_combo.currentText())
 
         if ' от' in table_in_base_combo:
-            asdf = table_in_base_combo.split(' ')
             table_in_base = table_in_base_combo.split(' ')[3].replace('krs', 'ПР').replace('dop_plan', 'ДП').replace(
                 'dop_plan_in_base', 'ДП')
             type_kr = table_in_base_combo.split(' ')[2]
@@ -496,7 +501,7 @@ class DopPlanWindow(WindowUnion):
         self.target_row_index_cancel = 5000
         self.bottom_row_index = 5000
 
-        perforation_list = []
+
 
         for i, row in self.data.items():
             if i != 'image':
@@ -508,7 +513,7 @@ class DopPlanWindow(WindowUnion):
                         self.old_index = 1
                     elif 'II. История эксплуатации скважины' in str(row[col]['value']) and \
                             self.data_well.work_plan not in ['plan_change']:
-                        self.target_row_index_cancel = int(i) - 1
+                        self.target_row_index_cancel = int(i)-1
                         break
                     elif 'внутренний диаметр ( d шарошечного долота) не обсаженной части ствола' in str(
                             row[col]['value']) and \
@@ -532,18 +537,22 @@ class DopPlanWindow(WindowUnion):
             else:
 
                 self.data_well.image_list = row
-
-            if len(list_row) != 0 and \
-                    'внутренний диаметр ( d шарошечного долота) не обсаженной части ствола' not in list_row:
-                if all([col is None or col == '' for col in list_row]) is False:
-                    perforation_list.append(list_row)
+            self.count_diam = 0
+            if len(list_row) > 4:
+                asdd = list_row[1]
+                if 'внутренний диаметр' not in list_row[1]:
+                    if all([col is None or col == '' for col in list_row]) is False:
+                        if list not in self.perforation_list:
+                            self.perforation_list.append(list_row)
+                else:
+                    self.count_diam = 1
         self.data_well.insert_index2 = self.data_well.data_x_max.get_value
         self.data_well.count_template = 1
 
         if self.data_well.work_plan != 'plan_change':
             self.tableWidget.setSortingEnabled(False)
             rows = self.tableWidget.rowCount()
-            for row_pvr in perforation_list[::-1]:
+            for row_pvr in self.perforation_list[::-1]:
                 self.tableWidget.insertRow(rows)
                 for index_col, col_pvr in enumerate(row_pvr):
                     if col_pvr is not None:
@@ -593,7 +602,13 @@ class DopPlanWindow(WindowUnion):
                     if int(self.target_row_index) + 1 <= value[1] <= int(self.target_row_index_cancel - 4):
                         value = [value[0], value[1], value[0], value[3]]
                     boundaries_dict_new[key] = value
+            len_rows = len(plast_list) - (self.target_row_index_cancel - self.target_row_index) + self.count_diam
+            asdef = self.target_row_index_cancel - self.target_row_index
+            index_key_change = self.target_row_index + len_rows
 
+            while index_key_change != self.target_row_index:
+                data[str(index_key_change)] = data[str(index_key_change - len_rows)]
+                index_key_change -= 1
             for index_row, plast in enumerate(plast_list):
                 row_index = str(int(self.target_row_index + index_row + 1))
                 a = plast[0]
@@ -650,64 +665,64 @@ class DopPlanWindow(WindowUnion):
                      'fill': {'color': 'RGB(00000000)'},
                      'borders': {'left': None, 'right': None, 'top': None, 'bottom': None},
                      'alignment': {'horizontal': None, 'vertical': None, 'wrap_text': None}}]
-            rows = self.tableWidget.rowCount()
-            while self.target_row_index != self.target_row_index_cancel - rows:
-                index = str(int(self.target_row_index + index_row + 2))
-                data[index] = [
-                    {'value': '', 'font': {'name': 'Times New Roman Cyr', 'size': 10.0, 'bold': False, 'italic': False},
-                     'fill': {'color': 'RGB(00000000)'},
-                     'borders': {'left': None, 'right': None, 'top': None, 'bottom': None},
-                     'alignment': {'horizontal': None, 'vertical': None, 'wrap_text': True}},
-                    {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-                     'fill': {'color': 'RGB(00000000)'},
-                     'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-                     'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-                    {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-                     'fill': {'color': 'RGB(00000000)'},
-                     'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-                     'alignment': {'horizontal': None, 'vertical': None, 'wrap_text': None}},
-                    {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-                     'fill': {'color': 'RGB(00000000)'},
-                     'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-                     'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-                    {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-                     'fill': {'color': 'RGB(00000000)'},
-                     'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-                     'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-                    {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-                     'fill': {'color': 'RGB(00000000)'},
-                     'borders': {'left': 'thin', 'right': None, 'top': 'thin', 'bottom': 'thin'},
-                     'alignment': {'horizontal': None, 'vertical': 'center', 'wrap_text': None}},
-                    {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-                     'fill': {'color': 'RGB(00000000)'},
-                     'borders': {'left': 'thin', 'right': None, 'top': 'thin', 'bottom': 'thin'},
-                     'alignment': {'horizontal': None, 'vertical': 'center', 'wrap_text': None}},
-                    {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-                     'fill': {'color': 'RGB(00000000)'},
-                     'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-                     'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-                    {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-                     'fill': {'color': 'RGB(00000000)'},
-                     'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-                     'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-                    {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-                     'fill': {'color': 'RGB(00000000)'},
-                     'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-                     'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-                    {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-                     'fill': {'color': 'RGB(00000000)'},
-                     'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-                     'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-                    {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-                     'fill': {'color': 'RGB(00000000)'},
-                     'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-                     'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-                    {'value': '', 'font': {'name': 'Calibri', 'size': 11.0, 'bold': False, 'italic': False},
-                     'fill': {'color': 'RGB(00000000)'},
-                     'borders': {'left': None, 'right': None, 'top': None, 'bottom': None},
-                     'alignment': {'horizontal': None, 'vertical': None, 'wrap_text': None}}]
-
-                self.target_row_index += 1
+            # rows = self.tableWidget.rowCount()
+            # while self.target_row_index != self.target_row_index_cancel:
+            #     index = str(int(self.target_row_index + index_row + 2))
+            #     data[index] = [
+            #         {'value': '', 'font': {'name': 'Times New Roman Cyr', 'size': 10.0, 'bold': False, 'italic': False},
+            #          'fill': {'color': 'RGB(00000000)'},
+            #          'borders': {'left': None, 'right': None, 'top': None, 'bottom': None},
+            #          'alignment': {'horizontal': None, 'vertical': None, 'wrap_text': True}},
+            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
+            #          'fill': {'color': 'RGB(00000000)'},
+            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
+            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
+            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
+            #          'fill': {'color': 'RGB(00000000)'},
+            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
+            #          'alignment': {'horizontal': None, 'vertical': None, 'wrap_text': None}},
+            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
+            #          'fill': {'color': 'RGB(00000000)'},
+            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
+            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
+            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
+            #          'fill': {'color': 'RGB(00000000)'},
+            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
+            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
+            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
+            #          'fill': {'color': 'RGB(00000000)'},
+            #          'borders': {'left': 'thin', 'right': None, 'top': 'thin', 'bottom': 'thin'},
+            #          'alignment': {'horizontal': None, 'vertical': 'center', 'wrap_text': None}},
+            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
+            #          'fill': {'color': 'RGB(00000000)'},
+            #          'borders': {'left': 'thin', 'right': None, 'top': 'thin', 'bottom': 'thin'},
+            #          'alignment': {'horizontal': None, 'vertical': 'center', 'wrap_text': None}},
+            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
+            #          'fill': {'color': 'RGB(00000000)'},
+            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
+            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
+            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
+            #          'fill': {'color': 'RGB(00000000)'},
+            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
+            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
+            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
+            #          'fill': {'color': 'RGB(00000000)'},
+            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
+            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
+            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
+            #          'fill': {'color': 'RGB(00000000)'},
+            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
+            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
+            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
+            #          'fill': {'color': 'RGB(00000000)'},
+            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
+            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
+            #         {'value': '', 'font': {'name': 'Calibri', 'size': 11.0, 'bold': False, 'italic': False},
+            #          'fill': {'color': 'RGB(00000000)'},
+            #          'borders': {'left': None, 'right': None, 'top': None, 'bottom': None},
+            #          'alignment': {'horizontal': None, 'vertical': None, 'wrap_text': None}}]
+            #
+            #     self.target_row_index += 1
         data[str(self.bottom_row_index)][3]['value'] = current_bottom
         data[str(self.bottom_row_index)][5]['value'] = current_bottom_date_edit
         data[str(self.bottom_row_index)][10 - self.old_index]['value'] = method_bottom_combo

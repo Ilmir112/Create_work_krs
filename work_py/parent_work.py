@@ -337,6 +337,7 @@ class WindowUnion(MyMainWindow):
                 self.data_well.open_trunk_well = True
             else:
                 self.data_well.open_trunk_well = False
+
     def extraction_data(self, table_name, paragraph_row=0):
         date_table = table_name.split(' ')[-1]
         well_number = table_name.split(' ')[0]
@@ -370,7 +371,9 @@ class WindowUnion(MyMainWindow):
                 Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
                 Data_gaz = namedtuple("Data_gaz", "category data")
                 self.data_well.dict_category = {}
-
+                self.data_well.category_pressure_list = []
+                self.data_well.category_h2s_list = []
+                self.data_well.category_gaz_factor_percent = []
                 for plast, plast_data in dict_data_well.items():
                     self.data_well.dict_category.setdefault(plast, {}).setdefault(
                         'по давлению',
@@ -382,6 +385,10 @@ class WindowUnion(MyMainWindow):
 
                     self.data_well.dict_category.setdefault(plast, {}).setdefault(
                         'отключение', dict_data_well[plast]['отключение'])
+
+                    self.data_well.category_pressure_list.append(plast_data['по давлению'][0])
+                    self.data_well.category_h2s_list.append(plast_data['по сероводороду'][0])
+                    self.data_well.category_gaz_factor_percent.append(plast_data['по газовому фактору'][0])
 
             if self.data_well.work_plan in ['dop_plan', 'dop_plan_in_base']:
                 data = self.insert_data_dop_plan(result, paragraph_row)

@@ -280,7 +280,7 @@ class GnktBopz(GnktModel):
             [None,
              'ПОРЯДОК ПРОВЕДЕНИЯ РАБОТ', None, None, None, None, None, None, None, None, None, None],
             [None,
-             'п.п', None, None, None, None, None, None, None, None, None, 'Ответственный'],
+             'п.п', 'Порядок работ', None, None, None, None, None, None, None, None, 'Ответственный'],
             [None, 1,
              'Ознакомить бригаду с планом работ и режимными параметрами дизайна по промывке и СПО. Провести инструктаж '
              'по промышленной безопасности',

@@ -1197,7 +1197,7 @@ class MyWindow(MyMainWindow):
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
-        elif action == self.create_GNKT_frez and self.table_widget is None:
+        elif action == self.create_PRS and self.table_widget is None:
             self.work_plan = 'prs'
             self.tableWidgetOpen(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
@@ -2228,8 +2228,8 @@ class MyWindow(MyMainWindow):
 
     def perforation_new_window(self):
         from work_py.perforation import PerforationWindow
-        if len(self.data_well.category_pressure_well) > 1:
-            if self.data_well.category_pressure_well[1] == 1 and self.data_well.category_pvo != 1:
+        if len(self.data_well.category_pressure_list) > 1:
+            if self.data_well.category_pressure_list[1] == 1 and self.data_well.category_pvo != 1:
                 QMessageBox.information(self, 'Внимание', 'Не произведен монтаж первой категории')
                 return
         self.add_window(PerforationWindow)

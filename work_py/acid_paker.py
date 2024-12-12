@@ -1839,7 +1839,7 @@ class AcidPakerWindow(WindowUnion):
             elif self.data_well.perforation_roof - 5 + paker_khost < self.data_well.current_bottom:
                 flushing_downhole_list = f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n ' \
                                          f'При отсутствии циркуляции на скважине промывку исключить, ' \
-                                         f'увеличить объем продавки кислотного состава в 1,5 кратном объеме НКТ' \
+                                         f'увеличить объем продавки кислотного состава в 1,5 кратном объеме НКТ\n' \
                                          f'При наличии ЦИРКУЛЯЦИИ: Допустить пакер до глубины ' \
                                          f'{int(self.data_well.perforation_roof - 5)}м. ' \
                                          f'(на 5м выше кровли интервала перфорации), низ НКТ до глубины' \
