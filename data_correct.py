@@ -584,11 +584,13 @@ class TabPageSoCorrect(TabPageUnion):
         self.type_kr_combo.setCurrentIndex(self.select_type_kr())
 
     def select_type_kr(self):
-        kr = self.data_well.type_kr.split(' ')[0] + ' '
+        kr = self.data_well.type_kr
         index_sel = 0
-        for index, type_kr in enumerate(data_list.TYPE_KR_LIST):
-            if kr in type_kr and kr != ' ':
-                index_sel = index
+        if kr:
+            kr = kr.split(' ')[0] + ' '
+            for index, type_kr in enumerate(data_list.TYPE_KR_LIST):
+                if kr in type_kr and kr != ' ':
+                    index_sel = index
         return index_sel
 
     def update_curator(self):

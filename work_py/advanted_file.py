@@ -18,55 +18,41 @@ def skm_interval(self, template):
 
     interval_raid = []
     if self.data_well.paker_before["after"] != 0:
-        interval_raid.append(
-            [float(self.data_well.depth_fond_paker_before["after"]) - 20,
+        interval_raid.append([float(self.data_well.depth_fond_paker_before["after"]) - 20,
              float(self.data_well.depth_fond_paker_before["after"]) + 20])
+
+    if self.data_well.paker_second_before["after"]:
+        interval_raid.append([float(self.data_well.depth_fond_paker_second_before["after"]) - 20,
+             float(self.data_well.depth_fond_paker_second_before["after"]) + 20])
 
     if self.data_well.dict_leakiness:
         for nek in list(self.data_well.dict_leakiness['НЭК']['интервал'].keys()):
-            if int(float(nek.split('-')[1])) + 20 < self.data_well.current_bottom:
+            if int(float(nek.split('-')[1])) + 20 < self.data_well.skm_depth:
                 interval_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
             else:
-                interval_raid.append([int(float(nek.split('-')[0])) - 90,
-                                 self.data_well.current_bottom - 2])
-
-    if all(
-            [self.data_well.dict_perforation[plast]['отрайбировано'] is True for plast in self.data_well.plast_all
-             if self.data_well.dict_perforation[plast]['подошва'] < self.data_well.current_bottom]) or sgm_true:
-        interval_raid = []
-
-        perforating_intervals = []
-
-        for plast in self.data_well.plast_all:
-            for interval in self.data_well.dict_perforation[plast]['интервал']:
-                if interval[1] <= self.data_well.current_bottom:
-                    perforating_intervals.append(list(interval))
-
-        interval_raid.extend(remove_overlapping_intervals(self, perforating_intervals))
-
-    elif all([self.data_well.dict_perforation[plast]['отрайбировано'] is False for plast in self.data_well.plast_all]):
-        interval_raid.append([self.data_well.perforation_roof - 90, self.data_well.skm_depth])
-        if self.data_well.dict_leakiness:
-            for nek in list(self.data_well.dict_leakiness['НЭК']['интервал'].keys()):
-                if float(nek.split('-')[1]) + 20 < self.data_well.current_bottom:
-                    interval_raid.append([int(float(nek.split('-')[0])) - 90, int(float(nek.split('-')[1])) + 20])
+                interval_raid.append([int(float(nek.split('-')[0])) - 90, self.data_well.skm_depth])
+    asd = self.data_well.skm_depth
+    perforating_intervals = []
+    for plast in self.data_well.plast_all:
+        for interval in self.data_well.dict_perforation[plast]['интервал']:
+            if interval[1] <= self.data_well.skm_depth:
+                interval_raid.append([interval[0] - 90, interval[1] - 2])
+                if self.data_well.skm_depth >= interval[1] + 20:
+                    if [interval[1] + 2, interval[1] + 20] not in interval_raid:
+                        interval_raid.append([interval[1] + 2, interval[1] + 20])
                 else:
-                    interval_raid.append([int(float(nek.split('-')[0])) - 90,
-                                     self.data_well.current_bottom - 2])
-
+                    if [interval[1] + 2, self.data_well.skm_depth] not in interval_raid:
+                        interval_raid.append([interval[1] + 2, self.data_well.skm_depth])
+                perforating_intervals.append(interval)
 
     if self.data_well.plast_project:
-        if any(
-            [plast in self.data_well.plast_all for plast in self.data_well.plast_project]) is False:
-            for plast in self.data_well.dict_perforation_project:
+        for plast in self.data_well.dict_perforation_project:
+            for interval in self.data_well.dict_perforation_project[plast]['интервал']:
+                if interval[1] + 20 < self.data_well.skm_depth:
+                    interval_raid.append([interval[0] - 70, interval[1] + 20])
+    if perforating_intervals:
+        interval_raid = remove_overlapping_intervals(self, perforating_intervals, interval_raid)
 
-                for interval in self.data_well.dict_perforation_project[plast]['интервал']:
-                    if interval[1] < self.data_well.current_bottom:
-                        interval_raid.append([interval[0] - 70, interval[1] + 20])
-                    else:
-                        interval_raid.append([interval[0] - 70, self.data_well.current_bottom - 2])
-
-    
     merged_segments = merge_overlapping_intervals(interval_raid)
     
     merged_segments_new = []
@@ -76,8 +62,7 @@ def skm_interval(self, template):
         if template in ['ПСШ ЭК', 'ПСШ без хвоста', 'ПСШ открытый ствол', 'СГМ ЭК', 'СГМ открытый ствол']:
             if self.data_well.skm_depth >= interval[1] > interval[0]:
                 merged_segments_new.append(interval)
-            elif interval[1] >= self.data_well.skm_depth >= interval[0] and interval[1] > interval[
-                0]:
+            elif interval[1] >= self.data_well.skm_depth >= interval[0] and interval[1] > interval[0]:
                 merged_segments_new.append([interval[0], self.data_well.skm_depth])
 
         elif template in ['ПСШ СКМ в доп колонне c хвостом', 'ПСШ СКМ в доп колонне без хвоста',
@@ -117,9 +102,10 @@ def skm_interval(self, template):
 
 # Функция исключения из интервалов скреперования интервалов ПВР
 def remove_overlapping_intervals(self, perforating_intervals, skm_interval=None):
+    skipping_intervals = []
     if skm_interval is None:
         # print(f' перфорация_ {perforating_intervals}')
-        skipping_intervals = []
+
         if self.data_well.paker_before["after"] != 0:
             if self.data_well.skm_depth > self.data_well.depth_fond_paker_before["after"] + 20:
                 skipping_intervals.append(
@@ -140,43 +126,37 @@ def remove_overlapping_intervals(self, perforating_intervals, skm_interval=None)
                                                self.data_well.skm_depth])
         # print(f'глубина СКМ {self.data_well.skm_depth, skipping_intervals}')
         perforating_intervals = sorted(perforating_intervals, key=lambda x: x[0])
+    skipping_intervals.extend(skm_interval)
+    # for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
+    #
+    #     if pvr[1] + 20 < self.data_well.skm_depth:
+    #         skipping_intervals.append([pvr[0] - 90, pvr[0] - 2])
+    #         if self.data_well.skm_depth >= pvr[1] + 20:
+    #             if [pvr[1] + 2, pvr[1] + 20] not in skipping_intervals:
+    #                 skipping_intervals.append([pvr[1] + 2, pvr[1] + 20])
+    #         else:
+    #             if [pvr[1] + 2, self.data_well.skm_depth] not in skipping_intervals:
+    #                 skipping_intervals.append([pvr[1] + 2, self.data_well.skm_depth])
 
+    skipping_intervals = merge_overlapping_intervals(sorted(skipping_intervals, key=lambda x: x[0]))
+    skipping_intervals_new = []
+    for skm in sorted(skipping_intervals, key=lambda x: x[0]):
+        krovly_skm = int(skm[0])
+        pod_skm = int(skm[1])
+
+        skm_range = list(range(krovly_skm, pod_skm))
         for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
-
-            if pvr[1] + 40 < self.data_well.skm_depth:
-                skipping_intervals.append([pvr[0] - 90, pvr[0] - 2])
-                if self.data_well.skm_depth >= pvr[1] + 40:
-                    if [pvr[1] + 2, pvr[1] + 40] not in skipping_intervals:
-                        skipping_intervals.append([pvr[1] + 2, pvr[1] + 40])
+            # print(int(pvr[0]) in skm_range, skm_range[0], int(pvr[0]))
+            if int(pvr[0]) in skm_range and int(pvr[1]) in skm_range and skm_range[0] + 1 <= int(pvr[0]):
+                if skm_range[0] + 1 < int(pvr[0]) - 2:
+                    skipping_intervals_new.append((skm_range[0] + 1, int(pvr[0] - 2)))
+                    skm_range = skm_range[skm_range.index(int(pvr[1])):]
                 else:
-                    if [pvr[1] + 2, self.data_well.skm_depth] not in skipping_intervals:
-                        skipping_intervals.append([pvr[1] + 2, self.data_well.skm_depth])
-            elif pvr[1] + 40 > self.data_well.skm_depth:
-                if [pvr[0] - 90, pvr[0] - 2] not in skipping_intervals:
-                    skipping_intervals.append([pvr[0] - 90, pvr[0] - 2])
-                if [pvr[1] + 1, self.data_well.skm_depth] not in skipping_intervals:
-                    skipping_intervals.append([pvr[1] + 1, self.data_well.skm_depth])
+                    skm_range = skm_range[skm_range.index(int(pvr[1]+1)):]
+            else:
+                skipping_intervals_new.append(skm)
 
-        skipping_intervals = merge_overlapping_intervals(sorted(skipping_intervals, key=lambda x: x[0]))
-        skipping_intervals_new = []
-        for skm in sorted(skipping_intervals, key=lambda x: x[0]):
-            krovly_skm = int(skm[0])
-            pod_skm = int(skm[1])
-
-            skm_range = list(range(krovly_skm, pod_skm))
-            for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
-                # print(int(pvr[0]) in skm_range, skm_range[0], int(pvr[0]))
-                if int(pvr[0]) in skm_range and int(pvr[1]) in skm_range and skm_range[0] + 1 <= int(pvr[0]):
-                    if skm_range[0] + 1 < int(pvr[0]) - 2:
-                        skipping_intervals_new.append((skm_range[0] + 1, int(pvr[0] - 2)))
-                        skm_range = skm_range[skm_range.index(int(pvr[1])):]
-                    else:
-                        skm_range = skm_range[skm_range.index(int(pvr[1]+1)):]
-
-            skipping_intervals_new.append((skm_range[0], pod_skm))
-    else:
-        skipping_intervals_new = skm_interval
-
+    skipping_intervals_new.append((skm_range[0], pod_skm))
     return skipping_intervals_new
 
 

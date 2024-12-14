@@ -2,6 +2,11 @@ from PyQt5.QtWidgets import QMessageBox
 
 import data_list
 from .descent_gno import GnoDescentWindow
+def select_ovtr(self):
+    ovtr = 'ОВТР 10ч'
+    if self.data_well.region == 'ЧГМ' or (self.data_well.region == 'КГМ' and self.data_well.curator == 'ОР'):
+        ovtr = 'ОВТР 4ч'
+    return ovtr
 
 
 def rgd_without_paker(self):
@@ -23,10 +28,10 @@ def rgd_without_paker(self):
          f'учебных тревог',
          None, None, None, None, None, None, None,
          'мастер КРС', 0.75],
-        [''.join(['ОВТР 10ч' if self.data_well.region != 'ЧГМ' else 'ОВТР 4ч']), None,
-         ''.join(['ОВТР 10ч' if self.data_well.region != 'ЧГМ' else 'ОВТР 4ч']),
+        [select_ovtr(self), None,
+         select_ovtr(self),
          None, None, None, None, None, None, None,
-         'мастер КРС', ''.join(['10' if self.data_well.region != 'ЧГМ' else '4'])],
+         'мастер КРС', ''.join([i for i in select_ovtr(self) if i.isdigit()])],
         [None, None,
          f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". Составить'
          f' акт готовности скважины и передать его начальнику партии. При необходимости подготовить площадку'
@@ -66,10 +71,10 @@ def rgd_without_paker(self):
 
 def rgd_with_paker(self):
     work_list = [
-        [''.join(['ОВТР 10ч' if self.data_well.region != 'ЧГМ' else 'ОВТР 4ч']),
-         None, ''.join(['ОВТР 10ч' if self.data_well.region != 'ЧГМ' else 'ОВТР 4ч']),
+        [select_ovtr(self), None,
+         select_ovtr(self),
          None, None, None, None, None, None, None,
-         'мастер КРС', ''.join(['10' if self.data_well.region != 'ЧГМ' else '4'])],
+         'мастер КРС', ''.join([i for i in select_ovtr(self) if i.isdigit()])],
         [None, None,
          f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
          f'Составить'

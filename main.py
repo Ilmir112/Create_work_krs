@@ -388,6 +388,10 @@ class MyMainWindow(QMainWindow):
                 elif self.work_plan == 'gnkt_frez':
                     self.gnkt_data = WorkWithGnkt(self.ws, self.table_title, self.table_schema, self.table_widget,
                                                   self.data_well)
+                elif self.work_plan in ['prs']:
+                    self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
+                    self.copy_pz(self.ws, self.table_widget, self.work_plan)
+
         elif self.work_plan in ['plan_change', 'dop_plan_in_base']:
             data_list.data_in_base = True
             self.data_well = FindIndexPZ

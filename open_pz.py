@@ -80,6 +80,7 @@ class CreatePZ(MyMainWindow):
                     ws.merge_cells(start_row=i, start_column=8, end_row=i, end_column=12)
                     ws.row_dimensions[i].height = 20
                 ws.row_dimensions[i + 1].height = 20
+                ws.row_dimensions[i + 1].height = 20
 
                 # print(f' индекс вставки ГНВП{self.data_well.insert_index}')
                 dict_events_gnvp = {}
