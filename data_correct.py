@@ -578,8 +578,10 @@ class TabPageSoCorrect(TabPageUnion):
 
         self.type_kr_combo.view().setWordWrap(True)
         self.type_kr_combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
-
-        self.type_kr_combo.addItems(data_list.TYPE_KR_LIST)
+        if self.data_well.work_plan in ['prs']:
+            self.type_kr_combo.addItems(data_list.TYPE_TR_LIST)
+        else:
+            self.type_kr_combo.addItems(data_list.TYPE_KR_LIST)
 
         self.type_kr_combo.setCurrentIndex(self.select_type_kr())
 

@@ -88,6 +88,7 @@ class CreatePZ(MyMainWindow):
                 dict_events_gnvp['gnkt_opz'] = events_gnvp_gnkt(self)
                 dict_events_gnvp['gnkt_bopz'] = events_gnvp_gnkt(self)
                 dict_events_gnvp['dop_plan'] = events_gnvp(self, data_list.contractor)
+                dict_events_gnvp['prs'] = events_gnvp(self, data_list.contractor)
 
                 # if work_plan != 'dop_plan':
                 text_width_dict = {20: (0, 100), 30: (101, 200), 40: (201, 300), 60: (301, 400), 70: (401, 500),
@@ -205,9 +206,8 @@ class CreatePZ(MyMainWindow):
 
                     ws.row_dimensions[2].height = 30
 
-                    if len(self.data_well.row_expected) != 0:
-                        for i in range(1, len(
-                                self.data_well.row_expected) + 1):  # Добавление показатели после ремонта
+                    if len(self.data_well.row_expected) != 0 and self.data_well.work_plan not in ['prs']:
+                        for i in range(1, len(self.data_well.row_expected) + 1):  # Добавление показатели после ремонта
                             ws.row_dimensions[self.data_well.insert_index + i - 1].height = None
                             for j in range(1, 12):
                                 if i == 1:
@@ -301,8 +301,6 @@ class CreatePZ(MyMainWindow):
                             self.data_well.gis_list.append(type_pvr)
         else:
             return ws
-
-
 
     def add_itog(self, ws, insert_index, work_plan):
         if ws.merged_cells.ranges:

@@ -390,7 +390,7 @@ class MyMainWindow(QMainWindow):
                                                   self.data_well)
                 elif self.work_plan in ['prs']:
                     self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
-                    self.copy_pz(self.ws, self.table_widget, self.work_plan)
+                    self.copy_pz(self.ws, self.table_widget, self.work_plan, 14)
 
         elif self.work_plan in ['plan_change', 'dop_plan_in_base']:
             data_list.data_in_base = True
@@ -856,8 +856,7 @@ class MyMainWindow(QMainWindow):
                 else:
                     table_widget.setRowHidden(row, False)
 
-            if work_plan == 'krs':
-
+            if work_plan in ['krs', 'prs']:
                 self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.data_well)
                 self.set_modal_window(self.work_window)
                 self.ws3 = self.wb.create_sheet("Расчет поглотителя сероводорода", 1)
@@ -865,7 +864,6 @@ class MyMainWindow(QMainWindow):
                 self.pause_app()
                 data_list.pause = True
                 self.work_window = None
-
 
         if work_plan in ['gnkt_frez'] and list_page == 2:
                 col_width = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,

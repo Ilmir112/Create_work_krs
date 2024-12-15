@@ -468,7 +468,7 @@ class FindIndexPZ(MyMainWindow):
 
             elif any(['IX. Мероприятия по предотвращению' in str(col) for col in row]) or \
                     any(['IX. Мероприятия по предотвращению аварий, инцидентов и осложнений::' in str(col) for col in
-                         row]):
+                         row])  or any(['Перемещение НКТ, ШН:' in str(col) for col in row]):
 
                 self.data_well_max = ProtectedIsDigit(row_ind)
 
@@ -1095,10 +1095,12 @@ class WellCondition(FindIndexPZ):
                             self.percent_water = FindIndexPZ.definition_is_none(
                                 self, self.percent_water, row_index,
                                 col + 1, 1)
-                        elif 'Vжг' in str(value):
+                        elif 'Vжг' in str(value) or 'Плотность жидкости глушения :' in str(value):
                             try:
-                                well_volume_in_pz = str(row[col + 1]).replace(',', '.')
-                                # print(f'строка {well_volume_in_pz}')
+                                if self.data_well.work_plan in ['prs']:
+                                    well_volume_in_pz = str(row[col + 5]).replace(',', '.')
+                                else:
+                                    well_volume_in_pz = str(row[col + 1]).replace(',', '.')
 
                                 self.well_volume_in_pz.append(round(float(well_volume_in_pz), 1))
                             except Exception:
