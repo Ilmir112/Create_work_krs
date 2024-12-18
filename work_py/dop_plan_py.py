@@ -437,7 +437,7 @@ class DopPlanWindow(WindowUnion):
         self.pressure_pvr_edit = current_widget.pressure_pvr_edit.text().replace(',', '.')
         self.date_pressure_edit = current_widget.date_pressure_edit.text()
         vertical_line = current_widget.vertical_line.text().replace(',', '.')
-
+        self.perforation_list = []
         if '' in [self.plast_line, self.roof_edit, self.sole_edit, self.count_pvr_edit, self.type_pvr_edit]:
             QMessageBox.warning(self, 'Ошибка', 'Не введены все данные')
             return
@@ -538,14 +538,16 @@ class DopPlanWindow(WindowUnion):
 
                 self.data_well.image_list = row
             self.count_diam = 0
+            self.perforation_list = []
             if len(list_row) > 4:
-                asdd = list_row[1]
-                if 'внутренний диаметр' not in list_row[1]:
-                    if all([col is None or col == '' for col in list_row]) is False:
-                        if list not in self.perforation_list:
-                            self.perforation_list.append(list_row)
-                else:
-                    self.count_diam = 1
+
+                if list_row:
+                    if 'внутренний диаметр' not in str(list_row[1]):
+                        if all([col is None or col == '' for col in list_row]) is False:
+                            if list_row not in self.perforation_list:
+                                self.perforation_list.append(list_row)
+                    else:
+                        self.count_diam = 1
         self.data_well.insert_index2 = self.data_well.data_x_max.get_value
         self.data_well.count_template = 1
 

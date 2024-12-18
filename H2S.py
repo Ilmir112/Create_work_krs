@@ -38,7 +38,7 @@ class CalculateH2s:
             sucker_rod_l_19 = self.data_well.dict_sucker_rod['19']
         except Exception:
             sucker_rod_l_19 = 0
-
+        self.data_well.fluid_work = 'EVASORB'
         if 'EVASORB' in self.data_well.fluid_work:
             self.data_well.type_absorbent = 'EVASORB марки 121'
         elif 'ХИМТЕХНО' in self.data_well.fluid_work:

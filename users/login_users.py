@@ -73,6 +73,7 @@ class LoginWindow(QWidget):
                 and user_dict['second_name'] and user_dict['password'] == str(password):
             # mes = QMessageBox.information(self, 'Пароль', 'вход произведен')
 
+
             data_list.user = (user_dict["pozition"] + ' ' + user_dict["organization"],
                               f'{user_dict["last_name"]} '
                               f'{user_dict["first_name"][0]}.{user_dict["second_name"][0]}.')
@@ -120,7 +121,7 @@ class RegisterWindow(QWidget):
 
         self.label_organization = QLabel("Организация:", self)
         self.organization = QComboBox(self)
-        self.organization.addItems(['', 'ООО "Ойл-cервис"', 'ООО "РН-Сервис"'])
+        self.organization.addItems(['', 'ООО Ойл-cервис', 'ООО РН-Сервис"'])
 
         self.label_password = QLabel("Пароль", self)
         self.password = QLineEdit(self)
@@ -138,7 +139,7 @@ class RegisterWindow(QWidget):
         self.label_region = QLabel("ЦЕХ:", self)
         self.region = QComboBox(self)
         self.region.addItems(
-            ['ЦТКРС № 1', 'ЦТКРС № 2', 'ЦТКРС № 3', 'ЦТКРС № 4', 'ЦТКРС № 5', 'ЦТКРС № 6', 'ЦТКРС № 7'])
+            ['ЦТКРС №1', 'ЦТКРС №2', 'ЦТКРС №3', 'ЦТКРС №4', 'ЦТКРС №5', 'ЦТКРС №6', 'ЦТКРС №7'])
 
         self.grid = QGridLayout(self)
         self.grid.addWidget(self.label_last_name, 0, 1)
@@ -166,10 +167,10 @@ class RegisterWindow(QWidget):
 
             self.label_region.setText("ЦЕХ:")
             self.region.clear()
-            self.region.addItems(['ЦТКРС № 1', 'ЦТКРС № 2', 'ЦТКРС № 3', 'ЦТКРС № 4',
-                                  'ЦТКРС № 5', 'ЦТКРС № 6', 'ЦТКРС № 7'])
+            self.region.addItems(['ЦТКРС №1', 'ЦТКРС №2', 'ЦТКРС №3', 'ЦТКРС №4',
+                                  'ЦТКРС №5', 'ЦТКРС №6', 'ЦТКРС №7'])
 
-        elif index == 'ООО "РН-Сервис"':
+        elif index == 'ООО РН-Сервис':
             self.label_region.setText("Экспедиция:")
             self.region.clear()
             self.region.addItems(['экспедиции №1', 'экспедиции №2', 'экспедиции №3', 'экспедиции №4',

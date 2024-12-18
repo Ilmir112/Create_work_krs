@@ -1030,7 +1030,7 @@ class GnktModel(WindowUnion):
              None, self.data_well.gaz_factor_percent[0], None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Коэффициент аномальности', None,
              None, None, None, koef_anomal, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, 'Плотность жидкости глушения',
+            [None, None, None, None, None, None, None, None, None, None, None, None, 'Расчетная плотность жидкости глушения',
              None, None, None, None, fluid_edit, None, 'в объеме', None, self.well_volume_ek, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Плотность рабочей жидкости',
              None, None, None, None, self.fluid_work_edit, None, None, None, None, None],

@@ -16,15 +16,15 @@ def curator_sel(curator, region):
     with open(f'{data_list.path_image}podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
     if curator == 'ОР':
-        return (podpis_dict["регион"][region]['ruk_orm']['post'], podpis_dict["регион"][region]["ruk_orm"]['surname'])
+        return (podpis_dict[data_list.costumer][region]['ruk_orm']['post'], podpis_dict[data_list.costumer][region]["ruk_orm"]['surname'])
     elif curator == 'ГТМ':
-        return (podpis_dict["регион"][region]["ruk_gtm"]['post'], podpis_dict["регион"][region]["ruk_gtm"]['surname'])
+        return (podpis_dict[data_list.costumer][region]["ruk_gtm"]['post'], podpis_dict[data_list.costumer][region]["ruk_gtm"]['surname'])
     elif curator == 'ГО':
-        return (podpis_dict["регион"][region]['go']['post'], podpis_dict["регион"][region]["go"]['surname'])
+        return (podpis_dict[data_list.costumer][region]['go']['post'], podpis_dict[data_list.costumer][region]["go"]['surname'])
     elif curator == 'ВНС':
-        return (podpis_dict["регион"][region]['go']['post'], podpis_dict["регион"][region]["go"]['surname'])
+        return (podpis_dict[data_list.costumer][region]['go']['post'], podpis_dict[data_list.costumer][region]["go"]['surname'])
     elif curator == 'ГРР':
-        return (podpis_dict["регион"][region]['grr']['post'], podpis_dict["регион"][region]["grr"]['surname'])
+        return (podpis_dict[data_list.costumer][region]['grr']['post'], podpis_dict[data_list.costumer][region]["grr"]['surname'])
     return False
 
 
@@ -41,14 +41,14 @@ def pop_down(self, region, curator_sel):
         nach_tkrs = ''
         nach_tkrs_post = ''
         if region == 'ЧГМ' or region == 'ТГМ' or 'gnkt' in self.data_well.work_plan:
-            nach_tkrs = podpis_dict["ООО Ойл-сервис"]["head_of_workshop_1"]["surname"]
-            nach_tkrs_post = podpis_dict["ООО Ойл-сервис"]["head_of_workshop_1"]["post"]
+            nach_tkrs = podpis_dict[data_list.contractor]["ЦТКРС №1"]["начальник"]["surname"]
+            nach_tkrs_post = podpis_dict[data_list.contractor]["ЦТКРС №1"]["начальник"]["post"]
         elif region == 'КГМ' or region == 'АГМ':
-            nach_tkrs = podpis_dict["ООО Ойл-сервис"]["head_of_workshop_2"]["surname"]
-            nach_tkrs_post = podpis_dict["ООО Ойл-сервис"]["head_of_workshop_2"]["post"]
+            nach_tkrs = podpis_dict[data_list.contractor]["ЦТКРС №2"]["начальник"]["surname"]
+            nach_tkrs_post = podpis_dict[data_list.contractor]["ЦТКРС №2"]["начальник"]["post"]
         elif region == 'ИГМ':
-            nach_tkrs = podpis_dict["ООО Ойл-сервис"]["head_of_workshop_4"]["surname"]
-            nach_tkrs_post = podpis_dict["ООО Ойл-сервис"]["head_of_workshop_4"]["post"]
+            nach_tkrs = podpis_dict[data_list.contractor]["ЦТКРС №4"]["начальник"]["surname"]
+            nach_tkrs_post = podpis_dict[data_list.contractor]["ЦТКРС №4"]["начальник"]["post"]
 
         nach_list = [
             [None, f'План работ составил {data_list.user[0]}', None, None, None, None, '___________________', None,
@@ -79,13 +79,13 @@ def pop_down(self, region, curator_sel):
          curator_sel[1], None, None],
         [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания', None,
          None],
-        [None, podpis_dict["регион"][region]['ruk_pto']['post'], None, None, None, None, '___________________', None,
+        [None, podpis_dict[data_list.costumer][region]['ruk_pto']['post'], None, None, None, None, '___________________', None,
          None,
-         podpis_dict["регион"][region]["ruk_pto"]['surname'], None, ' '],
+         podpis_dict[data_list.costumer][region]["ruk_pto"]['surname'], None, ' '],
         [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания', None,
          None],
-        [None, podpis_dict["регион"][region]['usrs']['post'], None, None, None, None,
-         '___________________', None, None, podpis_dict["регион"][region]['usrs']['surname'], None, None],
+        [None, podpis_dict[data_list.costumer][region]['usrs']['post'], None, None, None, None,
+         '___________________', None, None, podpis_dict[data_list.costumer][region]['usrs']['surname'], None, None],
         [None, None, None, None, None, None, '"___"___________', None, None, '     дата подписания', None,
          None],
         [None, None, None, None, None, None, None, None, None, None, None, None],
@@ -138,13 +138,13 @@ def pop_down(self, region, curator_sel):
     for row in nach_list[::-1]:
         podp_down.insert(0, row)
 
-    ved_gtm_list = [None, podpis_dict["регион"][region]['ved_gtm']['post'], None, None, None, None, '_______________',
+    ved_gtm_list = [None, podpis_dict[data_list.costumer][region]['ved_gtm']['post'], None, None, None, None, '_______________',
                     None, None,
-                    podpis_dict["регион"][region]['ved_gtm']['surname'], None, None]
+                    podpis_dict[data_list.costumer][region]['ved_gtm']['surname'], None, None]
 
-    ved_orm_list = [None, podpis_dict["регион"][region]['ved_orm']['post'], None, None, None, None, '_______________',
+    ved_orm_list = [None, podpis_dict[data_list.costumer][region]['ved_orm']['post'], None, None, None, None, '_______________',
                     None, None,
-                    podpis_dict["регион"][region]['ved_orm']['surname'], None, None]
+                    podpis_dict[data_list.costumer][region]['ved_orm']['surname'], None, None]
     if (region == 'ЧГМ') and self.data_well.curator == 'ОР':
         podp_down.insert(13, ved_orm_list)
         podp_down.insert(14,
@@ -192,22 +192,78 @@ def razdel_1(self, region, contractor):
     with open(f'{data_list.path_image}podpisant.json', 'r', encoding='utf-8') as file:
         podpis_dict = json.load(file)
     razdel_1 = ''
-    if 'Ойл' in contractor:
+    if 'prs' in self.data_well.work_plan:
+        if 'Ойл' in contractor:
+            if region == 'ЧГМ' or region == 'ТГМ' or 'gnkt' in self.data_well.work_plan:
+                data_list.ctkrs = "ЦТКРС №1"
+            elif region == 'КГМ' or region == 'АГМ':
+                data_list.ctkrs = "ЦТКРС №2"
+            elif region == 'ИГМ':
+                data_list.ctkrs = 'ЦТКРС №4'
+
+        nach_cdng_post = podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value]['Начальник']['post'] + ' ' + self.data_well.cdng.get_value
+        nach_cdng_name = podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value]['Начальник']["surname"]
+        nach_cdng_name = nach_cdng_name.split(' ')
+        nach_cdng_name = f'{nach_cdng_name[0]} {nach_cdng_name[1][0]}.{nach_cdng_name[1][0]}.'
+        technol_cdng_post = podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value]['Ведущий инженер-технолог']['post'] + ' ' + self.data_well.cdng.get_value
+        technol_cdng_name = podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value]['Ведущий инженер-технолог']["surname"]
+        technol_cdng_name = technol_cdng_name.split(' ')
+        technol_cdng_name = f'{technol_cdng_name[0]} {technol_cdng_name[1][0]}.{technol_cdng_name[1][0]}.'
+        geolog_cdng_post = podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value]['Ведущий геолог']['post'] + ' ' + self.data_well.cdng.get_value
+        geolog_cdng_name = podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value]['Ведущий геолог']["surname"]
+        geolog_cdng_name = geolog_cdng_name.split(' ')
+        geolog_cdng_name = f'{geolog_cdng_name[0]} {geolog_cdng_name[1][0]}.{geolog_cdng_name[1][0]}.'
+        nach_ctkrs_post = podpis_dict[data_list.contractor][data_list.ctkrs]['начальник']['post']
+        nach_ctkrs_name = podpis_dict[data_list.contractor][data_list.ctkrs]['начальник']["surname"]
+
 
         razdel_1 = [
             [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
-            [None, podpis_dict["регион"][region]['gi']['post'], None, None, None, None, None,
-             f'{podpis_dict["ООО Ойл-сервис"]["сhief_engineer"]["post"]}', None, None, None, None],
-            [None, f'____________{podpis_dict["регион"][region]["gi"]["surname"]}', None, None, None, None, None,
-             f'_____________{podpis_dict["ООО Ойл-сервис"]["сhief_engineer"]["surname"]}', None, None, None, None],
+            [None, nach_cdng_post, None, None, None, None, None, nach_ctkrs_post, None, None, None, None],
+            [None, f'____________{nach_cdng_name}',
+             None, None, None, None, None,
+             f'_____________{nach_ctkrs_name}', None, None, None, None],
             [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
              f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, podpis_dict["регион"][region]['gg']['post'], None, None, None,
+            [None,
+             technol_cdng_post,
+             None, None, None, None, None, None, None, None, None, None],
+            [None,
+             f'____________{technol_cdng_name}',
+             None, None, None, None, None, None, None, None, None, None],
+            [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
+             None, None, None, None, None],
+            [None,
+             geolog_cdng_post,
+             None, None, None, None, None, None, None, None, None, None],
+            [None,
+             f'____________{geolog_cdng_name}',
+             None, None, None, None, None, None, None, None, None, None],
+            [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
+             None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None]]
+
+    elif 'Ойл' in contractor:
+
+        razdel_1 = [
+            [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
+            [None, podpis_dict[data_list.costumer][region]['gi']['post'], None, None, None, None, None,
+             f'{podpis_dict[data_list.contractor]["сhief_engineer"]["post"]}', None, None, None, None],
+            [None, f'____________{podpis_dict[data_list.costumer][region]["gi"]["surname"]}', None, None, None, None, None,
+             f'_____________{podpis_dict[data_list.contractor]["сhief_engineer"]["surname"]}', None, None, None, None],
+            [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
+             f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None],
+            [None, podpis_dict[data_list.costumer][region]['gg']['post'], None, None, None,
              None,
-             None, f'{podpis_dict["ООО Ойл-сервис"]["chief_geologist"]["post"]}', None, None, None, None],
-            [None, f'_____________{podpis_dict["регион"][region]["gg"]["surname"]}', None, None, None, None, None,
-             f'_____________{podpis_dict["ООО Ойл-сервис"]["chief_geologist"]["surname"]}', None, None, '',
+             None, f'{podpis_dict[data_list.contractor]["chief_geologist"]["post"]}', None, None, None, None],
+            [None, f'_____________{podpis_dict[data_list.costumer][region]["gg"]["surname"]}', None, None, None, None, None,
+             f'_____________{podpis_dict[data_list.contractor]["chief_geologist"]["surname"]}', None, None, '',
              None],
             [None, f'"____"_____________________{current_datetime.year}г.', None, None, '', None, None,
              f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
@@ -222,20 +278,20 @@ def razdel_1(self, region, contractor):
     elif 'РН' in contractor:
         razdel_1 = [
             [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
-            [None, podpis_dict["регион"][region]['gi']['post'], None, None, None, None, None,
+            [None, podpis_dict[data_list.costumer][region]['gi']['post'], None, None, None, None, None,
              f'Главный Инженер Экспедиции № 5 {data_list.contractor} филиал г. Уфа ', None, None, None, None],
-            [None, f'____________{podpis_dict["регион"][region]["gi"]["surname"]}', None, None, None, None, None,
+            [None, f'____________{podpis_dict[data_list.costumer][region]["gi"]["surname"]}', None, None, None, None, None,
              '_____________А.А. Фаррахов ', None, None, None, None],
             [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
              f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
             [None, None, None, None, None, None,
              None, None, None,
              None, None, None],
-            [None, podpis_dict["регион"][region]['gg']['post'], None, None, None,
+            [None, podpis_dict[data_list.costumer][region]['gg']['post'], None, None, None,
              None,
              None, f'Главный геолог Экспедиции № 5 {data_list.contractor} филиал г.Уфа', None, None, None, None],
 
-            [None, f'_____________{podpis_dict["регион"][region]["gg"]["surname"]}', None, None, None, None, None,
+            [None, f'_____________{podpis_dict[data_list.costumer][region]["gg"]["surname"]}', None, None, None, None, None,
              f'_____________Е.А. Самойлова', None, None, '',
              None],
             [None, f'"____"_____________________{current_datetime.year}г.', None, None, '', None, None,
@@ -306,6 +362,6 @@ def razdel_1(self, region, contractor):
         if self.data_well.grp_plan is True:
             for row in range(len(podp_grp)):
                 for col in range(len(podp_grp[row])):
-                    razdel_1[row + 12][col] = podp_grp[row][col]
+                    razdel_1[row + 13][col] = podp_grp[row][col]
 
     return razdel_1

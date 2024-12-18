@@ -1,5 +1,6 @@
 import openpyxl
 from openpyxl.utils.cell import coordinate_from_string
+import json
 from data_base.work_with_base import ClassifierWell
 
 def excel_to_html(excel_file):
@@ -92,5 +93,42 @@ def excel_to_html(excel_file):
     '''
 
     return html
+
+
+
+
+wb = openpyxl.load_workbook('Копия Телефоны АР (00000002).xlsx')
+ws = wb.active
+
+dict_tel = {}
+for row_ind, row in enumerate(ws.iter_rows(values_only=True, min_row=1, max_row=300, max_col=8)):
+    for col in row:
+        if col == 'Начальник':
+            dict_tel.setdefault(
+                'ОАО "Башнефть"', {}).setdefault(
+                "регион", {}).setdefault(
+                row[0], {}).setdefault("ЦДНГ", {}).setdefault(row[1], {}).setdefault("Начальник", {
+                "post": row[2], "surname": row[3], "telephone": row[4], "email": row[5]})
+        if col == 'Заместитель начальника':
+            dict_tel.setdefault(
+                'ОАО "Башнефть"', {}).setdefault(
+                "регион", {}).setdefault(
+                row[0], {}).setdefault("ЦДНГ", {}).setdefault(row[1], {}).setdefault("Заместитель начальника", {
+                "post": row[2], "surname": row[3], "telephone": row[4], "email": row[5]})
+        if col == 'Ведущий геолог':
+            dict_tel.setdefault(
+                'ОАО "Башнефть"', {}).setdefault(
+                "регион", {}).setdefault(
+                row[0], {}).setdefault("ЦДНГ", {}).setdefault(row[1], {}).setdefault("Ведущий геолог", {
+                "post": row[2], "surname": row[3], "telephone": row[4], "email": row[5]})
+        if col == 'Ведущий инженер-технолог':
+            dict_tel.setdefault(
+                'ОАО "Башнефть"', {}).setdefault(
+                "регион", {}).setdefault(
+                row[0], {}).setdefault("ЦДНГ", {}).setdefault(row[1], {}).setdefault("Ведущий инженер-технолог", {
+                "post": row[2], "surname": row[3], "telephone": row[4], "email": row[5]})
+
+print(json.dumps(dict_tel['ОАО "Башнефть"']["регион"]["ТГМ"], indent=4,ensure_ascii=False))
+
 
 

@@ -52,6 +52,8 @@ def skm_interval(self, template):
                     interval_raid.append([interval[0] - 70, interval[1] + 20])
     if perforating_intervals:
         interval_raid = remove_overlapping_intervals(self, perforating_intervals, interval_raid)
+    else:
+        interval_raid = [[self.data_well.skm_depth-70, self.data_well.skm_depth]]
 
     merged_segments = merge_overlapping_intervals(interval_raid)
     
@@ -344,7 +346,7 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
         boundaries_dict[ind] = range_boundaries(str(_range))
 
     row_heights1 = [ws.row_dimensions[i].height for i in range(ws.max_row)]
-    col_width = [ws.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 13)] + [None]
+    col_width = [ws.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 15)]
     # print(col_width)
     for i, row_data in enumerate(work_list):
         for column, data in enumerate(row_data):
@@ -354,8 +356,16 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                     for key, value in text_width_dict.items():
                         if value[0] <= len(text) <= value[1]:
                             ws2.row_dimensions[i + 1].height = int(key)
-
-    head = plan.head_ind(0, ind_ins)
+    if 'prs' not in self.data_well.work_plan:
+        head = plan.head_ind(0, ind_ins)
+        merge_column = 10
+        size_font = 12
+        font_type = 'Arial'
+    else:
+        head = plan.head_ind_prs(0, ind_ins)
+        merge_column = 13
+        size_font = 16
+        font_type = 'Times New Roman'
 
     plan.copy_true_ws(self.data_well, ws, ws2, head)
     boundaries_dict_index = 1000
@@ -364,20 +374,21 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
         if 'Наименование работ' in work_list[i - 1][2]:
             boundaries_dict_index = i + 1
 
-        if 'код площади' in work_list[i - 1]:
+        if 'код площади' in work_list[i - 1] or 'код площади :' in work_list[i - 1]:
             for j in range(1, 13):
                 cell = ws2.cell(row=i, column=j)
                 cell.number_format = 'General'
                 cell.value = str(work_list[i - 1][j - 1])
-        elif 'по H2S' in work_list[i - 1]:
+        elif 'по H2S' in work_list[i - 1] or 'по H2S :' in work_list[i - 1] or \
+                'по Pпл :' in work_list[i - 1] or 'по Pпл' in work_list[i - 1]:
             for j in range(1, 13):
-                cell = ws2.cell(row=i, column=j)
+                cell = ws2.cell(row=i, column=j+1)
                 cell.number_format = 'General'
                 cell.value = str(work_list[i - 1][j - 1])
         elif 'ИТОГО:' in work_list[i - 1]:
             stop_str = i
 
-        for j in range(1, 13):
+        for j in range(1, len(work_list[i - 1])+1):
             cell = ws2.cell(row=i, column=j)
             if cell and str(cell) != str(work_list[i - 1][j - 1]):
                 # print(work_list[i - 1][j - 1])
@@ -392,11 +403,10 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                     if j != 1:
                         cell.border = data_list.thin_border
                     if j == 11:
-                        cell.font = Font(name='Arial', size=11, bold=False)
+                        cell.font = Font(name=font_type, size=size_font, bold=False)
                     # if j == 12:
                     #     cell.value = work_list[i - 1][j - 1]
-                    else:
-                        cell.font = Font(name='Arial', size=13, bold=False)
+
                     if work_list[i - 1][4]:
                         ws2.cell(row=i-1, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                         vertical='center')
@@ -405,12 +415,18 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                     else:
                         ws2.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                         vertical='center')
-                        ws2.cell(row=i, column=11).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                         vertical='center')
-                        ws2.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                         vertical='center')
                         ws2.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                         vertical='center')
+                        if 'prs' not in self.data_well.work_plan:
+                            ws2.cell(row=i, column=11).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                             vertical='center')
+                            ws2.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                             vertical='center')
+                        else:
+                            ws2.cell(row=i, column=14).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                             vertical='center')
+                            ws2.cell(row=i, column=15).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                             vertical='center')
                     if 'примечание' in str(cell.value).lower() \
                             or 'заявку оформить за 16 часов' in str(cell.value).lower() \
                             or 'ЗАДАЧА 2.9.' in str(cell.value).upper() \
@@ -426,20 +442,23 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                             or 'РИР' in str(cell.value).upper() \
                             or 'При отсутствии избыточного давления' in str(cell.value):
                         # print('есть жирный')
-                        ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
+                        asde = ws2.cell(row=i, column=j).value
+                        ws2.cell(row=i, column=j).font = Font(name=font_type, size=size_font, bold=True)
                     elif 'порядок работы' in str(cell.value).lower() or \
                             'наименование работ' in str(cell.value).lower():
-                        ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
+                        ws2.cell(row=i, column=j).font = Font(name=font_type, size=size_font, bold=True)
                         ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                         vertical='center')
+                    else:
+                        ws2.cell(row=i, column=j).font = Font(name=font_type, size=size_font, bold=False)
+
     # print(merged_cells_dict)
     for row, col in merged_cells_dict.items():
         if len(col) != 2:
             # print(row)
-            ws2.merge_cells(start_row=row + 1, start_column=3, end_row=row + 1, end_column=10)
+            ws2.merge_cells(start_row=row + 1, start_column=3, end_row=row + 1, end_column=merge_column)
 
     for key, value in boundaries_dict.items():
-
         if value[1] <= boundaries_dict_index-3:
             ws2.merge_cells(start_column=value[0], start_row=value[1],
                             end_column=value[2], end_row=value[3])
@@ -475,14 +494,19 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                 ws2.row_dimensions[index_row].height = row_heights1[index_row]
         except:
             pass
-        if index_row == 2:
-            for col_ind, col in enumerate(row):
-                if col_ind <= 12:
-                    ws2.column_dimensions[get_column_letter(col_ind + 1)].width = col_width[col_ind]
-    ws2.column_dimensions[get_column_letter(11)].width = 20
-    ws2.column_dimensions[get_column_letter(12)].width = 20
 
-    ws2.column_dimensions[get_column_letter(6)].width = 18
+    for col_ind in range(len(col_width)):
+        ws2.column_dimensions[get_column_letter(col_ind + 1)].width = col_width[col_ind]
+    if 'prs' in self.data_well.work_plan:
+        ws2.column_dimensions[get_column_letter(14)].width = 20
+        ws2.column_dimensions[get_column_letter(15)].width = 20
+
+        ws2.column_dimensions[get_column_letter(6)].width = 18
+    else:
+        ws2.column_dimensions[get_column_letter(11)].width = 20
+        ws2.column_dimensions[get_column_letter(12)].width = 20
+
+        ws2.column_dimensions[get_column_letter(6)].width = 18
 
     return 'Высота изменена'
 

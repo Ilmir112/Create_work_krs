@@ -185,6 +185,9 @@ class MyMainWindow(QMainWindow):
         from find import WellNkt, WellPerforation, WellCondition, WellHistoryData, WellName, WellCategory, \
             WellFondData, WellSuckerRod, WellExpectedPickUp, WellData
 
+
+
+
         # Запуск основного класса и всех дочерних классов в одной строке
         self.data_well = FindIndexPZ(self.ws, self.work_plan, self)
         self.data_well.work_plan = self.work_plan
@@ -197,11 +200,13 @@ class MyMainWindow(QMainWindow):
         date_str2 = datetime.strptime('2024-09-19', '%Y-%m-%d')
 
         if self.work_plan == 'dop_plan':
+
             from data_base.config_base import connection_to_database, WorkDatabaseWell
             number_list = list(map(str, range(1, 50)))
             self.data_well.number_dp, ok = QInputDialog.getItem(self, 'Номер дополнительного плана работ',
                                                                 'Введите номер дополнительного плана работ',
                                                                 number_list, 0, False)
+            adw = self.data_well.number_dp
 
             db = connection_to_database(data_list.DB_WELL_DATA)
             data_well_base = WorkDatabaseWell(db, self.data_well)
@@ -236,13 +241,21 @@ class MyMainWindow(QMainWindow):
                         return
 
         if data_list.data_well_is_True is False:
+            # Сохранение изменений
+
             WellNkt.read_well(
                 self.data_well, self.data_well.pipes_ind.get_value, self.data_well.condition_of_wells.get_value)
 
             WellHistoryData.read_well(
                 self.data_well, self.data_well.data_pvr_max.get_value, self.data_well.data_fond_min.get_value)
-            WellCondition.read_well(
-                self.data_well, self.data_well.condition_of_wells.get_value, self.data_well.data_well_max.get_value)
+            # Сохранение изменений
+
+            if 'prs' not in self.work_plan:
+                WellCondition.read_well(
+                    self.data_well, self.data_well.condition_of_wells.get_value, self.data_well.data_well_max.get_value)
+            else:
+                WellCondition.read_well(
+                    self.data_well, self.data_well.data_pvr_max.get_value, self.data_well.data_well_max.get_value)
 
             WellExpectedPickUp.read_well(
                 self.data_well, self.data_well.data_x_min.get_value, self.data_well.data_x_max.get_value)
@@ -251,16 +264,20 @@ class MyMainWindow(QMainWindow):
                     self.data_well, self.data_well.sucker_rod_ind.get_value, self.data_well.pipes_ind.get_value)
 
                 WellFondData.read_well(
-                    self.data_well, self.data_well.data_fond_min.get_value, self.data_well.condition_of_wells.get_value)
+                    self.data_well, self.data_well.data_fond_min.get_value, self.data_well.pipes_ind.get_value)
+
             WellData.read_well(self.data_well, self.data_well.cat_well_max.get_value,
                                self.data_well.data_pvr_min.get_value)
+            # Сохранение изменений
 
             WellPerforation.read_well(self.data_well, self.data_well.data_pvr_min.get_value,
                                       self.data_well.data_pvr_max.get_value + 1)
 
+
             self.data_well = \
                 WellCategory.read_well(self.data_well, self.data_well.cat_well_min.get_value,
                                        self.data_well.data_well_min.get_value)
+
 
             # self.set_modal_window(self.data_list.pdata_window)
 
@@ -306,8 +323,7 @@ class MyMainWindow(QMainWindow):
                         QInputDialog.getInt(self, 'диаметр внутренний cсужения',
                                             "ВВедите внутренний диаметр cсужения", 0,
                                             0,
-                                            int(float(self.data_well.current_bottom)))[
-                            0]
+                                            int(float(self.data_well.current_bottom)))[0]
                 else:
                     self.data_well.problem_with_ek = False
 
@@ -362,6 +378,8 @@ class MyMainWindow(QMainWindow):
                                                       'excel версия от 2010г и выше)')
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
+
+
             if self.fname:
                 try:
                     self.read_pz(self.fname)
@@ -380,6 +398,9 @@ class MyMainWindow(QMainWindow):
                     if self.work_plan == 'dop_plan':
                         self.rir_window = DopPlanWindow(self.data_well, self.table_widget)
                         self.set_modal_window(self.rir_window)
+
+                        data_list.pause = True
+                        self.pause_app()
                 elif self.work_plan in ['gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz']:
 
                     self.gnkt_data = GnktOsvWindow(self.ws,
@@ -389,8 +410,14 @@ class MyMainWindow(QMainWindow):
                     self.gnkt_data = WorkWithGnkt(self.ws, self.table_title, self.table_schema, self.table_widget,
                                                   self.data_well)
                 elif self.work_plan in ['prs']:
-                    self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
-                    self.copy_pz(self.ws, self.table_widget, self.work_plan, 14)
+
+                    self.wb2_prs = Workbook()
+                    self.ws2_prs = self.wb2_prs.active
+
+
+
+                    self.ws = read_pz.open_excel_file(self.ws, self.work_plan, self.ws2_prs)
+                    self.copy_pz(self.ws, self.table_widget, self.work_plan, 15)
 
         elif self.work_plan in ['plan_change', 'dop_plan_in_base']:
             data_list.data_in_base = True
@@ -716,6 +743,12 @@ class MyMainWindow(QMainWindow):
         # print(f'ДОП {work_plan}')
 
         for i, row_data in enumerate(work_list):
+            if 'prs' in  self.data_well.work_plan:
+                row_data.insert(-4, None)
+                row_data.insert(-4, None)
+                row_data.insert(-4, None)
+
+
             row = insert_index + i
             if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_opz', 'gnkt_bopz', 'gnkt_after_grp',
                                  'application_gis']:
@@ -725,6 +758,8 @@ class MyMainWindow(QMainWindow):
 
             if len(str(row_data)[1]) > 3 and work_plan in 'gnkt_frez':
                 table_widget.setSpan(i + insert_index, 1, 1, 12)
+            elif 'prs' in  self.data_well.work_plan:
+                table_widget.setSpan(i + insert_index, 2, 1, 11)
             else:
                 table_widget.setSpan(i + insert_index, 2, 1, 8 + index_setSpan)
 
@@ -1151,6 +1186,7 @@ class MyWindow(MyMainWindow):
             self.without_jamming_AGM_reload = self.without_jamming_AGM.addAction('&обновить', self.action_clicked)
 
         self.signatories_Bnd = self.signatories.addAction('&БашНефть-Добыча', self.action_clicked)
+        self.signatories_cdng = self.signatories.addAction('&ЦДНГ', self.action_clicked)
 
     @QtCore.pyqtSlot()
     def action_clicked(self):
@@ -1209,6 +1245,16 @@ class MyWindow(MyMainWindow):
         elif action == self.signatories_Bnd:
             if self.signatures_window is None:
                 self.signatures_window = CorrectSignaturesWindow()
+                self.signatures_window.setWindowTitle("Подписанты")
+                # self.signatures_window.setGeometry(200, 400, 300, 400)
+                self.signatures_window.show()
+            else:
+                self.signatures_window.close()
+                self.signatures_window = None
+        elif action == self.signatories_cdng:
+            if self.signatures_window is None:
+                from work_py.data_correct_position_cdng import CorrectSignaturesCdng
+                self.signatures_window = CorrectSignaturesCdng()
                 self.signatures_window.setWindowTitle("Подписанты")
                 # self.signatures_window.setGeometry(200, 400, 300, 400)
                 self.signatures_window.show()
@@ -1468,9 +1514,9 @@ class MyWindow(MyMainWindow):
         from work_py.advanted_file import count_row_height
 
         if not self.table_widget is None:
-            wb2 = Workbook()
-            ws2 = wb2.get_sheet_by_name('Sheet')
-            ws2.title = "План работ"
+            self.wb2 = Workbook()
+            self.ws2 = self.wb2.get_sheet_by_name('Sheet')
+            self.ws2.title = "План работ"
 
             insert_index = self.data_well.insert_index2
 
@@ -1503,70 +1549,83 @@ class MyWindow(MyMainWindow):
                     merged_cells_dict.setdefault(row[0], []).append(row[1])
             plan_short = ''
             self.data_well.norm_of_time = 0
-
+            number_index_norm = 11
+            if 'prs' in self.work_plan:
+                number_index_norm = 14
             for i in range(1, len(work_list)):  # нумерация работ
                 if i >= insert_index + 1:
-                    if is_number(work_list[i][11]) is True:
-                        self.data_well.norm_of_time += round(float(str(work_list[i][11]).replace(',', '.')), 1)
+                    if is_number(work_list[i][number_index_norm]) is True:
+                        self.data_well.norm_of_time += round(float(str(work_list[i][number_index_norm]).replace(',', '.')), 1)
                     if work_list[i][0]:
                         plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
 
-            count_row_height(self, wb2, self.ws, ws2, work_list, merged_cells_dict, insert_index)
+            count_row_height(self, self.wb2, self.ws, self.ws2, work_list, merged_cells_dict, insert_index)
 
             self.data_well.itog_ind_min = insert_index
             self.data_well.itog_ind_max = len(work_list)
-
-            CreatePZ.add_itog(self, ws2, self.table_widget.rowCount() + 1, self.work_plan)
+            if 'prs' not in self.work_plan:
+                self.ws2_prs = None
+            CreatePZ.add_itog(self, self.ws2, self.table_widget.rowCount() + 1, self.work_plan, self.ws2_prs)
 
             # try:
-            for row_ind, row in enumerate(ws2.iter_rows(values_only=True)):
+            for row_ind, row in enumerate(self.ws2.iter_rows(values_only=True)):
                 if 15 < row_ind < 100:
                     if all(cell in [None, ''] for cell in row) \
-                            and ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value) \
+                            and ('Интервалы темпа' not in str(self.ws2.cell(row=row_ind, column=2).value) \
                                  and 'Замечания к эксплуатационному периоду' not in str(
-                                ws2.cell(row=row_ind, column=2).value) \
+                                self.ws2.cell(row=row_ind, column=2).value) \
                                  and 'Замечания к эксплуатационному периоду' not in str(
-                                ws2.cell(row=row_ind - 2, column=2).value)):
+                                self.ws2.cell(row=row_ind - 2, column=2).value)):
                         # print(row_ind, ('Интервалы темпа' not in str(ws2.cell(row=row_ind, column=2).value)),
                         #       str(ws2.cell(row=row_ind, column=2).value))
-                        ws2.row_dimensions[row_ind + 1].hidden = True
+                        self.ws2.row_dimensions[row_ind + 1].hidden = True
                 for col, value in enumerate(row):
                     if 'Зуфаров' in str(value):
                         coordinate = f'{get_column_letter(col - 2)}{row_ind - 2}'
-                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/Зуфаров.png', coordinate)
+                        self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Зуфаров.png', coordinate)
                     elif 'М.К.Алиев' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
-                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/Алиев махир.png', coordinate)
+                        self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Алиев махир.png', coordinate)
+                    elif 'И.А. Котиков' in str(value):
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                        self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Котиков.png', coordinate)
                     elif 'З.К. Алиев' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
-                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/Алиев Заур.png', coordinate)
+                        self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Алиев Заур.png', coordinate)
                         break
                     elif 'Расчет жидкости глушения производится согласно МУ' in str(value):
-                        coordinate = f'{get_column_letter(6)}{row_ind + 1}'
-                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/schema_well/формула.png', coordinate,
+                        ind = 6
+                        row_ind_ins =row_ind + 1
+                        if 'prs' in self.work_plan:
+                            ind = 13
+                            row_ind_ins = row_ind
+                        coordinate = f'{get_column_letter(ind)}{row_ind_ins}'
+                        self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/schema_well/формула.png', coordinate,
                                           330, 130)
                         break
             if self.work_plan in ['krs', 'plan_change']:
-                self.create_short_plan(wb2, plan_short)
+                self.create_short_plan(self.wb2, plan_short)
             #
-            if 'Ойл' in data_list.contractor:
-                self.insert_image(ws2, f'{data_list.path_image}imageFiles/Хасаншин.png', 'H1')
-                self.insert_image(ws2, f'{data_list.path_image}imageFiles/Шамигулов.png', 'H4')
+            if 'Ойл' in data_list.contractor and 'prs' not in self.work_plan:
+                self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Хасаншин.png', 'H1')
+                self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Шамигулов.png', 'H4')
 
-            excel_data_dict = excel_in_json(self, ws2)
+            excel_data_dict = excel_in_json(self, self.ws2)
             self.thread_excel_insert = ExcelWorker(self.data_well)
             self.thread_excel_insert.insert_data_in_database(excel_data_dict, self.data_well)
-
-            ws2.print_area = f'B1:L{self.table_widget.rowCount() + 45}'
-            ws2.page_setup.fitToPage = True
-            ws2.page_setup.fitToHeight = False
-            ws2.page_setup.fitToWidth = True
-            ws2.print_options.horizontalCentered = True
+            if 'prs' in self.work_plan:
+                self.ws2.print_area = f'B1:O{self.ws2.max_row}'
+            else:
+                self.ws2.print_area = f'B1:L{self.ws2.max_row}'
+            self.ws2.page_setup.fitToPage = True
+            self.ws2.page_setup.fitToHeight = False
+            self.ws2.page_setup.fitToWidth = True
+            self.ws2.print_options.horizontalCentered = True
             # зададим размер листа
-            ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
+            self.ws2.page_setup.paperSize = self.ws2.PAPERSIZE_A4
             # содержимое по ширине страницы
-            ws2.sheet_properties.pageSetUpPr.fitToPage = True
-            ws2.page_setup.fitToHeight = False
+            self.ws2.sheet_properties.pageSetUpPr.fitToPage = True
+            self.ws2.page_setup.fitToHeight = False
 
             # path = 'workiii'
             # print(f'Пользоватль{data_list.puser}')
@@ -1581,31 +1640,31 @@ class MyWindow(MyMainWindow):
             if self.work_plan not in ['dop_plan', 'dop_plan_in_base']:
                 from H2S import CalculateH2s
                 if self.data_well.bvo:
-                    ws5 = wb2.create_sheet('Sheet1')
+                    ws5 = self.wb2.create_sheet('Sheet1')
                     ws5.title = "Схемы ПВО"
-                    ws5 = wb2["Схемы ПВО"]
-                    wb2.move_sheet(ws5, offset=-1)
+                    ws5 = self.wb2["Схемы ПВО"]
+                    self.wb2.move_sheet(ws5, offset=-1)
                     schema_list = self.check_pvo_schema(ws5, insert_index + 2)
                 category_check_list = []
                 for plast in self.data_well.dict_category:
                     if self.data_well.dict_category[plast] not in category_check_list:
                         if self.data_well.dict_category[plast]['по сероводороду'].category in [1, 2]:
                             name_list = f'Расчет H2S {plast}'
-                            self.ws3 = wb2.create_sheet(name_list, 1)
+                            self.ws3 = self.wb2.create_sheet(name_list, 1)
                             calculate = CalculateH2s(self.data_well)
                             calculate.calc_h2s(self.ws3, plast)
                             category_check_list.append(self.data_well.dict_category[plast])
 
-                            # Скрываем лист
-                            self.ws3.sheet_state = 'hidden'
+                            # # Скрываем лист
+                            # self.ws3.sheet_state = 'hidden'
 
 
             # Перед сохранением установите режим расчета
-            wb2.calculation.calcMode = "auto"
+            self.wb2.calculation.calcMode = "auto"
 
-            if wb2:
-                wb2.close()
-                self.save_file_dialog(wb2, full_path)
+            if self.wb2:
+                self.wb2.close()
+                self.save_file_dialog(self.wb2, full_path)
 
                 # wb2.save(full_path)
                 print(f'Table data saved to Excel {full_path}')

@@ -121,13 +121,20 @@ class TabPageSoCorrect(TabPageUnion):
 
         self.bottomhole_drill_Label = QLabel('Пробуренный забой')
         self.bottomhole_drill_edit_type = FloatLineEdit(self)
+
+
         self.bottomhole_drill_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.bottom_hole_drill.get_value))}')
+        if self.bottomhole_drill_edit_type.text() == 'отсут':
+            self.data_well.check_data_in_pz.append('Не корректно указан пробуренный забой\n')
 
         self.bottomhole_artificial_Label = QLabel('Искусственный забой')
         self.bottomhole_artificial_edit_type = FloatLineEdit(self)
         self.bottomhole_artificial_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.bottom_hole_artificial.get_value))}')
+
+        if self.bottomhole_artificial_edit_type.text() == 'отсут':
+            self.data_well.check_data_in_pz.append('Не корректно указан искусственный забой\n')
 
         self.current_bottom_Label = QLabel('Текущий забой')
         self.current_bottom_edit_type = FloatLineEdit(self)
@@ -138,19 +145,29 @@ class TabPageSoCorrect(TabPageUnion):
         self.max_angle_edit_type = FloatLineEdit(self)
         self.max_angle_edit_type.setText(f'{self.ifNone(self.data_well.max_angle.get_value)}')
 
+        if self.max_angle_edit_type.text() == 'отсут':
+            self.data_well.check_data_in_pz.append('Не корректно указан максимальный угол\n')
+
         self.max_angle_depth_Label = QLabel('Глубина максимального угла')
         self.max_angle_depth_edit_type = FloatLineEdit(self)
         self.max_angle_depth_edit_type.setText(f'{self.ifNone(self.data_well.max_angle_depth.get_value)}')
+        if  self.max_angle_depth_edit_type.text() == 'отсут':
+            self.data_well.check_data_in_pz.append('Не корректно указана глубина максимального угола\n')
 
         self.max_expected_pressure_Label = QLabel('Максимальный ожидаемое давление')
         self.max_expected_pressure_edit_type = FloatLineEdit(self)
         self.max_expected_pressure_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.max_expected_pressure.get_value))}')
+        if self.max_expected_pressure_edit_type.text() == 'отсут':
+            self.data_well.check_data_in_pz.append('Не корректно указана глубина максимального ожидаемое давление\n')
 
         self.max_admissible_pressure_Label = QLabel('Максимальный допустимое давление')
         self.max_admissible_pressure_edit_type = FloatLineEdit(self)
         self.max_admissible_pressure_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.max_admissible_pressure.get_value))}')
+
+        if self.max_admissible_pressure_edit_type.text() == 'отсут':
+            self.data_well.check_data_in_pz.append('Не корректно указана глубина максимального допустимое давление\n')
 
         self.pump_SHGN_do_Label = QLabel('Штанговый насос')
         self.pump_SHGN_do_edit_type = QLineEdit(self)
@@ -587,10 +604,14 @@ class TabPageSoCorrect(TabPageUnion):
 
     def select_type_kr(self):
         kr = self.data_well.type_kr
+        if 'prs' in self.data_well.work_plan:
+            TYPE_KR_LIST = data_list.TYPE_TR_LIST
+        else:
+            TYPE_KR_LIST = data_list.TYPE_KR_LIST
         index_sel = 0
         if kr:
             kr = kr.split(' ')[0] + ' '
-            for index, type_kr in enumerate(data_list.TYPE_KR_LIST):
+            for index, type_kr in enumerate(TYPE_KR_LIST):
                 if kr in type_kr and kr != ' ':
                     index_sel = index
         return index_sel
@@ -772,6 +793,9 @@ class DataWindow(WindowUnion):
         shoe_column_additional = self.current_widget.shoe_column_add_edit_type2.text()
         head_column_additional = self.current_widget.head_column_add_edit_type2.text()
         bottomhole_drill = self.current_widget.bottomhole_drill_edit_type.text()
+        if bottomhole_drill == 'отсут':
+            QMessageBox.warning(self, 'Ошибка', 'Ошибка в пробуренном забое')
+            return
         bottomhole_artificial = self.current_widget.bottomhole_artificial_edit_type.text().replace(',', '.')
         current_bottom = self.current_widget.current_bottom_edit_type.text().replace(',', '.')
         max_angle_depth = self.current_widget.max_angle_depth_edit_type.text()
@@ -1125,6 +1149,20 @@ class DataWindow(WindowUnion):
                 self.pause_app()
 
                 return
+            if self.data_well.column_additional is False or\
+                (self.data_well.column_additional and
+                 self.data_well.current_bottom > self.data_well.head_column_additional.get_value):
+                if self.data_well.dict_pump_ecn != '0':
+                    self.data_well.template_depth = self.data_well.dict_pump_ecn_depth
+                    self.data_well.template_length = 30
+            else:
+                if self.data_well.dict_pump_ecn != '0':
+                    if self.data_well.dict_pump_ecn_depth > self.data_well.head_column_additional.get_value:
+                        self.data_well.template_depth_addition = self.data_well.dict_pump_ecn_depth
+                        self.data_well.template_length_addition = 30
+                    else:
+                        self.data_well.template_depth = self.data_well.dict_pump_ecn_depth
+                        self.data_well.template_length = 30
 
             self.data_well.curator = curator
             if curator in ['ВНС']:

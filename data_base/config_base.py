@@ -256,6 +256,8 @@ class WorkDatabaseWell:
             work_plan_str = f'ДП№{data_well.number_dp}'
         elif 'krs' in work_plan:
             work_plan_str = 'ПР'
+        elif 'prs' in work_plan:
+            work_plan_str = 'ПР ТРС'
         elif work_plan == 'plan_change':
             if data_well.work_plan_change == 'krs':
                 work_plan_str = 'ПР'
