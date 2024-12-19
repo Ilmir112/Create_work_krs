@@ -307,7 +307,7 @@ class FindIndexPZ(MyMainWindow):
                     any(['IX. Мероприятия по предотвращению аварий, инцидентов и осложнений::' in str(col) for col in
                          row]):
 
-                self.data_well_max = ProtectedIsDigit(row_ind)
+                self.data_well_max = ProtectedIsDigit(row_ind -1)
 
             elif 'НКТ' == str(row[1]).upper():
                 self.pipes_ind = ProtectedIsDigit(row_ind + 1)
@@ -336,6 +336,12 @@ class FindIndexPZ(MyMainWindow):
 
                     if 'гипс' in str(value).lower() or 'гидратн' in str(value).lower():
                         self.gips_in_well = True
+
+        if self.data_x_max.get_value == 0:
+            QMessageBox.warning(self, 'Ошибка', 'Не корректный файл excel, либо отсутствует строка с '
+                                                'текстом Порядок работ')
+            self.pause_app()
+            return
 
         if self.cat_well_max.get_value == 0:
             QMessageBox.warning(self, 'Ошибка', 'Не корректный файл excel, либо отсутствует строка с '
@@ -619,7 +625,10 @@ class FindIndexPZ(MyMainWindow):
             coord = f'{get_column_letter(col)}{row}'
             if image_loader.image_in(coord):
                 # Загружаем изображение из текущей ячейки
-                image_file = image_loader.get(coord)
+                try:
+                    image_file = image_loader.get(coord)
+                except:
+                    image_file = None
                 if image_file:
                     coord = f'{get_column_letter(col)}{row + 17 - self.cat_well_min.get_value}'
 

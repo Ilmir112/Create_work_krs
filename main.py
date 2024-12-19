@@ -1656,7 +1656,7 @@ class MyWindow(MyMainWindow):
                             category_check_list.append(self.data_well.dict_category[plast])
 
                             # # Скрываем лист
-                            # self.ws3.sheet_state = 'hidden'
+                            self.ws3.sheet_state = 'hidden'
 
 
             # Перед сохранением установите режим расчета
@@ -2491,14 +2491,15 @@ if __name__ == "__main__":
         MyWindow.show_confirmation()
 
     # if data_list.connect_in_base:
-    #     app2 = UpdateChecker()
-    #     app2.check_version()
-    #     if app2.window_close == True:
-    #         MyWindow.set_modal_window(None, app2)
-    #         data_list.pause = True
-    #         self.pause_app()
-    #         data_list.pause = False
-    #         app2.close()dow = MyWindow()
+        # from work_py.check_new_version import UpdateChecker
+        # # app2 = UpdateChecker()
+        # app2.check_version()
+        # if app2.window_close == True:
+        #     MyWindow.set_modal_window(None, app2)
+        #     data_list.pause = True
+        #     self.pause_app()
+        #     data_list.pause = False
+        #     app2.close() = MyWindow()
 
     try:
         data_list.connect_in_base = connect_to_database('krs2')
