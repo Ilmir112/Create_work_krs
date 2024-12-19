@@ -17,13 +17,13 @@ from openpyxl.reader.excel import load_workbook
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
     QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog, QTabWidget, QTableWidgetItem
 from PyQt5 import QtCore, QtWidgets
-from pyupdater.client import Client
-from client_config import ClientConfig
+
 from datetime import datetime
 from openpyxl.utils import get_column_letter
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Alignment, Font
 from block_name import region_select
+
 
 from log_files.log import logger, QPlainTextEditLogger
 from openpyxl.drawing.image import Image
@@ -979,22 +979,22 @@ class MyWindow(MyMainWindow):
         self.thread.start()
     #     self.check_for_updates()
     #
-    # def check_for_updates(self):
-    #     APP_NAME = 'Zima'
-    #     APP_VERSION = '1.1.0'
-    #
-    #     client = Client(ClientConfig.PUBLIC_KEY, update_urls=ClientConfig.UPDATE_URLS, progress_hooks=[self.print_status_info])
-    #     app_update = client.update_check(APP_NAME, APP_VERSION)
-    #     client.refresh()
-    #
-    #     app_version = "1.0.0"  # Замените на вашу текущую версию приложения
-    #     latest_version = client.get_latest_version(ClientConfig.APP_NAME)
-    #
-    #     if latest_version and latest_version.version > app_version:
-    #         print(f"Доступно обновление: {latest_version.version}")
-    #         client.download_update(ClientConfig.APP_NAME)
-    #     else:
-    #         print("Вы на последней версии.")
+    def check_for_updates(self):
+        APP_NAME = 'Zima'
+        APP_VERSION = '1.1.0'
+
+        client = Client(ClientConfig.PUBLIC_KEY, update_urls=ClientConfig.UPDATE_URLS, progress_hooks=[self.print_status_info])
+        app_update = client.update_check(APP_NAME, APP_VERSION)
+        client.refresh()
+
+        app_version = "1.0.0"  # Замените на вашу текущую версию приложения
+        latest_version = client.get_latest_version(ClientConfig.APP_NAME)
+
+        if latest_version and latest_version.version > app_version:
+            print(f"Доступно обновление: {latest_version.version}")
+            client.download_update(ClientConfig.APP_NAME)
+        else:
+            print("Вы на последней версии.")
 
     def print_status_info(info):
         total = info.get(u'total')
@@ -2517,16 +2517,15 @@ if __name__ == "__main__":
         MyWindow.show_confirmation()
 
     # if data_list.connect_in_base:
-        # from work_py.check_new_version import UpdateChecker
-        # # app2 = UpdateChecker()
-        # app2.check_version()
-        # if app2.window_close == True:
-        #     MyWindow.set_modal_window(None, app2)
-        #     data_list.pause = True
-        #     self.pause_app()
-        #     data_list.pause = False
-        #     app2.close() = MyWindow()
-
+    #     from work_py.check_new_version import UpdateChecker
+    #     app2 = UpdateChecker()
+    #     app2.check_version()
+    #     if app2.window_close == True:
+    #         MyWindow.set_modal_window(app2)
+    #         data_list.pause = True
+    #         MyWindow.pause_app()
+    #         data_list.pause = False
+    #         # app2.close()
     try:
         data_list.connect_in_base = connect_to_database('krs2')
 

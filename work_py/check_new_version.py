@@ -220,6 +220,13 @@ class UpdateThread(QThread):
         except requests.exceptions.RequestException as e:
             QMessageBox.warning(None, "Ошибка", f"Не удалось загрузить обновления: {type(e).__name__}\n\n{str(e)}")
 
+    def is_process_running(self, process_name):
+        """Проверяет, запущен ли процесс с указанным именем."""
+        for proc in psutil.process_iter(attrs=['pid', 'name']):
+            if proc.info['name'] == process_name:
+                return True
+        return False
+
     def move_file(self, source_path, destination_path):
         zima_process_name = "ZIMA.exe"
         print("Ожидание 5 секунд перед закрытием приложения...")
@@ -227,7 +234,13 @@ class UpdateThread(QThread):
 
         # Закрываем приложение
         self.close_zima(zima_process_name)
-        print("Приложение закрыто.")
+
+        # Ждем, пока процесс закроется
+        time.sleep(2)  # Даем время на завершение процесса
+
+        # Проверяем, что процесс действительно закрыт
+        while self.is_process_running("ZIMA.exe"):
+            time.sleep(1)  # Ждем, пока процесс закроется
 
         # Перемещаем файл
         try:
@@ -235,10 +248,6 @@ class UpdateThread(QThread):
             print(f"Файл перемещен из {source_path} в {destination_path}.")
         except subprocess.CalledProcessError as e:
             print(f"Ошибка при перемещении файла: {type(e).__name__}\n\n{str(e)}")
-
-
-
-
 
         print("Ожидание 5 секунд перед запуском обновленного приложения...")
         time.sleep(5)
@@ -264,12 +273,11 @@ class UpdateThread(QThread):
 
 
     def update_process(self):
-
         extract_len = len(data_list.path_image) + len('ZIMA.exe')
 
         extract_dir = os.path.dirname(os.path.abspath(__file__))[:-extract_len]
         new_extract_dir = extract_dir + '/ZimaUpdate'
-        # # Переименовываем текущую версию
+        # # # Переименовываем текущую версию
         # os.rename(f"{os.path.dirname(sys.executable)}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
         # print(f"Переименование {os.path.dirname(sys.executable)}/ZIMA.exe", f"{os.path.dirname(sys.executable)}/ZIMA.exe.old")
 
@@ -284,11 +292,6 @@ class UpdateThread(QThread):
         print(f'Местонаходение папки {database_file,  ada}')
 
 
-        # if os.path.exists(database_file):
-        # # if 0 != 0:
-
-        print(f'файл databaseWell.db существует')
-        ad = os.listdir(new_extract_dir)
         print(f'папка архива {new_extract_dir}')
         # Файл databaseWell.db существует, перемещаем все, кроме исключений
         for filename in os.listdir(new_extract_dir):
@@ -309,16 +312,6 @@ class UpdateThread(QThread):
                 print(f"Перемещен файл: {filename} в папку {destination_path}")
             else:
                 print(f"Не Перемещен файл: {filename}")
-        # else:
-        #     # Файл databaseWell.db не существует, перемещаем все файлы
-        #     try:
-        #         for filename in os.listdir(new_extract_dir):
-        #             shutil.move(f"{extract_dir}/{filename}", f"{os.path.dirname(sys.executable)}/{filename}")
-
-            # except PermissionError:
-            #     QMessageBox.warning(None, "Ошибка",
-            #                         f"Не удалось переместить файл ZIMA.exe. Возможно, он используется другой программой.")
-            #     return
 
         try:
             # Удаляем папку
