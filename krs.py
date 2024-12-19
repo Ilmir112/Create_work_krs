@@ -164,11 +164,12 @@ class TabPageGno(TabPageUnion):
                 fluid_p = list(self.data_well.dict_perforation[plast]['рабочая жидкость'])[0]
         fluid_list.append(fluid_p)
         if max(fluid_list) <= 1.16:
-
             if start_date <= current_date <= end_date and max(fluid_list) <= 1.18 and \
-                    self.data_well.region in ['КГМ', 'АГМ', 'ИГМ']:
-
-                fluid_max = 1.16
+                    self.data_well.region in ['КГМ', 'АГМ', 'ИГМ', 'ТГМ']:
+                if self.data_well.region in ['КГМ']:
+                    fluid_max = 1.16
+                elif self.data_well.region in ['КГМ', 'АГМ', 'ИГМ', 'ТГМ']:
+                    fluid_max = 1.18
             else:
                 fluid_max = max(fluid_list)
         else:
