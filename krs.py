@@ -309,6 +309,16 @@ class GnoParent(ABC):
         self.nkt_diam_fond = TabPageGno.gno_nkt_opening(self.data_well.dict_nkt_before)
 
         self.without_damping_true = self.data_well.without_damping
+        if self.without_damping_true and self.data_well.category_pressure in [1, '1', 2, '2']:
+            question = QMessageBox.question(None, 'Нестыковка',
+                                            f'Скважина состоит в перечне скважин не подлежащих '
+                                            f'глушению, но так же скважина {self.data_well.category_pressure} '
+                                            f'по давлению, есть ли необходимость ее глушить?')
+            # question = QMessageBox.question(self, 'Корректность забой', f'Забой который можно нормализовать '
+            #                                                  f'без использования ВЗД на '
+            #                                                  f'глубине м, корректен?')
+            if question == QMessageBox.StandardButton.Yes:
+                self.without_damping_true = False
         self.well_jamming_str = self.well_jamming()
 
         self.well_jamming_ord = volume_jamming_well(self, float(self.data_well.depth_fond_paker_before["before"]))
@@ -466,7 +476,7 @@ class GnoParent(ABC):
              None, None, None, None, None, None, None,
              ' Мастер КРС.', None]]
 
-        if float(self.fluid) > 1.18:
+        if float(self.fluid) + 0.02 > 1.18:
             krs_begin.insert(-1, update_change_fluid_str[0])
 
         kvostovika_length = round(

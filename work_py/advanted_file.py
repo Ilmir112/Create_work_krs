@@ -53,7 +53,7 @@ def skm_interval(self, template):
     if perforating_intervals:
         interval_raid = remove_overlapping_intervals(self, perforating_intervals, interval_raid)
     else:
-        interval_raid = [[self.data_well.skm_depth-70, self.data_well.skm_depth]]
+        interval_raid = [[self.data_well.skm_depth-70, self.data_well.skm_depth]] + interval_raid
 
     merged_segments = merge_overlapping_intervals(interval_raid)
     
@@ -245,9 +245,9 @@ def change_true_raid(self, interval_raid):
                     self.data_well.dict_leakiness['НЭК']['интервал'][nek]['отрайбировано'] = True
     if self.data_well.plast_all:
         for plast in self.data_well.plast_all:
-            for _ in list((self.data_well.dict_perforation[plast]['интервал'])):
+            for roof, sole in list((self.data_well.dict_perforation[plast]['интервал'])):
                 for interval in interval_raid:
-                    if interval[0] <= list(interval)[0] <= interval[1]:
+                    if interval[0] <= roof <= interval[1] and interval[0] <= sole <= interval[1]:
                         self.data_well.dict_perforation[plast]['отрайбировано'] = True
 
 
@@ -380,9 +380,10 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                 cell.number_format = 'General'
                 cell.value = str(work_list[i - 1][j - 1])
         elif 'по H2S' in work_list[i - 1] or 'по H2S :' in work_list[i - 1] or \
-                'по Pпл :' in work_list[i - 1] or 'по Pпл' in work_list[i - 1]:
+                'по Pпл :' in work_list[i - 1] or 'по Pпл' in work_list[i - 1] or\
+                'по газовому факт' in work_list[i - 1] or 'по ГФ' in work_list[i - 1]:
             for j in range(1, 13):
-                cell = ws2.cell(row=i, column=j+1)
+                cell = ws2.cell(row=i+1, column=j+1)
                 cell.number_format = 'General'
                 cell.alignment = Alignment(horizontal='center', vertical='center')
                 cell.value = str(work_list[i - 1][j - 1])

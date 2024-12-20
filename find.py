@@ -728,7 +728,7 @@ class WellNkt(FindIndexPZ):
         for row_ind, row in enumerate(self.ws.iter_rows(values_only=True, min_row=begin_index - 1,
                                                         max_row=cancel_index)):  # словарь количества НКТ и метраж
             if self.check_text_in_row('план', row) or self.check_text_in_row('карта спуска (планируемое)', row):
-                a_plan = row_ind - 1
+                a_plan = row_ind
             if row_ind < 2:
                 for col_index, col in enumerate(row):
                     if 'диаметр' in str(col).lower() and 'мм' in str(col):
@@ -1124,7 +1124,7 @@ class WellCondition(FindIndexPZ):
                             self.percent_water = FindIndexPZ.definition_is_none(
                                 self, self.percent_water, row_index,
                                 col + 1, 1)
-                        elif 'Плотность жидкости глушения :' in str(value):
+                        elif 'плотность жидкости глушения' in str(value).lower():
                             try:
                                 if 'prs' in self.work_plan:
                                     well_volume_in_pz = str(row[col + 4]).replace(',', '.')
@@ -1296,7 +1296,7 @@ class WellData(FindIndexPZ):
                             self.interval_temp, row_index, col + 2, 1)
 
                     elif 'зенитный угол' in str(value).lower():
-                        self.max_angle = ProtectedIsDigit(row[col + 4])
+                        self.max_angle = ProtectedIsDigit(self.check_once_isdigit(row[col + 4]))
                         for index, col1 in enumerate(row[:14]):
                             if 'на глубине' in str(col1):
                                 self.max_angle_depth = ProtectedIsDigit(row[index + 1])
@@ -1304,10 +1304,10 @@ class WellData(FindIndexPZ):
                                 break
 
                     elif 'тек. забой:' in str(value).lower() and len(value) < 15:
-                        self.current_bottom = row[col + 1]
+                        self.current_bottom = self.check_once_isdigit(row[col + 1])
 
                     elif 'текущий забой' in str(value).lower() and len(value) < 15:
-                        self.current_bottom = row[col + 2]
+                        self.current_bottom = self.check_once_isdigit(row[col + 2])
                         self.current_bottom = \
                             FindIndexPZ.definition_is_none(
                                 self, self.current_bottom, row_index, col, 2)
@@ -2027,7 +2027,7 @@ class WellCategory(FindIndexPZ):
 
                     # Вычитаем даты, получая timedelta (разницу в днях)
                     difference = date_now - zamer_str
-                    adedfefefr = self.category_pressure, self.category_pressure_well
+
                     if self.category_pressure in [3, '3']:
                         if difference.days > 90:
                             self.check_data_in_pz.append(

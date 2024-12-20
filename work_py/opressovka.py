@@ -59,7 +59,7 @@ class OpressovkaEK(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window =None
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
     def add_row_table(self):
@@ -314,7 +314,7 @@ class OpressovkaEK(WindowUnion):
         current_bottom = self.data_well.current_bottom
         # print(drilling_interval)
         for sole in sorted(leakness_list):
-            if paker_depth > sole:
+            if paker_depth >= sole:
                 self.tableWidget.insertRow(rows)
                 self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(int(sole))))
         self.tableWidget.setSortingEnabled(True)
@@ -363,53 +363,67 @@ class OpressovkaEK(WindowUnion):
         else:
             dict_leakinest_keys = []
         plasts_keys = []
-        for ind_nek, pakerNEK in enumerate(depth_paker_list[1:]):
-            for plast in self.data_well.plast_all:
-                if f'{self.data_well.dict_perforation[plast]["кровля"]}-{self.data_well.dict_perforation[plast]["подошва"]}' not in plasts_keys:
-                    plasts_keys.append(
-                        f'{self.data_well.dict_perforation[plast]["кровля"]}-{self.data_well.dict_perforation[plast]["подошва"]}')
 
-                nek_count = ''
-                for nek in plasts_keys:
-                    if f'инт. {nek}' not in nek_count:
+        depth_paker_list = sorted(depth_paker_list)
+        for ind_nek, pakerNEK in enumerate(depth_paker_list):
+            if paker_depth != pakerNEK:
+                for plast in self.data_well.plast_all:
+                    if f'{self.data_well.dict_perforation[plast]["кровля"]}-{self.data_well.dict_perforation[plast]["подошва"]}' not in plasts_keys:
+                        plasts_keys.append(
+                            f'{self.data_well.dict_perforation[plast]["кровля"]}-{self.data_well.dict_perforation[plast]["подошва"]}')
+
+                    nek_count = ''
+                    for nek in plasts_keys:
+                        if f'инт. {nek}' not in nek_count:
+                            if int(float(nek.split('-')[0])) < pakerNEK:
+                                nek_count += f'инт. {nek}, '
+                for nek in dict_leakinest_keys:
+                    if f'НЭК {nek}' not in nek_count:
                         if int(float(nek.split('-')[0])) < pakerNEK:
-                            nek_count += f'инт. {nek}, '
-            for nek in dict_leakinest_keys:
-                if f'НЭК {nek}' not in nek_count:
-                    if int(float(nek.split('-')[0])) < pakerNEK:
-                        nek_count += f'НЭК {nek}, '
+                            nek_count += f'НЭК {nek}, '
 
-            pressureNEK_list = [
-                [f'При герметичности колонны:  Допустить пакер до глубины {paker_depth}м', None,
-                 f'При герметичности колонны:  Допустить пакер до глубины {pakerNEK}м',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС', descentNKT_norm(pakerNEK - paker_depth, 1.2)],
-                [f'Опрессовать в инт 0-{pakerNEK}м на Р={self.data_well.max_admissible_pressure.get_value}атм', None,
-                 f'{nkt_opress_list[1]} Посадить пакер. Опрессовать эксплуатационную колонну в '
-                 f'интервале {pakerNEK}-0м на Р={self.data_well.max_admissible_pressure.get_value}атм'
-                 f' в течение 30 минут в присутствии представителя заказчика, составить акт.',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС', 0.77],
-                [f'Насыщение 5м3. Определение Q при Р-{self.data_well.max_admissible_pressure.get_value}', None,
-                 f'ПРИ НЕГЕРМЕТИЧНОСТИ: \nПроизвести насыщение скважины в объеме 5м3 по '
-                 f'затрубному пространству. Определить приемистость '
-                 f'{nek_count} при Р-{self.data_well.max_admissible_pressure.get_value}'
-                 f'атм по затрубному пространству'
-                 f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль '
-                 f'за отдачей жидкости '
-                 f'после закачки, объем согласовать с подрядчиком по РИР).',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС', 1.5],
-                [f'срыв пакера 30мин', None,
-                 f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса '
-                 f'НКТ в течении 30мин и с '
-                 f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС', 0.7]]
+                pressureNEK_list = [
+                    [f'При герметичности колонны:  Допустить пакер до глубины {pakerNEK}м', None,
+                     f'При герметичности колонны:  Допустить пакер до глубины {pakerNEK}м',
+                     None, None, None, None, None, None, None,
+                     'мастер КРС', descentNKT_norm(pakerNEK - paker_depth, 1.2)],
+                    [f'Опрессовать в инт 0-{pakerNEK}м на Р={self.data_well.max_admissible_pressure.get_value}атм',
+                     None,
+                     f'{nkt_opress_list[1]} Посадить пакер. Опрессовать эксплуатационную колонну в '
+                     f'интервале {pakerNEK}-0м на Р={self.data_well.max_admissible_pressure.get_value}атм'
+                     f' в течение 30 минут в присутствии представителя заказчика, составить акт.',
+                     None, None, None, None, None, None, None,
+                     'мастер КРС', 0.77],
+                    [f'Насыщение 5м3. Определение Q при Р-{self.data_well.max_admissible_pressure.get_value}', None,
+                     f'ПРИ НЕГЕРМЕТИЧНОСТИ: \nПроизвести насыщение скважины в объеме 5м3 по '
+                     f'затрубному пространству. Определить приемистость '
+                     f'{nek_count} при Р-{self.data_well.max_admissible_pressure.get_value}'
+                     f'атм по затрубному пространству'
+                     f'в присутствии представителя УСРСиСТ или подрядчика по РИР. (Вести контроль '
+                     f'за отдачей жидкости '
+                     f'после закачки, объем согласовать с подрядчиком по РИР).',
+                     None, None, None, None, None, None, None,
+                     'мастер КРС', 1.5],
+                    [f'срыв пакера 30мин', None,
+                     f'Произвести срыв пакера с поэтапным увеличением нагрузки на 3-4т выше веса '
+                     f'НКТ в течении 30мин и с '
+                     f'выдержкой 1ч для возврата резиновых элементов в исходное положение. ',
+                     None, None, None, None, None, None, None,
+                     'мастер КРС', 0.7]]
+                if pakerNEK == depth_paker_list[-1]:
+                    pressureNEK_list[2] = [
+                        None, None,
+                        f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК '
+                        f'для определения интервала '
+                        f'негерметичности эксплуатационной колонны с точностью до одного НКТ или запись РГД, ВЧТ с '
+                        f'целью определения места нарушения в присутствии представителя заказчика, составить акт. '
+                        f'Определить приемистость НЭК.',
+                        None, None, None, None, None, None, None,
+                        'мастер КРС', None]
 
-            for row in pressureNEK_list:
-                paker_list.append(row)
-            paker_depth = pakerNEK
+                for row in pressureNEK_list:
+                    paker_list.append(row)
+                paker_depth = pakerNEK
 
         if pressure_zumpf_question == "Да":
             zumpf_list = [

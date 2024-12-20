@@ -149,6 +149,18 @@ class MyMainWindow(QMainWindow):
         else:
             return False
 
+    @staticmethod
+    def check_once_isdigit(string):
+        # Паттерн для проверки: допустимы только цифры, точка и запятая
+        string_exit = ''
+        for i in str(string):
+            if i in '1234567890,.':
+                string_exit += i
+        if string_exit == '':
+            return None
+        else:
+            return float(string_exit.replace(',', '.'))
+
     # def move_window(self, x, y):
     #     self.move(x, y)
     def add_window(self, window):
@@ -977,6 +989,16 @@ class MyWindow(MyMainWindow):
         self.excepthook.moveToThread(self.thread)
         # self.thread.started.connect(self.excepthook.handleException)
         self.thread.start()
+
+        if getattr(sys, 'frozen', False):
+            # Скомпилированное приложение
+            data_list.path_image = '_internal/'
+        else:
+            # Режим разработки
+            data_list.path_image = ''
+
+        print(f"Путь к изображению: {data_list.path_image}")
+
     #     self.check_for_updates()
     #
     def check_for_updates(self):
