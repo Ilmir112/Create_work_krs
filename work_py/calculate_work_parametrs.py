@@ -219,6 +219,14 @@ def volume_nkt(data_well):  # Внутренний объем НКТ по фон
     if data_well.dict_nkt_before:
         for nkt, length_nkt in data_well.dict_nkt_before.items():
             if nkt:
+                if '73' in str(nkt):
+                    nkt = 73
+                elif '60' in str(nkt):
+                    nkt = 60
+                elif '89' in str(nkt):
+                    nkt = 89
+                elif '48' in str(nkt):
+                    nkt = 48
                 volume_nkt += (float(nkt) - 2 * 7.6) ** 2 * 3.14 / 4 / 1000000 * length_nkt
     # print(f'объем НКТ {volume_nkt}')
     return round(volume_nkt, 1)

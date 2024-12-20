@@ -1833,42 +1833,7 @@ class WellPerforation(FindIndexPZ):
                         merged_segments[-1] = [merged_segments[-1][0], max(sole_int, merged_segments[-1][1])]
 
                 self.dict_perforation[plast]['интервал'] = merged_segments
-        for plast in self.dict_perforation:
-            if self.dict_perforation[plast]['отключение'] is False:
-                try:
-                    zamer = self.dict_perforation[plast]['замер'][0]
-                    zamer = zamer.split(' ')
-                    for string in zamer:
-                        if string.count('.') == 2:
-                            string = re.sub(r'[^.\d]', '', string)
-                            zamer_str = datetime.strptime(string, '%d.%m.%Y').date()
-                    date_now = datetime.now().date()
 
-                    # Вычитаем даты, получая timedelta (разницу в днях)
-                    difference = date_now - zamer_str
-
-                    if self.category_pressure == 3:
-                        if difference.days > 90:
-                            self.check_data_in_pz.append(
-                                'Согласно требований инструкций БНД № П3-05 И-102089 ЮЛ-305 версия 2 '
-                                f'замер по пласту {plast} не соответствует регламенту '
-                                f'для скважин 3-й категории не более 3 месяцев до '
-                                f'начала ремонта')
-                    elif self.category_pressure == 2:
-                        if difference.days > 30:
-                            self.check_data_in_pz.append(
-
-                                f'Согласно требований инструкций БНД № П3-05 И-102089 ЮЛ-305 версия 2  замер по пласту {plast} не соответствует регламенту '
-                                f'для скважин 3-й категории не более 1 месяца до '
-                                f'начала ремонта')
-                    elif self.category_pressure == 1:
-                        if difference.days > 3:
-                            self.check_data_in_pz.append(
-                                f'Согласно требований инструкций БНД № П3-05 И-102089 ЮЛ-305 версия 2  замер по пласту {plast} не соответствует регламенту '
-                                f'для скважин 3-й категории не более 3 дней до '
-                                f'начала ремонта')
-                except Exception:
-                    print('Ошибка добавления в информационное сообщение')
 
         if self.perforation_correct_window2 is None:
             from perforation_correct import PerforationCorrect
@@ -2044,6 +2009,48 @@ class WellCategory(FindIndexPZ):
                                     f'Скважина {self.well_number.get_value} '
                                     f'{self.well_area.get_value} не найдена в классификаторе. '
                                     f'Необходимо проверить соответствие данных с классификатором')
+
+        for plast in self.dict_perforation:
+            if self.dict_perforation[plast]['отключение'] is False:
+                try:
+                    zamer = self.dict_perforation[plast]['замер'][0]
+                    if type(zamer) != datetime:
+                        if ' ' in zamer:
+                            zamer = zamer.split(' ')
+                            for string in zamer:
+                                if string.count('.') == 2:
+                                    string = re.sub(r'[^.\d]', '', string)
+                                    zamer_str = datetime.strptime(string, '%d.%m.%Y').date()
+                    else:
+                        zamer_str = zamer.date()
+                    date_now = datetime.now().date()
+
+                    # Вычитаем даты, получая timedelta (разницу в днях)
+                    difference = date_now - zamer_str
+                    adedfefefr = self.category_pressure, self.category_pressure_well
+                    if self.category_pressure in [3, '3']:
+                        if difference.days > 90:
+                            self.check_data_in_pz.append(
+                                'Согласно требований инструкций БНД № П3-05 И-102089 ЮЛ-305 версия 2 '
+                                f'замер по пласту {plast} не соответствует регламенту '
+                                f'для скважин 3-й категории не более 3 месяцев до '
+                                f'начала ремонта')
+                    elif self.category_pressure in [2, '2']:
+                        if difference.days > 30:
+                            self.check_data_in_pz.append(
+                                f'Согласно требований инструкций БНД № П3-05 И-102089 ЮЛ-305 версия 2  замер по '
+                                f'пласту {plast} не соответствует регламенту '
+                                f'для скважин 3-й категории не более 1 месяца до '
+                                f'начала ремонта')
+                    elif self.category_pressure in [1, '1']:
+                        if difference.days > 3:
+                            self.check_data_in_pz.append(
+                                f'Согласно требований инструкций БНД № П3-05 И-102089 ЮЛ-305 версия 2  замер по '
+                                f'пласту {plast} не соответствует регламенту '
+                                f'для скважин 3-й категории не более 3 дней до '
+                                f'начала ремонта')
+                except Exception as e:
+                    print(f'Ошибка добавления в информационное сообщение {e}')
 
         if self.work_plan not in ['gnkt_frez', 'application_pvr',
                                   'application_gis', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz', 'plan_change', 'prs']:

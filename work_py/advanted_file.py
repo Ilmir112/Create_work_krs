@@ -384,6 +384,7 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
             for j in range(1, 13):
                 cell = ws2.cell(row=i, column=j+1)
                 cell.number_format = 'General'
+                cell.alignment = Alignment(horizontal='center', vertical='center')
                 cell.value = str(work_list[i - 1][j - 1])
         elif 'ИТОГО:' in work_list[i - 1]:
             stop_str = i
