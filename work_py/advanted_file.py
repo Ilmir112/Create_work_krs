@@ -9,21 +9,22 @@ import data_list
 
 from openpyxl.styles import Font, Alignment
 
+
 def skm_interval(self, template):
     sgm_true = False
     if template in ['СГМ ЭК', 'СГМ открытый ствол' 'СГМ в основной колонне',
-                                         'СГМ в доп колонне + открытый ствол',
-                                         'СГМ в доп колонне']:
+                    'СГМ в доп колонне + открытый ствол',
+                    'СГМ в доп колонне']:
         sgm_true = True
 
     interval_raid = []
     if self.data_well.paker_before["after"] != 0:
         interval_raid.append([float(self.data_well.depth_fond_paker_before["after"]) - 20,
-             float(self.data_well.depth_fond_paker_before["after"]) + 20])
+                              float(self.data_well.depth_fond_paker_before["after"]) + 20])
 
     if self.data_well.paker_second_before["after"]:
         interval_raid.append([float(self.data_well.depth_fond_paker_second_before["after"]) - 20,
-             float(self.data_well.depth_fond_paker_second_before["after"]) + 20])
+                              float(self.data_well.depth_fond_paker_second_before["after"]) + 20])
 
     if self.data_well.dict_leakiness:
         for nek in list(self.data_well.dict_leakiness['НЭК']['интервал'].keys()):
@@ -53,10 +54,10 @@ def skm_interval(self, template):
     if perforating_intervals:
         interval_raid = remove_overlapping_intervals(self, perforating_intervals, interval_raid)
     else:
-        interval_raid = [[self.data_well.skm_depth-70, self.data_well.skm_depth]] + interval_raid
+        interval_raid = [[self.data_well.skm_depth - 70, self.data_well.skm_depth]] + interval_raid
 
     merged_segments = merge_overlapping_intervals(interval_raid)
-    
+
     merged_segments_new = []
 
     for interval in merged_segments:
@@ -69,19 +70,20 @@ def skm_interval(self, template):
 
         elif template in ['ПСШ СКМ в доп колонне c хвостом', 'ПСШ СКМ в доп колонне без хвоста',
                           'ПСШ СКМ в доп колонне + открытый ствол',
-                                         'СГМ в доп колонне + открытый ствол',
-                                         'СГМ в доп колонне'] and self.data_well.skm_depth >= interval[1]:
+                          'СГМ в доп колонне + открытый ствол',
+                          'СГМ в доп колонне'] and self.data_well.skm_depth >= interval[1]:
 
             if float(self.data_well.head_column_additional.get_value) < interval[0] < interval[1] and float(
                     self.data_well.head_column_additional.get_value) <= interval[1] <= self.data_well.skm_depth:
                 # print(f'1 {interval, merged_segments}')
                 merged_segments_new.append(interval)
 
-            elif (interval[0] < float(self.data_well.head_column_additional.get_value) < interval[1] 
+            elif (interval[0] < float(self.data_well.head_column_additional.get_value) < interval[1]
                   and interval[1] >= self.data_well.skm_depth >= interval[0] and interval[1] > interval[0]):
                 # print(f'2 {interval, merged_segments}')
 
-                merged_segments_new.append((self.data_well.head_column_additional.get_value + 2, self.data_well.skm_depth))
+                merged_segments_new.append(
+                    (self.data_well.head_column_additional.get_value + 2, self.data_well.skm_depth))
             elif (interval[0] < float(self.data_well.head_column_additional.get_value) <
                   interval[1] <= self.data_well.skm_depth and interval[1] > interval[0]):
 
@@ -90,7 +92,7 @@ def skm_interval(self, template):
 
         elif template in ['ПСШ Доп колонна СКМ в основной колонне', 'СГМ в основной колонне']:
             if (interval[0] < float(self.data_well.head_column_additional.get_value) and
-                    interval[1] < float(self.data_well.head_column_additional.get_value) and 
+                    interval[1] < float(self.data_well.head_column_additional.get_value) and
                     self.data_well.skm_depth >= interval[1] > interval[0]):
                 merged_segments_new.append(interval)
 
@@ -154,7 +156,7 @@ def remove_overlapping_intervals(self, perforating_intervals, skm_interval=None)
                     skipping_intervals_new.append((skm_range[0] + 1, int(pvr[0] - 2)))
                     skm_range = skm_range[skm_range.index(int(pvr[1])):]
                 else:
-                    skm_range = skm_range[skm_range.index(int(pvr[1]+1)):]
+                    skm_range = skm_range[skm_range.index(int(pvr[1] + 1)):]
             else:
                 skipping_intervals_new.append(skm)
 
@@ -172,8 +174,8 @@ def raiding_interval(data_well, ryber_key):
 
             for interval in data_well.dict_perforation[plast]['интервал']:
                 if data_well.current_bottom > float(interval[1]) > float(interval[0]):
-                    if (data_well.column_additional is False or 
-                            (data_well.column_additional and data_well.head_column_additional.get_value 
+                    if (data_well.column_additional is False or
+                            (data_well.column_additional and data_well.head_column_additional.get_value
                              > data_well.current_bottom)):
 
                         if float(interval[1]) + 20 <= data_well.current_bottom and \
@@ -304,33 +306,33 @@ def definition_plast_work(self):
         zhgs = 1.01
         if "вертикаль" in list(self.data_well.dict_perforation[plast].keys()):
 
-            vertical = min(filter(lambda x: type(x) in [float, int], self.data_well.dict_perforation[plast]["вертикаль"]))
+            vertical = min(
+                filter(lambda x: type(x) in [float, int], self.data_well.dict_perforation[plast]["вертикаль"]))
 
             self.data_well.dict_perforation[plast]['давление'].append(0)
-            pressure = float(max(filter(lambda x: type(x) in [float, int], self.data_well.dict_perforation[plast]['давление'])))
+            pressure = float(
+                max(filter(lambda x: type(x) in [float, int], self.data_well.dict_perforation[plast]['давление'])))
 
             if vertical and pressure:
-                zhgs = calculation_fluid_work(self.data_well, vertical,pressure)
+                zhgs = calculation_fluid_work(self.data_well, vertical, pressure)
                 self.data_well.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость',
-                                                                                         []).append(zhgs)
+                                                                                 []).append(zhgs)
             else:
 
                 self.data_well.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость',
-                                                                                         []).append(zhgs)
+                                                                                 []).append(zhgs)
 
     self.data_well.perforation_roof = perforation_roof
     self.data_well.perforation_sole = perforation_sole
     self.data_well.dict_perforation = dict(
         sorted(self.data_well.dict_perforation.items(), key=lambda item: (not item[1]['отключение'],
-                                                                     item[0])))
+                                                                          item[0])))
     self.data_well.plast_all = list(self.data_well.dict_perforation.keys())
     self.data_well.plast_work = list(plast_work)
     self.data_well.plast_all = list(self.data_well.dict_perforation.keys())
     data_list.plast_work = self.data_well.plast_work
     if len(self.data_well.dict_perforation_project) != 0:
         self.data_well.plast_project = list(self.data_well.dict_perforation_project.keys())
-
-
 
 
 def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
@@ -380,17 +382,17 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                 cell.number_format = 'General'
                 cell.value = str(work_list[i - 1][j - 1])
         elif 'по H2S' in work_list[i - 1] or 'по H2S :' in work_list[i - 1] or \
-                'по Pпл :' in work_list[i - 1] or 'по Pпл' in work_list[i - 1] or\
-                'по газовому факт' in work_list[i - 1] or 'по ГФ' in work_list[i - 1]:
-            for j in range(1, 13):
-                cell = ws2.cell(row=i+1, column=j+1)
+                'по Pпл :' in work_list[i - 1] or 'по Pпл' in work_list[i - 1] or \
+                'по газовому фактору' in work_list[i - 1] or 'по ГФ' in work_list[i - 1]:
+            for j in range(3, 13):
+                cell = ws2.cell(row=i, column=j)
                 cell.number_format = 'General'
                 cell.alignment = Alignment(horizontal='center', vertical='center')
-                cell.value = str(work_list[i - 1][j - 1])
+                cell.value = work_list[i - 1][j - 1]
         elif 'ИТОГО:' in work_list[i - 1]:
             stop_str = i
 
-        for j in range(1, len(work_list[i - 1])+1):
+        for j in range(1, len(work_list[i - 1]) + 1):
             cell = ws2.cell(row=i, column=j)
             if cell and str(cell) != str(work_list[i - 1][j - 1]):
                 # print(work_list[i - 1][j - 1])
@@ -410,8 +412,8 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                     #     cell.value = work_list[i - 1][j - 1]
 
                     if work_list[i - 1][4]:
-                        ws2.cell(row=i-1, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                        vertical='center')
+                        ws2.cell(row=i - 1, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                            vertical='center')
                         ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                         vertical='center')
                     else:
@@ -461,10 +463,9 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
             ws2.merge_cells(start_row=row + 1, start_column=3, end_row=row + 1, end_column=merge_column)
 
     for key, value in boundaries_dict.items():
-        if value[1] <= boundaries_dict_index-3:
+        if value[1] <= boundaries_dict_index - 3:
             ws2.merge_cells(start_column=value[0], start_row=value[1],
                             end_column=value[2], end_row=value[3])
-
 
     if self.data_well.image_data:
         for image_info in self.data_well.image_data:

@@ -120,9 +120,9 @@ class CreatePZ(MyMainWindow):
 
     def insert_events_gnvp(self, ws, dict_events_gnvp, merge_count=0):
         # if work_plan != 'dop_plan':
-        text_width_dict = {20: (0, 100), 30: (101, 200), 40: (201, 300), 60: (301, 400), 70: (401, 500),
-                           90: (501, 600), 110: (601, 700), 120: (701, 800), 130: (801, 900),
-                           150: (901, 1500), 270: (1500, 2300)}
+        text_width_dict = {30: (0, 100), 40: (101, 200), 50: (201, 300), 70: (301, 400), 80: (401, 500),
+                           100: (501, 600), 120: (601, 700), 130: (701, 800), 140: (801, 900),
+                           200: (901, 1500), 270: (1500, 2300)}
 
         # Устанавливаем параметры границы
         red = 'FF0000'  # Красный цвет в формате HEX
@@ -225,7 +225,7 @@ class CreatePZ(MyMainWindow):
                         text_length = len(text)
                         if value[0] <= text_length <= value[1]:
                             if '\n' in text:
-                                row_dimension_value = int(len(text) / 4 + text.count('\n') * 5)
+                                row_dimension_value = int(len(text) / 4 + text.count('\n') * 6)
                                 ws.row_dimensions[i + max_row + 1].height = row_dimension_value
                             else:
                                 row_dimension_value = int(len(text) / 4)

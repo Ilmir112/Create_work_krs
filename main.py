@@ -2479,7 +2479,7 @@ class MyWindow(MyMainWindow):
         if len(self.data_well.leakiness_interval) != 0:
 
             for nek in self.data_well.leakiness_interval:
-                nek_str += f'{nek.split("-")[0]}-{nek.split("-")[1]} \n'
+                nek_str += f'{nek} \n'
 
         ws4.cell(row=3, column=7).value = nek_str
 

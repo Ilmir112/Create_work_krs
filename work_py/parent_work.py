@@ -451,7 +451,7 @@ class WindowUnion(MyMainWindow):
         self.data_well.leakiness_interval = []
         if self.data_well.dict_leakiness:
             self.data_well.leakiness = True
-            self.data_well.leakiness_interval = list(self.data_well.dict_leakiness['НЭК'].keys())
+            self.data_well.leakiness_interval = list(self.data_well.dict_leakiness['НЭК']['интервал'].keys())
 
         self.data_well.dict_perforation_short = json.loads(result[ind][2])
 

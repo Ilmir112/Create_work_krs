@@ -317,6 +317,12 @@ class CategoryWindow(WindowUnion):
                         QMessageBox.warning(self, 'Ошибка', f"Ошибка сохранения данных по категории {e}")
                         return
 
+        adwde = self.data_well.category_pressure_list, ('1' or 1) in self.data_well.category_pressure_list
+        if ('1' or 1) in self.data_well.category_pressure_list or '1' in self.data_well.category_h2s_list or \
+                '1' in self.data_well.category_gaz_factor_percent or \
+                self.data_well.curator == 'ВНС':
+            self.data_well.category_pvo = 1
+            self.data_well.bvo = True
         self.close()
 
     def ifNum(self, string):

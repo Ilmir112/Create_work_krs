@@ -2014,13 +2014,13 @@ class WellCategory(FindIndexPZ):
             if self.dict_perforation[plast]['отключение'] is False:
                 try:
                     zamer = self.dict_perforation[plast]['замер'][0]
+
                     if type(zamer) != datetime:
-                        if ' ' in zamer:
-                            zamer = zamer.split(' ')
-                            for string in zamer:
-                                if string.count('.') == 2:
-                                    string = re.sub(r'[^.\d]', '', string)
-                                    zamer_str = datetime.strptime(string, '%d.%m.%Y').date()
+                        date = re.search(r'\d{2}\.\d{2}\.\d{4}', str(zamer).strip())
+                        if date:
+                            extracted_date = date.group()
+
+                        zamer_str = datetime.strptime(extracted_date, '%d.%m.%Y').date()
                     else:
                         zamer_str = zamer.date()
                     date_now = datetime.now().date()
@@ -2040,14 +2040,14 @@ class WellCategory(FindIndexPZ):
                             self.check_data_in_pz.append(
                                 f'Согласно требований инструкций БНД № П3-05 И-102089 ЮЛ-305 версия 2  замер по '
                                 f'пласту {plast} не соответствует регламенту '
-                                f'для скважин 3-й категории не более 1 месяца до '
+                                f'для скважин 2-й категории не более 1 месяца до '
                                 f'начала ремонта')
                     elif self.category_pressure in [1, '1']:
                         if difference.days > 3:
                             self.check_data_in_pz.append(
                                 f'Согласно требований инструкций БНД № П3-05 И-102089 ЮЛ-305 версия 2  замер по '
                                 f'пласту {plast} не соответствует регламенту '
-                                f'для скважин 3-й категории не более 3 дней до '
+                                f'для скважин 1-й категории не более 3 дней до '
                                 f'начала ремонта')
                 except Exception as e:
                     print(f'Ошибка добавления в информационное сообщение {e}')
