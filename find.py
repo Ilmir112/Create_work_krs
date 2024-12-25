@@ -92,6 +92,7 @@ class FindIndexPZ(MyMainWindow):
 
         self.leakiness_count = 0
         self.emergency_count = 0
+        self.distance_from_well_to_sampling_point = None
 
         self.date_drilling_cancel = ''
         self.date_drilling_run = ''
@@ -1112,7 +1113,7 @@ class WellCondition(FindIndexPZ):
                             else:
                                 self.static_level = ProtectedIsDigit(row[col + 1])
                         elif 'Рмкп ' in str(value):
-                            self.pressure_mkp = ProtectedIsNonNone(row[col + 2])
+                            self.pressure_mkp = ProtectedIsNonNone(row[col + 3])
 
                         elif "грп" in str(value).lower():
                             self.grp_plan = True
@@ -1124,6 +1125,9 @@ class WellCondition(FindIndexPZ):
                             self.percent_water = FindIndexPZ.definition_is_none(
                                 self, self.percent_water, row_index,
                                 col + 1, 1)
+                        elif 'расстояние от скважин' in str(value).lower():
+                            self.distance_from_well_to_sampling_point = str(row[col + 2]).replace(',', '.')
+
                         elif 'плотность жидкости глушения' in str(value).lower():
                             try:
                                 if 'prs' in self.work_plan:
@@ -1141,6 +1145,7 @@ class WellCondition(FindIndexPZ):
         if self.static_level.get_value == 'не корректно':
             self.check_data_in_pz.append('не указано статический уровень')
         if self.pressure_mkp.get_value in [None, 'не корректно', '-', 'нет', 'отсут']:
+            asde = self.pressure_mkp.get_value
             self.check_data_in_pz.append(
                 'не указано наличие наличие устройство замера давления и наличие давления в МКП \n'
                 'Нарушен п. 9.1.9 инструкции БНД по предупреждению ГНВП №ПЗ-05 И-102089 ЮЛ-305')
@@ -1484,7 +1489,9 @@ class WellData(FindIndexPZ):
                     f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
                     f'после ремонта не равно глубине насоса '
                     f'{self.dict_pump_shgn_depth["after"]}м')
-
+        if self.distance_from_well_to_sampling_point is None:
+            QMessageBox.warning(self, 'Ошибка', f'Не указано расстояние до пункта налива')
+            self.check_data_in_pz.append(f'Не указано расстояние до пункта налива')
 
         if self.dict_pump_shgn['after'] not in ['0', 0] and self.dict_pump_shgn_depth['after'] not in ['0', 0]:
             if abs(sum(list(self.dict_sucker_rod_after.values())) - self.dict_pump_shgn_depth['after']) > 10:
@@ -2067,7 +2074,7 @@ class WellCategory(FindIndexPZ):
                         if date:
                             extracted_date = date.group()
 
-                        zamer_str = datetime.strptime(extracted_date, '%d.%m.%Y').date()
+                            zamer_str = datetime.strptime(extracted_date, '%d.%m.%Y').date()
                     else:
                         zamer_str = zamer.date()
                     date_now = datetime.now().date()

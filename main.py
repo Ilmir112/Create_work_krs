@@ -112,6 +112,8 @@ class MyMainWindow(QMainWindow):
 
         dialog = CustomMessageBox(data_well, message)
         dialog.exec_()  # Открываем диалоговое окно в модальном режиме
+
+
     @staticmethod
     def check_if_none(value):
         if isinstance(value, int) or isinstance(value, float):
