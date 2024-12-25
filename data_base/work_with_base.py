@@ -412,7 +412,7 @@ def excel_in_json(self, sheet):
 
     data = {}
     for row_index, row in enumerate(sheet.iter_rows()):
-        row_data = []
+
         if all(cell is None for cell in row[:32]) is False:
             if any([cell.value == "ИТОГО:" for cell in row[:4]]):
                 index_end_copy = row_index
@@ -444,10 +444,7 @@ def excel_in_json(self, sheet):
                         rgb_string_fill = f"RGB({fill.fgColor.rgb})"
 
                         borders = cell.border
-                        left_border = None
-                        right_border = None
-                        top_border = None
-                        bottom_border = None
+
                         borders_style_left = None
                         borders_style_right = None
                         borders_style_top = None
@@ -676,7 +673,12 @@ def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_di
                 cell = sheet_new.cell(row=int(row_index), column=int(col_index))
 
                 # Получение строки RGB из JSON
-                rgb_string = cell_data['fill']['color']
+                rgb_string = cell_data['font']['color']
+                hex_color = cell_data['fill']['color'][4:-1]
+
+                if hex_color != '00000000':
+                    color = Color(rgb=hex_color)
+                    cell.fill = PatternFill(patternType='solid', fgColor=color)
                 if 'color' in list(cell_data['font'].keys()):
 
                     color_font = change_rgb_to_hex(rgb_string)

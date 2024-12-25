@@ -70,7 +70,8 @@ class TabPageUnion(QWidget):
             if self.data_well.dict_leakiness:
                 paker_depth = min([float(nek.split('-')[0]) - 10
                                    for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()])
-        self.paker_depth_edit.setText(str(int(paker_depth)))
+        if paker_depth != '':
+            self.paker_depth_edit.setText(str(int(paker_depth)))
 
         self.grid.addWidget(self.diameter_paker_labelType, 1, 1)
         self.grid.addWidget(self.diameter_paker_edit, 2, 1)

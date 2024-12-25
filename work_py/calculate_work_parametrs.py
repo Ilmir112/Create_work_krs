@@ -67,7 +67,7 @@ class VolumeWellWithoutExstraColumn(VolumeWell):
     def volume_calculate_roof_of_sole(self, roof, sole):
 
         if self.data_well.head_column.get_value == 0:
-            return round(self.area_column * (sole - roof))
+            return round(self.area_column * (sole - roof), 1)
         else:
             if float(sole) > self.data_well.head_column.get_value and float(roof) > self.data_well.head_column.get_value:
                 return round(self.area_column * (sole - roof), 1)

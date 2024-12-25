@@ -15,7 +15,7 @@ from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_n
 class TabPageSoClay(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.validator = QIntValidator(0, 80000)
+
 
         self.purpose_of_clay_label = QLabel("цель закачки глинистого раствора", self)
         self.purpose_of_clay_combo = QComboBox(self)
@@ -23,12 +23,12 @@ class TabPageSoClay(TabPageUnion):
 
         self.current_bottom_label = QLabel("забой", self)
         self.current_bottom_edit = QLineEdit(self)
-        self.current_bottom_edit.setValidator(self.validator)
+        self.current_bottom_edit.setValidator(self.validator_float)
         self.current_bottom_edit.setText(f'{self.data_well.current_bottom}')
 
         self.roof_clay_label = QLabel("кровля ГР", self)
         self.roof_clay_edit = QLineEdit(self)
-        self.roof_clay_edit.setValidator(self.validator)
+        self.roof_clay_edit.setValidator(self.validator_float)
 
         self.roof_clay_edit.setText(f'{self.data_well.perforation_roof + 70}')
         self.roof_clay_edit.setClearButtonEnabled(True)
@@ -36,11 +36,11 @@ class TabPageSoClay(TabPageUnion):
         self.sole_clay_LabelType = QLabel("Подошва ГР", self)
         self.sole_clay_edit = QLineEdit(self)
         self.sole_clay_edit.setText(f'{self.data_well.current_bottom}')
-        self.sole_clay_edit.setValidator(self.validator)
+        self.sole_clay_edit.setValidator(self.validator_float)
 
         self.volume_clay_label = QLabel("Объем глинистого раствора", self)
         self.volume_clay_edit = QLineEdit(self)
-        self.volume_clay_edit.setValidator(self.validator)
+        self.volume_clay_edit.setValidator(self.validator_float)
 
         self.rir_question_Label = QLabel("Нужно ли УЦМ производить на данной компоновке", self)
         self.rir_question_combo = QComboBox(self)
@@ -126,7 +126,6 @@ class TabPageSoClay(TabPageUnion):
 
             self.info_rir_label = QLabel('Цель РИР')
             self.info_rir_edit = QLineEdit(self)
-
 
             self.grid.addWidget(self.roof_rir_label, 6, 4)
             self.grid.addWidget(self.roof_rir_edit, 7, 4)

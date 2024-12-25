@@ -502,7 +502,6 @@ class DopPlanWindow(WindowUnion):
         self.bottom_row_index = 5000
 
 
-
         for i, row in self.data.items():
             if i != 'image':
                 list_row = []
