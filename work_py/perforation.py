@@ -68,8 +68,8 @@ class TabPageSo(TabPageUnion):
             if sole != '':
                 angle_list = [(depth, angle) for depth, angle, curvature in self.data_well.angle_data
                               if abs(float(depth) - float(sole)) <= 10]
-                depth_max = max([float(depth.replace(',', '.')) for depth, angle in angle_list])
-                angle_depth = max([float(angle.replace(',', '.')) for depth, angle in angle_list])
+                depth_max = max([float(str(depth).replace(',', '.')) for depth, angle in angle_list])
+                angle_depth = max([float(str(angle).replace(',', '.')) for depth, angle in angle_list])
 
                 if angle_depth < 50:
                     TabPageSo.combobox_type_perforation.setCurrentIndex(0)
