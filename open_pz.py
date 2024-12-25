@@ -322,7 +322,7 @@ class CreatePZ(MyMainWindow):
                                 text = data.value
                                 for key, value in text_width_dict.items():
                                     if value[0] <= len(text) <= value[1]:
-                                        ws.row_dimensions[i].height = int(key)
+                                        ws.row_dimensions[i].height = int(key*1.1)
 
                     elif 'РН' in data_list.contractor:
                         # Устанавливаем красный цвет для текста

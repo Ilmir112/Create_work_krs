@@ -363,6 +363,7 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
         merge_column = 10
         size_font = 12
         font_type = 'Arial'
+        ws2.column_dimensions[get_column_letter(7)].width = 20
     else:
         head = plan.head_ind_prs(0, ind_ins)
         merge_column = 13
@@ -380,6 +381,8 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
             for j in range(1, 13):
                 cell = ws2.cell(row=i, column=j)
                 cell.number_format = 'General'
+                if 'инв. №' in str(work_list[i - 1][j-1]).lower():
+                    ws2.cell(row=i, column=j+1).number_format = 'Text'
                 cell.value = str(work_list[i - 1][j - 1])
         elif 'по H2S' in work_list[i - 1] or 'по H2S :' in work_list[i - 1] or \
                 'по Pпл :' in work_list[i - 1] or 'по Pпл' in work_list[i - 1] or \
@@ -509,7 +512,9 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
         ws2.column_dimensions[get_column_letter(11)].width = 20
         ws2.column_dimensions[get_column_letter(12)].width = 20
 
-        ws2.column_dimensions[get_column_letter(6)].width = 18
+        ws2.column_dimensions[get_column_letter(6)].width = 20
+        ws2.column_dimensions[get_column_letter(7)].width = 20
+
 
     return 'Высота изменена'
 

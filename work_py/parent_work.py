@@ -419,6 +419,9 @@ class WindowUnion(MyMainWindow):
         self.data_well.drilling_interval = []
         self.data_well.dict_perforation_project = {}
         self.data_well.bvo = False
+        self.data_well.fluid_work = result[0][7]
+        self.data_well.fluid_work_short = result[0][7]
+
         self.data_well.fluid = float(result[0][7][:4].replace('г', ''))
         self.data_well.stabilizator_need = False
         self.data_well.current_bottom_second = 0
@@ -458,7 +461,8 @@ class WindowUnion(MyMainWindow):
         self.data_well.category_pressure = result[ind][8]
         self.data_well.category_h2s = result[ind][9]
         self.data_well.category_gas_factor = result[ind][10]
-        if str(result[ind][8]) == '1' or str(result[ind][9]) == '1' or str(result[ind][10]) or '1':
+        asded = str(result[ind][8]) == '1', str(result[ind][9]) == '1', str(result[ind][10])
+        if str(result[ind][8]) == '1' or str(result[ind][9]) == '1' or str(result[ind][10]) == '1':
             self.data_well.bvo = True
 
         definition_plast_work(self)

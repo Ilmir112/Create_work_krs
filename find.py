@@ -89,8 +89,7 @@ class FindIndexPZ(MyMainWindow):
         self.head_column_additional = ProtectedIsNonNone('не корректно')
         self.shoe_column_additional = ProtectedIsNonNone('не корректно')
         self.interval_temp = ProtectedIsNonNone('не корректно')
-        self.dict_sucker_rod = {}
-        self.dict_sucker_rod_after = {}
+
         self.leakiness_count = 0
         self.emergency_count = 0
 
@@ -779,7 +778,8 @@ class WellSuckerRod(FindIndexPZ):
         if self.sucker_rod_ind.get_value != 0:
             for row_ind, row in enumerate(
                     self.ws.iter_rows(values_only=True, min_row=begin_index - 1, max_row=cancel_index, max_col=20)):
-                if self.check_text_in_row('план', row) or self.check_text_in_row('карта спуска (планируемое)', row):
+                if self.check_text_in_row('план', row) or \
+                        self.check_text_in_row('карта спуска (планируемое)', row):
                     b_plan = row_ind
                 if row_ind <= 1:
                     for col_index, col in enumerate(row):
@@ -1475,6 +1475,16 @@ class WellData(FindIndexPZ):
                     f'Ошибка в карте спуска: Длина штанг {sum(list(self.dict_sucker_rod.values()))}м '
                     f'до ремонта не равно глубине насоса '
                     f'{self.dict_pump_shgn_depth["before"]}м \n')
+            if sum(list((self.dict_nkt_before.values()))) - self.dict_pump_shgn_depth["before"] < 0:
+                QMessageBox.warning(self, 'Ошибка',
+                                    f'Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
+                                    f'после ремонта меньше глубины насоса'
+                                    f'{self.dict_pump_shgn_depth["before"]}м')
+                self.check_data_in_pz.append(
+                    f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
+                    f'после ремонта не равно глубине насоса '
+                    f'{self.dict_pump_shgn_depth["after"]}м')
+
 
         if self.dict_pump_shgn['after'] not in ['0', 0] and self.dict_pump_shgn_depth['after'] not in ['0', 0]:
             if abs(sum(list(self.dict_sucker_rod_after.values())) - self.dict_pump_shgn_depth['after']) > 10:
@@ -1485,6 +1495,18 @@ class WellData(FindIndexPZ):
                     f'Ошибка в карте спуска: \nОшибка в карте спуска: Длина штанг {sum(list(self.dict_sucker_rod.values()))}м '
                     f'после ремонта не равно глубине насоса '
                     f'{self.dict_pump_shgn_depth["before"]}м')
+            if sum(list((self.dict_nkt_after.values()))) - self.dict_pump_shgn_depth["after"] < 0:
+
+                QMessageBox.warning(self, 'Ошибка',
+                                    f'Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
+                                    f'после ремонта не равно глубине насоса '
+                                    f'{self.dict_pump_shgn_depth["after"]}м')
+
+                self.check_data_in_pz.append(
+                    f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
+                    f'после ремонта не равно глубине насоса '
+                    f'{self.dict_pump_shgn_depth["after"]}м')
+
         if sum(list(self.dict_nkt_before.values())) > self.current_bottom:
             QMessageBox.warning(self, 'Ошибка', f'Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
                                                 f'до ремонта больше текущего забоя {self.current_bottom}м')
@@ -1517,6 +1539,27 @@ class WellData(FindIndexPZ):
             QMessageBox.warning(self, 'Канатные технологии', f'Скважина согласована на канатные технологии')
             self.konte_true = True
 
+        if '0' != str(self.dict_pump_ecn['before']):
+            if sum(list((self.dict_nkt_before.values()))) - self.dict_pump_ecn_depth['before'] < 0:
+                QMessageBox.warning(self, 'Ошибка',
+                                    f'Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
+                                    f'до ремонта меньше глубины '
+                                    f'{self.dict_pump_ecn_depth["before"]}м')
+                self.check_data_in_pz.append(
+                    f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
+                    f'до ремонта меньше глубины'
+                    f'{self.dict_pump_ecn_depth["before"]}м')
+        if '0' != str(self.dict_pump_ecn['after']):
+            if sum(list((self.dict_nkt_after.values()))) - self.dict_pump_ecn_depth['after'] < 0:
+                QMessageBox.warning(self, 'Ошибка',
+                                    f'Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
+                                    f' меньше глубины насоса '
+                                    f'{self.dict_pump_ecn_depth["after"]}м')
+                self.check_data_in_pz.append(
+                    f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
+                    f'до ремонта меньше глубины '
+                    f'{self.dict_pump_shgn_depth["after"]}м')
+
         if self.data_window is None:
             from data_correct import DataWindow
             self.data_window = DataWindow(self)
@@ -1528,21 +1571,24 @@ class WellData(FindIndexPZ):
             data_list.pause = True
             self.data_window = None
 
-            if self.work_plan == 'krs':
-                from data_base.config_base import connection_to_database
-                from data_base.config_base import WorkDatabaseWell
-                db = connection_to_database(data_list.DB_WELL_DATA)
-                check_in_base = WorkDatabaseWell(db, self)
-                tables_filter = check_in_base.get_tables_starting_with(self.well_number.get_value,
-                                                                       self.well_area.get_value, 'ПР',
-                                                                       self.type_kr.split(' ')[0])
-                if tables_filter:
-                    mes = QMessageBox.question(None, 'Наличие в базе',
-                                               f'В базе имеется план работ по скважине:\n {" ".join(tables_filter)}. '
-                                               f'При продолжении план пересохранится, продолжить?')
-                    if mes == QMessageBox.StandardButton.No:
-                        self.pause_app()
-                        return
+
+
+
+        if self.work_plan == 'krs':
+            from data_base.config_base import connection_to_database
+            from data_base.config_base import WorkDatabaseWell
+            db = connection_to_database(data_list.DB_WELL_DATA)
+            check_in_base = WorkDatabaseWell(db, self)
+            tables_filter = check_in_base.get_tables_starting_with(self.well_number.get_value,
+                                                                   self.well_area.get_value, 'ПР',
+                                                                   self.type_kr.split(' ')[0])
+            if tables_filter:
+                mes = QMessageBox.question(None, 'Наличие в базе',
+                                           f'В базе имеется план работ по скважине:\n {" ".join(tables_filter)}. '
+                                           f'При продолжении план пересохранится, продолжить?')
+                if mes == QMessageBox.StandardButton.No:
+                    self.pause_app()
+                    return
 
     @staticmethod
     def read_angle_well():
@@ -2014,9 +2060,10 @@ class WellCategory(FindIndexPZ):
             if self.dict_perforation[plast]['отключение'] is False:
                 try:
                     zamer = self.dict_perforation[plast]['замер'][0]
-
                     if type(zamer) != datetime:
-                        date = re.search(r'\d{2}\.\d{2}\.\d{4}', str(zamer).strip())
+                        if zamer:
+                            zamer = str(zamer).replace(' ', '')
+                        date = re.search(r'\d{2}\.\d{2}\.\d{4}', zamer)
                         if date:
                             extracted_date = date.group()
 
