@@ -790,19 +790,20 @@ class WellSuckerRod(FindIndexPZ):
                             self.column_index_column_nkt = col_index
                         if 'длина' in str(col).lower() and 'м' in str(col):
                             self.column_index_lenght_nkt = col_index
+            asd = self.sucker_rod_none
 
-            if b_plan == 0 and self.sucker_rod_none is True:
+            if b_plan == 0:
                 sucker_rod_question = QMessageBox.question(self,
-                                                           'отсутствие штанг',
-                                                           'Программа определило что штанг в '
-                                                           'скважине нет, корректно?')
+                                                       'отсутствие штанг',
+                                                       'Программа определило что штанг в '
+                                                       'скважине нет, корректно?')
                 if sucker_rod_question == QMessageBox.StandardButton.Yes:
                     self.sucker_rod_none = False
                 else:
                     self.sucker_rod_none = True
 
                 if self.sucker_rod_none is True:
-                    sucker_rod_question = QMessageBox.warning(self, 'Индекс планового НКТ',
+                    QMessageBox.warning(self, 'Индекс планового НКТ',
                                                               'Программа не могла определить начала строку с ПЗ'
                                                               ' штанги - план')
                     self.pause_app()
@@ -1243,9 +1244,9 @@ class WellName(FindIndexPZ):
 
                     elif 'месторождение ' in str(value):  # определение номера скважины
                         if self.work_plan in ['prs']:
-                            self.well_oilfield = ProtectedIsNonNone(row[col + 2])
-                        else:
                             self.well_oilfield = ProtectedIsNonNone(row[col + 1])
+                        else:
+                            self.well_oilfield = ProtectedIsNonNone(row[col + 2])
                         # self.well_oilfield = ProtectedIsNonNone(row[col + 2])
                     elif 'инв. №' in str(value).lower():
                         self.inventory_number = ProtectedIsNonNone(row[col + 1])
@@ -1257,7 +1258,8 @@ class WellName(FindIndexPZ):
                         if self.work_plan in ['prs']:
                             self.appointment = ProtectedIsNonNone(row[col + 2])
                         else:
-                            self.appointment = ProtectedIsNonNone(row[col + 1])
+                            a = row[col + 3], row[col + 2], row[col + 1]
+                            self.appointment = ProtectedIsNonNone(row[col + 2])
                         # well_data.appointment = ProtectedIsDigit(row[col + 1])
                         # print(f' ЦДНГ {self.cdng.get_value}')
 

@@ -708,7 +708,7 @@ class RirWindow(WindowUnion):
              f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме {volume_in_ek}м3, цементный '
              f'раствор в объеме {round(volume_cement / 1.25, 1)}м3, '
              f'довести тех.жидкостью у=1,00г/см3 в объёме {volume_in_nkt}м3, тех. жидкостью  в '
-             f'объёме {round(volume_vn_nkt(dict_nkt) - volume_in_nkt, 1)}м3. '
+             f'объёме {round(volume_vn_nkt(dict_nkt, roof_rir_edit, sole_rir_edit) - volume_in_nkt, 1)}м3. '
              f'Уравновешивание цементного раствора',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
@@ -871,7 +871,8 @@ class RirWindow(WindowUnion):
                     f'объеме {volume_vn_nkt(dict_nkt)}м3. Закрыть затруб. '
                     f'Продавить в НКТ остаток глинистого раствора в объеме '
                     f'{round(5 - volume_vn_nkt(dict_nkt), 1)} и тех. воду  в объёме '
-                    f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более {self.data_well.max_admissible_pressure.get_value}атм.',
+                    f'{volume_vn_nkt(dict_nkt)}м3 при давлении не более '
+                    f'{self.data_well.max_admissible_pressure.get_value}атм.',
                     None, None, None, None, None, None, None,
                     'мастер КРС', 0.5]
 
@@ -898,7 +899,7 @@ class RirWindow(WindowUnion):
              'мастер КРС', 2.5],
             [None, None,
              f'Приготовить цементный раствор у=1,82г/см3 в объёме {round(volume_cement / 1.25, 1)}м3'
-             f' (сухой цемент{round(volume_cement, 1)}т) ',
+             f' (сухой цемент {round(volume_cement, 1)}т) ',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
             [None, None,
@@ -906,7 +907,7 @@ class RirWindow(WindowUnion):
              f' цементный раствор в '
              f'объеме {round(volume_cement / 1.25, 1)}м3, '
              f'довести тех.жидкостью у=1,00г/см3 в объёме {volume_in_nkt}м3, тех. жидкостью  в объёме '
-             f'{round(volume_vn_nkt(dict_nkt) - volume_in_nkt, 1)}м3. '
+             f'{round(volume_vn_nkt(dict_nkt, roof_rir_edit, sole_rir_edit) - volume_in_nkt, 1)}м3. '
              f'Уравновешивание цементного раствора',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
@@ -945,7 +946,7 @@ class RirWindow(WindowUnion):
              'мастер КРС', 1.2],
             [f'Опрессовать цементный мост на Р={self.data_well.max_admissible_pressure.get_value}атм',
              None,
-             f'Опрессовать цементный мост на Р={self.data_well.max_admissible_pressure.get_value}атм в'
+             f'Опрессовать цементный мост на Р={self.data_well.max_admissible_pressure.get_value}атм в '
              f'присутствии представителя '
              f'УСРСиСТ Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
              f'с подтверждением за 2 часа до '
@@ -1283,7 +1284,7 @@ class RirWindow(WindowUnion):
         self.close()
 
     def calc_buffer(self, roof, sole, dict_nkt):
-        volume_in_nkt = round(100 * volume_vn_nkt(dict_nkt) / 1000, 1)
+        volume_in_nkt = round(100 * volume_vn_nkt(dict_nkt, roof, sole) / 1000, 1)
         nkt = min(list(map(int, dict_nkt.keys()))) / 100
         volume_out_nkt = nkt ** 2 * 3.14 / 4 / 100
         volume_ek = volume_vn_ek(self, sole) / 1000

@@ -426,17 +426,22 @@ def volume_vn_ek(self, current):
     return round(volume, 1)
 
 
-def volume_vn_nkt(dict_nkt):  # Внутренний объем одного погонного местра НКТ
+def volume_vn_nkt(dict_nkt, roof=0,  sole=0):  # Внутренний объем одного погонного местра НКТ
     volume_vn_nkt_sel = 0
     for nkt, length_nkt in dict_nkt.items():
-
+        difference_sole = sole-roof
         nkt = ''.join(c for c in str(nkt) if c.isdigit())
         if '60' in str(nkt):
             t_nkt = 5
-            volume_vn_nkt_sel += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * length_nkt, 5)
+            volume_vn_nkt_sel += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * (length_nkt - (difference_sole)), 5)
+            if (difference_sole) >= length_nkt:
+                difference_sole = 0
+            else:
+                difference_sole = difference_sole - (sole-roof)
+
         elif '73' in str(nkt):
             t_nkt = 5.5
-            volume_vn_nkt_sel += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * length_nkt, 5)
+            volume_vn_nkt_sel += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * (length_nkt-(difference_sole)), 5)
         elif '89' in str(nkt):
             t_nkt = 6
             volume_vn_nkt_sel += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * length_nkt, 5)

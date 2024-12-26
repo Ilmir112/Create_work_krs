@@ -295,7 +295,7 @@ class ClayWindow(WindowUnion):
              f'({round(volume_clay * 0.45, 2)}т'
              f' сухого порошка) с добавлением ингибитора коррозии {round(volume_clay * 11, 1)}гр с '
              f'удельной дозировкой 11гр/м3 .\n'
-             f'-Продавить тех жидкостью  в объеме {volume_vn_nkt(dict_nkt)}м3.',
+             f'-Продавить тех жидкостью  в объеме {volume_vn_nkt(dict_nkt, rir_roof, rir_sole)}м3.',
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5]]
 
@@ -498,7 +498,7 @@ class ClaySolutionForEk(ClayWork):
              f'({round(volume_clay * 0.45, 2)}т'
              f' сухого порошка) с добавлением ингибитора коррозии {round(volume_clay * 11, 1)}гр с '
              f'удельной дозировкой 11гр/м3 .\n'
-             f'-Продавить тех жидкостью  в объеме {volume_vn_nkt(dict_nkt)}м3.',
+             f'-Продавить тех жидкостью  в объеме {volume_vn_nkt(dict_nkt, self.roof_clay, self.sole_clay)}м3.',
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5]]
 

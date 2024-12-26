@@ -370,6 +370,8 @@ class PerforationWindow(WindowUnion):
              "Вскрываемые пласты", "доп информация"]
             roof = self.tableWidget.item(row, 0).text().replace(',', '.')
             sool = self.tableWidget.item(row, 1).text().replace(',', '.')
+
+
             # pvr_str = TabPageSo.select_type_perforation(self, sool)
             if type_perforation == 'Трубная перфорация':
                 perforation[2] = [f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)", None,
@@ -387,7 +389,13 @@ class PerforationWindow(WindowUnion):
             dop_information = self.tableWidget.item(row, 6).text()
 
             pvr_str = f'ПВР {plast} {roof}-{sool}м {count_otv}отв/м'
-
+            if 'c.' not in plast or 'спец' not in plast:
+                if float(roof) < float(self.data_well.level_cement_column.get_value) and \
+                        self.data_well.column_additional is False:
+                    QMessageBox.warning(self, 'Ошибка', f'Уровень цемента за колонной '
+                                                        f'{self.data_well.level_cement_column.get_value}м ниже '
+                                                        f'кровли ПВР {roof}м,'
+                                                        f'Нужно согласовать дополнительно корректность ПВР')
             perf_list.extend(
                 [pvr_str, None, roof, '-', sool, type_charge, count_otv, count_charge, plast, dop_information,
                  'подрядчик по ГИС', round(float(sool) - float(roof)) * 1.5, 1])
