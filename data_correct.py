@@ -108,7 +108,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.level_cement_label = QLabel("Высота цемента \nза колонной", self)
         self.level_cement_edit = FloatLineEdit(self)
         if '-' in self.data_well.level_cement_column.get_value:
-            self.level_cement_edit.setText(self.ifNone(self.data_well.level_cement_column.get_value).split("-")[0])
+            self.level_cement_edit.setText(self.ifNone(self.data_well.level_cement_column.get_value).split("-")[0].strip())
         else:
             self.level_cement_edit.setText(f'{self.ifNone(self.data_well.level_cement_column.get_value)}')
         # self.shoe_column_edit_type2.setClearButtonEnabled(True)
@@ -815,7 +815,7 @@ class DataWindow(WindowUnion):
 
         column_type = self.current_widget.column_type.text()
         column_wall_thickness = self.current_widget.column_wall_thickness_edit_type2.text()
-        shoe_column = self.current_widget.shoe_column_edit_type2.text()
+        shoe_column = self.current_widget.shoe_column_edit_type2.text().strip()
         level_cement = self.current_widget.level_cement_edit.text()
         head_column = float(self.current_widget.head_column_edit_type2.text())
         column_add_True = str(self.current_widget.column_add_true_comboBox.currentText())

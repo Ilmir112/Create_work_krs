@@ -916,6 +916,8 @@ class TabPageSoWith(TabPageUnion):
                 self.data_well.paker_before["after"]):
             template_second_diam = 126
 
+        if self.data_well.column_additional_diameter == '114':
+            template_first_diam = '94'
         try:
             return (template_first_diam, template_second_diam)
         except Exception as e:

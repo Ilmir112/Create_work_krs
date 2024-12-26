@@ -1402,7 +1402,8 @@ class WellData(FindIndexPZ):
 
 
                     elif 'Уровень цемента за колонной' in str(value):
-                        self.level_cement_column = ProtectedIsDigit(row[col + 3])
+
+                        self.level_cement_column = ProtectedIsDigit(str(row[col + 3]).strip())
                         self.level_cement_column = self.definition_is_none(
                             self.level_cement_column, row_index, col, 1)
 

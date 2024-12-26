@@ -130,7 +130,8 @@ def remove_overlapping_intervals(self, perforating_intervals, skm_interval=None)
                                                self.data_well.skm_depth])
         # print(f'глубина СКМ {self.data_well.skm_depth, skipping_intervals}')
         perforating_intervals = sorted(perforating_intervals, key=lambda x: x[0])
-    skipping_intervals.extend(skm_interval)
+    if skm_interval:
+        skipping_intervals.extend(skm_interval)
     # for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
     #
     #     if pvr[1] + 20 < self.data_well.skm_depth:
@@ -149,16 +150,24 @@ def remove_overlapping_intervals(self, perforating_intervals, skm_interval=None)
         pod_skm = int(skm[1])
 
         skm_range = list(range(krovly_skm, pod_skm))
+        assdw = sorted(perforating_intervals, key=lambda x: x[0])
         for pvr in sorted(perforating_intervals, key=lambda x: x[0]):
             # print(int(pvr[0]) in skm_range, skm_range[0], int(pvr[0]))
             if int(pvr[0]) in skm_range and int(pvr[1]) in skm_range and skm_range[0] + 1 <= int(pvr[0]):
-                if skm_range[0] + 1 < int(pvr[0]) - 2:
-                    skipping_intervals_new.append((skm_range[0] + 1, int(pvr[0] - 2)))
-                    skm_range = skm_range[skm_range.index(int(pvr[1])):]
+                if skm_range[1] < int(pvr[0]) - 1:
+                    if (skm_range[1], int(pvr[0] - 2)) not in skipping_intervals_new:
+                        skipping_intervals_new.append((skm_range[0] + 1, int(pvr[0] - 2)))
+                        skm_range = skm_range[skm_range.index(int(pvr[1])):]
                 else:
                     skm_range = skm_range[skm_range.index(int(pvr[1] + 1)):]
-            else:
-                skipping_intervals_new.append(skm)
+
+            elif int(pvr[0]) in skm_range and int(pvr[1]) not in skm_range and skm_range[0] + 1 <= int(pvr[0]):
+                if (skm_range[2], skm_range[-1]) not in skipping_intervals_new:
+                    skipping_intervals_new.append((skm_range[2], pvr[1]-2))
+            elif int(pvr[0]) >= skm_range[0]:
+                if (skm_range[2], skm_range[-1]) not in skipping_intervals_new:
+                    skipping_intervals_new.append((skm_range[2], skm_range[-1]))
+
 
     skipping_intervals_new.append((skm_range[0], pod_skm))
     return skipping_intervals_new
