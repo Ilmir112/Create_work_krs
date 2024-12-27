@@ -1489,7 +1489,7 @@ class WellData(FindIndexPZ):
                     QMessageBox.warning(self, 'Ошибка',
                                         f'Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
                                         f'после ремонта меньше глубины насоса'
-                                        f'{self.dict_pump_shgn_depth["before"]}м')
+                                        f'{self.dict_pump_shgn_depth["after"]}м')
                     self.check_data_in_pz.append(
                         f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
                         f'после ремонта не равно глубине насоса '

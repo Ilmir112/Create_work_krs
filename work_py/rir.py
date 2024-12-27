@@ -700,13 +700,13 @@ class RirWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5],
             [None, None,
-             f'Приготовить цементный раствор у=1,82г/см3 в объёме {round(volume_cement / 1.25, 1)}м3'
-             f' (сухой цемент {volume_cement}т) ',
+             f'Приготовить цементный раствор у=1,82г/см3 в объёме {volume_cement}м3'
+             f' (сухой цемент {round(volume_cement / 1.25, 1)}т) ',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
             [None, None,
              f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме {volume_in_ek}м3, цементный '
-             f'раствор в объеме {round(volume_cement / 1.25, 1)}м3, '
+             f'раствор в объеме {volume_cement}м3, '
              f'довести тех.жидкостью у=1,00г/см3 в объёме {volume_in_nkt}м3, тех. жидкостью  в '
              f'объёме {round(volume_vn_nkt(dict_nkt, roof_rir_edit, sole_rir_edit) - volume_in_nkt, 1)}м3. '
              f'Уравновешивание цементного раствора',
@@ -898,14 +898,14 @@ class RirWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5],
             [None, None,
-             f'Приготовить цементный раствор у=1,82г/см3 в объёме {round(volume_cement / 1.25, 1)}м3'
-             f' (сухой цемент {round(volume_cement, 1)}т) ',
+             f'Приготовить цементный раствор у=1,82г/см3 в объёме {volume_cement}м3'
+             f' (сухой цемент {round(volume_cement / 1.25, 1)}т) ',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
             [None, None,
              f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме {volume_in_ek}м3,'
              f' цементный раствор в '
-             f'объеме {round(volume_cement / 1.25, 1)}м3, '
+             f'объеме {volume_cement}м3, '
              f'довести тех.жидкостью у=1,00г/см3 в объёме {volume_in_nkt}м3, тех. жидкостью  в объёме '
              f'{round(volume_vn_nkt(dict_nkt, roof_rir_edit, sole_rir_edit) - volume_in_nkt, 1)}м3. '
              f'Уравновешивание цементного раствора',

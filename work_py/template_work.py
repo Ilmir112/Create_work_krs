@@ -485,7 +485,7 @@ class TabPageSoWith(TabPageUnion):
             self.template_first_edit.setText(str(int(first_template)))
             self.template_second_edit.setText(str(int(template_second)))
             self.skm_edit.setText(str(self.data_well.column_diameter.get_value))
-            self.dictance_template_second_edit.setText(str(10))
+            self.dictance_template_second_edit.setText(str(1))
 
             roof_plast, roof_add_column_plast = self.definition_roof_not_raiding(current_bottom)
             dictance_template_first = float(current_bottom - roof_plast + 5)
@@ -559,7 +559,7 @@ class TabPageSoWith(TabPageUnion):
 
                 self.template_first_edit.setText('фильтр направление')
                 self.dictance_template_first_edit.setText(str(int(dictance_template_first)))
-                self.dictance_template_second_edit.setText(str(10))
+                self.dictance_template_second_edit.setText(str(1))
                 dictance_template_first = int(float(self.dictance_template_first_edit.text()))
                 dictance_template_second = int(float(self.dictance_template_second_edit.text()))
 

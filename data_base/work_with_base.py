@@ -676,32 +676,35 @@ def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_di
                 rgb_string = cell_data['font']['color']
                 hex_color = cell_data['fill']['color'][4:-1]
 
-                if hex_color != '00000000':
-                    color = Color(rgb=hex_color)
-                    cell.fill = PatternFill(patternType='solid', fgColor=color)
-                if 'color' in list(cell_data['font'].keys()):
-
-                    color_font = change_rgb_to_hex(rgb_string)
-
-                    cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
-                                     bold=cell_data['font']['bold'], italic=cell_data['font']['italic'],
-                                     color=color_font)
-                else:
-                    # Извлекаем шестнадцатеричный код цвета
-                    hex_color = rgb_string[4:-1]
-
-                    if hex_color != '00000000':
-
-                        try:
+                try:
+                    if 'color' in list(cell_data['font'].keys()):
+                        if hex_color != '00000000':
                             color = Color(rgb=hex_color)
+                            cell.fill = PatternFill(patternType='solid', fgColor=color)
 
-                            # Создание объекта заливки
-                            fill = PatternFill(patternType='solid', fgColor=color)
-                            cell.fill = fill
-                        except Exception:
-                            pass
-                    cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
-                                     bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
+                        color_font = change_rgb_to_hex(rgb_string)
+
+                        cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
+                                         bold=cell_data['font']['bold'], italic=cell_data['font']['italic'],
+                                         color=color_font)
+                    else:
+                        # Извлекаем шестнадцатеричный код цвета
+                        hex_color = rgb_string[4:-1]
+
+                        if hex_color != '00000000':
+
+                            try:
+                                color = Color(rgb=hex_color)
+
+                                # Создание объекта заливки
+                                fill = PatternFill(patternType='solid', fgColor=color)
+                                cell.fill = fill
+                            except Exception:
+                                pass
+                        cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
+                                         bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
+                except:
+                    pass
 
                 if type(cell_data['borders']['left']) is dict:
 

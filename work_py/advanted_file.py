@@ -36,8 +36,8 @@ def skm_interval(self, template):
     perforating_intervals = []
     for plast in self.data_well.plast_all:
         for interval in self.data_well.dict_perforation[plast]['интервал']:
+            interval_raid.append([interval[0] - 90, interval[1] - 2])
             if interval[1] <= self.data_well.skm_depth:
-                interval_raid.append([interval[0] - 90, interval[1] - 2])
                 if self.data_well.skm_depth >= interval[1] + 20:
                     if [interval[1] + 2, interval[1] + 20] not in interval_raid:
                         interval_raid.append([interval[1] + 2, interval[1] + 20])
