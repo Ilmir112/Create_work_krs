@@ -36,8 +36,8 @@ def skm_interval(self, template):
     perforating_intervals = []
     for plast in self.data_well.plast_all:
         for interval in self.data_well.dict_perforation[plast]['интервал']:
-            interval_raid.append([interval[0] - 90, interval[1] - 2])
             if interval[1] <= self.data_well.skm_depth:
+                interval_raid.append([interval[0] - 90, interval[0] - 2])
                 if self.data_well.skm_depth >= interval[1] + 20:
                     if [interval[1] + 2, interval[1] + 20] not in interval_raid:
                         interval_raid.append([interval[1] + 2, interval[1] + 20])
@@ -45,6 +45,8 @@ def skm_interval(self, template):
                     if [interval[1] + 2, self.data_well.skm_depth] not in interval_raid:
                         interval_raid.append([interval[1] + 2, self.data_well.skm_depth])
                 perforating_intervals.append(interval)
+            else:
+                interval_raid.append([interval[0] - 90, self.data_well.skm_depth])
 
     if self.data_well.plast_project:
         for plast in self.data_well.dict_perforation_project:
@@ -88,7 +90,8 @@ def skm_interval(self, template):
                   interval[1] <= self.data_well.skm_depth and interval[1] > interval[0]):
 
                 merged_segments_new.append((self.data_well.head_column_additional.get_value + 2, interval[1]))
-                # print(f'3 {interval, merged_segments}')
+                # print(f'3 {interval, merged_segments}
+
 
         elif template in ['ПСШ Доп колонна СКМ в основной колонне', 'СГМ в основной колонне']:
             if (interval[0] < float(self.data_well.head_column_additional.get_value) and
@@ -410,12 +413,14 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                 # print(work_list[i - 1][j - 1])
                 cell.value = is_num(work_list[i - 1][j - 1])
                 if i >= ind_ins:
-                    if abs(i - ind_ins) > 1 and stop_str > i:
+                    if abs(i - ind_ins-1) >= 1 and stop_str > i:
                         if self.work_plan in ['dop_plan', 'dop_plan_in_base']:
                             if 'Ранее проведенные работ' not in str(ws2[F"C{i}"].value):
-                                ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins + 3}:C{i})'
+                                pass
+                                # ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins + 3}:C{i})'
                         else:
-                            ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins + 2}:C{i})'
+                            if i != ind_ins:
+                                ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins+2}:C{i})'
                     if j != 1:
                         cell.border = data_list.thin_border
                     if j == 11:
@@ -460,8 +465,10 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                         # print('есть жирный')
                         asde = ws2.cell(row=i, column=j).value
                         ws2.cell(row=i, column=j).font = Font(name=font_type, size=size_font, bold=True)
-                    elif 'порядок работы' in str(cell.value).lower() or \
-                            'наименование работ' in str(cell.value).lower():
+                    elif 'Порядок работы' == cell.value\
+                            or 'Наименование работ' == cell.value:
+                        row_center = i
+                        col_center = j
                         ws2.cell(row=i, column=j).font = Font(name=font_type, size=size_font, bold=True)
                         ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                         vertical='center')
@@ -471,11 +478,22 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
     # print(merged_cells_dict)
     for row, col in merged_cells_dict.items():
         if len(col) != 2:
-            # print(row)
             ws2.merge_cells(start_row=row + 1, start_column=3, end_row=row + 1, end_column=merge_column)
 
+
+    ws2.cell(row=row_center, column=col_center).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                    vertical='center')
+    ws2.merge_cells(start_row=row_center, start_column=3, end_row=row_center, end_column=merge_column)
+    ws2.merge_cells(start_row=row_center-1, start_column=3, end_row=row_center-1, end_column=merge_column)
+    ws2.cell(row=row_center-2, column=j).font = Font(name=font_type, size=size_font, bold=False)
+    ws2.cell(row=row_center-1, column=col_center).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                    vertical='center')
+
+    ws2.cell(row=row_center-2, column=col_center).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                    vertical='left')
+
     for key, value in boundaries_dict.items():
-        if value[1] <= boundaries_dict_index - 3:
+        if value[1] <= boundaries_dict_index - 3 and value[1] != row_center-1:
             ws2.merge_cells(start_column=value[0], start_row=value[1],
                             end_column=value[2], end_row=value[3])
 

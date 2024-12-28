@@ -423,33 +423,33 @@ class CreatePZ(MyMainWindow):
                         ws.merge_cells(start_column=2, start_row=self.data_well.insert_index + 1, end_column=12,
                                        end_row=self.data_well.insert_index + 1)
                         self.data_well.insert_index += len(self.data_well.row_expected)
-                    if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz',
-                                         'plan_change']:
-                        work_list = [
-                            [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
-                            [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
-                             'Ответственный',
-                             'Нормы времени \n мин/час.']]
-
-                        for i in range(1, len(work_list) + 1):  # Добавление показатели после ремонта
-                            for j in range(1, 13):
-                                ws.cell(row=i + self.data_well.insert_index, column=j).font = Font(name='Arial Cyr',
-                                                                                                   size=13,
-                                                                                                   bold=True)
-                                ws.cell(row=i + self.data_well.insert_index, column=j).alignment = Alignment(
-                                    wrap_text=False,
-                                    horizontal='center',
-                                    vertical='center')
-                                ws.cell(row=i + self.data_well.insert_index, column=j).value = work_list[i - 1][
-                                    j - 1]
-                            if i == 1:
-                                ws.merge_cells(start_column=3, start_row=self.data_well.insert_index + i,
-                                               end_column=12,
-                                               end_row=self.data_well.insert_index + i)
-                            elif i == 2:
-                                ws.merge_cells(start_column=3, start_row=self.data_well.insert_index + i,
-                                               end_column=10,
-                                               end_row=self.data_well.insert_index + i)
+                    # if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz',
+                    #                      'plan_change']:
+                    #     work_list = [
+                    #         [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
+                    #         [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
+                    #          'Ответственный',
+                    #          'Нормы времени \n мин/час.']]
+                    #
+                    #     for i in range(1, len(work_list) + 1):  # Добавление показатели после ремонта
+                    #         for j in range(1, 13):
+                    #             ws.cell(row=i + self.data_well.insert_index, column=j).font = Font(name='Arial Cyr',
+                    #                                                                                size=13,
+                    #                                                                                bold=True)
+                    #             ws.cell(row=i + self.data_well.insert_index, column=j).alignment = Alignment(
+                    #                 wrap_text=False,
+                    #                 horizontal='center',
+                    #                 vertical='center')
+                    #             ws.cell(row=i + self.data_well.insert_index, column=j).value = work_list[i - 1][
+                    #                 j - 1]
+                    #         if i == 1:
+                    #             ws.merge_cells(start_column=3, start_row=self.data_well.insert_index + i,
+                    #                            end_column=12,
+                    #                            end_row=self.data_well.insert_index + i)
+                    #         elif i == 2:
+                    #             ws.merge_cells(start_column=3, start_row=self.data_well.insert_index + i,
+                    #                            end_column=10,
+                    #                            end_row=self.data_well.insert_index + i)
 
                     self.insert_index_border = self.data_well.insert_index
 
@@ -481,31 +481,31 @@ class CreatePZ(MyMainWindow):
                 self.copy_data_excel_in_excel(
                     ws, ws2, self.data_well.data_x_min.get_value, self.data_well.data_x_min.get_value + 2, 1, 17,
                                                                   ws2.max_row + 1)
-                work_list = [
-                    [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None,  None, None, None],
-                    [None, 'п/п', 'Наименование работ', None, None, None, None, None, None,  None,  None,  None, None,
-                     'Ответственный',
-                     'Нормы времени \n мин/час.']]
-                max_row = ws2.max_row
-                for i in range(1, len(work_list) + 1):
-                    for j in range(1, 16):
-                        ws2.cell(row=max_row+ i, column=j).font = Font(name='Arial Cyr',
-                                                                                           size=13,
-                                                                                           bold=True)
-                        ws2.cell(row=max_row + i, column=j).value = work_list[i - 1][
-                            j - 1]
-                    if i == 1:
-                        ws2.merge_cells(start_column=3, start_row=max_row + i,
-                                       end_column=15,
-                                       end_row=max_row + i)
-                    elif i == 2:
-                        ws2.merge_cells(start_column=3, start_row=max_row + i,
-                                       end_column=13,
-                                       end_row=max_row + i)
-                    ws2.cell(row=max_row + i, column=j).alignment = Alignment(
-                        wrap_text=False,
-                        horizontal='center',
-                        vertical='center')
+                # work_list = [
+                #     [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None,  None, None, None],
+                #     [None, 'п/п', 'Наименование работ', None, None, None, None, None, None,  None,  None,  None, None,
+                #      'Ответственный',
+                #      'Нормы времени \n мин/час.']]
+                # max_row = ws2.max_row
+                # for i in range(1, len(work_list) + 1):
+                #     for j in range(1, 16):
+                #         ws2.cell(row=max_row+ i, column=j).font = Font(name='Arial Cyr',
+                #                                                                            size=13,
+                #                                                                            bold=True)
+                #         ws2.cell(row=max_row + i, column=j).value = work_list[i - 1][
+                #             j - 1]
+                #     if i == 1:
+                #         ws2.merge_cells(start_column=3, start_row=max_row + i,
+                #                        end_column=15,
+                #                        end_row=max_row + i)
+                #     elif i == 2:
+                #         ws2.merge_cells(start_column=3, start_row=max_row + i,
+                #                        end_column=13,
+                #                        end_row=max_row + i)
+                #     ws2.cell(row=max_row + i, column=j).alignment = Alignment(
+                #         wrap_text=False,
+                #         horizontal='center',
+                #         vertical='center')
 
                 # self.copy_data_excel_in_excel(
                 #     ws, ws2, self.data_well.prs_copy_index.get_value, self.data_well.data_fond_min.get_value + 1,  1, 17, ws2.max_row + 1)

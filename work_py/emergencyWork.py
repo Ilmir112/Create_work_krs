@@ -105,7 +105,7 @@ def emergency_hook(self):
 
 def emergency_sticking(self, lar_diameter_line, nkt_key, lar_type_combo,
                       emergency_bottom_line, bottom_line):
-    from EmergencyLarWork import EmergencyLarWork
+
 
     emergence_type_list = ['ЭЦН', 'пакер', 'НКТ']
     emergence_type, ok = QInputDialog.getItem(self, 'Вид прихватченного оборудования',

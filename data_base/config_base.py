@@ -541,6 +541,7 @@ class CheckWellExistence:
                     f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
                     f"{self.path_index})"
 
+
             cursor.execute(query,
                            (well_number, area_well, version_year, region_name, costumer))
             # Не забудьте сделать коммит
@@ -659,6 +660,12 @@ class CheckWellExistence:
                 h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf,
                 gas_factor, version_year, region, costumer
             ))
+
+            # print(cdng, well_number, area_well,
+            #     oilfield_str, categoty_pressure, pressure_Ppl, pressure_Gst,
+            #     date_measurement, categoty_h2s,
+            #     h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf,
+            #     gas_factor, version_year, region, costumer)
             # Не забудьте сделать коммит
             self.db_connection.commit()
 

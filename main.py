@@ -798,11 +798,12 @@ class MyMainWindow(QMainWindow):
         if 'gnkt' not in work_plan:
 
             for row in range(table_widget.rowCount()):
-                if row >= self.data_well.insert_index2:
+                if row >= self.data_well.insert_index2 +3:
                     # Добавляем нумерацию в первую колонку
                     item_number = QtWidgets.QTableWidgetItem(
-                        str(row - self.data_well.insert_index2 + 1))  # Номер строки + 1
+                        str(row - self.data_well.insert_index2 -2))  # Номер строки + 1
                     table_widget.setItem(row, 1, item_number)
+        asdw = 25
 
     def check_true_depth_template(self, depth):
         check = True
@@ -1392,7 +1393,6 @@ class MyWindow(MyMainWindow):
             elif action == self.without_jamming_IGM_reload:
                 costumer = 'ООО Башнефть-добыча'
                 self.reload_without_damping(costumer, 'ИГМ')
-
             elif action == self.class_well_IGM_reload:
                 costumer = 'ООО Башнефть-добыча'
                 self.reload_class_well(costumer, 'ИГМ')
@@ -1568,7 +1568,7 @@ class MyWindow(MyMainWindow):
             self.ws2 = self.wb2.get_sheet_by_name('Sheet')
             self.ws2.title = "План работ"
 
-            insert_index = self.data_well.insert_index2
+            insert_index = self.data_well.insert_index2 +2
 
             merged_cells = []  # Список индексов объединения ячеек
 
@@ -1707,6 +1707,7 @@ class MyWindow(MyMainWindow):
 
                             # # Скрываем лист
                             self.ws3.sheet_state = 'hidden'
+
 
 
             # Перед сохранением установите режим расчета

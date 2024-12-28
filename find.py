@@ -315,8 +315,10 @@ class FindIndexPZ(MyMainWindow):
             elif 'ШТАНГИ' == str(row[1]).upper():
                 self.sucker_rod_ind = ProtectedIsDigit(row_ind + 1)
 
-            elif self.check_text_in_row('Планируемый объём работ', row) or \
-                    self.check_text_in_row('Порядок работы', row) and self.data_x_max.get_value == 0:
+            elif (self.check_text_in_row('Планируемый объём работ', row) or \
+                    self.check_text_in_row('Порядок работы', row) \
+                    or self.check_text_in_row('Ранее проведенные работ', row)) and\
+                   self.data_x_max.get_value == 0:
                 self.data_x_max = ProtectedIsDigit(row_ind)
                 break
 
@@ -745,7 +747,7 @@ class WellNkt(FindIndexPZ):
             return
 
         for row_ind, row in enumerate(
-                self.ws.iter_rows(values_only=True, min_row=begin_index - 1, max_row=cancel_index - 1)):
+                self.ws.iter_rows(values_only=True, min_row=begin_index - 1, max_row=cancel_index)):
             if row_ind >= 1:
                 key = str(row[self.column_index_diametr_nkt]).strip()
                 if key != str(None) and key != '-' and "диам" not in key.lower():
@@ -2123,7 +2125,8 @@ class WellCategory(FindIndexPZ):
             delete_rows_pz(self, self.ws, self.cat_well_min, self.data_well_max, self.data_x_max)
 
             self.insert_index = self.data_well_max.get_value - self.cat_well_min.get_value + 19
-            self.insert_index2 = self.data_well_max.get_value - self.cat_well_min.get_value + 19
+            self.insert_index2 = self.data_well_max.get_value - self.cat_well_min.get_value + 19 - 2
+
 
 
         return self

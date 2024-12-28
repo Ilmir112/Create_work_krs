@@ -94,7 +94,10 @@ class TabPageGno(TabPageUnion):
 
         str_gno = ''
         for nkt, length_nkt in dict_nkt_po.items():
-            str_gno += f'{nkt}мм - {round(float(length_nkt), 1)}м, '
+            if str(nkt).isdigit():
+                str_gno += f'{nkt}мм - {round(float(length_nkt), 1)}м, '
+            else:
+                str_gno += f'{nkt} - {round(float(length_nkt), 1)}м, '
         return str_gno[:-3]
 
     def select_gno(self):

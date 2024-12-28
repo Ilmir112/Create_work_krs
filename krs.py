@@ -396,7 +396,11 @@ class GnoParent(ABC):
             surfactant_hydrofabizer_str = 'с добавлением в жидкость глушения гидрофобизатора из расчёта' \
                                           ' 0,05% на 1м3 (0,5л)'
 
-        krs_begin = [
+        krs_begin = [[None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None,
+                             None, None, None],
+            [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
+             'Ответственный',
+             'Нормы времени \n мин/час.'],
             [None, None,
              f'Начальнику смены ЦТКРС, вызвать телефонограммой представителя Заказчика для оформления АКТа '
              f'приёма-передачи скважины в ремонт. \n'

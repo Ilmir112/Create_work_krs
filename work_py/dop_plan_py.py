@@ -520,7 +520,7 @@ class DopPlanWindow(WindowUnion):
                         self.target_row_index_cancel = int(i)
                         break
                     elif 'Порядок работы' in str(row[2]['value']):
-                        self.data_well.data_x_max = data_list.ProtectedIsDigit(int(i) + 1)
+                        self.data_well.data_x_max = data_list.ProtectedIsDigit(int(i) - 1)
                         break
                     elif 'ИТОГО:' in str(row[col]['value']) and self.data_well.work_plan in ['plan_change']:
                         self.target_row_index_cancel = int(i) + 1
@@ -768,6 +768,9 @@ class DopPlanWindow(WindowUnion):
             current_bottom_date_edit = current_widget.current_bottom_date_edit.text()
 
             template_depth_edit = current_widget.template_depth_edit.text()
+            if template_depth_edit.isdigit() is False:
+                QMessageBox.critical(self, 'Ошибка', 'ошибка в глубине диметра')
+                return
             template_length_edit = current_widget.template_length_edit.text()
             if self.data_well.column_additional:
                 template_depth_addition_edit = current_widget.template_depth_addition_edit.text()
@@ -1035,8 +1038,8 @@ class DopPlanWindow(WindowUnion):
                 self.data_well.template_length = float(template_length_addition_edit)
 
             work_list = self.work_list(work_earlier)
-            self.data_well.insert_index2 = self.insert_index + 2
-            self.populate_row(self.insert_index + 2, work_list, self.table_widget, self.work_plan)
+            self.data_well.insert_index2 = self.insert_index
+            self.populate_row(self.insert_index, work_list, self.table_widget, self.work_plan)
             definition_plast_work(self)
 
         data_list.pause = False
@@ -1077,9 +1080,14 @@ class DopPlanWindow(WindowUnion):
 
     def work_list(self, work_earlier):
         krs_begin = [[None, None,
-                      f' Ранее проведенные работ: \n {work_earlier}',
+                      f'Ранее проведенные работы: \n {work_earlier}',
                       None, None, None, None, None, None, None,
-                      'Мастер КРС', None]]
+                      None, None],
+                     [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
+                     [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
+                      'Ответственный',
+                      'Нормы времени \n мин/час.']
+                     ]
 
         return krs_begin
 

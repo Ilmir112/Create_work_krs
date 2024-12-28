@@ -1192,7 +1192,7 @@ class DataWindow(WindowUnion):
                 (self.data_well.column_additional and
                  self.data_well.current_bottom > self.data_well.head_column_additional.get_value):
                 if self.data_well.dict_pump_ecn != '0':
-                    self.data_well.template_depth = self.data_well.dict_pump_ecn_depth
+                    self.data_well.template_depth = self.data_well.dict_pump_ecn_depth["before"]
                     self.data_well.template_length = 30
             else:
                 if self.data_well.dict_pump_ecn != '0':
@@ -1200,7 +1200,7 @@ class DataWindow(WindowUnion):
                         self.data_well.template_depth_addition = self.data_well.dict_pump_ecn_depth
                         self.data_well.template_length_addition = 30
                     else:
-                        self.data_well.template_depth = self.data_well.dict_pump_ecn_depth
+                        self.data_well.template_depth = self.data_well.dict_pump_ecn_depth["before"]
                         self.data_well.template_length = 30
 
             self.data_well.curator = curator

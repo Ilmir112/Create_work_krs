@@ -112,9 +112,8 @@ class VpWindow(WindowUnion):
         self.angle_text = ''
         if self.data_well.angle_data and self.data_well.max_angle.get_value > 45:
             tuple_angle = self.calculate_angle(vp_depth, self.data_well.angle_data)
-            if float(tuple_angle[0].replace(',', '.')) >= 45:
+            if float(str(tuple_angle[0]).replace(',', '.')) >= 45:
                 self.angle_text = tuple_angle[2]
-
                 if self.angle_text:
                     question = QMessageBox.question(self, 'Ошибка', f'{self.angle_text},'
                                                                     f' есть риски не прохода ВП, продолжить?')

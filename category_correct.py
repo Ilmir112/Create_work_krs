@@ -288,7 +288,11 @@ class CategoryWindow(WindowUnion):
                     plast_index.append(plast)
 
                     if self.tabWidget.currentWidget().labels_category[index][8].currentText() == 'планируемый':
-                        self.data_well.plast_project.append(plast)
+                        if ',' in plast:
+                            for i in plast.split(','):
+                                self.data_well.plast_project.append(i)
+                        else:
+                            self.data_well.plast_project.append(plast)
                     try:
                         self.dict_category.setdefault(plast, {}).setdefault('по давлению',
                             pressure(int(self.tabWidget.currentWidget().labels_category[index][1].text()),

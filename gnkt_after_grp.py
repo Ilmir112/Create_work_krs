@@ -17,7 +17,7 @@ def gnkt_work(self, volume_gntk, fluid_work_insert):
         niz_nkt = self.data_well.perforation_roof - 100
 
     gnkt_opz = [
-        [None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None],
+        [None, "    ", 'Порядок работы', None, None, None, None, None, None, None, None, None, None],
         [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
          'Ответственный', 'Нормы'],
         [None,

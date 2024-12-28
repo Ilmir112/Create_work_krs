@@ -19,6 +19,7 @@ def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
                          end_column=value[2], end_row=value[3])
 
     # print(f'индекс удаления {1, self.cat_well_min - 1} , {data_well_max + 2, ws.max_row - data_well_max}')
+
     if 'prs' not in self.work_plan:
         ws.delete_rows(data_x_max.get_value, ws.max_row - data_x_max.get_value)
 

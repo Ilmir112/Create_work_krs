@@ -172,7 +172,7 @@ class TabPageGnkt(TabPageUnion):
 
             self.sole_label = QLabel("подошва пласта", self)
             self.sole_edit = QLineEdit(self)
-            self.sole_edit.setText(f'{self.data_well.perforation_roof}')
+            self.sole_edit.setText(f'{self.data_well.perforation_sole}')
             self.sole_edit.setValidator(self.validator_float)
             plast_work = ['']
             plast_work.extend(self.data_well.plast_work)

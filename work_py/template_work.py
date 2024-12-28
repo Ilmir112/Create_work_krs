@@ -283,7 +283,7 @@ class TabPageSoWith(TabPageUnion):
         if self.template_first_edit.text() != '':
             first_template = self.template_first_edit.text()
         if self.length_template_first_edit.text() != '':
-            length_template_first = self.length_template_first_edit.text()
+            length_template_first = int(float(self.length_template_first_edit.text()))
         if self.template_second_edit.text() != '':
             template_second = self.template_second_edit.text()
         if self.length_template_second_edit.text() != '':
@@ -888,8 +888,8 @@ class TabPageSoWith(TabPageUnion):
         template_second_diam_dict = {
             82: (84, 88),
             84: (88, 92),
-            90: (92.1, 97),
-            94: (97.1, 102),
+            90: (92.1, 96),
+            94: (96.1, 102),
             102: (102.1, 109),
             106: (109, 115),
             114: (118, 120),

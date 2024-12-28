@@ -246,7 +246,7 @@ class ClassifierWell(MyMainWindow):
                         if check_param in region_name:
                             self.classification_well.create_table_without_juming(region_name)
                             QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
-                                                f'регион выбрано корректно  {region_name}')
+                                                f'регион выбран корректно  {region_name}')
                             try:
                                 # Получение данных из Excel и запись их в базу данных
                                 for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
@@ -754,8 +754,8 @@ def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_di
         # Копирование высоты строки
         if any(['Наименование работ' in str(col.value) for col in row[:13]]) and self.data_well.work_plan not in [
             'plan_change']:
-            index_delete = index_row + 2
-            data_list.gns_ind2 = index_row + 2
+            index_delete = index_row
+            data_list.gns_ind2 = index_row
 
         elif any(['ПЛАН РАБОТ' in str(col.value).upper() for col in row[:4]]) and self.data_well.work_plan not in [
             'plan_change']:
