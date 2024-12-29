@@ -755,7 +755,10 @@ class GnktModel(WindowUnion):
                     float, self.data_well.dict_perforation[plast_ind]["давление"]))))
                 vertikal.append(min(list(map(
                     float, self.data_well.dict_perforation[plast_ind]["вертикаль"]))))
-
+        if pressure is None:
+            QMessageBox.warning(self, 'ошибка', 'Приложение не смогло найти рабочие интервалы под пакером. '
+                                                'Небходимо уточнить спущенную компоновку')
+            return
         self.pressure = max(pressure)
         vertikal = min(vertikal)
         koef_anomal.append(round(float(self.pressure) * 101325 / (float(vertikal) * 9.81 * 1000), 1))

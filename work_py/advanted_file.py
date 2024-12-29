@@ -490,7 +490,7 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                                                     vertical='center')
 
     ws2.cell(row=row_center-2, column=col_center).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                    vertical='left')
+                                                    vertical='top')
 
     for key, value in boundaries_dict.items():
         if value[1] <= boundaries_dict_index - 3 and value[1] != row_center-1:
