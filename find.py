@@ -148,7 +148,7 @@ class FindIndexPZ(MyMainWindow):
         self.dict_pump_shgn_depth = {"before": 0, "after": 0}
         self.dict_pump_ecn_depth = {"before": 0, "after": 0}
         self.dict_sucker_rod = {}
-        self.gis_list = []
+
         self.pvr_row_list = []
         self.dict_nkt_before = {}
         self.dict_nkt_after = {}

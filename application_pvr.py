@@ -196,7 +196,24 @@ class PvrApplication(WindowUnion):
         vbox.addWidget(self.buttonAddProject, 3, 1)
 
     def addPerfProject(self):
-        aas = self.data_well.pvr_row_list
+        for row_ind, row in enumerate(self.data_well.ws.iter_rows(values_only=True)):
+            for col_ind, col in enumerate(row):
+                if col_ind in [3, 2]:
+                    if 'кровля' in str(col).lower():
+                        type_pvr = self.data_well.ws.cell(row=row_ind, column=3).value
+                        index_row_pvr_begin = row_ind + 1
+                    if 'произвести контрольную' in str(col).lower():
+                        index_row_pvr_cancel = row_ind
+                        if index_row_pvr_begin < index_row_pvr_cancel:
+                            self.data_well.index_row_pvr_list.append(
+                                (index_row_pvr_begin, index_row_pvr_cancel, type_pvr))
+                            index_row_pvr_begin, index_row_pvr_cancel = 0, 0
+        for pvr in self.data_well.index_row_pvr_list:
+            for row in range(pvr[0], pvr[1]):
+                row_list = []
+                for col in range(2, 9):
+                    row_list.append(str(self.data_well.ws.cell(row=row + 1, column=col + 1).value))
+                self.data_well.pvr_row_list.append(row_list)
         if len(self.data_well.pvr_row_list) == 0:
 
             QMessageBox.warning(self, 'Ошибка', 'Перфорация в плане работ не найдены')
