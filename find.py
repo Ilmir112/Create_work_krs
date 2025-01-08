@@ -2127,6 +2127,4 @@ class WellCategory(FindIndexPZ):
             self.insert_index = self.data_well_max.get_value - self.cat_well_min.get_value + 19
             self.insert_index2 = self.data_well_max.get_value - self.cat_well_min.get_value + 19 - 2
 
-
-
         return self

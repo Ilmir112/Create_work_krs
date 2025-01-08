@@ -1708,8 +1708,6 @@ class MyWindow(MyMainWindow):
                             # # Скрываем лист
                             self.ws3.sheet_state = 'hidden'
 
-
-
             # Перед сохранением установите режим расчета
             self.wb2.calculation.calcMode = "auto"
 

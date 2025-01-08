@@ -420,10 +420,10 @@ class TabPageSoWith(TabPageUnion):
                     self.data_well.template_depth = int(
                         current_bottom - dictance_template_second - dictance_three - length_template_first)
 
-                    self.data_well.skm_depth = self.data_well.template_depth + dictance_three
+                    self.data_well.skm_depth = current_bottom
 
-                    skm_teml_str = f'шаблон-{first_template}мм до гл.{self.data_well.template_depth_addition}м, ' \
-                                   f'{skm_type}-{skm} до глубины {self.data_well.skm_depth}м, ' \
+                    skm_teml_str = f'{skm_type}-{skm} до глубины {self.data_well.skm_depth}м, ' \
+                                   f'шаблон-{first_template}мм до гл.{self.data_well.template_depth_addition}м, ' \
                                    f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
 
@@ -439,8 +439,7 @@ class TabPageSoWith(TabPageUnion):
                                    f'L-{length_template_second}м '
                     # if dictance_three and dictance_template_second and dictance_template_first and length_template_first:
                     self.data_well.template_depth_addition = int(current_bottom) - int(
-                        dictance_template_first) - \
-                                                             int(dictance_template_second)
+                        dictance_template_first) - int(dictance_template_second)
 
                     self.data_well.template_depth = int(current_bottom) - int(dictance_template_first) - \
                                                     int(dictance_template_second) - int(dictance_three) - \
@@ -699,7 +698,8 @@ class TabPageSoWith(TabPageUnion):
                                                           length_template_first - dictance_template_three)
                 self.data_well.template_depth_addition = math.ceil(current_bottom - dictance_template_second)
                 self.data_well.skm_depth = self.data_well.template_depth_addition + dictance_template_second
-                skm_teml_str = f'шаблон-{first_template}мм до гл.{self.data_well.template_depth_addition}м, ' \
+                skm_teml_str = f'до глубины {self.data_well.skm_depth}м,' \
+                               f' шаблон-{first_template}мм до гл.{self.data_well.template_depth_addition}м, ' \
                                f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
                 self.grid.addWidget(self.dictance_template_first_Label, 4, 2)

@@ -219,6 +219,7 @@ class TabPageUnion(QWidget):
                 or self.data_well.category_gas_factor == '1':
             self.data_well.category_pvo = 1
 
+
         self.data_well.template_depth, self.data_well.template_length, \
         self.data_well.template_depth_addition, self.data_well.template_length_addition = \
             json.loads(result[paragraph_row][11])
@@ -460,11 +461,16 @@ class WindowUnion(MyMainWindow):
         self.data_well.dict_perforation_short = json.loads(result[ind][2])
 
         self.data_well.category_pressure = result[ind][8]
+        self.data_well.category_pvo = 2
+
         self.data_well.category_h2s = result[ind][9]
         self.data_well.category_gas_factor = result[ind][10]
         asded = str(result[ind][8]) == '1', str(result[ind][9]) == '1', str(result[ind][10])
         if str(result[ind][8]) == '1' or str(result[ind][9]) == '1' or str(result[ind][10]) == '1':
             self.data_well.bvo = True
+        if str(self.data_well.category_pressure) == '1' or str(self.data_well.category_h2s) == '1' \
+                or self.data_well.category_gas_factor == '1':
+            self.data_well.category_pvo = 1
 
         definition_plast_work(self)
         return True
