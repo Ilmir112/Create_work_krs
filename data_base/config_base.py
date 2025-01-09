@@ -246,7 +246,7 @@ class WorkDatabaseWell:
         wellhead_fittings = data_well.wellhead_fittings
         well_oilfield = data_well.well_oilfield.get_value
         inv_number = data_well.inventory_number.get_value
-        appointment = data_well.appointment.get_value
+        appointment_well = data_well.appointment_well.get_value
         category_dict = json.dumps(data_well.dict_category, ensure_ascii=False)
         angle_data = json.dumps(data_well.angle_data, ensure_ascii=False)
 
@@ -308,7 +308,7 @@ class WorkDatabaseWell:
                     data_values = (str(well_number), well_area,
                                    data_well_dict, date_today, excel_json, contractor, data_list.costumer,
                                    work_plan_str, data_list.user[1], type_kr, data_paragraph, cdng, category_dict,
-                                   well_oilfield, appointment, str(inv_number), wellhead_fittings, angle_data)
+                                   well_oilfield, appointment_well, str(inv_number), wellhead_fittings, angle_data)
 
                     # Выполнение запроса с использованием параметров
                     cursor.execute(query, data_values)

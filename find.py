@@ -116,7 +116,7 @@ class FindIndexPZ(MyMainWindow):
         self.expected_oil = 0
         self.water_cut = 0
         self.expected_pressure = 0
-        self.appointment = ProtectedIsNonNone('')
+        self.appointment_well = ProtectedIsNonNone('')
         self.expected_pickup = 0
         self.sucker_rod_ind = ProtectedIsDigit(0)
         self.percent_water = 0
@@ -501,7 +501,6 @@ class FindIndexPZ(MyMainWindow):
             elif self.check_text_in_row('Запуск скважины из ремонта:', row):
                 self.data_x_max_prs = ProtectedIsDigit(row_ind + 1)
                 break
-
 
             elif any(['II. История эксплуатации скважины' in str(col) for col in row]):
                 self.data_pvr_max = ProtectedIsDigit(row_ind)
@@ -1239,16 +1238,14 @@ class WellName(FindIndexPZ):
 
                     if 'площадь' in str(value):
                         if self.work_plan not in ['prs']:
+
                             self.well_number = ProtectedIsNonNone(str(row[col - 1]))
                         self.well_area = ProtectedIsNonNone(str(row[col + 1]).replace(" ", "_"))
                         # self.well_number = ProtectedIsNonNone(row[col - 1])
                         # self.well_area = ProtectedIsNonNone(row[col + 1])
 
                     elif 'месторождение ' in str(value):  # определение номера скважины
-                        if self.work_plan in ['prs']:
-                            self.well_oilfield = ProtectedIsNonNone(row[col + 1])
-                        else:
-                            self.well_oilfield = ProtectedIsNonNone(row[col + 2])
+                        self.well_oilfield = ProtectedIsNonNone(row[col + 2])
                         # self.well_oilfield = ProtectedIsNonNone(row[col + 2])
                     elif 'инв. №' in str(value).lower():
                         self.inventory_number = ProtectedIsNonNone(row[col + 1])
@@ -1258,11 +1255,12 @@ class WellName(FindIndexPZ):
                         # self.cdng = ProtectedIsDigit(row[col + 1])
                     elif 'назначение' in str(value):
                         if self.work_plan in ['prs']:
-                            self.appointment = ProtectedIsNonNone(row[col + 2])
+                            a = row[col + 3], row[col + 2], row[col + 1]
+                            self.appointment_well = ProtectedIsNonNone(row[col + 2])
                         else:
                             a = row[col + 3], row[col + 2], row[col + 1]
-                            self.appointment = ProtectedIsNonNone(row[col + 2])
-                        # well_data.appointment = ProtectedIsDigit(row[col + 1])
+                            self.appointment_well = ProtectedIsNonNone(row[col + 2])
+                        # well_data.appointment_well = ProtectedIsDigit(row[col + 1])
                         # print(f' ЦДНГ {self.cdng.get_value}')
 
         return self

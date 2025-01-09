@@ -72,9 +72,9 @@ class TabPageSoCorrect(TabPageUnion):
         self.well_oilfield_line = QLineEdit(self)
         self.well_oilfield_line.setText(self.data_well.well_oilfield.get_value)
 
-        self.appointment_label = QLabel('назначение')
-        self.appointment_line = QLineEdit(self)
-        self.appointment_line.setText(self.data_well.appointment.get_value)
+        self.appointment_well_label = QLabel('назначение')
+        self.appointment_well_line = QLineEdit(self)
+        self.appointment_well_line.setText(self.data_well.appointment_well.get_value)
 
         self.column_conductor_length_Label = QLabel("башмак кондуктора", self)
         self.column_conductor_length_edit = FloatLineEdit(self)
@@ -327,8 +327,8 @@ class TabPageSoCorrect(TabPageUnion):
         self.grid.addWidget(self.well_area_line, 93, 3)
         self.grid.addWidget(self.well_oilfield_label, 92, 4)
         self.grid.addWidget(self.well_oilfield_line, 93, 4)
-        self.grid.addWidget(self.appointment_label, 92, 5)
-        self.grid.addWidget(self.appointment_line, 93, 5)
+        self.grid.addWidget(self.appointment_well_label, 92, 5)
+        self.grid.addWidget(self.appointment_well_line, 93, 5)
 
 
         self.grid.addWidget(self.column_conductor_diameter_Label, 2, 0)
