@@ -204,7 +204,7 @@ class TabPageUnion(QWidget):
             self.data_well.leakiness = True
             self.data_well.leakiness_interval = list(self.data_well.dict_leakiness['НЭК'].keys())
 
-        if result[paragraph_row][6] == 'true':
+        if result[paragraph_row][6] is True:
             self.data_well.column_additional = True
         else:
             self.data_well.column_additional = False

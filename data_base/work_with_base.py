@@ -541,14 +541,18 @@ def insert_data_well_dop_plan(self, data_well):
     from data_list import ProtectedIsDigit, ProtectedIsNonNone
 
     well_data_dict = json.loads(data_well)
-
+    self.data_well.column_direction_true = False
     self.data_well.column_direction_diameter = ProtectedIsDigit(well_data_dict["направление"]["диаметр"])
     self.data_well.column_direction_wall_thickness = ProtectedIsDigit(well_data_dict["направление"]["толщина стенки"])
     self.data_well.column_direction_length = ProtectedIsDigit(well_data_dict["направление"]["башмак"])
     self.data_well.level_cement_direction = ProtectedIsDigit(well_data_dict["направление"]["цемент"])
     self.data_well.column_conductor_diameter = ProtectedIsDigit(well_data_dict["кондуктор"]["диаметр"])
     self.data_well.column_conductor_wall_thickness = ProtectedIsDigit(well_data_dict["кондуктор"]["толщина стенки"])
+    if self.data_well.column_conductor_diameter.get_value != '0':
+        self.data_well.column_direction_true = True
+
     self.data_well.level_cement_column = ProtectedIsDigit(well_data_dict["ЭК"]["цемент"])
+    asd = self.data_well.level_cement_column
     self.data_well.column_conductor_length = ProtectedIsDigit(well_data_dict["кондуктор"]["башмак"])
     self.data_well.level_cement_conductor = ProtectedIsDigit(well_data_dict["кондуктор"]["цемент"])
     self.data_well.column_diameter = ProtectedIsDigit(well_data_dict["ЭК"]["диаметр"])

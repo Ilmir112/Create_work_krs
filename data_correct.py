@@ -107,7 +107,7 @@ class TabPageSoCorrect(TabPageUnion):
 
         self.level_cement_label = QLabel("Высота цемента \nза колонной", self)
         self.level_cement_edit = FloatLineEdit(self)
-        if '-' in self.data_well.level_cement_column.get_value:
+        if '-' in str(self.data_well.level_cement_column.get_value):
             self.level_cement_edit.setText(self.ifNone(self.data_well.level_cement_column.get_value).split("-")[0].strip())
         else:
             self.level_cement_edit.setText(f'{self.ifNone(self.data_well.level_cement_column.get_value)}')

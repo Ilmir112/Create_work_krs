@@ -1568,7 +1568,7 @@ class MyWindow(MyMainWindow):
             self.ws2 = self.wb2.get_sheet_by_name('Sheet')
             self.ws2.title = "План работ"
 
-            insert_index = self.data_well.insert_index2 +2
+            insert_index = self.data_well.insert_index +2
 
             merged_cells = []  # Список индексов объединения ячеек
 
