@@ -310,7 +310,7 @@ class GnoParent(ABC):
 
         self.calculate_chemistry = parent.calculate_chemistry
         self.current_widget = parent.tabWidget.currentWidget()
-        if float(self.fluid) >= 1.18:
+        if float(self.fluid) > 1.18:
             self.pntzh_combo = self.current_widget.pntzh_combo.currentText()
 
 
@@ -494,23 +494,24 @@ class GnoParent(ABC):
              None, None, None, None, None, None, None,
              ' Мастер КРС.', 1.5]
         ]
-        if self.pntzh_combo == '':
-            QMessageBox.warning(None, 'Ошибка', 'Не выбрано пункт налива')
-            return
+        if float(self.fluid) > 1.18:
+            if self.pntzh_combo == '':
+                QMessageBox.warning(None, 'Ошибка', 'Не выбрано пункт налива')
+                return
 
-        if self.pntzh_combo == 'Силами КРС':
-            krs_begin.insert(-2,
-                [None, None, f'Для приготовления жидкости в объеме 10м3 уд.весом {self.fluid}г/см3 необходимо завезти:\n'
-                             f'{type_of_chemistry} весом {10 * volume_chemistry/1000:.1f}т (из расчета '
-                             f'{10 * volume_chemistry:.1f}кг/м3 на {water_fresh:.1f}л  пресной воды) на основе '
-                             f'тех жидкости '
-                             f'уд. весом 1,01г/см3 в объеме {water_fresh * 10/1000:.1f}м3 доставленной автоцистернами '
-                             f'из ПНТЖ заказчика уд. весом 1,01г/см3 '
-                             f'Заявку на завоз тех жидкости подать за 24 часа до начала работ через '
-                             f'ведущего инженера ЦИТС {data_list.contractor}',
-                 None, None, None, None, None, None, None,
-                 ' Мастер КРС.', 10]
-            )
+            if self.pntzh_combo == 'Силами КРС':
+                krs_begin.insert(-2,
+                    [None, None, f'Для приготовления жидкости в объеме 10м3 уд.весом {self.fluid}г/см3 необходимо завезти:\n'
+                                 f'{type_of_chemistry} весом {10 * volume_chemistry/1000:.1f}т (из расчета '
+                                 f'{10 * volume_chemistry:.1f}кг/м3 на {water_fresh:.1f}л  пресной воды) на основе '
+                                 f'тех жидкости '
+                                 f'уд. весом 1,01г/см3 в объеме {water_fresh * 10/1000:.1f}м3 доставленной автоцистернами '
+                                 f'из ПНТЖ заказчика уд. весом 1,01г/см3 '
+                                 f'Заявку на завоз тех жидкости подать за 24 часа до начала работ через '
+                                 f'ведущего инженера ЦИТС {data_list.contractor}',
+                     None, None, None, None, None, None, None,
+                     ' Мастер КРС.', 10]
+                )
         if self.data_well.bvo:
             for row in mkp_revision_1_kateg(self):
                 krs_begin.insert(-3, row)
