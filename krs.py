@@ -14,6 +14,7 @@ from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 
 
 class TabPageGno(TabPageUnion):
+
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -25,7 +26,7 @@ class TabPageGno(TabPageUnion):
 
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
         self.fluid_edit = QLineEdit(self)
-        self.fluid_edit.setText(f'{self.calc_fluid(self.work_plan, self.data_well.current_bottom)}')
+
 
         self.volume_jumping_label = QLabel("Объем глушения", self)
         self.volume_jumping_edit = QLineEdit(self)
@@ -74,10 +75,24 @@ class TabPageGno(TabPageUnion):
             if plast in ['Сбоб-рад', 'Сбоб', 'Crr-bb', 'CI', 'CII', 'CIII', 'СIV0', 'CIV', 'CV', 'CVI', 'CVI0', 'D2ps',
                          'Дпаш', 'Дкын', 'C1rd-bb-tl', 'Ctl']:
                 self.surfactant_hydrofabizer_combo.setCurrentIndex(1)
-
-
-
         self.gno_combo.currentTextChanged.connect(self.update_select_gno)
+
+        self.fluid_edit.textChanged.connect(self.update_fluid_edit)
+        self.fluid_edit.setText(f'{self.calc_fluid(self.work_plan, self.data_well.current_bottom)}')
+
+    def update_fluid_edit(self):
+        fluid = self.fluid_edit.text()
+        if fluid != '':
+            if float(fluid) <= 1.18:
+                self.pntzh_label.setParent(None)
+                self.pntzh_combo.setParent(None)
+            else:
+                self.pntzh_label = QLabel('пункт налива тяжелой жидкости')
+                self.pntzh_combo = QComboBox(self)
+                self.pntzh_combo.addItems(['','КРЕЗОЛ', 'ВЕТЕРАН', 'ПНТЖ', 'Силами КРС'])
+
+                self.grid.addWidget(self.pntzh_label, 4, 8)
+                self.grid.addWidget(self.pntzh_combo, 5, 8)
 
     def update_select_gno(self, index):
         self.current_bottom_ecn_label = QLabel('голова извлекаемых пакеров')
@@ -295,6 +310,10 @@ class GnoParent(ABC):
 
         self.calculate_chemistry = parent.calculate_chemistry
         self.current_widget = parent.tabWidget.currentWidget()
+        if float(self.fluid) >= 1.18:
+            self.pntzh_combo = self.current_widget.pntzh_combo.currentText()
+
+
         self.lift_key = parent.lift_key
         self.pvo_gno = parent.pvo_gno
         self.length_nkt = sum(list(self.data_well.dict_nkt_before.values()))
@@ -396,6 +415,15 @@ class GnoParent(ABC):
             surfactant_hydrofabizer_str = 'с добавлением в жидкость глушения гидрофобизатора из расчёта' \
                                           ' 0,05% на 1м3 (0,5л)'
 
+        if 1 < float(self.fluid) < 1.34:
+            type_of_chemistry = 'CaCl'
+            water_fresh = data_list.DICT_CALC_CACL[float(self.fluid)][0]
+            volume_chemistry = data_list.DICT_CALC_CACL[float(self.fluid)][1]
+        elif 1.34 < float(self.fluid) < 1.6:
+            type_of_chemistry = 'CaЖГ'
+            water_fresh = data_list.DICT_CALC_CAZHG[float(self.fluid)][0]
+            volume_chemistry = data_list.DICT_CALC_CAZHG[float(self.fluid)][1]
+
         krs_begin = [[None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None,
                              None, None, None],
             [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
@@ -466,6 +494,23 @@ class GnoParent(ABC):
              None, None, None, None, None, None, None,
              ' Мастер КРС.', 1.5]
         ]
+        if self.pntzh_combo == '':
+            QMessageBox.warning(None, 'Ошибка', 'Не выбрано пункт налива')
+            return
+
+        if self.pntzh_combo == 'Силами КРС':
+            krs_begin.insert(-2,
+                [None, None, f'Для приготовления жидкости в объеме 10м3 уд.весом {self.fluid}г/см3 необходимо завезти:\n'
+                             f'{type_of_chemistry} весом {10 * volume_chemistry/1000:.1f}т (из расчета '
+                             f'{10 * volume_chemistry:.1f}кг/м3 на {water_fresh:.1f}л  пресной воды) на основе '
+                             f'тех жидкости '
+                             f'уд. весом 1,01г/см3 в объеме {water_fresh * 10/1000:.1f}м3 доставленной автоцистернами '
+                             f'из ПНТЖ заказчика уд. весом 1,01г/см3 '
+                             f'Заявку на завоз тех жидкости подать за 24 часа до начала работ через '
+                             f'ведущего инженера ЦИТС {data_list.contractor}',
+                 None, None, None, None, None, None, None,
+                 ' Мастер КРС.', 10]
+            )
         if self.data_well.bvo:
             for row in mkp_revision_1_kateg(self):
                 krs_begin.insert(-3, row)
@@ -1076,9 +1121,10 @@ class LiftVoronka(GnoParent):
 
     def add_work_lift(self):
         work_list = self.begin_work()
-        work_list.extend(self.lifting_voronka())
-        work_list.extend(self.append_posle_lift())
-        return work_list
+        if work_list:
+            work_list.extend(self.lifting_voronka())
+            work_list.extend(self.append_posle_lift())
+            return work_list
 
     def lifting_voronka(self):
         lift_voronka = [

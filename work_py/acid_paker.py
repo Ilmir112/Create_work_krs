@@ -1819,7 +1819,7 @@ class AcidPakerWindow(WindowUnion):
             if (self.data_well.perforation_roof - 5 + paker_khost >= self.data_well.current_bottom) or \
                     (all([self.data_well.dict_perforation[plast]['отрайбировано'] for plast in
                           self.data_well.plast_work])):
-                flushing_downhole_list = f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n ' \
+                flushing_downhole_list = f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
                                          f'При отсутствии циркуляции на скважине промывку исключить, ' \
                                          f'увеличить объем продавки кислотного состава в 1,5 кратном объеме НКТ. \n' \
                                          f'При наличии ЦИРКУЛЯЦИИ: Допустить компоновку до глубины ' \
@@ -1837,7 +1837,7 @@ class AcidPakerWindow(WindowUnion):
                                           f'не менее {round(well_volume(self, paker_depth + paker_khost) * 1.5, 1)}м3 '
 
             elif self.data_well.perforation_roof - 5 + paker_khost < self.data_well.current_bottom:
-                flushing_downhole_list = f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n ' \
+                flushing_downhole_list = f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
                                          f'При отсутствии циркуляции на скважине промывку исключить, ' \
                                          f'увеличить объем продавки кислотного состава в 1,5 кратном объеме НКТ\n' \
                                          f'При наличии ЦИРКУЛЯЦИИ: Допустить пакер до глубины ' \
