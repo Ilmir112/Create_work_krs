@@ -333,7 +333,6 @@ class VpWindow(WindowUnion):
                 interval_list.append(interval)
 
         if self.data_well.dict_leakiness:
-
             for nek in self.data_well.dict_leakiness['НЭК']['интервал']:
                 # print(nek)
                 if self.data_well.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False:

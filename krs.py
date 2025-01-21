@@ -83,13 +83,13 @@ class TabPageGno(TabPageUnion):
     def update_fluid_edit(self):
         fluid = self.fluid_edit.text()
         if fluid != '':
+            self.pntzh_label = QLabel('пункт налива тяжелой жидкости')
+            self.pntzh_combo = QComboBox(self)
+            self.pntzh_combo.addItems(['', 'КРЕЗОЛ', 'ВЕТЕРАН', 'ПНТЖ', 'Силами КРС'])
             if float(fluid) <= 1.18:
                 self.pntzh_label.setParent(None)
                 self.pntzh_combo.setParent(None)
             else:
-                self.pntzh_label = QLabel('пункт налива тяжелой жидкости')
-                self.pntzh_combo = QComboBox(self)
-                self.pntzh_combo.addItems(['','КРЕЗОЛ', 'ВЕТЕРАН', 'ПНТЖ', 'Силами КРС'])
 
                 self.grid.addWidget(self.pntzh_label, 4, 8)
                 self.grid.addWidget(self.pntzh_combo, 5, 8)
@@ -296,10 +296,11 @@ class GnoWindow(WindowUnion):
 
             if check_question == QMessageBox.StandardButton.No:
                 return
-            self.populate_row(self.insert_index, work_list, self.table_widget)
+            if work_list:
+                self.populate_row(self.insert_index, work_list, self.table_widget)
 
-            data_list.pause = False
-            self.close()
+                data_list.pause = False
+                self.close()
 
 
 class GnoParent(ABC):
@@ -424,7 +425,7 @@ class GnoParent(ABC):
             water_fresh = data_list.DICT_CALC_CAZHG[float(self.fluid)][0]
             volume_chemistry = data_list.DICT_CALC_CAZHG[float(self.fluid)][1]
 
-        krs_begin = [[None, None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None,
+        krs_begin = [[None, 'Порядок работы', None,  None, None, None, None, None, None, None, None, None, None,
                              None, None, None],
             [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
              'Ответственный',
@@ -728,8 +729,9 @@ class LiftPaker(GnoParent):
 
     def add_work_lift(self):
         work_list = self.begin_work()
-        work_list.extend(self.lifting_paker())
-        work_list.extend(self.append_posle_lift())
+        if work_list:
+            work_list.extend(self.lifting_paker())
+            work_list.extend(self.append_posle_lift())
         return work_list
 
     def lifting_paker(self):
@@ -1228,8 +1230,9 @@ class LiftPumpNnWithPaker(GnoParent):
 
     def add_work_lift(self):
         work_list = self.begin_work()
-        work_list.extend(self.lifting_nn_with_paker())
-        work_list.extend(self.append_posle_lift())
+        if work_list:
+            work_list.extend(self.lifting_nn_with_paker())
+            work_list.extend(self.append_posle_lift())
         return work_list
 
     def lifting_nn_with_paker(self):
@@ -1372,8 +1375,9 @@ class LiftPumpNvWithPaker(GnoParent):
 
     def add_work_lift(self):
         work_list = self.begin_work()
-        work_list.extend(self.lifting_nv_with_paker())
-        work_list.extend(self.append_posle_lift())
+        if work_list:
+            work_list.extend(self.lifting_nv_with_paker())
+            work_list.extend(self.append_posle_lift())
         return work_list
 
     def lifting_nv_with_paker(self):
@@ -1503,8 +1507,9 @@ class LiftEcnWithPaker(GnoParent):
 
     def add_work_lift(self):
         work_list = self.begin_work()
-        work_list.extend(self.lifting_ecn_with_paker())
-        work_list.extend(self.append_posle_lift())
+        if work_list:
+            work_list.extend(self.lifting_ecn_with_paker())
+            work_list.extend(self.append_posle_lift())
         return work_list
 
     def lifting_ecn_with_paker(self):
@@ -1625,8 +1630,9 @@ class LiftEcn(GnoParent):
 
     def add_work_lift(self):
         work_list = self.begin_work()
-        work_list.extend(self.lifting_ecn())
-        work_list.extend(self.append_posle_lift())
+        if work_list:
+            work_list.extend(self.lifting_ecn())
+            work_list.extend(self.append_posle_lift())
         return work_list
 
     def lifting_ecn(self):
@@ -1872,8 +1878,9 @@ class LiftPumpNn(GnoParent):
 
     def add_work_lift(self):
         work_list = self.begin_work()
-        work_list.extend(self.lifting_nn())
-        work_list.extend(self.append_posle_lift())
+        if work_list:
+            work_list.extend(self.lifting_nn())
+            work_list.extend(self.append_posle_lift())
         return work_list
 
     def lifting_nn(self):
@@ -2002,8 +2009,9 @@ class LiftEcnWith2Paker(GnoParent):
 
     def add_work_lift(self):
         work_list = self.begin_work()
-        work_list.extend(self.lifting_with2_paker())
-        work_list.extend(self.append_posle_lift())
+        if work_list:
+            work_list.extend(self.lifting_with2_paker())
+            work_list.extend(self.append_posle_lift())
         return work_list
 
     def lifting_with2_paker(self):

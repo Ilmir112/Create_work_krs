@@ -472,6 +472,10 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                         ws2.cell(row=i, column=j).font = Font(name=font_type, size=size_font, bold=True)
                         ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                         vertical='center')
+                        if 'Порядок работы' == cell.value:
+                            cell_num = i
+
+
                     else:
                         ws2.cell(row=i, column=j).font = Font(name=font_type, size=size_font, bold=False)
 
@@ -479,6 +483,9 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
     for row, col in merged_cells_dict.items():
         if len(col) != 2:
             ws2.merge_cells(start_row=row + 1, start_column=3, end_row=row + 1, end_column=merge_column)
+        if row == cell_num:
+            ws2.unmerge_cells(start_row=row, start_column=3, end_row=row, end_column=merge_column)
+            ws2.merge_cells(start_row=row, start_column=2, end_row=row, end_column=merge_column+2)
 
 
     ws2.cell(row=row_center, column=col_center).alignment = Alignment(wrap_text=True, horizontal='center',

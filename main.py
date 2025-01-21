@@ -764,7 +764,6 @@ class MyMainWindow(QMainWindow):
                 row_data.insert(-4, None)
                 row_data.insert(-4, None)
 
-
             row = insert_index + i
             if work_plan not in ['application_pvr', 'gnkt_frez', 'gnkt_opz', 'gnkt_bopz', 'gnkt_after_grp',
                                  'application_gis']:
@@ -776,6 +775,8 @@ class MyMainWindow(QMainWindow):
                 table_widget.setSpan(i + insert_index, 1, 1, 12)
             elif 'prs' in  self.data_well.work_plan:
                 table_widget.setSpan(i + insert_index, 2, 1, 11)
+            elif 'Порядок работы' in  row_data:
+                table_widget.setSpan(i + insert_index, 1, 1, 12)
             else:
                 table_widget.setSpan(i + insert_index, 2, 1, 8 + index_setSpan)
 
@@ -1633,6 +1634,9 @@ class MyWindow(MyMainWindow):
                     if 'Зуфаров' in str(value):
                         coordinate = f'{get_column_letter(col - 2)}{row_ind - 2}'
                         self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Зуфаров.png', coordinate)
+                    elif 'Закиев И.Э.' in str(value):
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                        self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Закиев.png', coordinate)
                     elif 'М.К.Алиев' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
                         self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Алиев махир.png', coordinate)

@@ -1291,7 +1291,7 @@ class TemplateKrs(WindowUnion):
                              f'текущего забоя с плановым, Нормализовать '
                              f'забой обратной промывкой тех жидкостью '
                              f'уд.весом {self.data_well.fluid_work}   до глубины {self.data_well.current_bottom}м',
-                             None, None, None, None, None, None, None, 'Мастер КРС', None, None]
+                             None, None, None, None, None, None, None, 'Мастер КРС', 4, None]
 
             list_template_ek.insert(-1, privyazka_nkt)
 
