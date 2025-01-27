@@ -895,7 +895,7 @@ class DataWindow(WindowUnion):
             for key, value in self.current_widget.labels_nkt.values():
                 asdf = key.text(), value.text()
                 if key.text() != '' and value.text() != '':
-                    self.data_well.dict_nkt_before[key.text()] = self.check_if_none(int(float(value.text())))
+                    self.data_well.dict_nkt_before[key.text()] = self.check_if_none(float(value.text()))
 
         if all([pump for pump in [self.ifNum(dict_pump_ecn_posle), self.ifNum(paker2_posle),
                                   self.ifNum(dict_pump_shgn_posle), self.ifNum(paker_posle)]]):
@@ -909,7 +909,7 @@ class DataWindow(WindowUnion):
         if self.current_widget.labels_nkt_po:
             for key, value in self.current_widget.labels_nkt_po.values():
                 if key.text() != '' and value.text() != '':
-                    self.data_well.dict_nkt_after[key.text()] = self.check_if_none(int(float(value.text())))
+                    self.data_well.dict_nkt_after[key.text()] = self.check_if_none(float(value.text()))
 
         if self.current_widget.labels_sucker:
             for key, value in self.current_widget.labels_sucker.values():
@@ -1315,12 +1315,11 @@ class DataWindow(WindowUnion):
             return int(value)
         elif str(value).replace('.', '').replace(',', '').isdigit():
 
-            if str(round(float(value.replace(',', '.')), 1))[-1] == "0":
+            if str(round(float(str(value).replace(',', '.')), 1))[-1] == "0":
 
-                return int(float(value.replace(',', '.')))
+                return int(float(str(value).replace(',', '.')))
             else:
-
-                return round(float(value.replace(',', '.')), 1)
+                return round(float(str(value).replace(',', '.')), 1)
         else:
             return value
 

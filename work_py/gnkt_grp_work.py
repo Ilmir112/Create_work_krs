@@ -742,7 +742,6 @@ class GnktModel(WindowUnion):
         vertikal = []
         koef_anomal = []
         for ind, plast_ind in enumerate(self.data_well.plast_work):
-
             if self.data_well.paker_before["before"] != 0:
                 if self.data_well.dict_perforation[plast_ind]['кровля'] > \
                         self.data_well.depth_fond_paker_before["before"]:
@@ -790,7 +789,7 @@ class GnktModel(WindowUnion):
 
             elif '73' in str(nkt_in):
                 nkt_in = 73
-                nkt_str += f'{nkt_in}\n'
+                nkt_str += f'{nkt_in}, \n'
                 nkt_widht = 5.5
                 nkt_widht_str += f'{nkt_widht}\n'
                 vn_str += f'{nkt_in - 2 * nkt_widht}\n'
@@ -809,7 +808,7 @@ class GnktModel(WindowUnion):
                 volume = round((volume_vn * length) / 1000, 1)
                 volume_str += f'{volume}\n'
 
-            length_str += f'{length + len_a}\n{length}-'
+            length_str += f'{length + len_a}, \n{length}-'
             len_a += length
 
         nkt_widht_str = nkt_widht_str[:-1]
@@ -846,7 +845,7 @@ class GnktModel(WindowUnion):
             column_add_head = ''
             column_add_shoe = ''
         if self.data_well.curator == 'ОР':
-            expected_title = 'Ожидаемый приемистость скважины'
+            expected_title = 'Ожидаемая приемистость скважины'
             expected_oil = f'{self.data_well.expected_pickup}м3/сут'
             water_cut = f'{self.data_well.expected_pressure}атм'
             proc_water = ''
@@ -885,10 +884,13 @@ class GnktModel(WindowUnion):
             list_gnkt_bopz = [
                 None, None, None, None, None, None, None, None, None, None, None, None,
                 None, None, None, None,
-                f'{plast_ind}\n{self.data_well.dict_perforation[plast_ind]["кровля"]}-{self.data_well.dict_perforation[plast_ind]["подошва"]}',
+                f'{plast_ind}\n{self.data_well.dict_perforation[plast_ind]["кровля"]}-'
+                f'{self.data_well.dict_perforation[plast_ind]["подошва"]}',
                 None,
                 None, None, None, f'Тек. забой: \n{self.data_well.current_bottom}м ', None]
         length_paker = 2
+        if self.data_well.curator == 'ОР' and self.data_well.region == 'ТГМ':
+            length_paker = self.data_well.depth_fond_paker_second_before["before"] - self.data_well.depth_fond_paker_before["before"]
 
         schema_well_list = [
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -941,7 +943,7 @@ class GnktModel(WindowUnion):
              f'{self.data_well.column_diameter.get_value}',
              f'{self.data_well.column_wall_thickness.get_value}',
              f'{round(float(self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value), 1)}',
-             f'0-', self.data_well.shoe_column.get_value, f'{self.data_well.level_cement_column.get_value}',
+             f'0-', self.data_well.shoe_column.get_value, f'{self.data_well.level_cement_column.get_value}-{self.data_well.shoe_column.get_value}',
              volume_pm_ek,
              self.well_volume_ek],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -1136,7 +1138,7 @@ class GnktModel(WindowUnion):
                             self.data_well.depth_fond_paker_before["before"]:
                         izol = 'над пакером'
                 try:
-                    vertikal_1 = self.data_well.dict_perforation[plast]['вертикаль'][index]
+                    vertikal_1 = min(self.data_well.dict_perforation[plast]['вертикаль'])
                 except:
                     pass
                 try:

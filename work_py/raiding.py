@@ -13,8 +13,6 @@ from work_py.advanted_file import change_true_raid
 from work_py.calculate_work_parametrs import volume_work
 
 
-
-
 class TabPageSo_raid(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -24,7 +22,7 @@ class TabPageSo_raid(TabPageUnion):
 
         self.raid_type_label = QLabel("Тип райбера", self)
         self.raid_type_combo = QComboBox(self)
-        raid_type_list = ['ФКК', 'арбузный ФА']
+        raid_type_list = ['ФКК', 'арбузный ФА', 'ФКК+фрезер Ф32']
         self.raid_type_combo.addItems(raid_type_list)
 
         self.raid_select_label = QLabel("компоновка НКТ", self)
@@ -367,7 +365,7 @@ class Raid(WindowUnion):
         raiding_interval = raid(raiding_interval_tuple)
         change_true_raid(self, raiding_interval_tuple)
         ryber_list = [
-            [f'СПО {ryber_str}  на НКТ{nkt_diam} до Н={krovly_raiding}м', None,
+            [f'СПО {ryber_str} на НКТ{nkt_diam} до Н={krovly_raiding}м', None,
              f'Спустить {ryber_str}  на НКТ{nkt_diam} до Н={krovly_raiding}м с замером, '
              f'шаблонированием шаблоном {nkt_template}мм (При СПО первых десяти НКТ на спайдере дополнительно '
              f'устанавливать элеватор ЭХЛ). '
@@ -383,7 +381,8 @@ class Raid(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', 0.6],
             [f'райбирование ЭК в инт. {raiding_interval}', None,
-             f'Произвести райбирование ЭК в инт. {raiding_interval}м с наращиванием, с промывкой и проработкой 5 раз каждого наращивания. '
+             f'Произвести райбирование ЭК в инт. {raiding_interval}м с наращиванием, с промывкой и '
+             f'проработкой 5 раз каждого наращивания. '
              f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа '
              f'до начала работ) Работы производить согласно сборника технологических регламентов и инструкций в присутствии'
              f' представителя заказчика. Допустить до глубины {current_str}м.',
@@ -404,22 +403,23 @@ class Raid(WindowUnion):
              'мастер КРС, предст. заказчика', well_volume_norm(volume_work(self.data_well) * 2)],
             [None, None,
              f'Поднять {ryber_str} на НКТ{nkt_diam}м с глубины {current_str}м с доливом скважины в '
-             f'объеме {round(self.data_well.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.data_well.fluid_work}',
+             f'объеме {round(self.data_well.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом '
+             f'{self.data_well.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС', liftingNKT_norm(current_str, 1.2)]]
 
-        # print(f' после отрайбирования {[self.data_well.dict_perforation[plast]["отрайбировано"] for plast in self.data_well.plast_work]}')
-        # if len(self.data_well.plast_work) == 0:
-        #     acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
-        #                                            'Нужно ли изменять удельный вес?')
-        #     try:
-        #         if acid_true_quest == QMessageBox.StandardButton.Yes:
-        #             for row in fluid_change(self):
-        #                 ryber_list.insert(-1, row)
-        #     except Exception as e:
-        #
-        #         QMessageBox.warning(self, 'ОШИБКА', f'Смена объема вставить не получитлось {type(e).__name__}\n\n{str(e)}')
-
+        if 'ФКК+фрезер Ф32' in raid_type_combo:
+            ryber_list.append([None, None,
+             f'При наличии АСПО и необходимости проведения обработки скважины растворителем или при незначительной '
+             f'циркуляции при промывке скважины по согласованию с заказчиком произвести СПО шаблона по '
+             f'дополнительному плану работ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', ])
+            if self.data_well.column_additional is False or \
+                    (self.data_well.column_additional and self.data_well.head_column_additional.get_value < self.data_well.current_bottom):
+                self.data_well.template_depth_addition = self.data_well.current_bottom
+            else:
+                self.data_well.template_depth = self.data_well.current_bottom
 
         return ryber_list
 

@@ -17,13 +17,13 @@ class TabPageSoLar(TabPageUnion):
         raid_type_list = ['ЭЦН', 'пакер', 'НКТ']
         self.po_type_combo.addItems(raid_type_list)
 
-        # self.lar_diameter_label = QLabel("Диаметр ловителя", self)
-        # self.lar_diameter_line = QLineEdit(self)
-        #
-        # self.lar_type_label = QLabel("Тип ловителя", self)
-        # self.lar_type_combo = QComboBox(self)
-        # raid_type_list = ['ОВ', 'ВТ', 'метчик', 'колокол']
-        # self.lar_type_combo.addItems(raid_type_list)
+        self.lar_diameter_label = QLabel("Диаметр ловителя", self)
+        self.lar_diameter_line = QLineEdit(self)
+
+        self.lar_type_label = QLabel("Тип ловителя", self)
+        self.lar_type_combo = QComboBox(self)
+        raid_type_list = ['ОВ', 'ВТ', 'метчик', 'колокол']
+        self.lar_type_combo.addItems(raid_type_list)
 
         self.nkt_select_label = QLabel("компоновка НКТ", self)
         self.nkt_select_combo = QComboBox(self)
@@ -163,7 +163,7 @@ class EmergencyPo(WindowUnion):
         self.close()
 
 
-    def emergency_sticking(self, emergence_type, nkt_key, emergency_bottom_line):
+    def emergency_sticking(self, emergence_type, nkt_key, emergency_bottom_line, bottom_line):
         from work_py.emergency_lar import EmergencyLarWork
         from work_py.emergencyWork import emergency_hook, magnet_select
 

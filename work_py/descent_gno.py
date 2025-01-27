@@ -493,7 +493,7 @@ class Conservation(DescentParent):
 
     def execute(self) -> List:
         work_list = self.begin_text()
-        work_list.extend(self.Conservation_well(self.nkt_edit))
+        work_list.extend(self.сonservation_well(self.nkt_edit))
         work_list.extend(self.append_finish())
         return work_list
 
@@ -534,7 +534,7 @@ class Conservation(DescentParent):
              descentNKT_norm(sum(list(self.data_well.dict_nkt_after.values())), 1)]]
         return descent_voronka
 
-    def Conservation_well(self, nkt_edit: str):
+    def сonservation_well(self, nkt_edit: str):
         descent_voronka = [
             [None, None,
              f'Заменить технологические НКТ на опрессованные эксплуатационные НКТ. Заменить подвесной патрубок на '
@@ -657,7 +657,7 @@ class DescentVoronka(DescentParent):
 
     def execute(self) -> List:
         work_list = self.begin_text()
-        work_list.extend(self.descent_voronka())
+        work_list.extend(self.voronka_down(self.nkt_edit))
         work_list.extend(self.append_finish())
         return work_list
 
@@ -1014,7 +1014,7 @@ class DescentEcnWithPaker(DescentParent):
              f'пакер - {self.data_well.paker_before["after"]} на глубину '
              f'{self.data_well.depth_fond_paker_before["after"]}м. (завоз с УСО ГНО,'
              f' ремонтные/новые) '
-             f'на гл. {self.data_well.dict_pump_ecn["after"]}м. Спуск НКТ производить с шаблонированием и '
+             f'на гл. {self.data_well.dict_pump_ecn_depth["after"]}м. Спуск НКТ производить с шаблонированием и '
              f'смазкой резьбовых соединений, замером изоляции каждые 100м. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика',
