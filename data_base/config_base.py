@@ -283,7 +283,9 @@ class WorkDatabaseWell:
                                         excel_json ={self.path_index},
                                          work_plan={self.path_index}, geolog ={self.path_index}, 
                                         type_kr={self.path_index}, data_change_paragraph={self.path_index}, 
-                                        cdng={self.path_index}, category_dict={self.path_index}                                                               
+                                        cdng={self.path_index}, category_dict={self.path_index}, 
+                                        well_oilfield={self.path_index}, appointment={self.path_index}, 
+                                        inv_number={self.path_index}, wellhead_fittings={self.path_index}                                                            
                                         WHERE well_number ={self.path_index} AND area_well ={self.path_index} 
                                         AND contractor ={self.path_index}
                                          AND costumer ={self.path_index} AND work_plan ={self.path_index} 
@@ -291,7 +293,8 @@ class WorkDatabaseWell:
                                                     """, (
                             data_well_dict, date_today, excel_json, work_plan_str, data_list.user[1], type_kr,
                             data_paragraph, cdng,
-                            category_dict, str(well_number), well_area, contractor, costumer, work_plan_str,
+                            category_dict, well_oilfield, appointment_well, inv_number, wellhead_fittings,
+                            str(well_number), well_area, contractor, costumer, work_plan_str,
                             type_kr))
 
                         QMessageBox.information(None, 'Успешно', 'Данные обновлены')

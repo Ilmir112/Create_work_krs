@@ -3,26 +3,26 @@ from collections import namedtuple
 from PyQt5.QtCore import QEvent, Qt
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, \
-    QLineEdit, QGridLayout, QTabWidget, \
-    QMainWindow, QPushButton, QApplication, QInputDialog, QTableWidget, QTableWidgetItem
+    QLineEdit, QGridLayout,  \
+     QPushButton, QApplication,  QTableWidget, QTableWidgetItem
 
 import data_list
 from H2S import calv_h2s
 
 
 from work_py.alone_oreration import well_volume
-from main import MyMainWindow
+
 from work_py.change_fluid import Change_fluid_Window
 
 from work_py.alone_oreration import privyazka_nkt, need_h2s
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from work_py.template_work import TabPageSoWith
-from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
 
 
 class TabPageSoSwab(TabPageUnion):
     def __init__(self, tableWidget, parent=None):
-        from .acid_paker import CheckableComboBox
+        from work_py.acid_paker import CheckableComboBox
         super().__init__(parent)
         self.validator_int = QIntValidator(0, 8000)
         self.validator_float = QDoubleValidator(0.87, 1.65, 2)
@@ -47,18 +47,21 @@ class TabPageSoSwab(TabPageUnion):
         self.pakerEdit = QLineEdit(self)
         self.pakerEdit.setValidator(self.validator_int)
 
-        if (self.data_well.perforation_roof - 40) < self.data_well.current_bottom:
-            self.pakerEdit.setText(f'{int(self.data_well.perforation_roof - 40)}')
-        else:
-            self.pakerEdit.setText(f'{int(self.data_well.current_bottom - 40)}')
-
         self.paker2Label = QLabel("глубина верхнего пакера", self)
         self.paker2Edit = QLineEdit(self)
         self.paker2Edit.setValidator(self.validator_int)
-        if (self.data_well.perforation_roof - 40) < self.data_well.current_bottom:
-            self.paker2Edit.setText(f'{int(self.data_well.perforation_roof - 40)}')
-        else:
-            self.pakerEdit.setText(f'{int(self.data_well.current_bottom - 40)}')
+
+        if self.data_well:
+            if (self.data_well.perforation_roof - 40) < self.data_well.current_bottom:
+                self.pakerEdit.setText(f'{int(self.data_well.perforation_roof - 40)}')
+            else:
+                self.pakerEdit.setText(f'{int(self.data_well.current_bottom - 40)}')
+
+
+            if (self.data_well.perforation_roof - 40) < self.data_well.current_bottom:
+                self.paker2Edit.setText(f'{int(self.data_well.perforation_roof - 40)}')
+            else:
+                self.pakerEdit.setText(f'{int(self.data_well.current_bottom - 40)}')
 
         self.kvost_label = QLabel("Длина хвостовики", self)
         self.khvostEdit = QLineEdit(self)
@@ -67,7 +70,8 @@ class TabPageSoSwab(TabPageUnion):
         self.khvostEdit.setClearButtonEnabled(True)
 
         plast_work = ['']
-        plast_work.extend(self.data_well.plast_work)
+        if self.data_well:
+            plast_work.extend(self.data_well.plast_work)
 
         self.plast_label = QLabel("Выбор пласта", self)
         self.plast_combo = CheckableComboBox(self)
@@ -84,13 +88,13 @@ class TabPageSoSwab(TabPageUnion):
         self.swab_volume_editLabel = QLabel("объем освоения", self)
         self.swab_volume_edit = QLineEdit(self)
         self.swab_volume_edit.setValidator(self.validator_int)
-        
-        if self.data_well.region in ['КГМ', 'АГМ']:
-            self.swab_type_combo.setCurrentIndex(3)
-            self.swab_volume_edit.setText('20')
-        else:
-            self.swab_type_combo.setCurrentIndex(1)
-            self.swab_volume_edit.setText('25')
+        if self.data_well:
+            if self.data_well.region in ['КГМ', 'АГМ']:
+                self.swab_type_combo.setCurrentIndex(3)
+                self.swab_volume_edit.setText('20')
+            else:
+                self.swab_type_combo.setCurrentIndex(1)
+                self.swab_volume_edit.setText('25')
 
         self.need_change_zgs_label = QLabel('Необходимо ли менять ЖГС', self)
         self.need_change_zgs_combo = QComboBox(self)
@@ -102,14 +106,14 @@ class TabPageSoSwab(TabPageUnion):
         self.pressure_new_label = QLabel('Ожидаемое давление', self)
         self.pressure_new_edit = QLineEdit(self)
         self.pressure_new_edit.setValidator(self.validator_int)
-
-        if len(self.data_well.plast_project) != 0:
-            self.plast_new_label = QLabel('индекс нового пласта', self)
-            self.plast_new_combo = QComboBox(self)
-            self.plast_new_combo.addItems(self.data_well.plast_project)
-        else:
-            self.plast_new_label = QLabel('индекс нового пласта', self)
-            self.plast_new_combo = QLineEdit(self)
+        if self.data_well:
+            if len(self.data_well.plast_project) != 0:
+                self.plast_new_label = QLabel('индекс нового пласта', self)
+                self.plast_new_combo = QComboBox(self)
+                self.plast_new_combo.addItems(self.data_well.plast_project)
+            else:
+                self.plast_new_label = QLabel('индекс нового пласта', self)
+                self.plast_new_combo = QLineEdit(self)
 
         self.paker_depth_zumpf_label = QLabel("Глубина посадки для ЗУМПФа", self)
         self.paker_depth_zumpf_edit = QLineEdit(self)
@@ -151,19 +155,20 @@ class TabPageSoSwab(TabPageUnion):
         self.grid.addWidget(self.need_change_zgs_label, 9, 1)
         self.grid.addWidget(self.need_change_zgs_combo, 10, 1)
         self.diameter_paker_edit.setText('122')
-        self.grid.addWidget(self.plast_new_label, 9, 2)
-        self.grid.addWidget(self.plast_new_combo, 10, 2)
+        if self.data_well:
+            self.grid.addWidget(self.plast_new_label, 9, 2)
+            self.grid.addWidget(self.plast_new_combo, 10, 2)
 
-        self.grid.addWidget(self.fluid_new_label, 9, 4)
-        self.grid.addWidget(self.fluid_new_edit, 10, 4)
+            self.grid.addWidget(self.fluid_new_label, 9, 4)
+            self.grid.addWidget(self.fluid_new_edit, 10, 4)
 
-        self.grid.addWidget(self.pressure_new_label, 9, 5)
-        self.grid.addWidget(self.pressure_new_edit, 10, 5)
+            self.grid.addWidget(self.pressure_new_label, 9, 5)
+            self.grid.addWidget(self.pressure_new_edit, 10, 5)
 
-        if all(self.data_well.dict_perforation[plast]['отрайбировано'] for plast in list(self.data_well.dict_perforation.keys())):
-            self.swab_true_edit_type.setCurrentIndex(0)
-        else:
-            self.swab_true_edit_type.setCurrentIndex(1)
+            if all(self.data_well.dict_perforation[plast]['отрайбировано'] for plast in list(self.data_well.dict_perforation.keys())):
+                self.swab_true_edit_type.setCurrentIndex(0)
+            else:
+                self.swab_true_edit_type.setCurrentIndex(1)
         self.pakerEdit.textChanged.connect(self.update_paker_edit)
         self.paker2Edit.textChanged.connect(self.update_paker_edit)
         self.pakerEdit.textChanged.connect(self.update_paker_diameter)
@@ -175,16 +180,17 @@ class TabPageSoSwab(TabPageUnion):
         self.pressure_zumpf_question_combo.setCurrentIndex(0)
 
     def update_paker_need(self, index):
-        if index == 'Да':
-            if len(self.data_well.plast_work) != 0:
-                paker_depth_zumpf = int(self.data_well.perforation_roof + 10)
-
-            else:
-                if self.data_well.dict_leakiness:
-                    paker_depth_zumpf = int(max([float(nek.split('-')[0]) + 10
-                                                 for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()]))
-                else:
+        if index == 'Да' and self.data_well:
+            if self.data_well:
+                if len(self.data_well.plast_work) != 0:
                     paker_depth_zumpf = int(self.data_well.perforation_roof + 10)
+
+                else:
+                    if self.data_well.dict_leakiness:
+                        paker_depth_zumpf = int(max([float(nek.split('-')[0]) + 10
+                                                     for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()]))
+                    else:
+                        paker_depth_zumpf = int(self.data_well.perforation_roof + 10)
 
             self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
 
@@ -195,7 +201,8 @@ class TabPageSoSwab(TabPageUnion):
             self.paker_depth_zumpf_edit.setParent(None)
 
     def update_change_fluid(self, index):
-        if index == 'Да':
+        if index == 'Да' and self.data_well:
+
             category_h2s_list_plan = list(
                 map(int, [self.data_well.dict_category[plast]['по сероводороду'].category for plast in
                           self.data_well.plast_project if self.data_well.dict_category.get(plast) and
@@ -249,11 +256,11 @@ class TabPageSoSwab(TabPageUnion):
                 self.grid.addWidget(self.calc_plast_h2s, 12, 5)
 
             if len(self.data_well.plast_project) != 0:
-                self.plast_new_combo = QComboBox(self)
+                # self.plast_new_combo = QComboBox(self)
                 self.plast_new_combo.addItems(self.data_well.plast_project)
                 plast = self.plast_new_combo.currentText()
             else:
-                self.plast_new_combo = QLineEdit(self)
+                # self.plast_new_combo = QLineEdit(self)
                 plast = self.plast_new_combo.text()
 
             if len(category_h2s_list_plan) != 0:
@@ -334,8 +341,6 @@ class TabPageSoSwab(TabPageUnion):
             self.grid.addWidget(self.pressure_zumpf_question_combo, 3, 8)
 
         if self.swab_true_edit_type.currentText() in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
-
-
             if paker_depth != '':
                 self.khvostEdit.setText(str(10))
 
@@ -364,7 +369,6 @@ class TabPageSoSwab(TabPageUnion):
                 self.paker2Edit.setEnabled(False)
                 if self.pakerEdit.text() != '':
                     self.paker2Edit.setText(f'{int(self.pakerEdit.text()) - self.distance_between_packers}')
-
 
         elif self.swab_true_edit_type.currentText() in ['воронка']:
             self.khvostEdit.setText(f'{sole_plast}')
@@ -564,17 +568,14 @@ class TabWidget(TabWidgetUnion):
 
 
 class SwabWindow(WindowUnion):
-    def __init__(self, data_well, table_widget, parent=None):
+    def __init__(self, data_well=None, table_widget=None, parent=None):
         super().__init__(data_well)
 
-
-        self.insert_index = data_well.insert_index
-
+        if data_well:
+            self.insert_index = data_well.insert_index
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
-
-
         self.dict_nkt = {}
         self.table_widget = table_widget
         self.tableWidget = QTableWidget(0, 8)
@@ -1460,8 +1461,8 @@ class SwabWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер КРС', 0.5],
         ]
-        ovtr = 'ОВТР 4ч' if self.data_well.region == 'ЧГМ' else 'ОВТР 10ч'
-        ovtr4 = 4 if self.data_well.region == 'ЧГМ' else 10
+        ovtr = 'ОВТР 4ч' if self.data_well.region == 'ЧГМ' else 'ОВТР 6ч'
+        ovtr4 = 4 if self.data_well.region == 'ЧГМ' else 6
         if swab_type_combo == 'Задача №2.1.13' and self.data_well.region not in ['ИГМ', 'ТГМ']:
             paker_list.insert(3, [ovtr, None, ovtr,
                                   None, None, None, None, None, None, None,
@@ -1680,8 +1681,8 @@ class SwabWindow(WindowUnion):
              f'или вычислить его расчетным методом.',
              None, None, None, None, None, None, None,
              'Мастер КРС', 0.5]])
-        ovtr = 'ОВТР 4ч' if self.data_well.region == 'ЧГМ' else 'ОВТР 10ч'
-        ovtr4 = 4 if self.data_well.region == 'ЧГМ' else 10
+        ovtr = 'ОВТР 4ч' if self.data_well.region == 'ЧГМ' else 'ОВТР 6ч'
+        ovtr4 = 4 if self.data_well.region == 'ЧГМ' else 6
         if swab_type_combo == 'Задача №2.1.13' and self.data_well.region not in ['ИГМ', 'ТГМ']:
             paker_list.insert(3, [ovtr, None, ovtr,
                                   None, None, None, None, None, None, None,
@@ -1974,8 +1975,8 @@ class SwabWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер КРС', 0.5],
         ]
-        ovtr = 'ОВТР 4ч' if self.data_well.region == 'ЧГМ' else 'ОВТР 10ч'
-        ovtr4 = 4 if self.data_well.region == 'ЧГМ' else 10
+        ovtr = 'ОВТР 4ч' if self.data_well.region == 'ЧГМ' else 'ОВТР 6ч'
+        ovtr4 = 4 if self.data_well.region == 'ЧГМ' else 6
         if swab_type_combo == 'Задача №2.1.13' and self.data_well.region not in ['ИГМ']:
             paker_list.insert(1, [ovtr, None, ovtr,
                                   None, None, None, None, None, None, None,

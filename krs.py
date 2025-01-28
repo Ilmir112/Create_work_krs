@@ -477,7 +477,7 @@ class GnoParent(ABC):
              None, None, None, None, None, None, None,
              ' Мастер КРС.', 0.5],
             [None, None,
-             f'Согласно инструкции ООО Башнефть-Добыча ПЗ-05 И-102089Ю ЮЛ-305 версия 2 п. 9.1.9 при отсутствии '
+             f'Согласно инструкции ООО Башнефть-Добыча ПЗ-05 И-102089 ЮЛ-305 версия 3 п. 8.1.9 при отсутствии '
              f'избыточного давления и '
              f'наличии риска поглощения жидкости глушения. произвести замер статического уровня силами ЦДНГ перед '
              f'началом работ и в '
@@ -855,14 +855,17 @@ class LiftOrz(GnoParent):
         super().__init__(parent)
 
     def add_work_lift(self):
-        work_list = self.lifting_orz()
-        work_list.extend(self.append_posle_lift())
+        work_list = self.begin_work()
+        if work_list:
+            work_list.extend(self.lifting_orz())
+            work_list.extend(self.append_posle_lift())
         return work_list
 
     def lifting_orz(self):
         lift_orz = [[]]
         if '89' in list(map(str, self.data_well.dict_nkt_before.keys())) and '48' in list(
                 map(str, self.data_well.dict_nkt_before.keys())):
+
             lift_orz = [
                 [f'глушение скважины в НКТ48мм в объеме '
                  f'{round(1.3 * self.data_well.dict_nkt_before["48"] / 1000, 1)}м3, '
@@ -980,6 +983,8 @@ class LiftOrz(GnoParent):
                  None, None, None, None, None,
                  'Мастер КРС', round(liftingNKT_norm(self.data_well.depth_fond_paker_before["before"], 1.3), 2)],
             ]
+            if self.without_damping_true:
+                lift_orz = lift_orz[1:]
         return lift_orz
 
 

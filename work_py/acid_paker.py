@@ -1118,8 +1118,9 @@ class AcidPakerWindow(WindowUnion):
                                                                 plast_combo, swab_type_combo, swab_volume_edit,
                                                                 depth_gauge_combo)
                 if self.paker_layout_combo == 'пакер с заглушкой':
-                    swab_work_list.pop(6)
+
                     swab_work_list = swab_work_list[4:]
+
 
             elif self.paker_layout_combo == 'двухпакерная':
                 paker_depth_swab = int(self.tabWidget.currentWidget().swab_paker_depth.text())

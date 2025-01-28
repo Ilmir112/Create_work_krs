@@ -1,12 +1,13 @@
 from PyQt5.QtWidgets import QMessageBox
 
 import data_list
-from .descent_gno import GnoDescentWindow
+from work_py.descent_gno import GnoDescentWindow
+
 def select_ovtr(self):
-    ovtr = 'ОВТР 10ч'
+    ovtr = 'ОВТР 6ч'
     if self.data_well.region == 'ЧГМ' or self.data_well.region == 'ТГМ' or \
             (self.data_well.region == 'КГМ' and self.data_well.curator == 'ОР'):
-        ovtr = 'ОВТР 4ч'
+        ovtr = 'ОВТР 6ч'
     return ovtr
 
 
