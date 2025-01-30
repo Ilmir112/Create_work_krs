@@ -712,22 +712,22 @@ class MyMainWindow(QMainWindow):
             if float(interval[0]) <= float(depth) <= float(interval[1]):
                 check_ribbing = True
 
-        if check_true is False:# and check_ribbing is False:
-            QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
-                                f'Проверка посадки показала, что пакер сажается не '
-                                f'в интервал скреперования {self.data_well.skm_interval}, и '
-                                f'райбирования {self.data_well.ribbing_interval} \n'
-                                f'Нужно скорректировать интервалы скреперования ')
-            return False
-        # if check_true is True and check_ribbing is False:
-        #     false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
-        #                                           f'Проверка посадки показала, что пакер сажается не '
-        #                                           f'в интервал скреперования {self.data_well.skm_interval}, '
-        #                                           f'но сажается в интервал райбирования '
-        #                                           f'райбирования {self.data_well.ribbing_interval} \n'
-        #                                           f'Продолжить?')
-        #     if false_question == QMessageBox.StandardButton.No:
-        #         return False
+        # if check_true is False:# and check_ribbing is False:
+        #     QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
+        #                         f'Проверка посадки показала, что пакер сажается не '
+        #                         f'в интервал скреперования {self.data_well.skm_interval}, и '
+        #                         f'райбирования {self.data_well.ribbing_interval} \n'
+        #                         f'Нужно скорректировать интервалы скреперования ')
+        #     return False
+        if check_true is True and check_ribbing is False:
+            false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
+                                                  f'Проверка посадки показала, что пакер сажается не '
+                                                  f'в интервал скреперования {self.data_well.skm_interval}, '
+                                                  f'но сажается в интервал райбирования '
+                                                  f'райбирования {self.data_well.ribbing_interval} \n'
+                                                  f'Продолжить?')
+            if false_question == QMessageBox.StandardButton.No:
+                return False
 
     def true_set_paker(self, depth):
 

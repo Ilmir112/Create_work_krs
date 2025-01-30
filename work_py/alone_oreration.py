@@ -366,7 +366,7 @@ def calculation_fluid_work(data_well, vertical, pressure):
             isinstance(pressure, float) or isinstance(pressure, int)):
 
         # print(vertical, pressure)
-        stock_ratio = 0.1 if float(vertical) <= 1200 else 0.
+        stock_ratio = 0.1 if float(vertical) <= 1200 else 0.05
 
         fluid_work_calculate = round(float(str(pressure)) * (1 + stock_ratio) / float(vertical) / 0.0981, 2)
 

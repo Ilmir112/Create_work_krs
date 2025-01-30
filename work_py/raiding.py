@@ -417,9 +417,10 @@ class Raid(WindowUnion):
              'мастер КРС', ])
             if self.data_well.column_additional is False or \
                     (self.data_well.column_additional and self.data_well.head_column_additional.get_value < self.data_well.current_bottom):
-                self.data_well.template_depth_addition = self.data_well.current_bottom
-            else:
                 self.data_well.template_depth = self.data_well.current_bottom
+            else:
+                self.data_well.template_depth_addition = self.data_well.current_bottom
+
 
         return ryber_list
 

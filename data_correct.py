@@ -739,19 +739,21 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(self.proc_water_edit, 26, 3)
 
     def ifNone(self, string):
+        try:
+            if str(string).lower() in ['0', 'none', '-', '--', 'отсутствует', 'отсут']:
+                return 'отсут'
+            if '/' in str(string):
+                return string.split('/')[0]
+            elif str(string).replace('.', '').replace(',', '').isdigit():
 
-        if str(string).lower() in ['0', 'none', '-', '--', 'отсутствует', 'отсут']:
-            return 'отсут'
-        if '/' in str(string):
-            return string.split('/')[0]
-        elif str(string).replace('.', '').replace(',', '').isdigit():
-
-            # print(str(round(float(string), 1))[-1] == '0', int(string), float(string))
-            return int(float(str(string).replace(',', '.'))) if str(round(float(str(string).replace(',', '.')), 1))[
-                                                                    -1] == "0" else \
-                round(float(str(string).replace(',', '.')), 1)
-        else:
-            return str(string).strip()
+                # print(str(round(float(string), 1))[-1] == '0', int(string), float(string))
+                return int(float(str(string).replace(',', '.'))) if str(round(float(str(string).replace(',', '.')), 1))[
+                                                                        -1] == "0" else \
+                    round(float(str(string).replace(',', '.')), 1)
+            else:
+                return str(string).strip()
+        except Exception as e:
+            QMessageBox.warning(self, 'Ошибка', f'ошибка обработки \n {e}')
 
     def remove_non_numeric_chars(self, string):
 

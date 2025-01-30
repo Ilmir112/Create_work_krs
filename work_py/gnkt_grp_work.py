@@ -758,7 +758,10 @@ class GnktModel(WindowUnion):
             QMessageBox.warning(self, 'ошибка', 'Приложение не смогло найти рабочие интервалы под пакером. '
                                                 'Небходимо уточнить спущенную компоновку')
             return
-        self.pressure = max(pressure)
+        if len(pressure) != 0:
+            self.pressure = max(pressure)
+        else:
+            self.pressure = max(self.data_well.dict_perforation[plast_ind]['давление'])
         vertikal = min(vertikal)
         koef_anomal.append(round(float(self.pressure) * 101325 / (float(vertikal) * 9.81 * 1000), 1))
 

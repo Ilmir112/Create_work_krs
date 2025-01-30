@@ -85,7 +85,7 @@ dict_data_cdng = {
     "ТЦДНГ 01":
         'Диспетчер ТЦДНГ 01 (DispetTCDNG1@bn.rosneft.ru) +7 (34767) 94338',
     "ТЦДНГ 02":
-        'Диспетчер ТЦДНГ 02 (DispetTCDNG2@bn.rosneft.ru) +7 (34767) 94…',
+        'Диспетчер ТЦДНГ 02 (DispetTCDNG2@bn.rosneft.ru) +7 (34767) 94752',
     "ТЦДНГ 03":
         'Диспетчер ТЦДНГ 03 (DispetTCDNG3@bn.rosneft.ru) +7 (34767) 94222',
     "ТЦДНГ 04":
