@@ -1790,8 +1790,7 @@ class WellPerforation(FindIndexPZ):
                         and is_number(row[col_sole_index]) is True:
                     # print(f'5 {row}')
 
-                    if is_number(str(row[col_vert_index]).replace(',', '.')) is True:
-                        self.dict_perforation.setdefault(
+                    self.dict_perforation.setdefault(
                             plast, {}).setdefault('вертикаль', []).append(
                             float(str(row[col_vert_index]).replace(',', '.')))
                     if any(['фильтр' in str(i).lower() for i in row]):
@@ -1850,8 +1849,7 @@ class WellPerforation(FindIndexPZ):
                                                                                      []).append(
                             round(0, 1))
 
-                    if row[col_date_pressure_index]:
-                        self.dict_perforation.setdefault(
+                    self.dict_perforation.setdefault(
                             plast, {}).setdefault('замер', []).append(row[col_date_pressure_index])
 
                 elif any([str((i)).lower() == 'проект' for i in row]) is True and all(

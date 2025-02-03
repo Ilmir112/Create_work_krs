@@ -767,9 +767,9 @@ class DopPlanWindow(WindowUnion):
 
             current_bottom_date_edit = current_widget.current_bottom_date_edit.text()
 
-            template_depth_edit = current_widget.template_depth_edit.text()
-            if template_depth_edit.isdigit() is False:
-                QMessageBox.critical(self, 'Ошибка', 'ошибка в глубине диметра')
+            template_depth_edit = int(current_widget.template_depth_edit.text().replace(',', '.'))
+            if str(template_depth_edit).isdigit() is False:
+                QMessageBox.critical(self, 'Ошибка', 'ошибка в глубине диаметра')
                 return
             template_length_edit = current_widget.template_length_edit.text()
             if self.data_well.column_additional:

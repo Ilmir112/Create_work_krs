@@ -1,10 +1,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import *
-from PyQt5.QtGui import QIntValidator, QDoubleValidator
+from PyQt5.QtGui import QDoubleValidator
 
 import data_list
-from main import MyMainWindow
-from work_py.parent_work import TabPageUnion, WindowUnion,TabWidgetUnion
+
+from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
 
 class TabPageSoLeakage(TabPageUnion):
@@ -38,13 +38,11 @@ class TabPageSoLeakage(TabPageUnion):
         self.grid.addWidget(self.insulation_combo, 1, 2)
 
 
-
-
-
 class TabWidget(TabWidgetUnion):
     def __init__(self, parent):
         super().__init__()
         self.addTab(TabPageSoLeakage(parent), 'Негерметичность')
+
 
 class LeakageWindow(WindowUnion):
 
@@ -99,7 +97,6 @@ class LeakageWindow(WindowUnion):
 
                 self.tableWidget.sortItems(0)
 
-
     def add_row_table(self):
 
         roof_leakage = self.tabWidget.currentWidget().roof_leakage_line.text().replace(',', '.')
@@ -130,19 +127,17 @@ class LeakageWindow(WindowUnion):
         self.tableWidget.sortItems(0)
 
     def add_string(self):
-       
+
         try:
             leakiness_column, ok = QInputDialog.getText(self, 'Нарушение колонны',
                                                         'Введите нарушение колонны через тире')
 
             dict_leakiness = self.get_leakiness(leakiness_column)
 
-
             return dict_leakiness
         except Exception:
             QMessageBox.warning(self, 'Ошибка', 'Данные введены не корректно')
             LeakageWindow.add_string(self)
-
 
     def get_leakiness(self, leakiness_column):
 
@@ -150,7 +145,6 @@ class LeakageWindow(WindowUnion):
         # print(leakiness_column)
         rows = 0
         for leakiness in leakiness_column.replace('м', '').replace(' ', '').split(','):
-
 
             roof_leakage = str(min(map(float, leakiness.split('-'))))
             sole_leakage = str(max(map(float, leakiness.split('-'))))
@@ -164,9 +158,8 @@ class LeakageWindow(WindowUnion):
             self.tableWidget.setSortingEnabled(False)
             self.tableWidget.sortItems(0)
 
-
     def add_work(self):
-       
+
         rows = self.tableWidget.rowCount()
         dict_leakiness = {}
         for row in range(rows):
@@ -179,9 +172,10 @@ class LeakageWindow(WindowUnion):
                 insulation = insulation_leakage.currentText()
 
                 dict_leakiness.setdefault(
-                    'НЭК', {}).setdefault('интервал', {}).setdefault((f"{roof}-{sole}"), {}).setdefault('отключение', False)
+                    'НЭК', {}).setdefault('интервал', {}).setdefault((f"{roof}-{sole}"), {}).setdefault('отключение',
+                                                                                                        False)
                 if insulation == 'изолирован':
-                   dict_leakiness['НЭК']['интервал'][f"{roof}-{sole}"]['отключение'] = True
+                    dict_leakiness['НЭК']['интервал'][f"{roof}-{sole}"]['отключение'] = True
                 dict_leakiness.setdefault(
                     'НЭК', {}).setdefault('интервал', {}).setdefault((f"{roof}-{sole}"), {}).setdefault(
                     'Прошаблонировано', False)

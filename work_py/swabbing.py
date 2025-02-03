@@ -1052,7 +1052,7 @@ class SwabWindow(WindowUnion):
         paker_list = [
             [f'СПО {paker_short} на НКТ{nkt_diam}м  до глубины {self.data_well.current_bottom}м', None,
              f'Спустить {paker_select} на НКТ{nkt_diam}м  до глубины {self.data_well.current_bottom}м'
-             f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм. ',
+             f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}. ',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(self.data_well.current_bottom, 1)],
             [f'Посадить пакер на глубину {paker_depth}м', None,
@@ -1184,7 +1184,7 @@ class SwabWindow(WindowUnion):
         paker_list = [
             [f'СПО {paker_short}до глубины {self.data_well.current_bottom}м', None,
              f'Спустить {paker_select} на НКТ{nkt_diam}м  до глубины {self.data_well.current_bottom}м'
-             f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм. ',
+             f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}. ',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(self.data_well.current_bottom, 1)],
             [f'Промыть уд.весом {self.data_well.fluid_work} в объеме '
@@ -1405,7 +1405,7 @@ class SwabWindow(WindowUnion):
              None,
              f'Спустить {paker_select} на НКТ{nkt_diam}м до глубины {paker_depth}м, воронкой до'
              f' {paker_depth + paker_khost}м'
-             f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм.'
+             f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}.'
              f' {("Произвести пробную посадку на глубине 50м" if self.data_well.column_additional is False else "")} '
              f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ',
              None, None, None, None, None, None, None,
@@ -1573,7 +1573,7 @@ class SwabWindow(WindowUnion):
                  None,
                  f'Спустить {paker_select} на НКТ{nkt_diam}м до глубины {paker_depth}м, воронкой до'
                  f' {paker_depth + paker_khost}м'
-                 f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм.'
+                 f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}.'
                  f' {("Произвести пробную посадку на глубине 50м" if self.data_well.column_additional is False else "")} '
                  f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ',
                  None, None, None, None, None, None, None,
@@ -1614,7 +1614,7 @@ class SwabWindow(WindowUnion):
                  None,
                  f'Спустить {paker_select} на НКТ{nkt_diam}м до глубины {paker_depth}м, воронкой до'
                  f' {paker_depth + paker_khost}м'
-                 f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм.'
+                 f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}.'
                  f' {("Произвести пробную посадку на глубине 50м" if self.data_well.column_additional is False else "")} '
                  f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ',
                  None, None, None, None, None, None, None,
@@ -1792,7 +1792,7 @@ class SwabWindow(WindowUnion):
         paker_list = [
             [f'Спуск {paker_short} до глубины {paker1_depth}/{paker2_depth}м', None,
              f'Спустить {paker_select} на НКТ{nkt_diam}м до глубины {paker1_depth}/{paker2_depth}м'
-             f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм. '
+             f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}. '
              f'{("Произвести пробную посадку на глубине 50м" if self.data_well.column_additional is False else "")} '
              f'ПРИ ОТСУТСТВИИ ЦИРКУЛЯЦИИ ПРЕДУСМОТРЕТЬ НАЛИЧИИ В КОМПОНОВКЕ УРАВНИТЕЛЬНЫХ КЛАПАНОВ',
              None, None, None, None, None, None, None,
@@ -1925,7 +1925,7 @@ class SwabWindow(WindowUnion):
         paker_list = [
             [paker_short, None,
              f'Спустить {paker_select} на НКТ{nkt_diam}м  воронкой до {paker_depth}м'
-             f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм. ',
+             f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}. ',
              None, None, None, None, None, None, None,
              'мастер КРС', round(
                 self.data_well.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04 + 0.18 + 0.008

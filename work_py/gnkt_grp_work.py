@@ -1121,50 +1121,44 @@ class GnktModel(WindowUnion):
                                     None,
                                     None, None, None, None, None, None, None, None]
 
+        try:
+            pvr_list = []
+            self.data_well.img_pvr_list = []
+            for plast in sorted(self.data_well.plast_all, key=lambda x: self.get_start_depth(
+                    self.data_well.dict_perforation[x]['интервал'][0])):
+                count_interval = 0
+                for index, interval in enumerate(self.data_well.dict_perforation[plast]['интервал']):
+                    count_interval += 1
+                    if self.data_well.dict_perforation[plast]['отключение']:
+                        izol = 'Изолирован'
+                    else:
+                        self.data_well.img_pvr_list = \
+                            [(plast, self.data_well.dict_perforation[plast]['интервал'])]
+                        izol = 'рабочий'
+                    if self.data_well.paker_before["before"] != 0:
+                        if self.data_well.dict_perforation[plast]['кровля'] < \
+                                self.data_well.depth_fond_paker_before["before"]:
+                            izol = 'над пакером'
 
-        pvr_list = []
-        self.data_well.img_pvr_list = []
-        for plast in sorted(self.data_well.plast_all, key=lambda x: self.get_start_depth(
-                self.data_well.dict_perforation[x]['интервал'][0])):
-            count_interval = 0
-            for index, interval in enumerate(self.data_well.dict_perforation[plast]['интервал']):
-                count_interval += 1
-                if self.data_well.dict_perforation[plast]['отключение']:
-                    izol = 'Изолирован'
-                else:
-
-                    self.data_well.img_pvr_list = \
-                        [(plast, self.data_well.dict_perforation[plast]['интервал'])]
-                    izol = 'рабочий'
-                if self.data_well.paker_before["before"] != 0:
-                    if self.data_well.dict_perforation[plast]['кровля'] < \
-                            self.data_well.depth_fond_paker_before["before"]:
-                        izol = 'над пакером'
-                try:
                     vertikal_1 = min(self.data_well.dict_perforation[plast]['вертикаль'])
-                except:
-                    pass
-                try:
                     pressure_1 = self.data_well.dict_perforation[plast]['давление'][0]
-                except:
-                    pressure_1 = None
-                try:
                     zamer_1 = self.data_well.dict_perforation[plast]['замер'][0]
-                except:
-                   zamer_1 = None
 
-                pvr_list.append(
-                    [None, None, None, None, None, None, None, None, None, None, None, None, plast, None, vertikal_1,
-                     None, interval[0],
-                     None, interval[1], None, izol, pressure_1,
-                     zamer_1, None])
-            self.data_well.dict_perforation[plast]['счет_объединение'] = count_interval
+                    pvr_list.append(
+                        [None, None, None, None, None, None, None, None, None, None, None, None, plast, None, vertikal_1,
+                         None, interval[0],
+                         None, interval[1], None, izol, pressure_1,
+                         zamer_1, None])
+                self.data_well.dict_perforation[plast]['счет_объединение'] = count_interval
 
-        for index, pvr in enumerate(pvr_list):
-            schema_well_list[26 + index] = pvr
+            for index, pvr in enumerate(pvr_list):
+                schema_well_list[26 + index] = pvr
 
-        self.data_well.current_bottom = round(float(current_bottom_edit), 1)
-
+            self.data_well.current_bottom = round(float(current_bottom_edit), 1)
+        except Exception as e:
+            QMessageBox.warning(self, 'ошибка', f'Ошибка обработки интервала перфорации, необходимо изменить '
+                                                f'изначальные данные {e}')
+            return
         return schema_well_list
 
     def create_title_list(self, ws2):

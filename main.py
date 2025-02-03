@@ -2316,7 +2316,13 @@ class MyWindow(MyMainWindow):
             self.set_modal_window(WellCondition.leakage_window)
             self.data_well.dict_leakiness = WellCondition.leakage_window.add_work()
             # print(f'словарь нарушений {self.data_well.dict_leakiness}')
+            data_list.pause = False
+            self.pause_app()
+
+            # print(f'словарь нарушений {self.data_well.dict_leakiness}')
+
         else:
+            data_list.pause = True
             WellCondition.leakage_window.close()  # Close window.
             WellCondition.leakage_window = None  # Discard reference.
         self.data_well.data_list[-1][5] = json.dumps(self.data_well.dict_leakiness, default=str,
