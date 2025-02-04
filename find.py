@@ -1789,10 +1789,9 @@ class WellPerforation(FindIndexPZ):
                         [str(i).strip() is None for i in row]) is False and is_number(row[col_roof_index]) is True \
                         and is_number(row[col_sole_index]) is True:
                     # print(f'5 {row}')
-
-                    self.dict_perforation.setdefault(
-                            plast, {}).setdefault('вертикаль', []).append(
-                            float(str(row[col_vert_index]).replace(',', '.')))
+                    if row[col_vert_index]:
+                        self.dict_perforation.setdefault(plast, {}).setdefault('вертикаль', []).append(
+                                float(str(row[col_vert_index]).replace(',', '.')))
                     if any(['фильтр' in str(i).lower() for i in row]):
                         self.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', True)
                     else:

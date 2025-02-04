@@ -363,7 +363,7 @@ class TabPageSoSwab(TabPageUnion):
                 if self.pakerEdit.text() != '' and self.paker2Edit.text() != '':
                     self.distance_between_packers = abs(int(self.pakerEdit.text()) - int(self.paker2Edit.text()))
 
-                    print(f' расстояние между пакерами {self.distance_between_packers}')
+                    # print(f' расстояние между пакерами {self.distance_between_packers}')
             else:
                 self.khvostEdit.setEnabled(False)
                 self.paker2Edit.setEnabled(False)
@@ -843,7 +843,7 @@ class SwabWindow(WindowUnion):
                 paker_depth = int(float(self.tableWidget.item(row, 2).text()))
                 paker2_depth = int(float(self.tableWidget.item(row, 3).text()))
                 swab_type_combo = self.tableWidget.cellWidget(row, 4).currentText()
-                swab_volume_edit = int(float(self.tableWidget.item(row, 2).text()))
+                swab_volume_edit = int(float(self.tableWidget.item(row, 5).text()))
                 if row == 0:
                     work_list = self.swabbing_with_2paker(diameter_paker, paker_depth, paker2_depth, paker_khost,
                                                           plast_combo, swab_type_combo, swab_volume_edit, depth_gauge_combo,
@@ -1345,7 +1345,7 @@ class SwabWindow(WindowUnion):
                                  plast_new, fluid_new, pressure_new):
         
 
-        swab_short, swab_select = SwabWindow.swab_select(self, swab_type_combo, plast_combo, swab_volume_edit)
+        swab_short, swab_select = self.swab_select( swab_type_combo, plast_combo, swab_volume_edit)
 
         if depth_gauge_combo == 'Да':
             depth_gauge = 'контейнер с манометром МТГ-25 + '
@@ -1500,7 +1500,7 @@ class SwabWindow(WindowUnion):
                             pressure_new='', pressure_zumph_combo='Нет', paker_depth_zumpf=0):
         from .opressovka import OpressovkaEK
 
-        swab_short, swab_select = SwabWindow.swab_select(self, swab_type_combo, plast_combo, swab_volume_edit)
+        swab_short, swab_select = self.swab_select(swab_type_combo, plast_combo, swab_volume_edit)
 
         if depth_gauge_combo == 'Да':
             depth_gauge = 'контейнер с манометром МТГ-25 + '
@@ -1723,7 +1723,7 @@ class SwabWindow(WindowUnion):
 
         from .opressovka import OpressovkaEK
 
-        swab_short, swab_select = SwabWindow.swab_select(self, swab_type_combo, plast_combo, swab_volume_edit)
+        swab_short, swab_select = self.swab_select(swab_type_combo, plast_combo, swab_volume_edit)
 
         nkt_diam = '73' if self.data_well.column_diameter.get_value > 110 or (
                 self.data_well.column_diameter.get_value > 110 and
@@ -1890,7 +1890,7 @@ class SwabWindow(WindowUnion):
     def swabbing_with_voronka(self, paker_depth, plast_combo, swab_type_combo, swab_volume_edit, depth_gauge_combo,
                               need_change_zgs_combo, plast_new, fluid_new, pressure_new):
 
-        swab_short, swab_select = SwabWindow.swab_select(self, swab_type_combo, plast_combo, swab_volume_edit)
+        swab_short, swab_select = self.swab_select( swab_type_combo, plast_combo, swab_volume_edit)
         nkt_diam = '73' if self.data_well.column_diameter.get_value > 110 or (
                 self.data_well.column_diameter.get_value > 110 and
                 self.data_well.column_additional is True and
