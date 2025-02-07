@@ -634,9 +634,9 @@ def insert_data_well_dop_plan(self, data_well):
         self.data_well.diameter_doloto_ek = ProtectedIsDigit(0)
         print(f'отсутствуют данные в базе по голове хвостовика и диаметру долото')
     if 'дата ввода в эксплуатацию' in list(well_data_dict.keys()):
-        self.data_well.date_commissioning_line = well_data_dict['дата ввода в эксплуатацию']
+        self.data_well.date_commissioning = well_data_dict['дата ввода в эксплуатацию']
     else:
-        self.data_well.date_commissioning_line = '01.01.2000'
+        self.data_well.date_commissioning = '01.01.2000'
     self.data_well.data_well_dict = well_data_dict
     # QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
 

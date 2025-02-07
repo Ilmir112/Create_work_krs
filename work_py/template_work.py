@@ -236,10 +236,9 @@ class TabPageSoWith(TabPageUnion):
             self.grid.addWidget(self.length_template_second_edit, 5, 10)
 
     def definition_pssh(self, current_bottom):
-
         if (self.data_well.column_additional is False or \
                 (self.data_well.column_additional and
-                 self.data_well.current_bottom > self.data_well.head_column_additional.get_value)) \
+                 self.data_well.current_bottom < self.data_well.head_column_additional.get_value) ) \
                 and self.data_well.open_trunk_well is False and \
                 ((self.difference_date_days(self.data_well.date_commissioning)/365 < 20 and \
                   self.data_well.category_h2s == "3") or (
@@ -825,15 +824,14 @@ class TabPageSoWith(TabPageUnion):
                     skm_teml_str = f'{skm_type}-{skm} до глубины {self.data_well.skm_depth}м, ' \
                                    f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м,' \
                                    f' пакер до глубины {int(self.paker_depth)}м'
-
-
+                self.dictance_three_edit.textChanged.connect(self.update_paker_depth)
 
             else:
                 self.dictance_three_Label.setParent(None)
                 self.dictance_three_edit.setParent(None)
                 self.diameter_paker_label_type.setParent(None)
                 self.diameter_paker_edit.setParent(None)
-            self.dictance_three_edit.textChanged.connect(self.update_paker_depth)
+
             self.template_str_edit.setText(template_str)
             self.skm_teml_str_edit.setText(skm_teml_str)
 

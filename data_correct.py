@@ -421,6 +421,9 @@ class TabPageSoCorrect(TabPageUnion):
         self.grid.addWidget(self.dinamic_level_Label, 21, 3)
         self.grid.addWidget(self.dinamic_level_edit_type, 22, 3)
 
+        self.grid.addWidget(self.date_commissioning_Label, 21, 5)
+        self.grid.addWidget(self.date_commissioning_line, 22, 5)
+
         self.grid.addWidget(self.curator_Label, 23, 1)
         self.grid.addWidget(self.curator_Combo, 24, 1)
 
