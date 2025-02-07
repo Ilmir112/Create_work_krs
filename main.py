@@ -24,7 +24,6 @@ from openpyxl.workbook import Workbook
 from openpyxl.styles import Alignment, Font
 from block_name import region_select
 
-
 from log_files.log import logger, QPlainTextEditLogger
 from openpyxl.drawing.image import Image
 from PyQt5.QtCore import QThread, pyqtSlot
@@ -113,7 +112,6 @@ class MyMainWindow(QMainWindow):
         dialog = CustomMessageBox(data_well, message)
         dialog.exec_()  # Открываем диалоговое окно в модальном режиме
 
-
     @staticmethod
     def check_if_none(value):
         if isinstance(value, int) or isinstance(value, float):
@@ -201,9 +199,6 @@ class MyMainWindow(QMainWindow):
         from find import WellNkt, WellPerforation, WellCondition, WellHistoryData, WellName, WellCategory, \
             WellFondData, WellSuckerRod, WellExpectedPickUp, WellData
 
-
-
-
         # Запуск основного класса и всех дочерних классов в одной строке
         self.data_well = FindIndexPZ(self.ws, self.work_plan, self)
         self.data_well.work_plan = self.work_plan
@@ -289,11 +284,9 @@ class MyMainWindow(QMainWindow):
             WellPerforation.read_well(self.data_well, self.data_well.data_pvr_min.get_value,
                                       self.data_well.data_pvr_max.get_value + 1)
 
-
             self.data_well = \
                 WellCategory.read_well(self.data_well, self.data_well.cat_well_min.get_value,
                                        self.data_well.data_well_min.get_value)
-
 
             # self.set_modal_window(self.data_list.pdata_window)
 
@@ -363,7 +356,7 @@ class MyMainWindow(QMainWindow):
         return self.data_well
 
     def determination_injection_pressure(self):
-        if self.data_well.region == 'ЧГМ' and self.data_well.expected_pressure< 80:
+        if self.data_well.region == 'ЧГМ' and self.data_well.expected_pressure < 80:
             return 80
         else:
             return self.data_well.expected_pressure
@@ -394,7 +387,6 @@ class MyMainWindow(QMainWindow):
                                                       'excel версия от 2010г и выше)')
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
-
 
             if self.fname:
                 try:
@@ -429,8 +421,6 @@ class MyMainWindow(QMainWindow):
 
                     self.wb2_prs = Workbook()
                     self.ws2_prs = self.wb2_prs.active
-
-
 
                     self.ws = read_pz.open_excel_file(self.ws, self.work_plan, self.ws2_prs)
                     self.copy_pz(self.ws, self.table_widget, self.work_plan, 15)
@@ -760,7 +750,7 @@ class MyMainWindow(QMainWindow):
         # print(f'ДОП {work_plan}')
 
         for i, row_data in enumerate(work_list):
-            if 'prs' in  self.data_well.work_plan:
+            if 'prs' in self.data_well.work_plan:
                 row_data.insert(-4, None)
                 row_data.insert(-4, None)
                 row_data.insert(-4, None)
@@ -774,9 +764,9 @@ class MyMainWindow(QMainWindow):
 
             if len(str(row_data)[1]) > 3 and work_plan in 'gnkt_frez':
                 table_widget.setSpan(i + insert_index, 1, 1, 12)
-            elif 'prs' in  self.data_well.work_plan:
+            elif 'prs' in self.data_well.work_plan:
                 table_widget.setSpan(i + insert_index, 2, 1, 11)
-            elif 'Порядок работы' in  row_data:
+            elif 'Порядок работы' in row_data:
                 table_widget.setSpan(i + insert_index, 1, 1, 12)
             else:
                 table_widget.setSpan(i + insert_index, 2, 1, 8 + index_setSpan)
@@ -800,10 +790,10 @@ class MyMainWindow(QMainWindow):
         if 'gnkt' not in work_plan:
 
             for row in range(table_widget.rowCount()):
-                if row >= self.data_well.insert_index2 +3:
+                if row >= self.data_well.insert_index2 + 3:
                     # Добавляем нумерацию в первую колонку
                     item_number = QtWidgets.QTableWidgetItem(
-                        str(row - self.data_well.insert_index2 -2))  # Номер строки + 1
+                        str(row - self.data_well.insert_index2 - 2))  # Номер строки + 1
                     table_widget.setItem(row, 1, item_number)
         asdw = 25
 
@@ -920,14 +910,14 @@ class MyMainWindow(QMainWindow):
                 self.work_window = None
 
         if work_plan in ['gnkt_frez'] and list_page == 2:
-                col_width = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
-                            13.0, 5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
-                            13.0,
-                            13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
-                            13.0,
-                            13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
-                for column in range(table_widget.columnCount()):
-                    table_widget.setColumnWidth(column, int(col_width[column]))  # Здесь задайте требуемую ширину столбца
+            col_width = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
+                         13.0, 5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
+                         13.0,
+                         13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
+                         13.0,
+                         13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
+            for column in range(table_widget.columnCount()):
+                table_widget.setColumnWidth(column, int(col_width[column]))  # Здесь задайте требуемую ширину столбца
         elif work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz'] and list_page == 2:
 
             col_width = property_excel.property_excel_pvr.col_width_gnkt_osv
@@ -951,7 +941,7 @@ class MyWindow(MyMainWindow):
         self.initUI()
         self.login_window = None
         self.operation_window = None
-        self.skm_depth =0
+        self.skm_depth = 0
         self.new_window = None
         self.raid_window = None
         self.leakage_window = None
@@ -1010,7 +1000,8 @@ class MyWindow(MyMainWindow):
         APP_NAME = 'Zima'
         APP_VERSION = '1.1.0'
 
-        client = Client(ClientConfig.PUBLIC_KEY, update_urls=ClientConfig.UPDATE_URLS, progress_hooks=[self.print_status_info])
+        client = Client(ClientConfig.PUBLIC_KEY, update_urls=ClientConfig.UPDATE_URLS,
+                        progress_hooks=[self.print_status_info])
         app_update = client.update_check(APP_NAME, APP_VERSION)
         client.refresh()
 
@@ -1027,7 +1018,7 @@ class MyWindow(MyMainWindow):
         total = info.get(u'total')
         downloaded = info.get(u'downloaded')
         status = info.get(u'status')
-        print (downloaded, total, status)
+        print(downloaded, total, status)
 
     def insert_data_in_chemistry(self):
 
@@ -1570,7 +1561,7 @@ class MyWindow(MyMainWindow):
             self.ws2 = self.wb2.get_sheet_by_name('Sheet')
             self.ws2.title = "План работ"
 
-            insert_index = self.data_well.insert_index +2
+            insert_index = self.data_well.insert_index + 2
 
             merged_cells = []  # Список индексов объединения ячеек
 
@@ -1607,7 +1598,8 @@ class MyWindow(MyMainWindow):
             for i in range(1, len(work_list)):  # нумерация работ
                 if i >= insert_index + 1:
                     if is_number(work_list[i][number_index_norm]) is True:
-                        self.data_well.norm_of_time += round(float(str(work_list[i][number_index_norm]).replace(',', '.')), 1)
+                        self.data_well.norm_of_time += round(
+                            float(str(work_list[i][number_index_norm]).replace(',', '.')), 1)
                     if work_list[i][0]:
                         plan_short += f'п.{work_list[i][1]} {work_list[i][0]} \n'
 
@@ -1650,12 +1642,13 @@ class MyWindow(MyMainWindow):
                         break
                     elif 'Расчет жидкости глушения производится согласно МУ' in str(value):
                         ind = 6
-                        row_ind_ins =row_ind + 1
+                        row_ind_ins = row_ind + 1
                         if 'prs' in self.work_plan:
                             ind = 13
                             row_ind_ins = row_ind
                         coordinate = f'{get_column_letter(ind)}{row_ind_ins}'
-                        self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/schema_well/формула.png', coordinate,
+                        self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/schema_well/формула.png',
+                                          coordinate,
                                           330, 130)
                         break
             if self.work_plan in ['krs', 'plan_change']:
@@ -1788,6 +1781,10 @@ class MyWindow(MyMainWindow):
         del_menu.addAction(deleteString_action)
         deleteString_action.triggered.connect(self.deleteString)
 
+        descent_gno_action = QAction("Подьем ГНО", self)
+        action_menu.addAction(descent_gno_action)
+        descent_gno_action.triggered.connect(self.descent_gno_action)
+
         opressovka_action = QAction("Опрессовка колонны", self)
         action_menu.addAction(opressovka_action)
         opressovka_action.triggered.connect(self.pressure_test)
@@ -1886,6 +1883,10 @@ class MyWindow(MyMainWindow):
         alone_menu.addAction(mkp_action)
         mkp_action.triggered.connect(self.mkp_revision)
 
+        resuscitation_work = QAction('Реанимация ШГН')
+        alone_menu.addAction(resuscitation_work)
+        resuscitation_work.triggered.connect(self.resuscitation_work)
+
         block_pack_action = QAction('Блок пачка')
         alone_menu.addAction(block_pack_action)
         block_pack_action.triggered.connect(self.block_pack)
@@ -1941,6 +1942,7 @@ class MyWindow(MyMainWindow):
 
         self.insert_index = r + 1
         self.data_well.insert_index = r + 1
+
         # print(r, self.data_well.count_row_well)
         if r > self.data_well.count_row_well and 'gnkt' not in self.work_plan:
             data = self.read_clicked_mouse_data(r)
@@ -2162,6 +2164,12 @@ class MyWindow(MyMainWindow):
         mkp_work_list = mkp_revision(self)
         self.populate_row(self.insert_index, mkp_work_list, self.table_widget)
 
+    def resuscitation_work(self):
+        from work_py.descent_gno import DescentParent
+        mkp_work_list = DescentParent.append_note_6(self)
+        mkp_work_list[0][2] = mkp_work_list[0][2].replace('ПРИМЕЧАНИЕ №6: ', '')
+        self.populate_row(self.insert_index, mkp_work_list, self.table_widget)
+
     def acid_action_gons(self):
         from work_py.acids import GonsWindow
         self.add_window(GonsWindow)
@@ -2248,6 +2256,11 @@ class MyWindow(MyMainWindow):
     def gno_bottom(self):
         from work_py.descent_gno import GnoDescentWindow
         self.add_window(GnoDescentWindow)
+
+    def descent_gno_action(self):
+        from krs import GnoWindow
+        self.work_window = GnoWindow(self.data_well.insert_index, self.table_widget, self.data_well)
+        self.set_modal_window(self.work_window)
 
     def pressure_test(self):
         from work_py.opressovka import OpressovkaEK

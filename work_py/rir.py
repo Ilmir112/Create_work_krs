@@ -1,10 +1,11 @@
+import datetime
+
 import data_list
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QLabel, QComboBox, QLineEdit, QGridLayout, QWidget, QPushButton
 from work_py.alone_oreration import volume_vn_ek, well_volume, volume_vn_nkt
 from work_py.change_fluid import Change_fluid_Window
 from work_py.opressovka import OpressovkaEK
-
 
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
@@ -22,10 +23,16 @@ class TabPageSoRir(TabPageUnion):
         self.paker_need_combo = QComboBox(self)
         self.paker_need_combo.addItems(['Нужно СПО', 'без СПО'])
 
+        if self.difference_date_days(self.data_well.date_commissioning) < 365.25 * 20 and \
+                self.difference_date_days(self.data_well.result_pressure_date) < 365 * 3 and \
+                len(self.data_well.leakiness_interval) == 0:
+            self.paker_need_combo.setCurrentIndex(1)
+
         self.rir_type_Label = QLabel("Вид РИР", self)
         self.rir_type_combo = QComboBox(self)
         self.rir_type_combo.addItems(['', 'РИР на пере', 'УЦМ в глухой колонне',
-                                      'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП', 'РИР ОВП с пакером', 'Силами ККТ'])
+                                      'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП', 'РИР ОВП с пакером',
+                                      'РПП Силами ККТ', 'РИР с РПП + ЦМ'])
         plast_work = ['']
         plast_work.extend(self.data_well.plast_work)
 
@@ -52,46 +59,10 @@ class TabPageSoRir(TabPageUnion):
         self.sole_rir_edit.setValidator(self.validator_int)
         self.sole_rir_edit.setClearButtonEnabled(True)
 
-        # self.diameter_paker_labelType = QLabel("Диаметр пакера", self)
-        # self.diameter_paker_edit = QLineEdit(self)
-        # self.diameter_paker_edit.setValidator(self.validator_int)
-        #
-        # self.paker_khost_label = QLabel("Длина хвостовика", self)
-        # self.paker_khost_edit = QLineEdit(self)
-        # self.paker_khost_edit.setValidator(self.validator_int)
-        # self.paker_khost_edit.setText('10')
-        #
-        # self.paker_depth_label = QLabel("Глубина посадки", self)
-        # self.paker_depth_edit = QLineEdit(self)
-        # self.paker_depth_edit.setValidator(self.validator_int)
-        # # self.paker_depth_edit.textChanged.connect(self.update_plast_edit)
-
         self.cement_volume_label = QLabel('Объем цемента')
         self.cement_volume_line = QLineEdit(self)
 
-        # if len(self.data_well.plast_work) != 0:
-        #     paker_depth = self.data_well.perforation_roof - 20
-        #     if paker_depth != '':
-        #         self.paker_depth_edit.setText(str(int(paker_depth)))
-        # else:
-        #     if self.data_well.leakiness:
-        #         paker_depth = min([float(nek.split('-')[0]) - 10
-        #                           for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()])
-
-        # self.paker_depth_zumpf_label = QLabel("Глубина посадки для ЗУМПФа", self)
-        # self.paker_depth_zumpf_edit = QLineEdit(self)
-        # self.paker_depth_zumpf_edit.setValidator(self.validator_int)
-        #
-        # self.pressure_zumpf_question_label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
-        # self.pressure_zumpf_question_combo = QComboBox(self)
-        # self.pressure_zumpf_question_combo.addItems(['Нет', 'Да'])
         self.paker_need_combo.currentTextChanged.connect(self.update_paker_need_ek)
-        #
-        # self.pressure_zumpf_question_combo.currentTextChanged.connect(self.update_paker_zumph)
-        #
-        # self.need_privyazka_Label = QLabel("Привязка оборудования", self)
-        # self.need_privyazka_q_combo = QComboBox()
-        # self.need_privyazka_q_combo.addItems(['Нет', 'Да'])
 
         self.need_change_zgs_label = QLabel('Необходимо ли менять ЖГС', self)
         self.need_change_zgs_combo = QComboBox(self)
@@ -130,7 +101,7 @@ class TabPageSoRir(TabPageUnion):
         self.grid.addWidget(self.sole_rir_LabelType, 4, 5)
         self.grid.addWidget(self.sole_rir_edit, 5, 5)
 
-        self.grid.addWidget(self.diameter_paker_labelType, 1, 1)
+        self.grid.addWidget(self.diameter_paker_label_type, 1, 1)
         self.grid.addWidget(self.diameter_paker_edit, 2, 1)
 
         self.grid.addWidget(self.paker_khost_label, 1, 2)
@@ -199,36 +170,10 @@ class TabPageSoRir(TabPageUnion):
             self.pressure_new_label.setParent(None)
             self.pressure_new_edit.setParent(None)
 
-    # def update_paker_zumph(self, index):
-    #     if index == 'Да':
-    #         if len(self.data_well.plast_work) != 0:
-    #             paker_depth_zumpf = self.data_well.perforation_roof + 10
-    #             self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
-    #         else:
-    #             if self.data_well.dict_leakiness:
-    #                 paker_depth_zumpf = max([float(nek.split('-')[0]) + 10
-    #                                          for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()])
-    #                 self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
-    #
-    #
-    #         self.grid.addWidget(self.paker_depth_zumpf_label, 1, 5)
-    #         self.grid.addWidget(self.paker_depth_zumpf_edit, 2, 5)
-    #     elif index == 'Нет':
-    #         self.paker_depth_zumpf_label.setParent(None)
-    #         self.paker_depth_zumpf_edit.setParent(None)
-    #
-    #
-    #     else:
-    #         paker_depth = self.paker_depth_edit.text()
-    #         if paker_depth != '':
-    #             paker_khost = 10
-    #             self.paker_khost_edit.setText(f'{paker_khost}')
-    #             self.diameter_paker_edit.setText(f'{self.paker_diameter_select(int(float(paker_depth)))}')
-
     def update_depth_paker(self):
 
         self.view_paker_work()
-        
+
         paker_depth = self.paker_depth_edit.text()
         if paker_depth != '':
             self.diameter_paker_edit.setText(f'{self.paker_diameter_select(int(float(paker_depth)))}')
@@ -255,7 +200,7 @@ class TabPageSoRir(TabPageUnion):
             self.paker_depth_edit.setText(f'{self.data_well.perforation_roof - 30}')
             self.roof_rir_edit.setText(f'{self.data_well.perforation_roof - 30}')
             self.sole_rir_edit.setText(f'{self.data_well.current_bottom}')
-        elif index in ['РИР с РПК', 'РИР с РПП', 'Силами ККТ']:
+        elif index in ['РИР с РПК', 'РИР с РПП', 'РПП Силами ККТ']:
             self.need_change_zgs_label.setParent(None)
             self.need_change_zgs_combo.setParent(None)
             self.cement_volume_label.setParent(None)
@@ -275,7 +220,8 @@ class TabPageSoRir(TabPageUnion):
                 self.sole_rir_edit.setText(f'{self.data_well.perforation_roof - 10}')
                 self.paker_depth_edit.setText(f'{self.data_well.perforation_roof - 10}')
         elif index in ['РИР на пере',
-                       'УЦМ в глухой колонне']:  # ['РИР на пере', 'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП']
+                       'УЦМ в глухой колонне',
+                       'РИР с РПП + ЦМ']:  # ['РИР на пере', 'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП']
 
             self.grid.addWidget(self.cement_volume_label, 4, 6)
             self.grid.addWidget(self.cement_volume_line, 5, 6)
@@ -297,14 +243,13 @@ class TabPageSoRir(TabPageUnion):
 
     def update_volume_cement(self):
         if self.roof_rir_edit.text() != '' and self.sole_rir_edit.text() != '':
-            self.cement_volume_line.setText(
-                f'{round(volume_vn_ek(self, float(self.roof_rir_edit.text())) * (float(self.sole_rir_edit.text()) - float(self.roof_rir_edit.text())) / 1000, 1)}')
+            volume_cement = round(volume_vn_ek(self, float(self.roof_rir_edit.text())) * (
+                    float(self.sole_rir_edit.text()) - float(self.roof_rir_edit.text())) / 1000, 1)
+            self.cement_volume_line.setText(f'{min([2, volume_cement])}')
 
     def update_paker_need_ek(self, index):
-
         if index == 'Нужно СПО':
-
-            self.grid.addWidget(self.diameter_paker_labelType, 1, 1)
+            self.grid.addWidget(self.diameter_paker_label_type, 1, 1)
             self.grid.addWidget(self.diameter_paker_edit, 2, 1)
 
             self.grid.addWidget(self.paker_khost_label, 1, 2)
@@ -318,7 +263,7 @@ class TabPageSoRir(TabPageUnion):
             if self.pressure_zumpf_question_combo.currentText() == 'Да':
                 self.paker_depth_zumpf_edit.setText(f'{self.data_well.perforation_sole + 10}')
         else:
-            self.diameter_paker_labelType.setParent(None)
+            self.diameter_paker_label_type.setParent(None)
             self.diameter_paker_edit.setParent(None)
             self.paker_khost_label.setParent(None)
             self.paker_khost_edit.setParent(None)
@@ -418,11 +363,11 @@ class RirWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
             [f'{self.need_opressovki(rir_rpk_plast_true)}', None,
-                f'{self.need_opressovki(rir_rpk_plast_true)} '
-                f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с '
-                f'подтверждением за 2 часа до начала работ) ',
-                None, None, None, None, None, None, None,
-                'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
+             f'{self.need_opressovki(rir_rpk_plast_true)} '
+             f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с '
+             f'подтверждением за 2 часа до начала работ) ',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
             [None, None,
              f'В случае негерметичности э/к, по согласованию с заказчиком произвести ОТСЭК для определения интервала '
              f'негерметичности эксплуатационной колонны с точностью до одного НКТ  с '
@@ -438,6 +383,7 @@ class RirWindow(WindowUnion):
         self.perf_new(roof_rir_edit, roof_rir_edit + 1)
 
         return rir_list
+
     def rir_rpp(self, paker_need_combo, plast_combo,
                 roof_rir_edit, sole_rir_edit, pressure_zumpf_question,
                 diameter_paker=122, paker_khost=0, paker_depth=0):
@@ -451,17 +397,16 @@ class RirWindow(WindowUnion):
         else:
             rir_rpk_plast_true = False
 
-
         rir_work_list = [
-            [f'СПО РПП до глубины {roof_rir_edit}м', None,
-             f'Спустить пакер глухой {self.rpk_nkt(roof_rir_edit)}  на тНКТ{self.data_well.nkt_diam}мм '
-             f'до глубины {roof_rir_edit}м '
+            [f'СПО РПП до глубины {sole_rir_edit}м', None,
+             f'Спустить пакер глухой {self.rpk_nkt(sole_rir_edit)}  на тНКТ{self.data_well.nkt_diam}мм '
+             f'до глубины {sole_rir_edit}м '
              f'с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм. '
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) \n'
              f'Перед спуском технологического пакера произвести визуальный осмотр в присутствии '
              f'представителя РИР или УСРСиСТ.',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(roof_rir_edit, 1.2)],
+             'мастер КРС', descentNKT_norm(sole_rir_edit, 1.2)],
             [f'Привязка по ГК и ЛМ', None,
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
              f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  '
@@ -474,15 +419,13 @@ class RirWindow(WindowUnion):
              f'в присутствии подрядчика по РИР. Составить акт. Вымыть шар обратной промывкой ',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.5 + 0.6],
-            [f'установка РПП на {roof_rir_edit}м', None,
+            [f'установка РПП на {sole_rir_edit}м', None,
              f'Произвести установку глухого пакера  для изоляции {plast_combo} по технологическому плану '
-             f'подрядчика по РИР силами подрядчика по РИР '
-             f'с установкой пакера  на глубине {roof_rir_edit}м',
+             f'с установкой пакера  на глубине {sole_rir_edit}м',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
 
-            [
-                f'{self.need_opressovki(rir_rpk_plast_true)}',
+            [f'{self.need_opressovki(rir_rpk_plast_true)}',
                 None,
                 f'{self.need_opressovki(rir_rpk_plast_true)} '
                 f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с '
@@ -504,6 +447,106 @@ class RirWindow(WindowUnion):
         # print(f'текущий забой {self.data_well.current_bottom}')
         return rir_list
 
+    def rir_rpp_cm(self, paker_need_combo, plast_combo,
+                   roof_rir_edit, sole_rir_edit, volume_cement, need_change_zgs_combo='Нет', plast_new_combo='',
+                   fluid_new_edit='', pressure_new_edit='', pressure_zumpf_question='Не нужно',
+                   diameter_paker=122, paker_khost=0, paker_depth=0):
+        work_list = self.rir_rpp(paker_need_combo, plast_combo,
+                                 roof_rir_edit, sole_rir_edit, pressure_zumpf_question,
+                                 diameter_paker, paker_khost, paker_depth)
+
+        if self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
+                sole_rir_edit > self.data_well.head_column_additional.get_value:
+            dict_nkt = {73: self.data_well.head_column_additional.get_value,
+                        60: sole_rir_edit - self.data_well.head_column_additional.get_value}
+        else:
+            dict_nkt = {73: sole_rir_edit}
+
+        volume_in_nkt, volume_in_ek = RirWindow.calc_buffer(self, roof_rir_edit, sole_rir_edit, dict_nkt)
+
+        rir_list = [
+            [f'УЦМ в инт {roof_rir_edit}-{sole_rir_edit}м', None,
+                     f'Произвести цементную заливку с целью изоляции пласта {plast_combo}  в интервале '
+                     f'{roof_rir_edit}-{sole_rir_edit}м в присутствии '
+                     f'представителя УСРС и СТ',
+                     None, None, None, None, None, None, None,
+                     'мастер КРС', 2.5],
+                    [None, None,
+                     f'Приготовить цементный раствор у=1,82г/см3 в объёме {volume_cement}м3'
+                     f' (сухой цемент {round(volume_cement / 1.25, 1)}т) ',
+                     None, None, None, None, None, None, None,
+                     'мастер КРС', 0.5],
+                    [None, None,
+                     f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме {volume_in_ek}м3,'
+                     f' цементный раствор в '
+                     f'объеме {volume_cement}м3, '
+                     f'довести тех.жидкостью у=1,00г/см3 в объёме {volume_in_nkt}м3, тех. жидкостью  в объёме '
+                     f'{round(volume_vn_nkt(dict_nkt, roof_rir_edit, sole_rir_edit) - volume_in_nkt, 1)}м3. '
+                     f'Уравновешивание цементного раствора',
+                     None, None, None, None, None, None, None,
+                     'мастер КРС', 0.5],
+                    [None, None,
+                     f'Приподнять перо до гл.{roof_rir_edit}м. Закрыть трубное пространство. '
+                     f'Продавить по затрубному пространству '
+                     f'тех.жидкостью  при давлении не более {self.data_well.max_admissible_pressure.get_value}атм '
+                     f'(до получения технологического СТОП).',
+                     None, None, None, None, None, None, None,
+                     'мастер КРС', 0.5],
+                    [None, None,
+                     f'Открыть трубное пространство. Промыть скважину обратной промывкой (срезка) по круговой циркуляции '
+                     f'тех.жидкостью  в объеме не менее {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 уд.весом '
+                     f'{self.data_well.fluid_work} '
+                     f'(Полуторакратный объем НКТ) '
+                     f'с расходом жидкости 8л/с (срезка) до чистой воды.',
+                     None, None, None, None, None, None, None,
+                     'мастер КРС', well_volume_norm(16)]]
+
+        for row in rir_list:
+            work_list.insert(-1, row)
+
+        ozc_list = [
+            [self.ozc_str_short, None,
+             self.ozc_str,
+             None, None, None, None, None, None, None,
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', self.time_ozc],
+            [None, None,
+             f'Спустить перо с замером и шаблонированием НКТ до кровли цементного моста '
+             f'(плановый на гл. {roof_rir_edit}м'
+             f' с прямой промывкой и разгрузкой на забой 3т. Текущий забой согласовать с Заказчиком письменной '
+             f'телефонограммой.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 1.2],
+            [f'Опрессовать цементный мост на Р={self.data_well.max_admissible_pressure.get_value}атм',
+             None,
+             f'Опрессовать цементный мост на Р={self.data_well.max_admissible_pressure.get_value}атм в '
+             f'присутствии представителя '
+             f'УСРСиСТ Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
+             f'с подтверждением за 2 часа до '
+             f'начала работ) В случае негерметичности цементного моста дальнейшие работы согласовать с Заказчиком '
+             f'В случае головы ЦМ ниже планового РИР повторить  с учетом корректировки мощности моста ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.67]]
+        work_list.extend(ozc_list)
+        if need_change_zgs_combo == "Да":
+            for row in Change_fluid_Window.fluid_change(self, plast_new_combo, fluid_new_edit,
+                                                        pressure_new_edit):
+                work_list.append(row)
+            work_list.append([
+                None, None,
+                f'Поднять перо на тНКТ с глубины {roof_rir_edit}м с доливом скважины в '
+                f'объеме {round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью уд.весом {self.data_well.fluid_work}',
+                None, None, None, None, None, None, None,
+                'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
+        else:
+            work_list.append([
+                None, None,
+                f'Поднять перо на тНКТ с глубины {roof_rir_edit}м с доливом скважины в объеме '
+                f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
+                f'уд.весом {self.data_well.fluid_work}',
+                None, None, None, None, None, None, None,
+                'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
+        return work_list
+
     def rir_rpk(self, paker_need_combo, plast_combo,
                 roof_rir_edit, sole_rir_edit, pressure_zumpf_question='Не нужно',
                 diameter_paker=122, paker_khost=0, paker_depth=0):
@@ -518,8 +561,7 @@ class RirWindow(WindowUnion):
 
         if rir_rpk_plast_true:
             rir_q_list = [
-                [f'посадить пакер на глубину {roof_rir_edit}м'
-                    , None,
+                [f'посадить пакер на глубину {roof_rir_edit}м', None,
                  f'посадить пакер на глубину {roof_rir_edit}м',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 1],
@@ -579,11 +621,10 @@ class RirWindow(WindowUnion):
              f'с установкой пакера РПК на глубине {roof_rir_edit}м',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
-            [f'ОЗЦ 16-24 часа', None,
-             f'ОЗЦ 16-24 часа: (по качеству пробы) с момента отстыковки пакера В случае не получения '
-             f'технологического "СТОП" ОЗЦ без давления.',
+            [self.ozc_str_short, None,
+             self.ozc_str,
              None, None, None, None, None, None, None,
-             'Мастер КРС, подрядчик РИР, УСРСиСТ', 16],
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', self.time_ozc],
             [
                 f'{self.need_opressovki(rir_rpk_plast_true)}',
                 None,
@@ -612,6 +653,7 @@ class RirWindow(WindowUnion):
                           f' Р={self.data_well.max_admissible_pressure.get_value}атм в присутствии представителя' \
                           f' заказчика'
         return need_opress
+
     def perf_new(self, roof_rir, sole_rir):
 
         for plast in self.data_well.plast_all:
@@ -670,10 +712,10 @@ class RirWindow(WindowUnion):
         return rpk_nkt_select
 
     def rir_with_pero_gl(self, paker_need_combo, plast_combo,
-                       roof_rir_edit, sole_rir_edit, volume_cement, info_rir_edit='',
+                         roof_rir_edit, sole_rir_edit, volume_cement, info_rir_edit='',
                          need_change_zgs_combo='Нет', plast_new_combo='',
-                       fluid_new_edit='', pressure_new_edit='', pressure_zumpf_question='Не нужно',
-                       diameter_paker=122, paker_khost=0, paker_depth=0):
+                         fluid_new_edit='', pressure_new_edit='', pressure_zumpf_question='Не нужно',
+                         diameter_paker=122, paker_khost=0, paker_depth=0):
 
         nkt_diam = ''.join(['73' if self.data_well.column_diameter.get_value > 110 else '60'])
 
@@ -730,11 +772,10 @@ class RirWindow(WindowUnion):
              f'уд.весом {self.data_well.fluid_work}.',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],
-            [f'ОЗЦ - 23 час', None,
-             f'ОЗЦ - 23 часа (с момента завершения срезки цементного раствора - 24 часа (по качеству пробы))) \n'
-             f'ОЗЦ без давления.',
+            [self.ozc_str_short, None,
+             self.ozc_str,
              None, None, None, None, None, None, None,
-             'мастер КРС', 24],
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', self.time_ozc],
             [None, None,
              f'Допустить компоновку с замером и шаблонированием НКТ до кровли цементного моста (плановый на '
              f'гл. {roof_rir_edit}м'
@@ -800,9 +841,9 @@ class RirWindow(WindowUnion):
         return uzm_pero_list
 
     def rir_with_pero(self, paker_need_combo, plast_combo,
-                    roof_rir_edit, sole_rir_edit, volume_cement, need_change_zgs_combo='Нет', plast_new_combo='',
-                    fluid_new_edit='', pressure_new_edit='', pressure_zumpf_question='Не нужно',
-                    diameter_paker=122, paker_khost=0, paker_depth=0):
+                      roof_rir_edit, sole_rir_edit, volume_cement, need_change_zgs_combo='Нет', plast_new_combo='',
+                      fluid_new_edit='', pressure_new_edit='', pressure_zumpf_question='Не нужно',
+                      diameter_paker=122, paker_khost=0, paker_depth=0):
         from .claySolution import ClayWindow
 
         nkt_diam = ''.join(['73' if self.data_well.column_diameter.get_value > 110 else '60'])
@@ -932,11 +973,10 @@ class RirWindow(WindowUnion):
              f'уд.весом {self.data_well.fluid_work}.',
              None, None, None, None, None, None, None,
              'мастер КРС', 1.2],
-            [None, None,
-             f'ОЗЦ - 23 часа (с момента завершения срезки цементного раствора - 24 часа (по качеству пробы))) \n'
-             f'ОЗЦ без давления.',
+            [self.ozc_str_short, None,
+             self.ozc_str,
              None, None, None, None, None, None, None,
-             'мастер КРС', 24],
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', self.time_ozc],
             [None, None,
              f'Допустить компоновку с замером и шаблонированием НКТ до кровли цементного моста '
              f'(плановый на гл. {roof_rir_edit}м'
@@ -1047,7 +1087,7 @@ class RirWindow(WindowUnion):
     def rir_paker(self, paker_need_combo, plast_combo,
                   roof_rir_edit, sole_rir_edit, pressure_zumpf_question='Не нужно',
                   diameter_paker=122, paker_khost=0, paker_depth=0):
-        
+
         rir_list = self.need_paker(paker_need_combo, plast_combo, diameter_paker, paker_khost,
                                    paker_depth, pressure_zumpf_question)
 
@@ -1062,11 +1102,10 @@ class RirWindow(WindowUnion):
              f'РИР или УСРСиСТ.',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
-            [f'ОЗЦ 16-24 часа', None,
-             f'ОЗЦ 16-24 часа: (по качеству пробы) с момента отстыковки пакера В случае не получения '
-             f'технологического "СТОП" ОЗЦ без давления.',
+            [self.ozc_str_short, None,
+             self.ozc_str,
              None, None, None, None, None, None, None,
-             'Мастер КРС, подрядчик РИР, УСРСиСТ', 24],
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', self.time_ozc],
             [f'Определение кровли', None,
              f'Допустить компоновку с замером и шаблонированием НКТ до кровли цементного моста '
              f'(плановый на '
@@ -1103,8 +1142,8 @@ class RirWindow(WindowUnion):
         return rir_list
 
     def rir_paker_ovp(self, paker_need_combo, plast_combo,
-                  roof_rir_edit, sole_rir_edit, pressure_zumpf_question='Не нужно',
-                  diameter_paker=122, paker_khost=0, paker_depth=0):
+                      roof_rir_edit, sole_rir_edit, pressure_zumpf_question='Не нужно',
+                      diameter_paker=122, paker_khost=0, paker_depth=0):
 
         rir_list = self.need_paker(paker_need_combo, plast_combo, diameter_paker, paker_khost,
                                    paker_depth, pressure_zumpf_question)
@@ -1120,11 +1159,10 @@ class RirWindow(WindowUnion):
              f'РИР или УСРСиСТ.',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
-            [f'ОЗЦ 16-24 часа', None,
-             f'ОЗЦ 16-24 часа: (по качеству пробы) с момента отстыковки пакера В случае не получения '
-             f'технологического "СТОП" ОЗЦ без давления.',
+            [self.ozc_str_short, None,
+             self.ozc_str,
              None, None, None, None, None, None, None,
-             'Мастер КРС, подрядчик РИР, УСРСиСТ', 24],
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', self.time_ozc],
             [f'Определение кровли', None,
              f'Допустить компоновку с замером и шаблонированием НКТ до кровли цементного моста '
              f'(плановый на '
@@ -1150,7 +1188,6 @@ class RirWindow(WindowUnion):
              'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit, 1.2)]
         ]
 
-
         self.data_well.current_bottom = roof_rir_edit
         if OpressovkaEK.testing_pressure(self, roof_rir_edit)[2]:
             rir_paker_list.pop(-2)
@@ -1160,6 +1197,21 @@ class RirWindow(WindowUnion):
 
         self.data_well.for_paker_list = None
         return rir_list
+
+    @staticmethod
+    def calculate_time_ozc(roof_rir_edit):
+        if roof_rir_edit >= 1300:
+            string = f'ОЗЦ 24 часа: (по качеству пробы) с момента отстыковки пакера В случае не получения ' \
+                     f'технологического "СТОП" ОЗЦ без давления.'
+            string_short = 'ОЗЦ 24 часа'
+            time = 24
+
+        else:
+            string = f'ОЗЦ 12-16 часа: (по качеству пробы) с момента отстыковки пакера В случае не получения ' \
+                     f'технологического "СТОП" ОЗЦ без давления.'
+            string_short = 'ОЗЦ 12-16 часа'
+            time = 24
+        return string_short, string, time
 
     def add_work(self):
         try:
@@ -1175,9 +1227,35 @@ class RirWindow(WindowUnion):
                 sole_rir_edit = int(float(sole_rir_edit))
 
             if sole_rir_edit > self.data_well.current_bottom:
-                QMessageBox.warning(self, 'Ошибка', f'Подошва ЦМ ниже текущего забоя - {self.data_well.current_bottom}м')
+                QMessageBox.warning(self, 'Ошибка',
+                                    f'Подошва ЦМ ниже текущего забоя - {self.data_well.current_bottom}м')
                 return
             paker_need_combo = current_widget.paker_need_combo.currentText()
+
+            if paker_need_combo == 'без СПО':
+                difference_date_well = self.difference_date_days(self.data_well.date_commissioning)
+                difference_date_pressuar = self.difference_date_days(self.data_well.result_pressure_date)
+                if difference_date_well > 365.25 * 20:
+                    mes = QMessageBox.question(self, 'Критерии',
+                                               f'Скважина в эксплуатации более {difference_date_well / 365:.0f}лет '
+                                               f'Согласно технологических мероприятий по сокращению продолжительности'
+                                               ' ТКРС от 31 мая 2025г, СПО пакера не нужно только при ПВЛГ и '
+                                               'скважины с периодом эксплуатации более 20 лет')
+
+                if difference_date_pressuar < 365 * 3:
+                    mes = QMessageBox.question(self, 'Критерии',
+                                               f'Последняя опрессовка ЭК более {difference_date_pressuar / 365:.0f}лет '
+                                               f'Согласно технологических мероприятий по сокращению продолжительности'
+                                               f' ТКРС от 31 мая 2025г, СПО пакера не нужно только при ПВЛГ и '
+                                               f'(Отсутствие исследований по герметичности Э/К в течении последних 3 лет')
+
+                if len(self.data_well.leakiness_interval) != 0:
+                    mes = QMessageBox.question(self, 'Критерии', 'В скважине имеется НЭК, РИР без СПО пакер'
+                                                                 ' не желателен')
+
+                if mes == QMessageBox.StandardButton.No:
+                    return
+
             pressure_zumpf_question = current_widget.pressure_zumpf_question_combo.currentText()
             need_change_zgs_combo = current_widget.need_change_zgs_combo.currentText()
             volume_cement = current_widget.cement_volume_line.text().replace(',', '.')
@@ -1191,6 +1269,9 @@ class RirWindow(WindowUnion):
             pressure_new_edit = current_widget.pressure_new_edit.text()
         except Exception:
             QMessageBox.warning(self, 'ОШИБКА', 'Введены не все данные')
+
+        self.ozc_str_short, self.ozc_str, self.time_ozc = self.calculate_time_ozc(roof_rir_edit)
+
         if paker_need_combo == 'Нужно СПО':
             diameter_paker = int(float(current_widget.diameter_paker_edit.text()))
             paker_khost = int(float(current_widget.paker_khost_edit.text()))
@@ -1218,10 +1299,10 @@ class RirWindow(WindowUnion):
                 return
 
             work_list = self.rir_with_pero(paker_need_combo, plast_combo,
-                                         roof_rir_edit, sole_rir_edit, volume_cement, need_change_zgs_combo,
-                                         plast_new_combo,
-                                         fluid_new_edit, pressure_new_edit, pressure_zumpf_question,
-                                         diameter_paker, paker_khost, paker_depth)
+                                           roof_rir_edit, sole_rir_edit, volume_cement, need_change_zgs_combo,
+                                           plast_new_combo,
+                                           fluid_new_edit, pressure_new_edit, pressure_zumpf_question,
+                                           diameter_paker, paker_khost, paker_depth)
 
         elif self.rir_type_combo == 'УЦМ в глухой колонне':  # ['РИР на пере', 'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП']
             if (plast_new_combo == '' or fluid_new_edit == '' or pressure_new_edit == '') and \
@@ -1239,8 +1320,8 @@ class RirWindow(WindowUnion):
 
             work_list = self.rir_with_pero_gl(
                 paker_need_combo, plast_combo, roof_rir_edit, sole_rir_edit, volume_cement, info_rir_edit,
-                need_change_zgs_combo, plast_new_combo,fluid_new_edit, pressure_new_edit, pressure_zumpf_question,
-                                            diameter_paker, paker_khost, paker_depth)
+                need_change_zgs_combo, plast_new_combo, fluid_new_edit, pressure_new_edit, pressure_zumpf_question,
+                diameter_paker, paker_khost, paker_depth)
 
 
 
@@ -1254,8 +1335,8 @@ class RirWindow(WindowUnion):
         elif self.rir_type_combo in ['РИР ОВП с пакером']:
             # print(paker_need_combo, plast_combo, roof_rir_edit, sole_rir_edit)
             work_list = self.rir_paker_ovp(paker_need_combo, plast_combo,
-                                       roof_rir_edit, sole_rir_edit, pressure_zumpf_question,
-                                       diameter_paker, paker_khost, paker_depth)
+                                           roof_rir_edit, sole_rir_edit, pressure_zumpf_question,
+                                           diameter_paker, paker_khost, paker_depth)
             self.calculate_chemistry('РИР ОВП', 1)
 
         elif self.rir_type_combo == 'РИР с РПК':  # ['РИР на пере', 'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП']
@@ -1272,12 +1353,16 @@ class RirWindow(WindowUnion):
                                      diameter_paker, paker_khost, paker_depth)
             self.calculate_chemistry('РПП', volume_cement)
 
-        elif self.rir_type_combo == 'Силами ККТ':  # ['РИР на пере', 'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП']
+        elif self.rir_type_combo == 'РПП Силами ККТ':  # ['РИР на пере', 'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП']
 
             work_list = self.rir_kkt(paker_need_combo, plast_combo,
                                      roof_rir_edit, pressure_zumpf_question,
                                      diameter_paker, paker_khost, paker_depth)
 
+        elif self.rir_type_combo == 'РИР с РПП + ЦМ':
+            work_list = self.rir_rpp_cm(paker_need_combo, plast_combo, roof_rir_edit, sole_rir_edit, volume_cement,
+                            need_change_zgs_combo, plast_new_combo, fluid_new_edit, pressure_new_edit,
+                            pressure_zumpf_question, diameter_paker, paker_khost, paker_depth)
 
         self.populate_row(self.insert_index, work_list, self.table_widget)
         data_list.pause = False
@@ -1424,8 +1509,8 @@ class RirWindow(WindowUnion):
             rir_list.append(row)
 
         self.data_well.current_bottom, ok = QInputDialog.getInt(None, 'Глубина забоя',
-                                                           'Введите глубину текущего забоя после извлечения',
-                                                           int(self.data_well.current_bottom), 0,
-                                                           int(self.data_well.bottom_hole_drill.get_value))
+                                                                'Введите глубину текущего забоя после извлечения',
+                                                                int(self.data_well.current_bottom), 0,
+                                                                int(self.data_well.bottom_hole_drill.get_value))
         self.data_well.for_paker_list = None
         return rir_list

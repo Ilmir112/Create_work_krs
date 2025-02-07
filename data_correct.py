@@ -288,6 +288,10 @@ class TabPageSoCorrect(TabPageUnion):
         self.dinamic_level_edit_type.setText(self.remove_non_numeric_chars(
             self.ifNone(self.data_well.dinamic_level.get_value)))
 
+        self.date_commissioning_Label = QLabel('Дата ввода в эксплуатацию')
+        self.date_commissioning_line = QLineEdit(self)
+        self.date_commissioning_line.setText(self.data_well.date_commissioning)
+
         self.curator_Label = QLabel('Куратор ремонта')
         self.curator_Combo = QComboBox(self)
         self.curator_Combo.setMinimumWidth(50)
@@ -875,7 +879,14 @@ class DataWindow(WindowUnion):
 
         static_level = self.current_widget.static_level_edit_type.text()
         dinamic_level = self.current_widget.dinamic_level_edit_type.text()
+        date_commissioning_line = self.current_widget.date_commissioning_line.text()
         curator = str(self.current_widget.curator_Combo.currentText())
+        if date_commissioning_line.count('.') != 2:
+            if curator != 'ВНС':
+                QMessageBox.warning(self, 'Ошибка', 'Не корректна дата ввода в эскплуатацию')
+                return
+            else:
+                self.data_well.date_commissioning = self.data_well.date_drilling_cancel
 
         if curator == 'ОР':
             expected_pickup_edit = self.current_widget.expected_pickup_edit.text()
@@ -1124,6 +1135,7 @@ class DataWindow(WindowUnion):
             self.data_well.max_expected_pressure = ProtectedIsDigit(self.check_if_none(max_expected_pressure))
             self.data_well.max_admissible_pressure = ProtectedIsDigit(
                 self.check_if_none(max_admissible_pressure))
+            self.data_well.date_commissioning = date_commissioning_line
 
             # print(f'макс {self.data_well.max_expected_pressure.get_value}')
             self.data_well.dict_pump_shgn["before"] = self.check_if_none(dict_pump_shgn_do)
@@ -1197,8 +1209,8 @@ class DataWindow(WindowUnion):
                     self.data_well.template_depth = self.data_well.dict_pump_ecn_depth["before"]
                     self.data_well.template_length = 30
             else:
-                if self.data_well.dict_pump_ecn != '0':
-                    if self.data_well.dict_pump_ecn_depth > self.data_well.head_column_additional.get_value:
+                if self.data_well.dict_pump_ecn != 0:
+                    if self.data_well.dict_pump_ecn_depth["before"] > self.data_well.head_column_additional.get_value:
                         self.data_well.template_depth_addition = self.data_well.dict_pump_ecn_depth
                         self.data_well.template_length_addition = 30
                     else:
@@ -1264,6 +1276,7 @@ class DataWindow(WindowUnion):
                 },
                 'статика': self.data_well.static_level.get_value,
                 'динамика': self.data_well.dinamic_level.get_value,
+                'дата ввода в эксплуатацию': self.data_well.date_commissioning,
                 'НКТ': {
                     'До': self.data_well.dict_nkt_before,
                     "После": self.data_well.dict_nkt_after

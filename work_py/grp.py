@@ -13,7 +13,7 @@ class TabPageSoGrp(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.diameter_paker_labelType = QLabel("Диаметр пакера", self)
+        self.diameter_paker_label_type = QLabel("Диаметр пакера", self)
         self.diameter_paker_edit = QLineEdit(self)
 
         self.paker_khost_label = QLabel("Длина хвостовика", self)
@@ -57,7 +57,7 @@ class TabPageSoGrp(TabPageUnion):
 
         # self.grid = QGridLayout(self)
 
-        self.grid.addWidget(self.diameter_paker_labelType, 3, 1)
+        self.grid.addWidget(self.diameter_paker_label_type, 3, 1)
         self.grid.addWidget(self.diameter_paker_edit, 4, 1)
 
         self.grid.addWidget(self.paker_khost_label, 3, 2)

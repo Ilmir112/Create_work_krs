@@ -24,7 +24,7 @@ class TabPageSoLar(TabPageUnion):
 
         self.lar_type_label = QLabel("Тип ловителя", self)
         self.lar_type_combo = QComboBox(self)
-        raid_type_list = ['ОВ', 'ВТ', 'метчик', 'колокол', 'МЭС', 'МБУ']
+        raid_type_list = ['ОВ', 'ВТ', 'метчик', 'колокол', 'МЭС', 'МБУ', 'штанголовитель']
         self.lar_type_combo.addItems(raid_type_list)
 
         self.nkt_select_label = QLabel("компоновка", self)
@@ -62,10 +62,10 @@ class TabPageSoLar(TabPageUnion):
         self.bottom_line = QLineEdit(self)
         self.bottom_line.setClearButtonEnabled(True)
 
-        self.nkt_str_label = QLabel("НКТ или СБТ", self)
+        self.nkt_str_label = QLabel("НКТ или СБТ, штанги", self)
         self.nkt_str_combo = QComboBox(self)
         self.nkt_str_combo.addItems(
-            ['НКТ', 'СБТ'])
+            ['НКТ', 'СБТ', "штанги"])
         # self.nkt_select_combo.currentTextChanged.connect(self.update_nkt)
 
         # self.grid = QGridLayout(self)
@@ -192,11 +192,15 @@ class EmergencyLarWork(WindowUnion):
         if nkt_str_combo == 'НКТ':
             raid_list = self.emergencyNKT(lar_diameter_line, nkt_key, lar_type_combo, nkt_str_combo,
                                           emergency_bottom_line, bottom_line)
+            self.data_well.current_bottom = bottom_line
         elif nkt_str_combo == 'СБТ':
             raid_list = self.emergence_sbt(lar_diameter_line, nkt_key, lar_type_combo,
                                            emergency_bottom_line, bottom_line, gidroayss_combo, ubt_combo, udlinitelel,
                                            udlinitelel_length)
-        self.data_well.current_bottom = bottom_line
+            self.data_well.current_bottom = bottom_line
+        elif nkt_str_combo == 'штанги':
+            raid_list = self.emergency_pods(lar_diameter_line, nkt_key, lar_type_combo, nkt_str_combo,
+                                          emergency_bottom_line, bottom_line)
 
         self.populate_row(self.insert_index, raid_list, self.table_widget)
         data_list.pause = False
@@ -302,7 +306,7 @@ class EmergencyLarWork(WindowUnion):
         emergencyNKT_list = [
             [None, 'СПО ловильного оборудования',
              f'По согласованию с аварийной службой УСРСиСТ, сборка и спуск компоновки: '
-             f'Спустить с замером {lar_type_combo}-{lar_diameter_line} + {magnet_select(self, nkt_str_combo)} на '
+             f'Спустить с замером {lar_type_combo}-{lar_diameter_line} + штангах на '
              f'{nkt_str_combo} до Н= {emergency_bottom_line}м с замером . ',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(emergency_bottom_line, 1.2)],
@@ -330,6 +334,39 @@ class EmergencyLarWork(WindowUnion):
              f'При положительных результатах расхаживания - демонтаж ведущей трубы. '
              f'Поднять компоновку с доливом тех жидкости в '
              f'объеме {round(self.data_well.current_bottom * 1.25 / 1000, 1)}м3'
+             f' удельным весом {self.data_well.fluid_work}.',
+             None, None, None, None, None, None, None,
+             'Мастер', liftingNKT_norm(self.data_well.current_bottom, 1)],
+        ]
+        self.data_well.current_bottom = bottom_line
+
+        return emergencyNKT_list
+
+    def emergency_pods(self, lar_diameter_line, nkt_key, lar_type_combo, nkt_str_combo,
+                     emergency_bottom_line, bottom_line):
+
+        emergencyNKT_list = [
+            [None, 'СПО ловильного оборудования',
+             f'По согласованию с аварийной службой УСРСиСТ, сборка и спуск компоновки: '
+             f'Спустить с замером {lar_type_combo}-{lar_diameter_line} + штангах на '
+             f'{nkt_str_combo} до Н= {emergency_bottom_line}м с замером . ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', descentNKT_norm(emergency_bottom_line, 1.2)],
+
+            [f'ЛАР', None,
+             f'Произвести ловильные работы на "голове" аварийной компоновки. Количество подходов '
+             f'инструмента  согласовать с аварийной службой супервайзинга.'],
+            [None, None,
+             f'Произвести расхаживание аварийной компоновки с постепенным увеличением'
+             f' веса до 10т. Дальнейшие '
+             f'увеличение нагрузки согласовать с УСРСиСТ. При отрицательных '
+             f'результатах произвести освобождение ',
+             None, None, None, None, None, None, None,
+             'мастер КРС, УСРСиСТ', 10],
+            [None, None,
+             f'П. '
+             f'Поднять компоновку с доливом тех жидкости в '
+             f'объеме {round(self.data_well.current_bottom * 0.25 / 1000, 1)}м3'
              f' удельным весом {self.data_well.fluid_work}.',
              None, None, None, None, None, None, None,
              'Мастер', liftingNKT_norm(self.data_well.current_bottom, 1)],

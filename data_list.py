@@ -118,7 +118,7 @@ DICT_VOLUME_CHEMISTRY = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF'
 data = ''
 row_heights = ''
 data_well_is_True = False
-current_date = datetime.now().date()
+current_date = datetime.now()
 
 col_width = ''
 boundaries_dict = ''

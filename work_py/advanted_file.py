@@ -64,7 +64,7 @@ def skm_interval(self, template):
 
     for interval in merged_segments:
 
-        if template in ['ПСШ ЭК', 'ПСШ без хвоста', 'ПСШ открытый ствол', 'СГМ ЭК', 'СГМ открытый ствол']:
+        if template in ['ПСШ ЭК', 'ПСШ без хвоста', 'ПСШ открытый ствол', 'СГМ ЭК', 'СГМ открытый ствол', 'ПСШ + пакер']:
             if self.data_well.skm_depth >= interval[1] > interval[0]:
                 merged_segments_new.append(interval)
             elif interval[1] >= self.data_well.skm_depth >= interval[0] and interval[1] > interval[0]:

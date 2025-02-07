@@ -17,7 +17,7 @@ class TabPageSo_aspo(TabPageUnion):
 
         self.validator = QIntValidator(0, 5000)
 
-        self.diameter_paker_labelType = QLabel("Диаметр пакера", self)
+        self.diameter_paker_label_type = QLabel("Диаметр пакера", self)
         self.diameter_paker_edit = QLineEdit(self)
         self.diameter_paker_edit.setValidator(self.validator)
 
@@ -41,7 +41,7 @@ class TabPageSo_aspo(TabPageUnion):
 
         # self.grid = QGridLayout(self)
 
-        self.grid.addWidget(self.diameter_paker_labelType, 3, 1)
+        self.grid.addWidget(self.diameter_paker_label_type, 3, 1)
         self.grid.addWidget(self.diameter_paker_edit, 4, 1)
 
         self.grid.addWidget(self.paker_khost_label, 3, 2)

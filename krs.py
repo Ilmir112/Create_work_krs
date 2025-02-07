@@ -160,7 +160,7 @@ class TabPageGno(TabPageUnion):
         if work_plan != 'gnkt_frez':
             self.data_well.current_bottom = current_bottom
         # Задаем начальную и конечную даты периода
-        current_date = data_list.current_date
+        current_date = data_list.current_date.date()
         if current_date.month > 4:
             start_date = datetime(current_date.year, 12, 1).date()
             end_date = datetime(current_date.year + 1, 4, 1).date()
@@ -297,6 +297,9 @@ class GnoWindow(WindowUnion):
             if check_question == QMessageBox.StandardButton.No:
                 return
             if work_list:
+                if self.data_well.work_plan != 'krs':
+                    work_list = work_list[2:]
+
                 self.populate_row(self.insert_index, work_list, self.table_widget)
 
                 data_list.pause = False
@@ -663,10 +666,11 @@ class GnoParent(ABC):
                                  'глушение скважины по дополнительному плану работ'
 
             # print([well_jamming_str, well_jamming_list2, well_jamming_short])
-        return [well_jamming_str, well_jamming_list2, well_jamming_short]
+        return [well_jamming_str  + '\nОпределить приемистость пласта при Р=80-120атм', well_jamming_list2,
+                well_jamming_short  + '\nОпределить приемистость пласта при Р=80-120атм']
 
     def calculate_hard_fluid(self):
-        current_date = data_list.current_date
+        current_date = data_list.current_date.date()
         if current_date.month > 4:
             start_date = datetime(current_date.year, 12, 1).date()
             end_date = datetime(current_date.year + 1, 4, 1).date()

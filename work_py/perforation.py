@@ -89,7 +89,6 @@ class PerforationWindow(WindowUnion):
     def __init__(self, data_well, table_widget, parent=None):
         super().__init__(data_well)
 
-
         self.insert_index = data_well.insert_index
         self.tabWidget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
@@ -125,9 +124,10 @@ class PerforationWindow(WindowUnion):
         vbox.addWidget(self.buttonAddProject, 3, 1)
 
     def closeEvent(self, event):
-                # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window  = None
+        # Закрываем основное окно при закрытии окна входа
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
+
     def addPerfProject(self):
 
         if self.data_well.grp_plan:
@@ -371,7 +371,6 @@ class PerforationWindow(WindowUnion):
             roof = self.tableWidget.item(row, 0).text().replace(',', '.')
             sool = self.tableWidget.item(row, 1).text().replace(',', '.')
 
-
             # pvr_str = TabPageSo.select_type_perforation(self, sool)
             if type_perforation == 'Трубная перфорация':
                 perforation[2] = [f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)", None,
@@ -424,25 +423,53 @@ class PerforationWindow(WindowUnion):
                             None, None, None, None, None, None, None,
                             'Подрядчик по ГИС', 2])
         # print([self.data_well.dict_perforation[plast] for plast in self.data_well.plast_work])
-        pipe_perforation = [
-            [f'монтаж трубного перфоратора', None,
-             f'Произвести монтаж трубного перфоратора + 2шт/20м НКТ + реперный '
-             f'патрубок L=2м до намеченного интервала перфорации '
-             f'(с шаблонировкой НКТ{self.data_well.nkt_diam}мм шаблоном {self.data_well.nkt_template}мм. '
-             f'Спуск компоновки производить  со скоростью не более 0,30 м/с, не допуская резких ударов и вращения.'
-             f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации, '
-             f'фотографии предоставить в ЦИТС {data_list.contractor}, передать по сводке уровня '
-             f'жидкости до перфорации и после перфорации) '
-             f'(При СПО первых десяти НКТ на спайдере дополнительно '
-             f'устанавливать элеватор ЭХЛ).',
-             None, None, None, None, None, None, None,
-             'Подрядчик по ГИС, мастер КРС', None, None],
-            [None, None, 'Произвести ГИС привязку трубного перфоратора по ГК, ЛМ.',
-             None, None, None, None, None, None, None,
-             'Подрядчик по ГИС', None, None]]
+
+
         if type_perforation == 'Трубная перфорация':
-            QMessageBox.information(self, 'Проверка',
-                                          'Необходимо проверить длину шаблона, должна быть не менее 10м')
+            pipe_perforation = [
+                [f'монтаж трубного перфоратора', None,
+                 f'Произвести монтаж трубного перфоратора + 2шт/20м НКТ + реперный '
+                 f'патрубок L=2м до намеченного интервала перфорации '
+                 f'(с шаблонировкой НКТ{self.data_well.nkt_diam}мм шаблоном {self.data_well.nkt_template}мм. '
+                 f'Спуск компоновки производить  со скоростью не более 0,30 м/с, не допуская резких ударов и вращения.'
+                 f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации, '
+                 f'фотографии предоставить в ЦИТС {data_list.contractor}, передать по сводке уровня '
+                 f'жидкости до перфорации и после перфорации) '
+                 f'(При СПО первых десяти НКТ на спайдере дополнительно '
+                 f'устанавливать элеватор ЭХЛ). ',
+                 None, None, None, None, None, None, None,
+                 'Подрядчик по ГИС, мастер КРС', None, None],
+                [None, None, 'Произвести ГИС привязку трубного перфоратора по ГК, ЛМ.',
+                 None, None, None, None, None, None, None,
+                 'Подрядчик по ГИС', None, None]]
+            if self.data_well.column_additional is False:
+                mes = QMessageBox.warning(self, 'пакер при трубной перфорации',
+                                          'Внедрять ли пакер в компоновку с трубным перфоратором')
+                if mes == QMessageBox.StandardButton.Yes:
+                    pipe_perforation[0] = [
+                        f'монтаж трубного перфоратора + ПАКЕР', None,
+                        f'Произвести монтаж трубного перфоратора + 2шт/20м НКТ + пакер + НКТ 20м + реперный '
+                        f'патрубок L=2м до намеченного интервала перфорации '
+                        f'(с шаблонировкой НКТ{self.data_well.nkt_diam}мм шаблоном {self.data_well.nkt_template}мм. '
+                        f'Спуск компоновки производить  со скоростью не более 0,30 м/с, не допуская резких ударов '
+                        f'и вращения.'
+                        f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации, '
+                        f'фотографии предоставить в ЦИТС {data_list.contractor}, передать по сводке уровня '
+                        f'жидкости до перфорации и после перфорации) '
+                        f'(При СПО первых десяти НКТ на спайдере дополнительно '
+                        f'устанавливать элеватор ЭХЛ). ',
+                        None, None, None, None, None, None, None,
+                        'Подрядчик по ГИС, мастер КРС', None, None]
+
+                    pipe_perforation.insert(0, [
+                        None, None, 'Согласно технологических мероприятий по сокращению продолжительности '
+                                    'ТКРС от 31 мая 2025г НУЖНО СОГЛАСОВАТЬ С ЗАКАЗЧИКОВ ВНЕДРЕНИЯ В КОМПОНОВКУ'
+                                    ' ПАКЕРА ДЛЯ ПРОВЕДЕНИЯ '
+                                    'СКО И ОСВОЕНИЯ ОДНИМ СПО)',
+                        None, None, None, None, None, None, None,
+                        'Подрядчик по ГИС, заказчик', None, None])
+            # QMessageBox.information(self, 'Проверка',
+            #                               'Необходимо проверить длину шаблона, должна быть не менее 10м')
             for i in range(len(pipe_perforation)):
                 perforation.insert(i + 1, pipe_perforation[i])
 
@@ -483,7 +510,6 @@ class PerforationWindow(WindowUnion):
             self.table_widget.setRowHeight(self.insert_index + 1, 60)
 
             self.close()
-
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()

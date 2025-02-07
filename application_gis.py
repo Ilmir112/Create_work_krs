@@ -29,7 +29,7 @@ class TabPageSoPvr(TabPageUnion):
 
         self.date_new_label = QLabel('Дата заявки', self)
         self.date_new_edit = QLineEdit(self)
-        self.date_new_edit.setText(f'{data_list.current_date}')
+        self.date_new_edit.setText(f'{data_list.current_date.date()}')
 
         self.time_new_label = QLabel('Время заявки', self)
         self.time_new_edit = QLineEdit(self)
@@ -394,7 +394,7 @@ class GisApplication(MyMainWindow):
 
         self.ws_pvr.print_area = f'B1:AP{85}'
 
-        filenames = f'{self.data_well.well_number.get_value} {self.data_well.well_area.get_value} ГИС {data_list.current_date}.xlsx'
+        filenames = f'{self.data_well.well_number.get_value} {self.data_well.well_area.get_value} ГИС {data_list.current_date.date()}.xlsx'
         path = 'D:\Documents\Desktop\ГТМ\заявки ГИС'
         full_path = path + "/" + filenames
         if wb:

@@ -463,13 +463,13 @@ class GnktModel(WindowUnion):
                     elif 'Зуфаров' in str(value):
                         coordinate = f'{get_column_letter(col - 2)}{row_ind}'
                         self.insert_image(ws2, f'{data_list.path_image}imageFiles/Зуфаров.png', coordinate)
-                    elif 'М.К.Алиев' in str(value):
-                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
-                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/Алиев махир.png', coordinate)
-                    elif 'З.К. Алиев' in str(value):
-                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 2}'
-                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/Алиев Заур.png', coordinate)
-                        break
+                    elif 'Закиев И.Э.' in str(value):
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/Закиев.png', coordinate)
+
+                    elif 'И.А. Котиков' in str(value):
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/Котиков.png', coordinate)
 
     def work_with_data_gnkt(self):
         if self.data_gnkt is None:
@@ -748,7 +748,8 @@ class GnktModel(WindowUnion):
                         if pressure != 0:
                             pressure.append(max(list(map(
                                 float, self.data_well.dict_perforation[plast_ind]["давление"]))))
-                            vertikal.append(min(self.data_well.dict_perforation[plast_ind]["вертикаль"]))
+                            if "вертикаль" in list(self.data_well.dict_perforation[plast_ind].keys()):
+                                vertikal.append(min(self.data_well.dict_perforation[plast_ind]["вертикаль"]))
             else:
                 pressure.append(max(list(map(
                     float, self.data_well.dict_perforation[plast_ind]["давление"]))))
@@ -1139,8 +1140,10 @@ class GnktModel(WindowUnion):
                         if self.data_well.dict_perforation[plast]['кровля'] < \
                                 self.data_well.depth_fond_paker_before["before"]:
                             izol = 'над пакером'
-
-                    vertikal_1 = min(self.data_well.dict_perforation[plast]['вертикаль'])
+                    if 'вертикаль' in self.data_well.dict_perforation[plast].keys():
+                        vertikal_1 = min(self.data_well.dict_perforation[plast]['вертикаль'])
+                    else:
+                        vertikal_1 = None
                     pressure_1 = self.data_well.dict_perforation[plast]['давление'][0]
                     zamer_1 = self.data_well.dict_perforation[plast]['замер'][0]
 

@@ -231,6 +231,7 @@ class GnoDescentWindow(WindowUnion):
                     return
         return True
 
+
     def add_work(self):
 
         self.current_widget = self.tabWidget.currentWidget()
@@ -298,6 +299,26 @@ class DescentParent(ABC):
     @abstractmethod
     def execute(self) -> String:
         NotImplementedError('Не выбран метод реализации, метод должен быть переопределен')
+
+    @staticmethod
+    def insert_text_depth_paker_1000(depth):
+        if depth < 1000:
+            work_list = [
+                [None, None,
+                 f'При посадки пакерного устройства с верхним механическим якорем в скважине на плановой глубине до '
+                 f'1000м, обеспечить контрольную проверку посадки пакерного устройства путем создания '
+                 f'натяжения (без рывков) колонны НКТ+пакер на величину превышающую собственный вес компоновки на 2 тонны.'
+                 f'Контрольную проверку выполнять сразу после посадки пакерного устройства в скважине. '
+                 f'В случае, если при натяжении парное устройство сорвалось с места посадки, '
+                 f'что характеризуется падением показаний на индикаторе веста до собственного веса'
+                 f'компоновки - выполнить повторную посадку с проведением контрольной проверки.\n'
+                 f'При повторении отрицательного результата посадки - подать оперативную заявку на замену '
+                 f'пакерного устройства\n'
+                 f'Результаты контрольной проверки необходимо оформлять актом и отражать в ежедневных сводках ТКРС',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', float(8.5)]
+            ]
+            return work_list
 
     def jumping_after_sko(self):
         jumping_sko_list = []
@@ -635,6 +656,9 @@ class DescentPaker(DescentParent):
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', 0.67],
         ]
+        work_list_depth = self.insert_text_depth_paker_1000(self.data_well.depth_fond_paker_before["after"])
+        if work_list_depth:
+            paker_descent.insert(-2, work_list_depth[0])
 
         if self.need_privyazka_nkt():
             if privyazka_nkt(self)[0] not in paker_descent:
@@ -648,6 +672,9 @@ class DescentPaker(DescentParent):
             else:
                 for row in rgd_with_paker(self):
                     paker_descent.append(row)
+        else:
+            QMessageBox.warning(self, 'РГД не проводиться', 'При не проведении РГД при бригаде кислотную обработку '
+                                                            'нужно запланировать на фондовом НКТ с обранной арматурой')
         return paker_descent
 
 

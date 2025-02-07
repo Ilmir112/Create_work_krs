@@ -31,13 +31,13 @@ class TabPageUnion(QWidget):
         self.paker_khost_edit = None
         self.paker_khost_label = None
         self.diameter_paker_edit = None
-        self.diameter_paker_labelType = None
+        self.diameter_paker_label_type = None
         self.validator_float = QDoubleValidator(0.0, 8000.0, 2)
         self.validator_int = QIntValidator(0, 8000)
         self.data_well = data_well
 
     def view_paker_work(self):
-        self.diameter_paker_labelType = QLabel("Диаметр пакера", self)
+        self.diameter_paker_label_type = QLabel("Диаметр пакера", self)
         self.diameter_paker_edit = QLineEdit(self)
 
         self.paker_khost_label = QLabel("Длина хвостовика", self)
@@ -73,7 +73,7 @@ class TabPageUnion(QWidget):
         if paker_depth != '':
             self.paker_depth_edit.setText(str(int(paker_depth)))
 
-        self.grid.addWidget(self.diameter_paker_labelType, 1, 1)
+        self.grid.addWidget(self.diameter_paker_label_type, 1, 1)
         self.grid.addWidget(self.diameter_paker_edit, 2, 1)
 
         self.grid.addWidget(self.paker_khost_label, 1, 2)
@@ -86,6 +86,16 @@ class TabPageUnion(QWidget):
         self.grid.addWidget(self.pressure_zumpf_question_combo, 2, 4)
         self.grid.addWidget(self.need_privyazka_Label, 1, 6)
         self.grid.addWidget(self.need_privyazka_q_combo, 2, 6)
+
+    @staticmethod
+    def difference_date_days(date1, today=data_list.current_date):
+        # Задание дат
+        date1 = datetime.strptime(date1, "%d.%m.%Y")
+
+        # Вычисление разницы в днях
+        difference = (today - date1).days
+
+        return difference
 
     def update_paker_need(self, index):
         if index == 'Нет':
@@ -262,6 +272,15 @@ class WindowUnion(MyMainWindow):
     def __init__(self, data_well: FindIndexPZ):
         super().__init__()
         self.data_well = data_well
+        self.tableWidget = None
+
+
+    def find_item_in_table(self, value):
+        for row in range(self.tableWidget.rowCount()):
+            item = self.tableWidget.item(row, 0)  # Проверяем первый столбец
+            if item and item.text() == str(value):
+                return item
+        return None
 
     def calc_fond_nkt(self, len_nkt: str, distance_between_nkt: str) -> List:
 
@@ -300,6 +319,16 @@ class WindowUnion(MyMainWindow):
         elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110:
             return f'НКТ{self.data_well.nkt_diam}мм со снятыми фасками L- ' \
                    f'{round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value + 20, 0)}'
+
+    @staticmethod
+    def difference_date_days(date1, today=data_list.current_date):
+        # Задание дат
+        date1 = datetime.strptime(date1, "%d.%m.%Y")
+
+        # Вычисление разницы в днях
+        difference = (today - date1).days
+
+        return difference
 
     @staticmethod
     def read_excel_in_base(number_well, area_well, work_plan, type_kr):

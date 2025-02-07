@@ -27,6 +27,7 @@ class FindIndexPZ(MyMainWindow):
         self.perforation_sole = 5000
         self.number_dp = 0
         self.image_loader = None
+        self.result_pressure_date = None
 
         self.fluid_work = None
         self.nkt_template = None
@@ -115,6 +116,7 @@ class FindIndexPZ(MyMainWindow):
         self.angle_data = []
         self.expected_oil = 0
         self.water_cut = 0
+        self.date_commissioning = '01.01.2000'
         self.expected_pressure = 0
         self.appointment_well = ProtectedIsNonNone('')
         self.expected_pickup = 0
@@ -982,6 +984,15 @@ class WellFondData(FindIndexPZ):
                             if paker_do["after"] != 0:
                                 depth_fond_paker_do["after"] = row[col_plan]
 
+        if self.depth_fond_paker_before["after"] < 900 and self.paker_before['after'] != 0 and \
+            '89' not in list(self.dict_nkt_after.keys) and self.dict_pump_ecn['after'] == 0 and\
+                self.dict_pump_shgn['after'] == 0:
+            QMessageBox.warning(self, 'НКТ89мм', f'При глубине спуска ф.пакера до глубины 900м '
+                                                 f'необходимо использование НКТ89мм, а не {list(self.dict_nkt_after.keys)}')
+            self.check_data_in_pz.append(f'Согласно мероприятий по недопущению разгерметизации системы НКТ- пакер от 20.04.2021:\n'
+                                         f'При глубине спуска ф.пакера до глубины 900м '
+                                         f'необходимо использование НКТ89мм, а не {list(self.dict_nkt_after.keys)}')
+
         if wellhead_fittings in [None, '']:
             self.check_data_in_pz.append('Не указан тип устьевой арматуры\n '
                                          'Нарушен п. 9.1.9 инструкции БНД по предупреждению ГНВП №ПЗ-05 И-102089 ЮЛ-305')
@@ -1064,6 +1075,11 @@ class WellHistoryData(FindIndexPZ):
                             self.result_pressure,
                             row_index + begin_index,
                             col + 1, 1)
+                    elif 'Дата опрессовки' in str(value):
+                        self.result_pressure_date = ProtectedIsDigit(row[col + 2])
+                        if type(self.result_pressure_date) is datetime:
+                            self.result_pressure_date = self.result_pressure_date.strftime(
+                                '%d.%m.%Y')
 
                     elif 'Первоначальное давление опрессовки э/колонны' == value:
                         self.first_pressure = ProtectedIsDigit(row[col + 3])

@@ -177,7 +177,6 @@ class Raid(WindowUnion):
     def __init__(self, data_well, table_widget, parent=None):
         super().__init__(data_well)
 
-
         self.insert_index = data_well.insert_index
         self.tabWidget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
@@ -270,13 +269,17 @@ class Raid(WindowUnion):
                                       'Не выбраны интервалы райбирования')
             return
 
-        rows = self.tableWidget.rowCount()
-
         for roof, sole in raiding_interval:
-            self.tableWidget.insertRow(rows)
-            self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(int(roof))))
-            self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(int(sole))))
-            self.tableWidget.setSortingEnabled(False)
+            # Проверяем, что roof и sole еще не присутствуют в таблице
+            item_roof = self.find_item_in_table(int(roof))
+            item_sole = self.find_item_in_table(int(roof))
+
+            if item_roof is None and item_sole is None:
+                rows = self.tableWidget.rowCount()  # Получаем текущее количество строк
+                self.tableWidget.insertRow(rows)
+                self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(int(roof))))
+                self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(int(sole))))
+                self.tableWidget.setSortingEnabled(False)
 
     def add_work(self):
         nkt_str_combo = self.tabWidget.currentWidget().nkt_str_combo.currentText()

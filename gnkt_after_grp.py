@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 
 import data_list
 import work_py.alone_oreration
-from krs import GnoWindow
 
 
 def gnkt_work(self, volume_gntk, fluid_work_insert):

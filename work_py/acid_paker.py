@@ -178,7 +178,8 @@ class TabPageSoAcid(TabPageUnion):
         self.paker_layout_label = QLabel("Компоновка пакеров", self)
         self.paker_layout_combo = QComboBox(self)
         paker_layout_list = ['воронка', 'однопакерная', 'двухпакерная',
-                             'однопакерная, упорный', 'двухпакерная, упорные', 'пакер с заглушкой']
+                             'однопакерная, упорный', 'двухпакерная, упорные', 'пакер с заглушкой',
+                             'без монтажа компоновки на спуск']
         self.paker_layout_combo.addItems(paker_layout_list)
 
         self.swab_true_label_type = QLabel("необходимость освоения", self)
@@ -192,12 +193,14 @@ class TabPageSoAcid(TabPageUnion):
 
         self.pakerLabel = QLabel("глубина пакера", self)
         self.paker_depth = QLineEdit(self)
+        self.diameter_paker_label_type = QLabel("Диаметр пакера", self)
+        self.diameter_paker_edit = QLineEdit(self)
 
         self.paker2Label = QLabel("глубина верхнего пакера", self)
         self.paker2_depth = QLineEdit(self)
         self.paker2_depth.setText(f'{int(self.data_well.perforation_roof - 20)}')
 
-        self.diameter_paker_labelType = QLabel("Диаметр пакера", self)
+        self.diameter_paker_label_type = QLabel("Диаметр пакера", self)
         self.diameter_paker_edit = QLineEdit(self)
 
         self.kvost_label = QLabel("Длина хвостовики", self)
@@ -325,7 +328,7 @@ class TabPageSoAcid(TabPageUnion):
         self.grid.addWidget(self.plast_combo, 3, 1)
         self.grid.addWidget(self.depth_gauge_label, 2, 2)
         self.grid.addWidget(self.depth_gauge_combo, 3, 2)
-        self.grid.addWidget(self.diameter_paker_labelType, 2, 3)
+        self.grid.addWidget(self.diameter_paker_label_type, 2, 3)
         self.grid.addWidget(self.diameter_paker_edit, 3, 3)
         self.grid.addWidget(self.kvost_label, 2, 4)
         self.grid.addWidget(self.paker_khost, 3, 4)
@@ -624,6 +627,11 @@ class TabPageSoAcid(TabPageUnion):
                 self.paker_depth.setText(f"{paker_depth}")
                 self.paker2_depth.setText(f"{int(roof_plast - 10)}")
                 self.swab_paker_depth.setText(str(paker_depth))
+        elif self.paker_layout_combo.currentText() == 'без монтажа компоновки на спуск':
+            self.paker_khost.setText(f'')
+            self.paker_depth.setText(f'')
+            self.paker2_depth.setText(f'')
+            self.swab_paker_depth.setText(f'')
 
         # print(f'кровля {roof_plast}, подошва {sole_plast}')
 
@@ -1049,7 +1057,8 @@ class AcidPakerWindow(WindowUnion):
                     acidOilProc = 0
 
                 work_template_list = self.voronka_layout(swab_true_edit_type, paker_khost, depth_gauge_combo)
-
+            elif self.paker_layout_combo == 'без монтажа компоновки на спуск':
+                work_template_list = []
             if svk_true_combo == 'Нужно СКВ':
                 work_template_list.extend(self.skv_acid_work(skv_acid_edit, skv_proc_edit, skv_volume_edit))
             if sko_true_combo == 'Да':
