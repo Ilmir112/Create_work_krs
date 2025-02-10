@@ -1,3 +1,5 @@
+import datetime
+
 from PyQt5 import QtCore
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QComboBox, QLabel, QLineEdit, QGridLayout, QMessageBox, QWidget, QPushButton, QApplication
@@ -890,6 +892,14 @@ class DataWindow(WindowUnion):
                 return
             else:
                 self.data_well.date_commissioning = self.data_well.date_drilling_cancel
+
+            try:
+                # Попытка распарсить строку в формате 'ДД.ММ.ГГГГ'
+                datetime.strptime(date_commissioning_line, '%d.%m.%Y')
+
+            except ValueError:
+                QMessageBox.warning(self, 'Ошибка', 'Не корректна дата ввода в эскплуатацию')
+                return
 
         if curator == 'ОР':
             expected_pickup_edit = self.current_widget.expected_pickup_edit.text()
