@@ -1,13 +1,14 @@
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 import os
+import data_list
 
 
 
 
 def decrypt(name):
     # Загрузка ключа
-    with open('key.key', 'rb') as key_file:
+    with open(f"{data_list.path_image}key.key", 'rb') as key_file:
         key = key_file.read()
     cipher = Fernet(key)
 
