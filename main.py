@@ -986,14 +986,6 @@ class MyWindow(MyMainWindow):
         # self.thread.started.connect(self.excepthook.handleException)
         self.thread.start()
 
-        if getattr(sys, 'frozen', False):
-            # Скомпилированное приложение
-            data_list.path_image = '_internal/'
-        else:
-            # Режим разработки
-            data_list.path_image = ''
-
-        print(f"Путь к изображению: {data_list.path_image}")
 
     #     self.check_for_updates()
     #
@@ -2662,6 +2654,15 @@ if __name__ == "__main__":
     #         data_list.pause = False
     #         # app2.close()
     try:
+        if getattr(sys, 'frozen', False):
+            # Скомпилированное приложение
+            data_list.path_image = '_internal/'
+        else:
+            # Режим разработки
+            data_list.path_image = ''
+
+        print(f"Путь к изображению: {data_list.path_image}")
+
         data_list.connect_in_base = connect_to_database(decrypt("DB_NAME_USER"))
 
         login_window = LoginWindow()
