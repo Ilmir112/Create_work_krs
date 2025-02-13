@@ -1,4 +1,3 @@
-import keyring
 from datetime import datetime
 from openpyxl.styles import Border, Side, PatternFill
 
