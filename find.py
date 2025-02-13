@@ -311,7 +311,7 @@ class FindIndexPZ(MyMainWindow):
                     any(['IX. Мероприятия по предотвращению аварий, инцидентов и осложнений::' in str(col) for col in
                          row]):
 
-                self.data_well_max = ProtectedIsDigit(row_ind -1)
+                self.data_well_max = ProtectedIsDigit(row_ind - 1)
 
             elif 'НКТ' == str(row[1]).upper():
                 self.pipes_ind = ProtectedIsDigit(row_ind + 1)
@@ -320,9 +320,9 @@ class FindIndexPZ(MyMainWindow):
                 self.sucker_rod_ind = ProtectedIsDigit(row_ind + 1)
 
             elif (self.check_text_in_row('Планируемый объём работ', row) or \
-                    self.check_text_in_row('Порядок работы', row) \
-                    or self.check_text_in_row('Ранее проведенные работ', row)) and\
-                   self.data_x_max.get_value == 0:
+                  self.check_text_in_row('Порядок работы', row) \
+                  or self.check_text_in_row('Ранее проведенные работ', row)) and \
+                    self.data_x_max.get_value == 0:
                 self.data_x_max = ProtectedIsDigit(row_ind)
                 break
 
@@ -432,8 +432,6 @@ class FindIndexPZ(MyMainWindow):
                 self.row_expected.append(lst)
 
     def read_pz_prs(self):
-
-
 
         cat_well_min = []
         self.image_loader = None
@@ -799,9 +797,9 @@ class WellSuckerRod(FindIndexPZ):
 
             if b_plan == 0:
                 sucker_rod_question = QMessageBox.question(self,
-                                                       'отсутствие штанг',
-                                                       'Программа определило что штанг в '
-                                                       'скважине нет, корректно?')
+                                                           'отсутствие штанг',
+                                                           'Программа определило что штанг в '
+                                                           'скважине нет, корректно?')
                 if sucker_rod_question == QMessageBox.StandardButton.Yes:
                     self.sucker_rod_none = False
                 else:
@@ -809,8 +807,8 @@ class WellSuckerRod(FindIndexPZ):
 
                 if self.sucker_rod_none is True:
                     QMessageBox.warning(self, 'Индекс планового НКТ',
-                                                              'Программа не могла определить начала строку с ПЗ'
-                                                              ' штанги - план')
+                                        'Программа не могла определить начала строку с ПЗ'
+                                        ' штанги - план')
                     self.pause_app()
                     return
             # print(f'б {b_plan}')
@@ -987,13 +985,14 @@ class WellFondData(FindIndexPZ):
                                 depth_fond_paker_do["after"] = row[col_plan]
 
         if self.depth_fond_paker_before["after"] < 900 and self.paker_before['after'] != 0 and \
-            '89' not in list(self.dict_nkt_after.keys) and self.dict_pump_ecn['after'] == 0 and\
+                '89' not in list(self.dict_nkt_after.keys) and self.dict_pump_ecn['after'] == 0 and \
                 self.dict_pump_shgn['after'] == 0:
             QMessageBox.warning(self, 'НКТ89мм', f'При глубине спуска ф.пакера до глубины 900м '
                                                  f'необходимо использование НКТ89мм, а не {list(self.dict_nkt_after.keys)}')
-            self.check_data_in_pz.append(f'Согласно мероприятий по недопущению разгерметизации системы НКТ- пакер от 20.04.2021:\n'
-                                         f'При глубине спуска ф.пакера до глубины 900м '
-                                         f'необходимо использование НКТ89мм, а не {list(self.dict_nkt_after.keys)}')
+            self.check_data_in_pz.append(
+                f'Согласно мероприятий по недопущению разгерметизации системы НКТ- пакер от 20.04.2021:\n'
+                f'При глубине спуска ф.пакера до глубины 900м '
+                f'необходимо использование НКТ89мм, а не {list(self.dict_nkt_after.keys)}')
 
         if wellhead_fittings in [None, '']:
             self.check_data_in_pz.append('Не указан тип устьевой арматуры\n '
@@ -1158,7 +1157,8 @@ class WellCondition(FindIndexPZ):
                                 self.well_volume_in_pz.append(round(float(well_volume_in_pz), 1))
                             except Exception as e:
                                 well_volume_in_pz, _ = QInputDialog.getDouble(self, 'Объем глушения',
-                                                                              f'Введите объем глушения согласно ПЗ {e}', 50,
+                                                                              f'Введите объем глушения согласно ПЗ {e}',
+                                                                              50,
                                                                               1, 70)
                                 self.well_volume_in_pz.append(well_volume_in_pz)
 
@@ -1256,7 +1256,6 @@ class WellName(FindIndexPZ):
 
                     if 'площадь' in str(value):
                         if self.work_plan not in ['prs']:
-
                             self.well_number = ProtectedIsNonNone(str(row[col - 1]))
                         self.well_area = ProtectedIsNonNone(str(row[col + 1]).replace(" ", "_"))
                         # self.well_number = ProtectedIsNonNone(row[col - 1])
@@ -1519,16 +1518,16 @@ class WellData(FindIndexPZ):
         if self.dict_pump_shgn['after'] not in ['0', 0] and self.dict_pump_shgn_depth['after'] not in ['0', 0]:
             if self.dict_sucker_rod_after:
                 if abs(sum(list(self.dict_sucker_rod_after.values())) - self.dict_pump_shgn_depth['after']) > 10:
-                    QMessageBox.warning(self, 'Ошибка', f'Длина штанг {sum(list(self.dict_sucker_rod_after.values()))}м '
-                                                        f'после ремонта не равно глубине насоса '
-                                                        f'{self.dict_pump_shgn_depth["before"]}м')
+                    QMessageBox.warning(self, 'Ошибка',
+                                        f'Длина штанг {sum(list(self.dict_sucker_rod_after.values()))}м '
+                                        f'после ремонта не равно глубине насоса '
+                                        f'{self.dict_pump_shgn_depth["before"]}м')
                     self.check_data_in_pz.append(
                         f'Ошибка в карте спуска: \nОшибка в карте спуска: Длина штанг {sum(list(self.dict_sucker_rod.values()))}м '
                         f'после ремонта не равно глубине насоса '
                         f'{self.dict_pump_shgn_depth["before"]}м')
             if self.dict_nkt_after:
                 if sum(list((self.dict_nkt_after.values()))) - self.dict_pump_shgn_depth["after"] < 0:
-
                     QMessageBox.warning(self, 'Ошибка',
                                         f'Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
                                         f'после ремонта не равно глубине насоса '
@@ -1602,9 +1601,6 @@ class WellData(FindIndexPZ):
             self.pause_app()
             data_list.pause = True
             self.data_window = None
-
-
-
 
         if self.work_plan == 'krs':
             from data_base.config_base import connection_to_database
@@ -1789,8 +1785,8 @@ class WellPerforation(FindIndexPZ):
                         self.ws.iter_rows(values_only=True, min_row=begin_index + 3, max_row=cancel_index + 2)):
 
                     aswa = row[col_roof_index], row[col_sole_index]
-                    if str(row[col_roof_index]).replace('.', '').replace(',', '').isdigit() and\
-                        str(row[col_sole_index]).replace('.', '').replace(',', '').isdigit():
+                    if str(row[col_roof_index]).replace('.', '').replace(',', '').isdigit() and \
+                            str(row[col_sole_index]).replace('.', '').replace(',', '').isdigit():
                         perforations_intervals.append(row)
             except Exception as e:
                 QMessageBox.warning(self, 'ОШИБКА',
@@ -1802,14 +1798,13 @@ class WellPerforation(FindIndexPZ):
                 if row[col_plast_index]:
                     plast = row[col_plast_index].strip()
 
-
                 if any(['проект' in str((i)).lower() or 'не пер' in str((i)).lower() for i in row]) is False and all(
                         [str(i).strip() is None for i in row]) is False and is_number(row[col_roof_index]) is True \
                         and is_number(row[col_sole_index]) is True:
                     # print(f'5 {row}')
                     if row[col_vert_index]:
                         self.dict_perforation.setdefault(plast, {}).setdefault('вертикаль', []).append(
-                                float(str(row[col_vert_index]).replace(',', '.')))
+                            float(str(row[col_vert_index]).replace(',', '.')))
                     if any(['фильтр' in str(i).lower() for i in row]):
                         self.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', True)
                     else:
@@ -1867,9 +1862,9 @@ class WellPerforation(FindIndexPZ):
                             round(0, 1))
 
                     self.dict_perforation.setdefault(
-                            plast, {}).setdefault('замер', []).append(row[col_date_pressure_index])
+                        plast, {}).setdefault('замер', []).append(row[col_date_pressure_index])
                     self.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость',
-                                                      []).append(
+                                                                           []).append(
                         calculation_fluid_work(self, row[col_vert_index], row[col_pressure_index]))
 
 
@@ -2148,7 +2143,6 @@ class WellCategory(FindIndexPZ):
             ase = self.cat_well_min.get_value, self.data_well_max.get_value, self.data_x_max.get_value
             # if self.work_plan == 'prs':
             #     self.data_well_max = self.data_x_max_prs
-
 
             delete_rows_pz(self, self.ws, self.cat_well_min, self.data_well_max, self.data_x_max)
 
