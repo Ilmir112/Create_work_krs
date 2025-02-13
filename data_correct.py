@@ -893,13 +893,13 @@ class DataWindow(WindowUnion):
             else:
                 self.data_well.date_commissioning = self.data_well.date_drilling_cancel
 
-            try:
-                # Попытка распарсить строку в формате 'ДД.ММ.ГГГГ'
-                datetime.strptime(date_commissioning_line, '%d.%m.%Y')
-
-            except ValueError:
-                QMessageBox.warning(self, 'Ошибка', 'Не корректна дата ввода в эскплуатацию')
-                return
+            # try:
+            #     # Попытка распарсить строку в формате 'ДД.ММ.ГГГГ'
+            #     datetime.strptime(self.data_well.date_commissioning, '%d.%m.%Y')
+            # 
+            # except:
+            #     QMessageBox.warning(self, 'Ошибка', 'Не корректна дата ввода в эскплуатацию')
+            #     return
 
         if curator == 'ОР':
             expected_pickup_edit = self.current_widget.expected_pickup_edit.text()

@@ -4,6 +4,8 @@ from openpyxl.styles import Font, Alignment
 from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QPushButton
 from PyQt5.QtCore import Qt
 from data_base.config_base import connection_to_database, WorkDatabaseWell
+from decrypt import decrypt
+from main import ExcelWorker
 
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
@@ -132,7 +134,7 @@ class CorrectPlanWindow(WindowUnion):
                 else:
                     self.data_well.work_plan_change = 'krs'
 
-            db = connection_to_database(data_list.DB_WELL_DATA)
+            db = connection_to_database(decrypt("DB_WELL_DATA"))
             data_well_base = WorkDatabaseWell(db, self.data_well)
 
             data_well = data_well_base.check_in_database_well_data(
@@ -165,6 +167,12 @@ class CorrectPlanWindow(WindowUnion):
             if well_number != '' and well_area != '':
                 self.data_well.well_number, self.data_well.well_area = \
                     ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
+
+            self.thread_excel = ExcelWorker(self)
+
+            self.without_damping, stop_app = self.thread_excel.check_well_existence(
+                self.data_well.well_number.get_value, self.data_well.well_area.get_value,
+                self.data_well.region)
 
             data_list.pause = False
             self.close()

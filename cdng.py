@@ -468,7 +468,12 @@ def events_gnvp(self, contractor):
                    'плотности в присутствии супервайзера.', None, None, None, None, None, None, None, None, None],
             [None, 'IX. Мероприятия по определению безопасного статического уровня', None, None, None, None, None, None,
              None, None, None],
-            [None, 'Производить замер статического уровня (БСУ) в скважине согласно Инструкциии "ОПРЕДЕЛЕНИЕ '
+            [None, f'Для скважины { self.data_well.well_number.get_value} {self.data_well.well_area.get_value} '
+                   f'безопасный статический уровень составляет: \n'
+                   f'для пласта {self.data_well.plast_work[0]} -'
+                   f' {self.data_well.dict_perforation[self.data_well.plast_work[0]]["БСУ"]}м',
+             None, None, None, None, None, None, None, None, None],
+            [None, 'Производить замер статического уровня (БСУ) в скважине согласно Инструкции "ОПРЕДЕЛЕНИЕ '
                    'СТАТИЧЕСКОГО УРОВНЯ ЖИДКОСТИ ПРИ ПРОВЕДЕНИИ ТЕКУЩЕГО, КАПИТАЛЬНОГО РЕМОНТА И ОСВОЕНИЯ '
                    'СКВАЖИН ПОСЛЕ  БУРЕНИЯ № П1-01.05. И-089042 ЮЛ-305.  \n'
                    'Определение БСУ в процессе ТКРС производится с отражением результатов в вахтовом журнале:',

@@ -866,12 +866,15 @@ class AcidPakerWindow(WindowUnion):
             self.tableWidget.setCellWidget(rows, 5, acid_edit_combo)
             self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(acid_proc_edit)))
             self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(acid_volume_edit)))
-        elif paker_layout_combo in ['воронка','без монтажа компоновки на спуск']:
+        elif paker_layout_combo in ['воронка', 'без монтажа компоновки на спуск']:
             paker_depth = int(self.check_if_none(self.current_widget.paker_depth.text()))
-
+            paker_khost = self.check_if_none((self.current_widget.paker_khost.text()))
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(plast_combo))
-            self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_depth)))
+            if paker_layout_combo in ['воронка']:
+                self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_depth)))
+            elif paker_layout_combo in ['без монтажа компоновки на спуск']:
+                self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_khost)))
             self.tableWidget.setCellWidget(rows, 2, svk_true_combo)
             self.tableWidget.setCellWidget(rows, 3, acid_edit_combo)
             self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(acid_proc_edit)))
@@ -1049,8 +1052,8 @@ class AcidPakerWindow(WindowUnion):
 
                 svk_true_combo = self.tableWidget.cellWidget(row, 2).currentText()
                 acid_edit = self.tableWidget.cellWidget(row, 3).currentText()
-                acid_volume_edit = round(float(self.tableWidget.item(row, 4).text()), 1)
-                acid_proc_edit = int(float(self.tableWidget.item(row, 5).text()))
+                acid_volume_edit = round(float(self.tableWidget.item(row, 5).text()), 1)
+                acid_proc_edit = int(float(self.tableWidget.item(row, 4).text()))
                 if acid_edit == 'HCl':
                     self.sko_volume_all += acid_volume_edit
 
@@ -1060,8 +1063,8 @@ class AcidPakerWindow(WindowUnion):
                     acidOilProc = 0
 
                 work_template_list = self.voronka_layout(swab_true_edit_type, paker_khost, depth_gauge_combo)
-            elif self.paker_layout_combo == 'без монтажа компоновки на спуск':
-                work_template_list = []
+                if self.paker_layout_combo == 'без монтажа компоновки на спуск':
+                    work_template_list = []
             if svk_true_combo == 'Нужно СКВ':
                 work_template_list.extend(self.skv_acid_work(skv_acid_edit, skv_proc_edit, skv_volume_edit))
             if self.QplastEdit == 'ДА':
@@ -1179,7 +1182,8 @@ class AcidPakerWindow(WindowUnion):
             work_template_list.extend(swab_work_list[-10:])
 
         else:
-            work_template_list.append([None, None,
+            if self.paker_layout_combo != 'без монтажа компоновки на спуск':
+                work_template_list.append([None, None,
                                        f'Поднять {self.paker_select} на НКТ{self.data_well.nkt_diam} c глубины '
                                        f'{sum(list(self.dict_nkt.values()))}м с '
                                        f'доливом скважины в '
@@ -1727,7 +1731,7 @@ class AcidPakerWindow(WindowUnion):
                              f'{acid_volume_edit}м3 - {20}% не ' \
                              f'более Р={self.data_well.max_admissible_pressure.get_value}атм.\n'
             # print(f'Ожидаемое показатели {self.data_well.expected_pick_up.values()}')
-        if self.paker_layout_combo in ['воронка', 'пакер с заглушкой']:
+        if self.paker_layout_combo in ['воронка', 'пакер с заглушкой', 'без монтажа компоновки на спуск']:
             layout_select = 'Закрыть затрубное пространство'
         elif 'одно' in self.paker_layout_combo:
             layout_select = f'посадить пакер на глубине {paker_depth}м'
@@ -1787,6 +1791,8 @@ class AcidPakerWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', well_volume_norm(well_volume(self, self.data_well.current_bottom))]
         ]
+        if self.paker_layout_combo in ['воронка', 'без монтажа компоновки на спуск']:
+            acid_list_1.pop(-2)
 
         for row in acid_list_1:
             paker_list.append(row)

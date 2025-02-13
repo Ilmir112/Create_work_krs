@@ -19,6 +19,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction,
 from PyQt5 import QtCore, QtWidgets
 
 from datetime import datetime
+from decrypt import decrypt
 from openpyxl.utils import get_column_letter
 from openpyxl.workbook import Workbook
 from openpyxl.styles import Alignment, Font
@@ -58,7 +59,7 @@ class ExcelWorker(QThread):
         from data_base.config_base import CheckWellExistence, connection_to_database
         check_true = True
         try:
-            db = connection_to_database(data_list.DB_CLASSIFICATION)
+            db = connection_to_database(decrypt("DB_CLASSIFICATION"))
             self.check_correct_well = CheckWellExistence(db)
             check_true, stop_app = self.check_correct_well.checking_well_database_without_juming(well_number,
                                                                                                  deposit_area, region)
@@ -76,7 +77,7 @@ class ExcelWorker(QThread):
     def insert_data_in_database(self, excel_data_dict, data_well):
         from data_base.config_base import connection_to_database, WorkDatabaseWell
         try:
-            db = connection_to_database(data_list.DB_WELL_DATA)
+            db = connection_to_database(decrypt("DB_WELL_DATA"))
             data_well_base = WorkDatabaseWell(db)
             data_well_base.insert_in_database_well_data(self.data_well,
                                                         data_list.contractor, data_list.costumer, excel_data_dict)
@@ -219,7 +220,7 @@ class MyMainWindow(QMainWindow):
                                                                 number_list, 0, False)
             adw = self.data_well.number_dp
 
-            db = connection_to_database(data_list.DB_WELL_DATA)
+            db = connection_to_database(decrypt("DB_WELL_DATA"))
             data_well_base = WorkDatabaseWell(db, self.data_well)
 
             data_well = data_well_base.check_in_database_dp_data(self.data_well.well_number.get_value,
@@ -1781,6 +1782,18 @@ class MyWindow(MyMainWindow):
         del_menu.addAction(deleteString_action)
         deleteString_action.triggered.connect(self.deleteString)
 
+        copy_string_action = QAction("копировать строку", self)
+        del_menu.addAction(copy_string_action)
+        copy_string_action.triggered.connect(self.copy_string)
+
+        cut_string_action = QAction("вырезать строку", self)
+        del_menu.addAction(cut_string_action)
+        cut_string_action.triggered.connect(self.cut_string)
+
+        paste_string_action = QAction("Вставить строку", self)
+        del_menu.addAction(paste_string_action)
+        paste_string_action.triggered.connect(self.paste_string)
+
         descent_gno_action = QAction("Подьем ГНО", self)
         action_menu.addAction(descent_gno_action)
         descent_gno_action.triggered.connect(self.descent_gno_action)
@@ -1937,6 +1950,81 @@ class MyWindow(MyMainWindow):
         gno_menu.triggered.connect(self.gno_bottom)
 
         context_menu.exec_(self.mapToGlobal(position))
+
+    def copy_string(self):
+        if self.insert_index > self.data_well.count_row_well:
+            selected_rows = sorted(set(item.row() for item in self.table_widget.selectedItems()))
+            if selected_rows:
+                self.copied_rows = []
+                self.merge_rows = {}
+                self.data_copy = []
+                count_col = 0
+                rows_to_span = []
+                for row in selected_rows:
+                    row_data = [self.table_widget.item(row, col).text() for col in
+                                range(self.table_widget.columnCount())]
+                    for column in range(self.table_widget.columnCount()):
+                        if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
+                            start_row = row + 1
+                            start_column = column + 1
+                            end_row = start_row + self.table_widget.rowSpan(row, column) - 1
+                            end_column = start_column + self.table_widget.columnSpan(row, column) - 1
+                            if rows_to_span:
+                                if start_row != rows_to_span[-1][0]:
+                                    rows_to_span.append((start_row, start_column, end_row, end_column))
+                                else:
+                                    if start_column > rows_to_span[-1][-1] and start_row == rows_to_span[-1][0]:
+                                        rows_to_span.append((start_row, start_column, end_row, end_column))
+                            else:
+                                rows_to_span.append((start_row, start_column, end_row, end_column))
+                    index_row = row-self.data_well.count_row_well
+                    self.data_copy.append(self.data_well.data_list[row-self.data_well.count_row_well])
+
+                    if rows_to_span:
+                        self.merge_rows[row] = rows_to_span
+
+                    self.copied_rows.append((row, row_data))
+                return selected_rows
+
+    def cut_string(self):
+        if self.insert_index > self.data_well.count_row_well:
+            selected_rows = self.copy_string()
+            if selected_rows:
+                for row in reversed(selected_rows):
+                    self.table_widget.removeRow(row)
+                    self.data_well.data_list.pop(row - self.data_well.count_row_well)
+            else:
+                QMessageBox.warning(self, "Ошибка", "Выберите строки для вырезания.")
+
+    def paste_string(self):
+        text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
+                           120: (501, 600), 140: (601, 700), 160: (701, 800), 180: (801, 900), 200: (901, 1500)}
+        if self.insert_index > self.data_well.count_row_well:
+            if self.copied_rows:
+
+                currentRow = self.table_widget.currentRow() + 1 if self.table_widget.currentRow() >= 0 else self.table_widget.rowCount()
+                for original_row, row_data in self.copied_rows[::-1]:
+                    self.table_widget.insertRow(currentRow)
+                    for column in range(len(row_data)):
+                        item = QTableWidgetItem(row_data[column])
+                        self.table_widget.setItem(currentRow, column, item)
+                        for key, value in text_width_dict.items():
+                            if value[0] <= len(row_data[2]) <= value[1]:
+                                self.table_widget.setRowHeight(currentRow, int(key))
+
+                    index_row = currentRow - self.data_well.count_row_well
+                    self.data_well.data_list.insert(index_row, self.data_copy[-1])
+                    self.data_copy.pop(-1)
+                if self.merge_rows:
+                    for key, value in self.merge_rows.items():
+                        for _, col, _, merge in value:
+                            self.table_widget.setSpan(currentRow, col - 1, 1, abs(merge - col) + 1)
+
+                        currentRow += 1
+
+            else:
+                QMessageBox.warning(self, "Ошибка", "Сначала вырежьте строки.")
+
 
     def clickedRowColumn(self, r, c):
 
@@ -2574,7 +2662,7 @@ if __name__ == "__main__":
     #         data_list.pause = False
     #         # app2.close()
     try:
-        data_list.connect_in_base = connect_to_database('krs2')
+        data_list.connect_in_base = connect_to_database(decrypt("DB_NAME_USER"))
 
         login_window = LoginWindow()
         login_window.setWindowModality(Qt.ApplicationModal)

@@ -5,6 +5,8 @@ from data_base.config_base import connection_to_database, GnktDatabaseWell
 from PyQt5.QtWidgets import QInputDialog, QTabWidget, QWidget, QApplication, QLabel, \
     QLineEdit, QGridLayout, QComboBox, QPushButton, QMessageBox
 from openpyxl.utils import get_column_letter
+
+from decrypt import decrypt
 from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict, read_database_gnkt
 from block_name import razdel_1
 from openpyxl.styles import PatternFill, Font, Alignment
@@ -54,7 +56,7 @@ class TabPageGnkt(TabPageUnion):
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
         self.fluid_edit = QLineEdit(self)
         self.fluid_edit.setValidator(self.validator_float)
-        self.fluid_edit.setText(self.data_well.fluid)
+        self.fluid_edit.setText(str(self.data_well.fluid))
 
         self.fluid_work_label = QLabel("уд.вес рабочей жидкости", self)
         self.fluid_work_edit = QLineEdit(self)
@@ -201,7 +203,7 @@ class TabPageGnkt(TabPageUnion):
         previus_well = self.previous_well_combo.currentText()
         try:
             if previus_well:
-                db = connection_to_database(data_list.DB_NAME_GNKT)
+                db = connection_to_database(decrypt("DB_NAME_GNKT"))
                 data_gnkt = GnktDatabaseWell(db)
 
                 if 'ойл-сервис' in data_list.contractor.lower():

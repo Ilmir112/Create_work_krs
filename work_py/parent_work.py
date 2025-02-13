@@ -5,6 +5,7 @@ from typing import List
 
 import data_list
 from data_base.config_base import connection_to_database, WorkDatabaseWell
+from decrypt import decrypt
 from find import FindIndexPZ
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QWidget, QTabWidget, QInputDialog, QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayout
@@ -332,7 +333,7 @@ class WindowUnion(MyMainWindow):
 
     @staticmethod
     def read_excel_in_base(number_well, area_well, work_plan, type_kr):
-        db = connection_to_database(data_list.DB_WELL_DATA)
+        db = connection_to_database(decrypt("DB_WELL_DATA"))
         data_well_base = WorkDatabaseWell(db)
 
         data_well = data_well_base.read_excel_in_base(number_well, area_well, work_plan, type_kr)
@@ -377,7 +378,7 @@ class WindowUnion(MyMainWindow):
         contractor_select = data_list.contractor
         work_plan = table_name.split(' ')[-3]
 
-        db = connection_to_database(data_list.DB_WELL_DATA)
+        db = connection_to_database(decrypt("DB_WELL_DATA"))
         data_well_base = WorkDatabaseWell(db, self.data_well)
 
         result_table = data_well_base.extraction_data(str(well_number), well_area, type_kr,

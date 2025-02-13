@@ -12,6 +12,8 @@ from openpyxl.utils import column_index_from_string
 from openpyxl.workbook import Workbook
 from openpyxl.utils.cell import get_column_letter
 from openpyxl_image_loader import SheetImageLoader
+
+from decrypt import decrypt
 from main import ExcelWorker, MyMainWindow, MyWindow
 from plan import delete_rows_pz
 from data_list import ProtectedIsDigit, ProtectedIsNonNone
@@ -35,7 +37,7 @@ class FindIndexPZ(MyMainWindow):
         self.perforation_roof = 5000
         self.old_version = False
         self.region = None
-        self.fluid = ''
+        self.fluid = 1.18
         self.insert_index = 0
         self.curator = None
         self.data_well_max = ProtectedIsDigit(0)
@@ -1607,7 +1609,7 @@ class WellData(FindIndexPZ):
         if self.work_plan == 'krs':
             from data_base.config_base import connection_to_database
             from data_base.config_base import WorkDatabaseWell
-            db = connection_to_database(data_list.DB_WELL_DATA)
+            db = connection_to_database(decrypt("DB_WELL_DATA"))
             check_in_base = WorkDatabaseWell(db, self)
             tables_filter = check_in_base.get_tables_starting_with(self.well_number.get_value,
                                                                    self.well_area.get_value, 'ПР',
@@ -1866,6 +1868,11 @@ class WellPerforation(FindIndexPZ):
 
                     self.dict_perforation.setdefault(
                             plast, {}).setdefault('замер', []).append(row[col_date_pressure_index])
+                    self.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость',
+                                                      []).append(
+                        calculation_fluid_work(self, row[col_vert_index], row[col_pressure_index]))
+
+
 
                 elif any([str((i)).lower() == 'проект' for i in row]) is True and all(
                         [str(i).strip() is None for i in row]) is False and is_number(row[col_roof_index]) is True \
@@ -1906,7 +1913,17 @@ class WellPerforation(FindIndexPZ):
                         merged_segments[-1] = [merged_segments[-1][0], max(sole_int, merged_segments[-1][1])]
 
                 self.dict_perforation[plast]['интервал'] = merged_segments
-
+        for plast, data in self.dict_perforation.items():
+            try:
+                if data["вертикаль"] and data["давление"][0] != 0 and data['рабочая жидкость']:
+                    bsu_data = int(float(min(data["вертикаль"])) - float(
+                        max(data["давление"])) * 100 / max(data['рабочая жидкость']) / 9.81)
+                    self.dict_perforation.setdefault(plast, {}).setdefault('БСУ', bsu_data)
+                else:
+                    self.dict_perforation.setdefault(plast, {}).setdefault('БСУ', 89)
+            except:
+                self.dict_perforation.setdefault(plast, {}).setdefault('БСУ', 89)
+                print('Ошибка БСУ')
 
         if self.perforation_correct_window2 is None:
             from perforation_correct import PerforationCorrect

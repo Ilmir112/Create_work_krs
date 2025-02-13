@@ -10,6 +10,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from datetime import datetime
 
 from data_base.config_base import connection_to_database, WorkDatabaseWell
+from decrypt import decrypt
 
 from work_py.advanted_file import merge_overlapping_intervals
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
@@ -206,7 +207,7 @@ class TabPageDp(TabPageUnion):
                 self.number_DP_Combo.setCurrentIndex(int(number_dp_in_base))
 
     def check_in_database_well_data2(self, number_well):
-        db = connection_to_database(data_list.DB_WELL_DATA)
+        db = connection_to_database(decrypt("DB_WELL_DATA"))
         data_well_base = WorkDatabaseWell(db, self.data_well)
 
         # Получение всех результатов
@@ -902,7 +903,7 @@ class DopPlanWindow(WindowUnion):
                 data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-1]
                 work_plan_in_base = well_data_in_base_combo.split(' ')[3]
 
-            db = connection_to_database(data_list.DB_WELL_DATA)
+            db = connection_to_database(decrypt("DB_WELL_DATA"))
             data_well_base = WorkDatabaseWell(db, self.data_well)
 
             data_well = data_well_base.check_in_database_well_data(well_number, well_area,

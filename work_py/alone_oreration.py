@@ -378,7 +378,7 @@ def calculation_fluid_work(data_well, vertical, pressure):
 
         return fluid_work_calculate
     else:
-        return None
+        return 0.01
 
 
 

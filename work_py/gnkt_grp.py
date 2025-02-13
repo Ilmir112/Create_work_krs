@@ -5,6 +5,8 @@ from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QInputDialog, QTabWidget, QWidget, QApplication, \
     QLineEdit, QGridLayout, QComboBox, QMessageBox
 from openpyxl.workbook import Workbook
+
+from decrypt import decrypt
 from work_py.calculate_work_parametrs import volume_work, volume_nkt
 
 from data_base.config_base import connect_to_database
@@ -79,7 +81,7 @@ class TabPageDp(QWidget):
 
         try:
 
-            conn = connect_to_database(data_list.DB_NAME_GNKT)
+            conn = connect_to_database(decrypt("DB_NAME_GNKT"))
             cursor = conn.cursor()
             cursor.execute(f"SELECT * FROM КГМ WHERE today (%s), ?", (number_gnkt, self.previous_well_edit.text()))
 

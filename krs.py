@@ -351,11 +351,11 @@ class GnoParent(ABC):
                                                           f"(объем колонны от пакера до устья уд.весом"
                                                           f" {self.data_well.fluid_work}. Техостой 2ч."])
 
-
-        if any([str(cater) == '1' for cater in self.data_well.category_pressure_well]):
-            self.data_well.category_pvo, _ = QInputDialog.getInt(
-                None, 'Категория скважины', f'Категория скважины № {self.data_well.category_pvo}, корректно?',
-                self.data_well.category_pvo, 1, 2)
+        if self.data_well.work_plan == 'krs':
+            if any([str(cater) == '1' for cater in self.data_well.category_pressure_well]):
+                self.data_well.category_pvo, _ = QInputDialog.getInt(
+                    None, 'Категория скважины', f'Категория скважины № {self.data_well.category_pvo}, корректно?',
+                    self.data_well.category_pvo, 1, 2)
 
     def append_posle_lift(self):
         posle_lift = [
@@ -418,8 +418,11 @@ class GnoParent(ABC):
             self.calculate_chemistry('гидрофабизатор', round(self.volume_well_jamming * 0.05, 2))
             surfactant_hydrofabizer_str = 'с добавлением в жидкость глушения гидрофобизатора из расчёта' \
                                           ' 0,05% на 1м3 (0,5л)'
-
-        if 1 < float(self.fluid) < 1.34:
+        if 1.2 < float(self.fluid) < 1.62:
+            type_of_chemistry = 'СГС-18'
+            water_fresh = data_list.DICT_SGS[float(self.fluid)][0]
+            volume_chemistry = data_list.DICT_SGS[float(self.fluid)][1]
+        elif 1.19 < float(self.fluid) < 1.34:
             type_of_chemistry = 'CaCl'
             water_fresh = data_list.DICT_CALC_CACL[float(self.fluid)][0]
             volume_chemistry = data_list.DICT_CALC_CACL[float(self.fluid)][1]

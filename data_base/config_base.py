@@ -12,7 +12,7 @@ import data_list
 from typing import Dict, List
 from abc import ABC, abstractmethod
 
-
+from decrypt import decrypt
 
 
 class DatabaseConnection(ABC):
@@ -38,10 +38,10 @@ class PostgresConnection(DatabaseConnection):
 
         load_dotenv(dotenv_path=os.path.join(ext_data_dir, '.env'))
 
-        db_user = os.getenv('DB_USER')
-        db_password = os.getenv('DB_PASSWORD')
-        db_host = os.getenv('DB_HOST')
-        db_port = os.getenv('DB_PORT')
+        db_user = decrypt('DB_USER')
+        db_password = decrypt('DB_PASSWORD')
+        db_host = decrypt('DB_HOST')
+        db_port = decrypt('DB_PORT')
 
         try:
             connection = psycopg2.connect(

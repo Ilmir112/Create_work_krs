@@ -6,6 +6,7 @@ import psycopg2
 from PyQt5.QtWidgets import  QMessageBox
 import data_list
 from data_base.config_base import connect_to_database, GnktDatabaseWell, connection_to_database
+from decrypt import decrypt
 
 Saddles = namedtuple('Saddles', ['saddle', 'ball'])
 
@@ -79,7 +80,7 @@ def read_database_gnkt(contractor, gnkt_number):
 
     # Подключение к базе данных
     try:
-        db = connection_to_database(data_list.DB_NAME_GNKT)
+        db = connection_to_database(decrypt("DB_NAME_GNKT"))
 
         data_gnkt = GnktDatabaseWell(db)
 
@@ -107,7 +108,7 @@ def insert_data_base_gnkt(self, contractor, well_name, gnkt_number, gnkt_length,
                      iznos, pipe_mileage, pipe_fatigue, pvo, previous_well):
 
     try:
-        db = connection_to_database(data_list.DB_NAME_GNKT)
+        db = connection_to_database(decrypt("DB_NAME_GNKT"))
         data_gnkt = GnktDatabaseWell(db)
 
         if 'ойл-сервис' in contractor.lower():

@@ -18,12 +18,14 @@ from openpyxl import load_workbook
 from openpyxl.styles import PatternFill, Font, Color
 from openpyxl.utils import get_column_letter, range_boundaries
 from data_base.config_base import connect_to_database, connection_to_database, CheckWellExistence
+from decrypt import decrypt
 
-from main import MyMainWindow
+from main import MyMainWindow, ExcelWorker
+from work_py.alone_oreration import well_volume
 
 
 def get_data_from_db(region):
-    db = connection_to_database(data_list.DB_CLASSIFICATION)
+    db = connection_to_database(decrypt("DB_CLASSIFICATION"))
 
     well_classification = CheckWellExistence(db)
     data = well_classification.get_data_from_db(region)
@@ -32,7 +34,7 @@ def get_data_from_db(region):
 
 
 def get_data_from_class_well_db(region):
-    db = connection_to_database(data_list.DB_CLASSIFICATION)
+    db = connection_to_database(decrypt("DB_CLASSIFICATION"))
 
     well_classification = CheckWellExistence(db)
     data = well_classification.get_data_from_class_well_db(region)
@@ -236,7 +238,7 @@ class ClassifierWell(MyMainWindow):
         if data_list.connect_in_base:
             try:
                 # Подключение к базе данных
-                db = connection_to_database(data_list.DB_CLASSIFICATION)
+                db = connection_to_database(decrypt("DB_CLASSIFICATION"))
                 self.classification_well = CheckWellExistence(db)
 
                 REGION_LIST = ['ЧГМ', 'АГМ', 'ТГМ', 'ИГМ', 'КГМ', ]
@@ -328,7 +330,7 @@ class ClassifierWell(MyMainWindow):
         ws = wb.active
 
         try:
-            db = connection_to_database(data_list.DB_CLASSIFICATION)
+            db = connection_to_database(decrypt("DB_CLASSIFICATION"))
             self.classification_well = CheckWellExistence(db)
 
             check_param, well_column, cdng, area_column, oilfield, categoty_pressure, pressure_Gst, \
@@ -638,6 +640,14 @@ def insert_data_well_dop_plan(self, data_well):
     else:
         self.data_well.date_commissioning = '01.01.2000'
     self.data_well.data_well_dict = well_data_dict
+
+    self.data_well.well_volume_in_pz = [well_volume(self, self.data_well.head_column_additional.get_value)]
+    self.data_well.check_data_in_pz = []
+    self.data_well.without_damping = False
+    self.thread_excel = ExcelWorker(self)
+
+
+
     # QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
 
     # definition_plast_work(self)

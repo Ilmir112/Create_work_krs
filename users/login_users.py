@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt
 
 from data_base.config_base import UserService, connection_to_database, \
     RegistrationService
+from decrypt import decrypt
 
 
 class LoginWindow(QWidget):
@@ -64,7 +65,7 @@ class LoginWindow(QWidget):
         password = self.password.text()
         last_name, first_name, second_name, _ = username.split(' ')
 
-        db = connection_to_database(data_list.DB_NAME_USER)
+        db = connection_to_database(decrypt("DB_NAME_USER"))
 
         user_service = UserService(db)
 
@@ -90,7 +91,7 @@ class LoginWindow(QWidget):
             data_list.connect_in_base = False
     @staticmethod
     def get_list_users():
-        db = connection_to_database(data_list.DB_NAME_USER)
+        db = connection_to_database(decrypt("DB_NAME_USER"))
         user_service = UserService(db)
         users_list = user_service.get_users_list()
         return users_list
@@ -190,7 +191,7 @@ class RegisterWindow(QWidget):
         password = self.password.text().strip()
         password2 = self.password2.text().strip()
 
-        db = connection_to_database(data_list.DB_NAME_USER)
+        db = connection_to_database(decrypt("DB_NAME_USER"))
 
         registration = RegistrationService(db)
 
