@@ -1151,6 +1151,8 @@ class TemplateKrs(WindowUnion):
                                        f' ТКРС от 31 мая 2025г, Объединение ПСШ + пакер не возможно при '
                                        f'эксплуатации скважины с периодом более 20 лет при отсутствии сероводорода '
                                        f'в скважине. \n Продолжить?')
+                if mes == QMessageBox.StandardButton.No:
+                    return
             if difference_date_well > 365.25 * 10 and self.data_well.category_h2s != "3":
                 mes = QMessageBox.question(self, 'Критерии',
                                            f'Скважина в эксплуатации более {difference_date_well / 365:.0f}лет '
@@ -1158,8 +1160,8 @@ class TemplateKrs(WindowUnion):
                                            f' ТКРС от 31 мая 2025г, Объединение ПСШ + пакер не возможно'
                                            f' с периодом эксплуатации более 10 лет и наличии сероводород'
                                            f'\n Продолжить?')
-            if mes == QMessageBox.StandardButton.No:
-                return
+                if mes == QMessageBox.StandardButton.No:
+                    return
 
 
         distance_second = int(float(self.current_widget.dictance_template_second_edit.text()))
