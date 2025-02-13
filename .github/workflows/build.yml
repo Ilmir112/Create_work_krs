@@ -92,6 +92,8 @@ jobs:
           --add-data "data_list.py;." `
           --add-data "requirements.txt;." `
           --add-data "plan.py;." `
+          --add-data "key.key;." `
+          --add-data "decrypt.py;." `
           --add-data "perforation_correct_gnkt_frez.py;." `
           --add-data "perforation_correct.py;." `
           --add-data "open_pz.py;." `
