@@ -30,7 +30,8 @@ class FindIndexPZ(MyMainWindow):
         self.number_dp = 0
         self.image_loader = None
         self.result_pressure_date = None
-
+        self.column_direction_mine_diameter, self.column_direction_mine_wall_thickness, \
+        self.column_direction_mine_length, self.level_cement_direction_mine = None, None, None, None
         self.fluid_work = None
         self.nkt_template = None
         self.nkt_diam = None
@@ -157,6 +158,7 @@ class FindIndexPZ(MyMainWindow):
         self.dict_nkt_before = {}
         self.dict_nkt_after = {}
         self.dict_sucker_rod_after = {}
+        self.column_direction_mine_true = False
         self.dict_pump = {"before": 0, "after": 0}
         self.column_head_m = ''
         self.wellhead_fittings = ''
@@ -207,6 +209,7 @@ class FindIndexPZ(MyMainWindow):
         self.dict_category = {}
         self.check_data_in_pz = []
         self.plast_project = []
+        self.bcu_level = False
         self.plast_work = []
         self.category_p_p = []
         self.image_data = []
@@ -260,8 +263,6 @@ class FindIndexPZ(MyMainWindow):
         return diameter, wall_thickness, length
 
     def check_text_in_row(self, text, row):
-        asde = [text.lower() in str(col).lower() for col in row]
-        asdef = [str(col).lower() for col in row]
         return any([text.lower() in str(col).lower() for col in row])
 
     def read_pz(self):
@@ -332,7 +333,9 @@ class FindIndexPZ(MyMainWindow):
 
             elif 'III. Состояние скважины к началу ремонта ' in row:
                 self.condition_of_wells = ProtectedIsDigit(row_ind)
-
+            elif any([('безопасный' in str(col).lower() and 'урове' in str(col).lower())
+                      or 'бсу ' in str(col).lower() for col in row]):
+                self.bcu_level = True
             for col, value in enumerate(row):
                 if value is not None and col <= 12:
                     if 'сужен' in str(value).lower() or 'не проход' in str(value).lower() or \
@@ -430,6 +433,11 @@ class FindIndexPZ(MyMainWindow):
                 for i in range(0, 12):
                     lst.append(self.ws.cell(row=j + 1, column=i + 1).value)
                 self.row_expected.append(lst)
+
+        if self.bcu_level is False:
+            QMessageBox.warning(self, 'безопасный статический уровень',
+                                'В план заказе не указан безопасный статический уровень')
+            self.check_data_in_pz.append('Согласно правил НГВП В план заказе должен быть указан безопасный статический уровень')
 
     def read_pz_prs(self):
 
@@ -1340,6 +1348,19 @@ class WellData(FindIndexPZ):
                     elif 'Расстояние от стола ротора ' in str(value):
                         self.stol_rotor = FindIndexPZ.definition_is_none(
                             self, ProtectedIsDigit(row[col + 5]), row_index, col + 1, 1)
+                    elif 'Шахтное направление' in str(value):
+                        if row[col + 3] not in ['-', None, '0', 0, '']:
+                            self.column_direction_mine_true = True
+                            if self.column_direction_mine_true:
+                                column_direction_mine_data = row[col + 3]
+                                column_direction_mine_data = FindIndexPZ.definition_is_none(self, column_direction_mine_data,
+                                                                                       row_index, col, 2)
+                                self.column_direction_mine_diameter, self.column_direction_mine_wall_thickness, \
+                                self.column_direction_mine_length = self.insert_column_direction(column_direction_mine_data)
+                                self.level_cement_direction_mine = ProtectedIsNonNone(row[col + 9])
+                        else:
+                            self.column_direction_mine_true = None
+
                     elif 'Направление (диаметр наружный(мм)' in str(value):
                         self.column_direction_true = True
                         if self.column_direction_true:

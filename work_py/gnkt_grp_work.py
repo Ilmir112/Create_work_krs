@@ -936,8 +936,7 @@ class GnktModel(WindowUnion):
              None, None,
              'Ø канавки', None, f'{self.data_well.groove_diameter}', None, None,
              None, None, None, None, 'л/п.м.', 'м3'],
-            [None, None, None, None, None, None, None, None, None, None, None, None, 'Шахтное направление', None, None,
-             "", None, None, "", "", '', None, None],
+
             [None, None, None, None, None, None, None, None, None, nkt_schema, None, None, 'Направление', None,
              None,
              f'{self.data_well.column_direction_diameter.get_value}',
@@ -1043,7 +1042,7 @@ class GnktModel(WindowUnion):
              None, None, self.data_well.category_pressure, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Содержание H2S, мг/л', None, None,
              None,
-             None, 'отсут' if self.data_well.value_h2s_mg[0] is None else self.data_well.value_h2s_mg[0], None,
+             None, 'отсут' if self.data_well.value_h2s_mg[0] in [None, 0] else self.data_well.value_h2s_mg[0], None,
              None, None, None, None],
             [None, None, None, None, None, None, None, None,
              None, None, None, None, 'Газовый фактор', None, None, None,
@@ -1118,6 +1117,21 @@ class GnktModel(WindowUnion):
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],
         ]
+        if self.data_well.column_direction_mine_true:
+            schema_well_list.insert(10, [None, None, None, None, None, None, None, None, None, nkt_schema, None, None, 'Шахтное направление', None,
+             None,
+             f'{self.data_well.column_direction_mine_diameter.get_value}',
+             self.data_well.column_direction_mine_wall_thickness.get_value,
+             round(
+                 self.data_well.column_direction_mine_diameter.get_value - 2 * self.data_well.column_direction_mine_wall_thickness.get_value,
+                 1),
+             f'0-', self.data_well.column_direction_mine_length.get_value,
+             f'{self.data_well.level_cement_direction_mine.get_value}-{self.data_well.column_direction_mine_length.get_value}',
+             None,
+             None])
+        else:
+            schema_well_list.insert(10, [None, None, None, None, None, None, None, None, None, nkt_schema, None, None,
+                                        'Шахтное направление', None, None, '-', '-', '-', None, None, '-', '-', None])
 
         if self.data_well.work_plan == 'gnkt_bopz':
             schema_well_list.append(list_gnkt_bopz)
@@ -1151,10 +1165,13 @@ class GnktModel(WindowUnion):
                         if self.data_well.dict_perforation[plast]['кровля'] < \
                                 self.data_well.depth_fond_paker_before["before"]:
                             izol = 'над пакером'
+                    vertikal_1 = None
                     if 'вертикаль' in self.data_well.dict_perforation[plast].keys():
-                        vertikal_1 = min(self.data_well.dict_perforation[plast]['вертикаль'])
-                    else:
-                        vertikal_1 = None
+                        if len(self.data_well.dict_perforation[plast]['вертикаль']) > 2:
+                            vertikal_1 = sorted(self.data_well.dict_perforation[plast]['вертикаль'])[count_interval-1]
+                        else:
+                            vertikal_1 = sorted(self.data_well.dict_perforation[plast]['вертикаль'])[0]
+
                     pressure_1 = self.data_well.dict_perforation[plast]['давление'][0]
                     zamer_1 = self.data_well.dict_perforation[plast]['замер'][0]
 

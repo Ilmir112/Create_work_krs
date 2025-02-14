@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# .github/workflows/build.yml
 name: Build PyInstaller
 on: [push, pull_request]
 
@@ -23,11 +23,8 @@ jobs:
       with:
         python-version: '3.8.8'
 
-
     - name: Check database secrets
-
       run: |
-       
         $secrets = @(
           @{Name='DB_USER'; Value=$Env:DB_USER},
           @{Name='DB_PASSWORD'; Value=$Env:DB_PASSWORD},
@@ -37,7 +34,7 @@ jobs:
           @{Name='DB_NAME_GNKT'; Value=$Env:DB_NAME_GNKT},
           @{Name='DB_CLASSIFICATION'; Value=$Env:DB_CLASSIFICATION},
           @{Name='DB_PORT'; Value=$Env:DB_PORT}
-        )       
+        )
 
         foreach ($secret in $secrets) {
           if ([string]::IsNullOrEmpty($secret.Value)) {
@@ -46,7 +43,6 @@ jobs:
             Write-Host "Данные для базы данных загружены: $($secret.Name)"
           }
         }
-
 
     - name: Create virtual environment and install dependencies
       run: |
@@ -66,60 +62,18 @@ jobs:
         Add-Content -Path $envFilePath -Value "DB_HOST=$($Env:DB_HOST)"
         Add-Content -Path $envFilePath -Value "DB_PORT=$($Env:DB_PORT)"
         
-        
         if (Test-Path ".env") {
           Get-Content ".env" | Out-Host
         } else {
           Write-Host ".env file does not exist."
         }
 
-
-
     - name: Build executable
       run: |
-
-        pyinstaller --noconfirm --onedir --icon=imageFiles/icon/zima_ico.ico --console --name "ZIMA" `
-          --add-data "work_py;work_py/" `
-          --add-data "users;users/" `
-          --add-data "tests;tests/" `
-          --add-data "log_files;log_files/" `
-          --add-data "property_excel;property_excel/" `
-          --add-data "imageFiles;imageFiles/" `
-          --add-data "gnkt_data;gnkt_data/" `
-          --add-data "data_base;data_base/" `
-          --add-data "podpisant.json;." `
-          --add-data "work_json.py;." `
-          --add-data "data_list.py;." `
-          --add-data "requirements.txt;." `
-          --add-data "plan.py;." `
-          --add-data "key.key;." `
-          --add-data "decrypt.py;." `
-          --add-data "perforation_correct_gnkt_frez.py;." `
-          --add-data "perforation_correct.py;." `
-          --add-data "open_pz.py;." `
-          --add-data "krs.py;." `
-          --add-data "H2S.py;." `
-          --add-data "gnkt_opz.py;." `
-          --add-data "gnkt_after_grp.py;." `
-          --add-data "find.py;." `
-          --add-data "data_correct_position_people.py;." `
-          --add-data "data_correct.py;." `
-          --add-data "cdng.py;." `
-          --add-data "category_correct.py;." `
-          --add-data "build_script.py;." `
-          --add-data "block_name.py;." `
-          --add-data "application_pvr.py;." `
-          --add-data "application_gis.py;." `
-          --add-data ".env;." `
-          main.py
-
+        pyinstaller --noconfirm main.spec
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: ZIMA
         path: dist/*
-
-
-
-

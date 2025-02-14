@@ -1121,7 +1121,7 @@ class DataWindow(WindowUnion):
         elif close_file is True:
             self.data_well.column_diameter = ProtectedIsDigit(self.check_if_none(column_type))
             self.data_well.column_wall_thickness = ProtectedIsDigit(self.check_if_none(column_wall_thickness))
-            self.data_well.shoe_column = ProtectedIsDigit(int(float(self.check_if_none(shoe_column))))
+            self.data_well.shoe_column = ProtectedIsDigit(float(self.check_if_none(shoe_column)))
             self.data_well.head_column = ProtectedIsDigit(head_column)
             self.data_well.diameter_doloto_ek = ProtectedIsDigit(0)
             if self.data_well.column_additional:

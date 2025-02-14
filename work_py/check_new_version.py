@@ -25,6 +25,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import QUrl, QProcess, pyqtSignal, QThread, Qt, QEvent
 
 
+
 class ModalWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -187,7 +188,15 @@ class UpdateThread(QThread):
         return self.latest_version
 
     def run(self):
+        client = Client('Zima',
+                        update_url='http://api.github.com/repos/Ilmir112/Create_work_krs/releases/latest')
+        client.start()
 
+        # Проверяем наличие обновлений
+        if client.update_check():
+            print(f'Обновление до версии {self.latest_version}...')
+            client.download_update()
+            client.extract_update()
 
         # на URL архива для загрузки
         url = f"https://github.com/Ilmir112/Create_work_krs/releases/download/{self.latest_version}/ZIMA.zip"
@@ -370,6 +379,10 @@ class UpdateThread(QThread):
             if proc.info['name'] == zima_process_name:
                 proc.terminate()  # Остановка процесса ZIMA.exe
                   # Ожидание завершения
+
+
+
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

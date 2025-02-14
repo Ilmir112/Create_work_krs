@@ -301,7 +301,7 @@ def events_gnvp(self, contractor):
                    ' за скважиной', None, None, None, None, None, None, None, None, None],
             [None, '8. Запретить использование плашек превенторов при проведении спускоподъемных технологических '
                    'операций (удержание на весу подвески труб плашками не допускать) (Инструкция БНД № П1-01.05 '
-                   'И-0136ЮЛ-305)..', None, None, None, None, None, None, None, None, None],
+                   'И-0136ЮЛ-305).', None, None, None, None, None, None, None, None, None],
             [None, '9.Мастеру бригады – запретить бурильщикам оставлять устье скважины незагерметизированным'
                    ' независимо от продолжительности перерывов в работе.', None, None, None, None, None, None, None,
              None,
@@ -468,11 +468,11 @@ def events_gnvp(self, contractor):
                    'плотности в присутствии супервайзера.', None, None, None, None, None, None, None, None, None],
             [None, 'IX. Мероприятия по определению безопасного статического уровня', None, None, None, None, None, None,
              None, None, None],
-            [None, f'Для скважины { self.data_well.well_number.get_value} {self.data_well.well_area.get_value} '
-                   f'безопасный статический уровень составляет: \n'
-                   f'для пласта {self.data_well.plast_work[0]} -'
-                   f' {self.data_well.dict_perforation[self.data_well.plast_work[0]]["БСУ"]}м',
-             None, None, None, None, None, None, None, None, None],
+            # [None, f'Для скважины { self.data_well.well_number.get_value} {self.data_well.well_area.get_value} '
+            #        f'безопасный статический уровень составляет: \n'
+            #        f'для пласта {self.data_well.plast_work[0]} -'
+            #        f' {self.data_well.dict_perforation[self.data_well.plast_work[0]]["БСУ"]}м',
+            #  None, None, None, None, None, None, None, None, None],
             [None, 'Производить замер статического уровня (БСУ) в скважине согласно Инструкции "ОПРЕДЕЛЕНИЕ '
                    'СТАТИЧЕСКОГО УРОВНЯ ЖИДКОСТИ ПРИ ПРОВЕДЕНИИ ТЕКУЩЕГО, КАПИТАЛЬНОГО РЕМОНТА И ОСВОЕНИЯ '
                    'СКВАЖИН ПОСЛЕ  БУРЕНИЯ № П1-01.05. И-089042 ЮЛ-305.  \n'

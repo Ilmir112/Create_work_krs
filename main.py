@@ -13,10 +13,12 @@ import win32con
 import property_excel.property_excel_pvr
 import threading
 import win32gui
+
 from openpyxl.reader.excel import load_workbook
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
     QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog, QTabWidget, QTableWidgetItem
 from PyQt5 import QtCore, QtWidgets
+
 
 from datetime import datetime
 from decrypt import decrypt
@@ -958,6 +960,8 @@ class MyWindow(MyMainWindow):
         self.table_juming = None
         self.resize(1400, 800)
 
+        # self.check_for_updates()
+
         self.perforation_correct_window2 = None
         self.ws = None
         self.insert_index = None
@@ -990,22 +994,29 @@ class MyWindow(MyMainWindow):
     #     self.check_for_updates()
     #
     def check_for_updates(self):
-        APP_NAME = 'Zima'
+        from client_config import ClientConfig
+        APP_NAME = 'Create_work_krs'
         APP_VERSION = '1.1.0'
 
-        client = Client(ClientConfig.PUBLIC_KEY, update_urls=ClientConfig.UPDATE_URLS,
-                        progress_hooks=[self.print_status_info])
-        app_update = client.update_check(APP_NAME, APP_VERSION)
-        client.refresh()
+        ASSET_NAME = 'Zima'
+        ASSET_VERSION = '2.3.2'
 
-        app_version = "1.0.0"  # Замените на вашу текущую версию приложения
-        latest_version = client.get_latest_version(ClientConfig.APP_NAME)
+        # You can initialize the client with a callbacks
+        client = Client(ClientConfig(), progress_hooks=[self.progress, self.log_progress], downloader=MyDownloader)
+        app_update = client.update_check(APP_NAME, APP_VERSION, channel='beta')
+        if app_update is not None:
+            app_update.download()
 
-        if latest_version and latest_version.version > app_version:
-            print(f"Доступно обновление: {latest_version.version}")
-            client.download_update(ClientConfig.APP_NAME)
-        else:
-            print("Вы на последней версии.")
+            if app_update.is_downloaded():
+                app_update.extract_overwrite()
+                app_update.extract_restart()
+    @staticmethod
+    def progress(data):
+        print('Time remaining'.format(data['time']))
+
+    @staticmethod
+    def log_progress(data):
+        log.debug('Total file size %s', data['total'])
 
     def print_status_info(info):
         total = info.get(u'total')
@@ -2643,16 +2654,6 @@ if __name__ == "__main__":
     if MyWindow.check_process():
         MyWindow.show_confirmation()
 
-    # if data_list.connect_in_base:
-    #     from work_py.check_new_version import UpdateChecker
-    #     app2 = UpdateChecker()
-    #     app2.check_version()
-    #     if app2.window_close == True:
-    #         MyWindow.set_modal_window(app2)
-    #         data_list.pause = True
-    #         MyWindow.pause_app()
-    #         data_list.pause = False
-    #         # app2.close()
     try:
         if getattr(sys, 'frozen', False):
             # Скомпилированное приложение
