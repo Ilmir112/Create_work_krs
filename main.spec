@@ -6,7 +6,7 @@ a = Analysis(['main.py'],
              pathex=['.'],
              binaries=[],
              datas=[
-                ('temp_my_app/repository/metadata/root.json', '.'),
+
                  ('work_py', 'work_py'),
                  ('users', 'users'),
                  ('tests', 'tests'),
