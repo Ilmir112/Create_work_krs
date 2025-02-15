@@ -47,7 +47,7 @@ class UncaughtExceptions(QObject):
             logger.critical(f'{self.data_well.well_number.get_value}'
                             f' {self.data_well.well_area.get_value} Критическая ошибка: {ex}')
         except:
-            logger.critical(f'{self.well_number} {self.data_well.well_area} Критическая ошибка: {ex}')
+            logger.critical(f'{self.data_well.well_number} {self.data_well.well_area} Критическая ошибка: {ex}')
 
 
 class ExcelWorker(QThread):
@@ -764,13 +764,16 @@ class MyMainWindow(QMainWindow):
                 self.insert_data_in_database(row, row_max + i)
 
             table_widget.insertRow(row)
-
+            adefef = len([row_str for row_str in row_data if row_str not in ['', None]])
             if len(str(row_data)[1]) > 3 and work_plan in 'gnkt_frez':
                 table_widget.setSpan(i + insert_index, 1, 1, 12)
             elif 'prs' in self.data_well.work_plan:
                 table_widget.setSpan(i + insert_index, 2, 1, 11)
             elif 'Порядок работы' in row_data:
                 table_widget.setSpan(i + insert_index, 1, 1, 12)
+            elif len([row_str for row_str in row_data if row_str not in ['', None]]) >6:
+                pass
+
             else:
                 table_widget.setSpan(i + insert_index, 2, 1, 8 + index_setSpan)
 
@@ -990,39 +993,6 @@ class MyWindow(MyMainWindow):
         # self.thread.started.connect(self.excepthook.handleException)
         self.thread.start()
 
-
-    #     self.check_for_updates()
-    #
-    def check_for_updates(self):
-        from client_config import ClientConfig
-        APP_NAME = 'Create_work_krs'
-        APP_VERSION = '1.1.0'
-
-        ASSET_NAME = 'Zima'
-        ASSET_VERSION = '2.3.2'
-
-        # You can initialize the client with a callbacks
-        client = Client(ClientConfig(), progress_hooks=[self.progress, self.log_progress], downloader=MyDownloader)
-        app_update = client.update_check(APP_NAME, APP_VERSION, channel='beta')
-        if app_update is not None:
-            app_update.download()
-
-            if app_update.is_downloaded():
-                app_update.extract_overwrite()
-                app_update.extract_restart()
-    @staticmethod
-    def progress(data):
-        print('Time remaining'.format(data['time']))
-
-    @staticmethod
-    def log_progress(data):
-        log.debug('Total file size %s', data['total'])
-
-    def print_status_info(info):
-        total = info.get(u'total')
-        downloaded = info.get(u'downloaded')
-        status = info.get(u'status')
-        print(downloaded, total, status)
 
     def insert_data_in_chemistry(self):
 

@@ -28,6 +28,7 @@ class FindIndexPZ(MyMainWindow):
         self.prs_copy_index = ProtectedIsDigit(0)
         self.perforation_sole = 5000
         self.number_dp = 0
+        self.head_column = 0
         self.image_loader = None
         self.result_pressure_date = None
         self.column_direction_mine_diameter, self.column_direction_mine_wall_thickness, \

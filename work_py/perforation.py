@@ -2,18 +2,18 @@ from PyQt5 import QtWidgets
 from PyQt5.Qt import *
 
 import data_list
-from main import MyMainWindow, MyWindow
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from .advanted_file import definition_plast_work
 
 
 class TabPageSo(TabPageUnion):
-    def __init__(self, parent=None):
+    def __init__(self, tableWidget, parent=None):
         super().__init__(parent)
 
         self.labelType = QLabel("Кровля  перфорации", self)
         self.lineedit_type = QLineEdit(self)
         self.lineedit_type.setClearButtonEnabled(True)
+        self.tableWidget = tableWidget
 
         self.labelType2 = QLabel("Подошва  перфорации", self)
         self.lineedit_type2 = QLineEdit(self)
@@ -91,12 +91,14 @@ class TabPageSo(TabPageUnion):
             self.grid.addWidget(self.diameter_paker_label_type, 0, 9)
             self.grid.addWidget(self.diameter_paker_edit, 1, 9)
 
-
+            self.tableWidget.min_roof = min([float(self.tableWidget.item(row, 0).text()) for row in range(self.tableWidget.rowCount())])
             if self.data_well.column_additional is False or \
                 (self.data_well.column_additional and self.data_well.head_column_additional.get_value > self.data_well.current_bottom):
-                self.paker_depth.setText(str(self.data_well.perforation_roof - 20))
+                self.paker_depth.setText(str(int(self.tableWidget.min_roof) - 20))
+            else:
+                self.paker_depth.setText(str(float(self.data_well.head_column_additional.get_value) - 20))
 
-            self.paker_depth.editingFinished.connect(self.update_paker_depth)
+            self.paker_depth.textChanged.connect(self.update_paker_depth)
 
     def update_paker_depth(self):
         paker_depth = self.paker_depth.text()
@@ -126,9 +128,9 @@ class TabPageSo(TabPageUnion):
 
 
 class TabWidget(TabWidgetUnion):
-    def __init__(self, parent):
+    def __init__(self,  tableWidget, parent=None):
         super().__init__()
-        self.addTab(TabPageSo(parent), 'Перфорация')
+        self.addTab(TabPageSo(tableWidget, parent), 'Перфорация')
 
 
 class PerforationWindow(WindowUnion):
@@ -136,7 +138,7 @@ class PerforationWindow(WindowUnion):
         super().__init__(data_well)
 
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -151,6 +153,7 @@ class PerforationWindow(WindowUnion):
 
         self.tableWidget.setSortingEnabled(True)
         self.tableWidget.setAlternatingRowColors(True)
+        self.tabWidget = TabWidget(self.tableWidget, self.data_well)
 
         self.buttonAdd = QPushButton('Добавить интервалы перфорации в таблицу')
         self.buttonAdd.clicked.connect(self.add_row_table)
@@ -310,13 +313,14 @@ class PerforationWindow(WindowUnion):
                 return f'{diam} ПП{zar}ГП', f'{diam} ПП{zar}БО'
 
     def add_row_table(self):
+        self.current_widget = self.tabWidget.currentWidget()
 
-        edit_type = self.tabWidget.currentWidget().lineedit_type.text().replace(',', '.')
-        edit_type2 = self.tabWidget.currentWidget().lineedit_type2.text().replace(',', '.')
-        chargesx = str(self.tabWidget.currentWidget().ComboBoxCharges.currentText())
-        editHolesMetr = self.tabWidget.currentWidget().lineEditHolesMetr.currentText()
-        editIndexFormation = self.tabWidget.currentWidget().lineEditIndexFormation.text()
-        dopInformation = self.tabWidget.currentWidget().lineEditDopInformation.text()
+        edit_type = self.current_widget.lineedit_type.text().replace(',', '.')
+        edit_type2 = self.current_widget.lineedit_type2.text().replace(',', '.')
+        chargesx = str(self.current_widget.ComboBoxCharges.currentText())
+        editHolesMetr = self.current_widget.lineEditHolesMetr.currentText()
+        editIndexFormation = self.current_widget.lineEditIndexFormation.text()
+        dopInformation = self.current_widget.lineEditDopInformation.text()
         if not edit_type or not edit_type2 or not chargesx or not editIndexFormation:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
@@ -343,13 +347,10 @@ class PerforationWindow(WindowUnion):
         self.tableWidget.setSortingEnabled(True)
         # print(edit_type, spinYearOfIssue, editSerialNumber, editSpecifications)
 
-    def geophysicalSelect(self, geophysic):
-        return geophysic
-
     def add_work(self):
-
+        self.current_widget = self.tabWidget.currentWidget()
         rows = self.tableWidget.rowCount()
-        type_perforation = self.tabWidget.currentWidget().combobox_type_perforation.currentText()
+        self.type_perforation = self.current_widget.combobox_type_perforation.currentText()
         if len(self.data_well.category_pressure_list) > 1:
             self.data_well.category_pressure = self.data_well.category_pressure_list[1]
 
@@ -364,7 +365,7 @@ class PerforationWindow(WindowUnion):
         if 'Ойл' in data_list.contractor:
             shema_str = 'a'
         elif 'РН' in data_list.contractor:
-            if type_perforation == 'ПВР на кабеле':
+            if self.type_perforation == 'ПВР на кабеле':
                 shema_str = 'a'
             else:
                 shema_str = 'б'
@@ -417,16 +418,26 @@ class PerforationWindow(WindowUnion):
             roof = self.tableWidget.item(row, 0).text().replace(',', '.')
             sool = self.tableWidget.item(row, 1).text().replace(',', '.')
 
-            # pvr_str = TabPageSo.select_type_perforation(self, sool)
-            if type_perforation == 'Трубная перфорация':
-                self.question_need_paker_combo = self.tabWidget.currentWidget().question_need_paker_combo.currentText()
+            if self.type_perforation == 'Трубная перфорация':
+                self.question_need_paker_combo = self.current_widget.question_need_paker_combo.currentText()
                 if self.question_need_paker_combo == 'Да':
-                    self.paker_depth = self.tabWidget.currentWidget().paker_depth.text()
-                    self.diameter_paker_edit = self.tabWidget.currentWidget().diameter_paker_edit.text()
-                    self.tabWidget.currentWidget().question_need_paker_combo.currentText()
+                    self.paker_depth = self.current_widget.paker_depth.text()
+                    self.diameter_paker_edit = self.current_widget.diameter_paker_edit.text()
+                    self.current_widget.question_need_paker_combo.currentText()
                     if self.paker_depth == '' or self.diameter_paker_edit == '':
                         QMessageBox.warning(self, 'Ошибка', 'Не введены данные по пакеру')
                         return
+                    else:
+                        self.paker_depth = int(self.paker_depth)
+                        self.diameter_paker_edit = float(self.diameter_paker_edit)
+
+                    if self.check_true_depth_template(self.paker_depth) is False:
+                        return
+                    if self.true_set_paker(self.paker_depth) is False:
+                        return
+                    if self.check_depth_in_skm_interval(self.paker_depth) is False:
+                        return
+
 
                 perforation[2] = [f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)", None,
                                   f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2). \n{angle_text}", None, None, None, None,
@@ -468,7 +479,7 @@ class PerforationWindow(WindowUnion):
             perforation.append(perf_list)
 
         end_list = "Произвести контрольную запись ЛМ;ТМ. Составить АКТ на перфорацию." \
-            if type_perforation != 'Трубная перфорация' \
+            if self.type_perforation != 'Трубная перфорация' \
             else f'Подъем последних 5-ти НКТ{self.data_well.nkt_diam}мм и демонтаж перфоратора ' \
                  f'производить в присутствии ответственного ' \
                  f'представителя подрядчика по ГИС» (руководителя взрывных' \
@@ -480,7 +491,7 @@ class PerforationWindow(WindowUnion):
         # print([self.data_well.dict_perforation[plast] for plast in self.data_well.plast_work])
 
 
-        if type_perforation == 'Трубная перфорация':
+        if self.type_perforation == 'Трубная перфорация':
             pipe_perforation = [
                 [f'монтаж трубного перфоратора', None,
                  f'Произвести монтаж трубного перфоратора + 2шт/20м НКТ + реперный '
@@ -497,35 +508,30 @@ class PerforationWindow(WindowUnion):
                 [None, None, 'Произвести ГИС привязку трубного перфоратора по ГК, ЛМ.',
                  None, None, None, None, None, None, None,
                  'Подрядчик по ГИС', None, None]]
-            if self.data_well.column_additional is False:
-                mes = QMessageBox.question(self, 'пакер при трубной перфорации',
-                                          'Внедрять ли пакер в компоновку с трубным перфоратором?')
-                if mes == QMessageBox.StandardButton.Yes:
-                    pipe_perforation[0] = [
-                        f'монтаж трубного перфоратора + ПАКЕР', None,
-                        f'Произвести монтаж трубного перфоратора + 2шт/20м НКТ + пакер-{self.diameter_paker_edit}мм + '
-                        f'НКТ 20м + реперный '
-                        f'патрубок L=2м до намеченного интервала перфорации '
-                        f'(с шаблонировкой НКТ{self.data_well.nkt_diam}мм шаблоном {self.data_well.nkt_template}мм. '
-                        f'Спуск компоновки производить  со скоростью не более 0,30 м/с, не допуская резких ударов '
-                        f'и вращения.'
-                        f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации, '
-                        f'фотографии предоставить в ЦИТС {data_list.contractor}, передать по сводке уровня '
-                        f'жидкости до перфорации и после перфорации) '
-                        f'(При СПО первых десяти НКТ на спайдере дополнительно '
-                        f'устанавливать элеватор ЭХЛ). ',
-                        None, None, None, None, None, None, None,
-                        'Подрядчик по ГИС, мастер КРС', None, None]
+            if self.question_need_paker_combo == 'Да':
 
-                    pipe_perforation.insert(0, [
-                        None, None, 'Согласно технологических мероприятий по сокращению продолжительности '
-                                    'ТКРС от 31 мая 2025г НУЖНО СОГЛАСОВАТЬ С ЗАКАЗЧИКОВ ВНЕДРЕНИЯ В КОМПОНОВКУ'
-                                    ' ПАКЕРА ДЛЯ ПРОВЕДЕНИЯ '
-                                    'СКО И ОСВОЕНИЯ ОДНИМ СПО)',
-                        None, None, None, None, None, None, None,
-                        'Подрядчик по ГИС, заказчик', None, None])
-            # QMessageBox.information(self, 'Проверка',
-            #                               'Необходимо проверить длину шаблона, должна быть не менее 10м')
+                pipe_perforation = [[
+                    f'монтаж трубного перфоратора + ПАКЕР', None,
+                    f'Произвести монтаж трубного перфоратора + НКТ {self.tableWidget.min_roof - self.paker_depth} НКТ + пакер-{self.diameter_paker_edit}мм + '
+                    f'НКТ 20м + реперный '
+                    f'патрубок L=2м до намеченного интервала перфорации '
+                    f'(с шаблонировкой НКТ{self.data_well.nkt_diam}мм шаблоном {self.data_well.nkt_template}мм. '
+                    f'Спуск компоновки производить  со скоростью не более 0,30 м/с, не допуская резких ударов '
+                    f'и вращения.'
+                    f'(Произвести фотографию перфоратора в заряженном состоянии, и после проведения перфорации, '
+                    f'фотографии предоставить в ЦИТС {data_list.contractor}, передать по сводке уровня '
+                    f'жидкости до перфорации и после перфорации) '
+                    f'(При СПО первых десяти НКТ на спайдере дополнительно '
+                    f'устанавливать элеватор ЭХЛ). ',
+                    None, None, None, None, None, None, None,
+                    'Подрядчик по ГИС, мастер КРС', None, None]]
+                mes = QMessageBox.question(self, 'пакер при трубной перфорации',
+                                           'Внедрять ли пакер в компоновку с трубным перфоратором?')
+                if mes == QMessageBox.Yes:
+                    return
+
+
+
             for i in range(len(pipe_perforation)):
                 perforation.insert(i + 1, pipe_perforation[i])
 
@@ -536,35 +542,7 @@ class PerforationWindow(WindowUnion):
         if len(perforation) < 6:
             QMessageBox.information(self, 'Внимание', 'Не добавлены интервалы перфорации!!!')
         else:
-
-            for i, row_data in enumerate(perforation):
-                row = self.insert_index + i
-                self.table_widget.insertRow(row)
-                if type_perforation == 'ПВР на кабеле':
-                    lst = [0, 1, 2, len(perforation) - 1]
-                else:
-                    lst = [0, 1, 2, 3, 4, len(perforation) - 1]
-                row_max = self.table_widget.rowCount()
-                definition_plast_work(self)
-                self.insert_data_in_database(row, row_max)
-
-                if i in lst:  # Объединение ячеек по вертикале в столбце "отвественные и норма"
-                    self.table_widget.setSpan(i + self.insert_index, 2, 1, 8)
-                for column, data in enumerate(row_data):
-                    self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
-
-                    if not data is None:
-                        text = data
-                        for key, value in text_width_dict.items():
-                            if value[0] <= len(str(text)) <= value[1]:
-                                text_width = key
-                                self.table_widget.setRowHeight(row, int(float(text_width)))
-                    else:
-                        self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
-
-            self.table_widget.setRowHeight(self.insert_index, 60)
-            self.table_widget.setRowHeight(self.insert_index + 1, 60)
-
+            self.populate_row(self.insert_index, perforation, self.table_widget)
             self.close()
 
     def del_row_table(self):

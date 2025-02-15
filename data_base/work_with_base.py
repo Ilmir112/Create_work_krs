@@ -269,6 +269,7 @@ class ClassifierWell(MyMainWindow):
                                         area_well = row[area_column]
 
                                         if well_number:
+                                            print(well_number)
                                             self.classification_well.insert_data_in_table_without_juming(
                                                 str(well_number), area_well, version_year, region_name, costumer)
 

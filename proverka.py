@@ -1,5 +1,5 @@
-import openpyxl
-from openpyxl.utils.cell import coordinate_from_string
+# import openpyxl
+# from openpyxl.utils.cell import coordinate_from_string
 # import json
 # from data_base.work_with_base import ClassifierWell
 #
@@ -110,11 +110,11 @@ ade='15.СОГЛАСНО ПИСЬМА ООО "БАШНЕФТЬ-ДОБЫЧА" №
              'зоны (внутри ПКС) каждые 30 мин с фиксацией в журнале ГВС. '
 print(len(ade))
 
-wb = openpyxl.load_workbook('27 Сухоязская КР13-1 БР№29 11.01.2025.xlsm', keep_vba=True)
+wb = openpyxl.load_workbook('Копия Телефоны АР (00000002).xlsx')
 ws = wb.active
 
 dict_tel = {}
-for row_ind, row in enumerate(ws.iter_rows(min_row=130, max_row=140, max_col=8)):
+for row_ind, row in enumerate(ws.iter_rows(values_only=True, min_row=1, max_row=300, max_col=8)):
     for col in row:
         if col == 'Начальник':
             dict_tel.setdefault(

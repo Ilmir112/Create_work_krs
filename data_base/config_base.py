@@ -523,7 +523,7 @@ class CheckWellExistence:
         if not self.db_connection:
             return None
         with CursorContext(self.db_connection.cursor()) as cursor:
-            self.drop_table(cursor, region_name)
+            # self.drop_table(cursor, region_name)
 
             # Создание таблицы в базе данных
             cursor.execute(f'CREATE TABLE IF NOT EXISTS {region_name}'
@@ -672,7 +672,7 @@ class CheckWellExistence:
 
     def drop_table(self, cursor, region_name):
 
-        cursor.execute(f"DROP TABLE IF EXISTS {region_name};")
+        cursor.execute(f"DROP TABLE IF EXISTS {region_name}")
 
     def checking_well_database_month(self, region: str):
         date_string = self.check_correct_month()
