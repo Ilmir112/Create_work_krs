@@ -278,45 +278,43 @@ class WorkDatabaseWell:
                                                  f'Обновить данные?')
                     if reply == QMessageBox.Yes:
                         cursor.execute(f"""
-                                        UPDATE wells
-                                        SET data_well ={self.path_index}, today ={self.path_index}, 
-                                        excel_json ={self.path_index},
-                                         work_plan={self.path_index}, geolog ={self.path_index}, 
-                                        type_kr={self.path_index}, data_change_paragraph={self.path_index}, 
-                                        cdng={self.path_index}, category_dict={self.path_index}, 
-                                        well_oilfield={self.path_index}, appointment={self.path_index}, 
-                                        inv_number={self.path_index}, wellhead_fittings={self.path_index}                                                            
+                                        DELETE FROM wells                                                                                                   
                                         WHERE well_number ={self.path_index} AND area_well ={self.path_index} 
                                         AND contractor ={self.path_index}
                                          AND costumer ={self.path_index} AND work_plan ={self.path_index} 
                                          AND type_kr={self.path_index}
                                                     """, (
-                            data_well_dict, date_today, excel_json, work_plan_str, data_list.user[1], type_kr,
-                            data_paragraph, cdng,
-                            category_dict, well_oilfield, appointment_well, inv_number, wellhead_fittings,
                             str(well_number), well_area, contractor, costumer, work_plan_str,
                             type_kr))
 
-                        QMessageBox.information(None, 'Успешно', 'Данные обновлены')
-                else:
+                        QMessageBox.information(None, 'Успешно', 'Данные удалены')
+                    else:
+                        # Не забудьте сделать коммит
+                        self.db_connection.commit()
 
-                    # Подготовленный запрос для вставки данных с параметрами
-                    query = f"INSERT INTO wells " \
-                            f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, " \
-                            f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                            f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                            f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                            f"{self.path_index}, {self.path_index}, {self.path_index})"
+                        # Закрытие соединения после завершения всех операций
+                        self.db_connection.close()
+                        return
 
-                    data_values = (str(well_number), well_area,
-                                   data_well_dict, date_today, excel_json, contractor, data_list.costumer,
-                                   work_plan_str, data_list.user[1], type_kr, data_paragraph, cdng, category_dict,
-                                   well_oilfield, appointment_well, str(inv_number), wellhead_fittings, angle_data)
+                # Подготовленный запрос для вставки данных с параметрами
+                query = f"INSERT INTO wells " \
+                        f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, " \
+                        f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
+                        f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
+                        f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
+                        f"{self.path_index}, {self.path_index}, {self.path_index})"
 
-                    # Выполнение запроса с использованием параметров
-                    cursor.execute(query, data_values)
-                    # Не забудьте сделать коммит
-                    self.db_connection.commit()
+                data_values = (str(well_number), well_area,
+                               data_well_dict, date_today, excel_json, contractor, data_list.costumer,
+                               work_plan_str, data_list.user[1], type_kr, data_paragraph, cdng, category_dict,
+                               well_oilfield, appointment_well, str(inv_number), wellhead_fittings, angle_data)
+
+                # Выполнение запроса с использованием параметров
+                cursor.execute(query, data_values)
+                # Не забудьте сделать коммит
+                self.db_connection.commit()
+                # Закрытие соединения после завершения всех операций
+                self.db_connection.close()
 
 
 

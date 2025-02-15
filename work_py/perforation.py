@@ -59,6 +59,52 @@ class TabPageSo(TabPageUnion):
         self.grid.addWidget(self.label_type_perforation, 0, 6)
         self.grid.addWidget(TabPageSo.combobox_type_perforation, 1, 6)
 
+        TabPageSo.combobox_type_perforation.currentTextChanged.connect(self.update_combobox_type_perforation)
+
+    def update_combobox_type_perforation(self, index):
+        if index == 'Трубная перфорация':
+            self.question_need_paker_label = QLabel('Внедрять пакер в компоновку?')
+            self.question_need_paker_combo = QComboBox(self)
+            self.question_need_paker_combo.addItems(['Нет', 'Да'])
+
+            self.grid.addWidget(self.question_need_paker_label, 0, 7)
+            self.grid.addWidget(self.question_need_paker_combo, 1, 7)
+            self.question_need_paker_combo.currentTextChanged.connect(self.update_need_paker)
+        else:
+            self.question_need_paker_combo.setParent(None)
+            self.question_need_paker_combo.setParent(None)
+
+    def update_need_paker(self, index):
+        if index == 'Нет':
+            self.paker_label.setParent(None)
+            self.paker_depth.setParent(None)
+            self.diameter_paker_label_type.setParent(None)
+            self.diameter_paker_edit.setParent(None)
+        else:
+            self.paker_label = QLabel("глубина пакера", self)
+            self.paker_depth = QLineEdit(self)
+            self.diameter_paker_label_type = QLabel("Диаметр пакера", self)
+            self.diameter_paker_edit = QLineEdit(self)
+
+            self.grid.addWidget(self.paker_label, 0, 8)
+            self.grid.addWidget(self.paker_depth, 1, 8)
+            self.grid.addWidget(self.diameter_paker_label_type, 0, 9)
+            self.grid.addWidget(self.diameter_paker_edit, 1, 9)
+
+
+            if self.data_well.column_additional is False or \
+                (self.data_well.column_additional and self.data_well.head_column_additional.get_value > self.data_well.current_bottom):
+                self.paker_depth.setText(str(self.data_well.perforation_roof - 20))
+
+            self.paker_depth.editingFinished.connect(self.update_paker_depth)
+
+    def update_paker_depth(self):
+        paker_depth = self.paker_depth.text()
+        if paker_depth:
+            paker_diameter = int(float(self.paker_diameter_select(paker_depth)))
+            self.diameter_paker_edit.setText(str(paker_diameter))
+
+
     def select_type_perforation(self, sole):
         if len(self.data_well.angle_data) == 0 and self.data_well.max_angle.get_value < 50:
             TabPageSo.combobox_type_perforation.setCurrentIndex(0)
@@ -373,6 +419,15 @@ class PerforationWindow(WindowUnion):
 
             # pvr_str = TabPageSo.select_type_perforation(self, sool)
             if type_perforation == 'Трубная перфорация':
+                self.question_need_paker_combo = self.tabWidget.currentWidget().question_need_paker_combo.currentText()
+                if self.question_need_paker_combo == 'Да':
+                    self.paker_depth = self.tabWidget.currentWidget().paker_depth.text()
+                    self.diameter_paker_edit = self.tabWidget.currentWidget().diameter_paker_edit.text()
+                    self.tabWidget.currentWidget().question_need_paker_combo.currentText()
+                    if self.paker_depth == '' or self.diameter_paker_edit == '':
+                        QMessageBox.warning(self, 'Ошибка', 'Не введены данные по пакеру')
+                        return
+
                 perforation[2] = [f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)", None,
                                   f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2). \n{angle_text}", None, None, None, None,
                                   None, None, None, 'подрядчик по ГИС', None]
@@ -443,12 +498,13 @@ class PerforationWindow(WindowUnion):
                  None, None, None, None, None, None, None,
                  'Подрядчик по ГИС', None, None]]
             if self.data_well.column_additional is False:
-                mes = QMessageBox.warning(self, 'пакер при трубной перфорации',
-                                          'Внедрять ли пакер в компоновку с трубным перфоратором')
+                mes = QMessageBox.question(self, 'пакер при трубной перфорации',
+                                          'Внедрять ли пакер в компоновку с трубным перфоратором?')
                 if mes == QMessageBox.StandardButton.Yes:
                     pipe_perforation[0] = [
                         f'монтаж трубного перфоратора + ПАКЕР', None,
-                        f'Произвести монтаж трубного перфоратора + 2шт/20м НКТ + пакер + НКТ 20м + реперный '
+                        f'Произвести монтаж трубного перфоратора + 2шт/20м НКТ + пакер-{self.diameter_paker_edit}мм + '
+                        f'НКТ 20м + реперный '
                         f'патрубок L=2м до намеченного интервала перфорации '
                         f'(с шаблонировкой НКТ{self.data_well.nkt_diam}мм шаблоном {self.data_well.nkt_template}мм. '
                         f'Спуск компоновки производить  со скоростью не более 0,30 м/с, не допуская резких ударов '
