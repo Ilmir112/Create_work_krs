@@ -235,16 +235,7 @@ def definition_q_nek(self):
     return definition_q_list
 
 
-def privyazka_nkt(self):
 
-    priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
-                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
-                  f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
-                  f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
-                  f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
-                  None, None, None, None, None, None, None,
-                  'Мастер КРС, подрядчик по ГИС', 4]]
-    return priv_list
 
 
 def definition_bottom_gklm(self):

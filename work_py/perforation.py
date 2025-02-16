@@ -75,16 +75,24 @@ class TabPageSo(TabPageUnion):
             self.question_need_paker_combo.setParent(None)
 
     def update_need_paker(self, index):
+        adwd = self.tableWidget.rowCount()
+
+        self.paker_label = QLabel("глубина пакера", self)
+        self.paker_depth = QLineEdit(self)
+        self.diameter_paker_label_type = QLabel("Диаметр пакера", self)
+        self.diameter_paker_edit = QLineEdit(self)
+
+        if self.tableWidget.rowCount() == 0 and index == 'Да':
+            QMessageBox.warning(self, 'Ошибка', 'Сначало нужно добавить все плановые интервалы перфорации')
+            self.question_need_paker_combo.setCurrentIndex(0)
+            return
+
         if index == 'Нет':
             self.paker_label.setParent(None)
             self.paker_depth.setParent(None)
             self.diameter_paker_label_type.setParent(None)
             self.diameter_paker_edit.setParent(None)
         else:
-            self.paker_label = QLabel("глубина пакера", self)
-            self.paker_depth = QLineEdit(self)
-            self.diameter_paker_label_type = QLabel("Диаметр пакера", self)
-            self.diameter_paker_edit = QLineEdit(self)
 
             self.grid.addWidget(self.paker_label, 0, 8)
             self.grid.addWidget(self.paker_depth, 1, 8)
@@ -437,8 +445,9 @@ class PerforationWindow(WindowUnion):
                         return
                     if self.check_depth_in_skm_interval(self.paker_depth) is False:
                         return
-
-
+                mes = QMessageBox.question(self, 'Внедрять пакер', 'уверены, что пакер в компоновку не внедрять')
+                if mes == QMessageBox.No:
+                    return
                 perforation[2] = [f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)", None,
                                   f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2). \n{angle_text}", None, None, None, None,
                                   None, None, None, 'подрядчик по ГИС', None]
@@ -527,7 +536,7 @@ class PerforationWindow(WindowUnion):
                     'Подрядчик по ГИС, мастер КРС', None, None]]
                 mes = QMessageBox.question(self, 'пакер при трубной перфорации',
                                            'Внедрять ли пакер в компоновку с трубным перфоратором?')
-                if mes == QMessageBox.Yes:
+                if mes == QMessageBox.No:
                     return
 
 

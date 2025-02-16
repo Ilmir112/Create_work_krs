@@ -275,7 +275,118 @@ class WindowUnion(MyMainWindow):
         self.data_well = data_well
         self.tableWidget = None
 
+    def swab_select(self, swab_type_combo, plast_combo, swab_volume_edit):
 
+        if swab_type_combo == 'Задача №2.1.13':  # , 'Задача №2.1.16', 'Задача №2.1.11', 'своя задача']'
+            swab_select = f'Произвести  геофизические исследования пласта {plast_combo} по технологической ' \
+                          f'задаче № 2.1.13 Определение профиля ' \
+                          f'и состава притока, дебита, источника обводнения и технического состояния ' \
+                          f'эксплуатационной колонны и НКТ ' \
+                          f'после свабирования с отбором жидкости не менее {swab_volume_edit}м3. \n' \
+                          f'Пробы при свабировании отбирать в стандартной таре на {swab_volume_edit - 10}, ' \
+                          f'{swab_volume_edit - 5}, {swab_volume_edit}м3,' \
+                          f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
+            swab_short = f'сваб не менее {swab_volume_edit}м3 + профиль притока'
+        elif swab_type_combo == 'Задача №2.1.14':
+            swab_select = f'Произвести  геофизические исследования {plast_combo} по технологической задаче № 2.1.14 ' \
+                          f'Определение профиля и состава притока, дебита, источника обводнения и технического ' \
+                          f'состояния эксплуатационной колонны и НКТ с использованием малогабаритного пакерного ' \
+                          f'расходомера (РН) после свабирования не менее {swab_volume_edit}м3. \n' \
+                          f'Пробы при свабировании отбирать в стандартной таре на {swab_volume_edit - 10}, ' \
+                          f'{swab_volume_edit - 5}, {swab_volume_edit}м3,' \
+                          f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
+            swab_short = f'сваб не менее {swab_volume_edit}м3 + профиль притока Малогабаритный прибор'
+
+        elif swab_type_combo == 'Задача №2.1.16':
+            swab_select = f'Произвести  геофизические исследования {plast_combo} по технологической задаче № 2.1.16 ' \
+                          f'Определение дебита и ' \
+                          f'обводнённости по прослеживанию уровней, ВНР и по регистрации забойного ' \
+                          f'давления после освоения ' \
+                          f'свабированием  не менее {swab_volume_edit}м3. \n' \
+                          f'Пробы при свабировании отбирать в стандартной таре на {swab_volume_edit - 10}, ' \
+                          f'{swab_volume_edit - 5}, {swab_volume_edit}м3,' \
+                          f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
+            swab_short = f'сваб не менее {swab_volume_edit}м3 + КВУ, ВНР'
+        elif swab_type_combo == 'Задача №2.1.11':
+            swab_select = f'Произвести  геофизические исследования {plast_combo} по технологической задаче № 2.1.11' \
+                          f' свабирование в объеме не ' \
+                          f'менее  {swab_volume_edit}м3. \n ' \
+                          f'Отобрать пробу на химический анализ воды на ОСТ-39 при последнем рейсе сваба ' \
+                          f'(объем не менее 10литров).' \
+                          f'Обязательная сдача в этот день в ЦДНГ'
+            swab_short = f'сваб не менее {swab_volume_edit}м3'
+
+        elif swab_type_combo == 'Задача №2.1.16 + герметичность пакера':
+            swab_select = f'Произвести фоновую запись. Понизить до стабильного динамического уровня. ' \
+                          f'Произвести записи по определению герметичности пакера. При герметичности произвести ' \
+                          f'геофизические исследования {plast_combo} по технологической задаче № 2.1.16' \
+                          f'свабирование в объеме не менее  {swab_volume_edit}м3. \n ' \
+                          f'Отобрать пробу на химический анализ воды на ОСТ-39 при последнем рейсе сваба ' \
+                          f'(объем не менее 10литров).' \
+                          f'Обязательная сдача в этот день в ЦДНГ'
+            swab_short = f'сваб не менее {swab_volume_edit}м3'
+
+        elif swab_type_combo == 'ГРР':
+            swab_select = f'Провести освоение объекта {plast_combo} свабированием ' \
+                          f'(объем согласовать с ОГРР) не менее ' \
+                          f'{swab_volume_edit}м3 с отбором поверхностных ' \
+                          f'проб через каждые 5м3 сваб и передачей представителю ЦДНГ, выполнить ' \
+                          f'прослеживание уровней ' \
+                          f'и ВНР с регистрацией КВУ глубинными манометрами, записать профиль притока, в случае ' \
+                          f'получения притока нефти отобрать глубинные пробы (при выполнении условий отбора), ' \
+                          f'провести ГДИС (КВДз).'
+            swab_short = f'сваб профиль не менее ' \
+                         f'{swab_volume_edit}'
+
+        return swab_short, swab_select
+
+    def testing_pressure(self, depth):
+
+        interval_list = []
+
+        for plast in self.data_well.plast_all:
+            if self.data_well.dict_perforation[plast]['отключение'] is False:
+                for interval in self.data_well.dict_perforation[plast]['интервал']:
+                    if interval[0] < self.data_well.current_bottom:
+                        interval_list.append(interval)
+
+        if self.data_well.leakiness is True:
+            for nek in self.data_well.dict_leakiness['НЭК']['интервал']:
+                if self.data_well.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False and float(
+                        nek.split('-')[0]) < depth:
+                    interval_list.append(list(map(float, nek.split('-'))))
+
+        if any([float(interval[1]) < float(depth) for interval in interval_list]):
+            check_true = True
+            testing_pressure_str = f'Закачкой тех жидкости в затрубное пространство при Р=' \
+                                   f'{self.data_well.max_admissible_pressure.get_value}атм' \
+                                   f' удостоверить в отсутствии выхода тех жидкости и герметичности пакера, составить акт. ' \
+                                   f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа ' \
+                                   f'до начала работ)'
+            testing_pressure_short = f'Закачкой в затруб при Р=' \
+                                     f'{self.data_well.max_admissible_pressure.get_value}атм' \
+                                     f' удостоверить в герметичности пакера'
+        else:
+            check_true = False
+            testing_pressure_str = f'Опрессовать эксплуатационную колонну в интервале {depth}-0м на ' \
+                                   f'Р={self.data_well.max_admissible_pressure.get_value}атм' \
+                                   f' в течение 30 минут в присутствии представителя заказчика, составить акт. ' \
+                                   f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа ' \
+                                   f'до начала работ)'
+            testing_pressure_short = f'Опрессовать в {depth}-0м на Р={self.data_well.max_admissible_pressure.get_value}атм'
+
+        return testing_pressure_str, testing_pressure_short, check_true
+
+    def privyazka_nkt(self):
+
+        priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
+                      f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
+                      f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
+                      f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
+                      None, None, None, None, None, None, None,
+                      'Мастер КРС, подрядчик по ГИС', 4]]
+        return priv_list
     def find_item_in_table(self, value):
         for row in range(self.tableWidget.rowCount()):
             item = self.tableWidget.item(row, 0)  # Проверяем первый столбец

@@ -6,7 +6,7 @@ import data_list
 from abc import ABC, abstractmethod
 
 from main import MyMainWindow
-from work_py.alone_oreration import privyazka_nkt
+
 from work_py.parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
 from work_py.rationingKRS import descentNKT_norm, descent_sucker_pod
 
@@ -661,8 +661,8 @@ class DescentPaker(DescentParent):
             paker_descent.insert(-2, work_list_depth[0])
 
         if self.need_privyazka_nkt():
-            if privyazka_nkt(self)[0] not in paker_descent:
-                paker_descent.insert(2, privyazka_nkt(self)[0])
+            if self.privyazka_nkt()[0] not in paker_descent:
+                paker_descent.insert(2, self.privyazka_nkt()[0])
 
         if self.rgd_question_combo == 'Да':
             if self.data_well.column_additional and self.data_well.depth_fond_paker_before['after'] >= self.data_well.head_column_additional.get_value:

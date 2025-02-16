@@ -14,7 +14,7 @@ from work_py.alone_oreration import well_volume
 
 from work_py.change_fluid import Change_fluid_Window
 
-from work_py.alone_oreration import privyazka_nkt, need_h2s
+from work_py.alone_oreration import  need_h2s
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from work_py.template_work import TabPageSoWith
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
@@ -1275,70 +1275,7 @@ class SwabWindow(WindowUnion):
                                liftingNKT_norm(depth_opy + 200, 1)])
         return paker_list
 
-    def swab_select(self, swab_type_combo, plast_combo, swab_volume_edit):
 
-        if swab_type_combo == 'Задача №2.1.13':  # , 'Задача №2.1.16', 'Задача №2.1.11', 'своя задача']'
-            swab_select = f'Произвести  геофизические исследования пласта {plast_combo} по технологической ' \
-                          f'задаче № 2.1.13 Определение профиля ' \
-                          f'и состава притока, дебита, источника обводнения и технического состояния ' \
-                          f'эксплуатационной колонны и НКТ ' \
-                          f'после свабирования с отбором жидкости не менее {swab_volume_edit}м3. \n' \
-                          f'Пробы при свабировании отбирать в стандартной таре на {swab_volume_edit - 10}, ' \
-                          f'{swab_volume_edit - 5}, {swab_volume_edit}м3,' \
-                          f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
-            swab_short = f'сваб не менее {swab_volume_edit}м3 + профиль притока'
-        elif swab_type_combo == 'Задача №2.1.14':
-            swab_select = f'Произвести  геофизические исследования {plast_combo} по технологической задаче № 2.1.14 ' \
-                          f'Определение профиля и состава притока, дебита, источника обводнения и технического ' \
-                          f'состояния эксплуатационной колонны и НКТ с использованием малогабаритного пакерного ' \
-                          f'расходомера (РН) после свабирования не менее {swab_volume_edit}м3. \n' \
-                          f'Пробы при свабировании отбирать в стандартной таре на {swab_volume_edit - 10}, ' \
-                          f'{swab_volume_edit - 5}, {swab_volume_edit}м3,' \
-                          f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
-            swab_short = f'сваб не менее {swab_volume_edit}м3 + профиль притока Малогабаритный прибор'
-
-        elif swab_type_combo == 'Задача №2.1.16':
-            swab_select = f'Произвести  геофизические исследования {plast_combo} по технологической задаче № 2.1.16 ' \
-                          f'Определение дебита и ' \
-                          f'обводнённости по прослеживанию уровней, ВНР и по регистрации забойного ' \
-                          f'давления после освоения ' \
-                          f'свабированием  не менее {swab_volume_edit}м3. \n' \
-                          f'Пробы при свабировании отбирать в стандартной таре на {swab_volume_edit - 10}, ' \
-                          f'{swab_volume_edit - 5}, {swab_volume_edit}м3,' \
-                          f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
-            swab_short = f'сваб не менее {swab_volume_edit}м3 + КВУ, ВНР'
-        elif swab_type_combo == 'Задача №2.1.11':
-            swab_select = f'Произвести  геофизические исследования {plast_combo} по технологической задаче № 2.1.11' \
-                          f' свабирование в объеме не ' \
-                          f'менее  {swab_volume_edit}м3. \n ' \
-                          f'Отобрать пробу на химический анализ воды на ОСТ-39 при последнем рейсе сваба ' \
-                          f'(объем не менее 10литров).' \
-                          f'Обязательная сдача в этот день в ЦДНГ'
-            swab_short = f'сваб не менее {swab_volume_edit}м3'
-
-        elif swab_type_combo == 'Задача №2.1.16 + герметичность пакера':
-            swab_select = f'Произвести фоновую запись. Понизить до стабильного динамического уровня. ' \
-                          f'Произвести записи по определению герметичности пакера. При герметичности произвести ' \
-                          f'геофизические исследования {plast_combo} по технологической задаче № 2.1.16' \
-                          f'свабирование в объеме не менее  {swab_volume_edit}м3. \n ' \
-                          f'Отобрать пробу на химический анализ воды на ОСТ-39 при последнем рейсе сваба ' \
-                          f'(объем не менее 10литров).' \
-                          f'Обязательная сдача в этот день в ЦДНГ'
-            swab_short = f'сваб не менее {swab_volume_edit}м3'
-
-        elif swab_type_combo == 'ГРР':
-            swab_select = f'Провести освоение объекта {plast_combo} свабированием ' \
-                          f'(объем согласовать с ОГРР) не менее ' \
-                          f'{swab_volume_edit}м3 с отбором поверхностных ' \
-                          f'проб через каждые 5м3 сваб и передачей представителю ЦДНГ, выполнить ' \
-                          f'прослеживание уровней ' \
-                          f'и ВНР с регистрацией КВУ глубинными манометрами, записать профиль притока, в случае ' \
-                          f'получения притока нефти отобрать глубинные пробы (при выполнении условий отбора), ' \
-                          f'провести ГДИС (КВДз).'
-            swab_short = f'сваб профиль не менее ' \
-                         f'{swab_volume_edit}'
-
-        return swab_short, swab_select
 
     def swabbing_with_paker_stub(self, diameter_paker, paker_depth, paker_khost, plast_combo, swab_type_combo,
                                  swab_volume_edit, depth_gauge_combo, need_change_zgs_combo,
@@ -1472,9 +1409,9 @@ class SwabWindow(WindowUnion):
         for plast in list(self.data_well.dict_perforation.keys()):
             for interval in self.data_well.dict_perforation[plast]['интервал']:
                 if abs(float(interval[1] - paker_depth)) < 10 or abs(float(interval[0] - paker_depth)) < 10:
-                    if privyazka_nkt(self) not in paker_list and data_list.privyazkaSKO == 0:
+                    if self.privyazka_nkt() not in paker_list and data_list.privyazkaSKO == 0:
                         data_list.privyazkaSKO += 1
-                        paker_list.insert(1, privyazka_nkt(self)[0])
+                        paker_list.insert(1, self.privyazka_nkt()[0])
 
         if need_change_zgs_combo == 'Да':
             paker_list.extend(Change_fluid_Window.fluid_change(self, plast_new, fluid_new, pressure_new))
@@ -1692,9 +1629,9 @@ class SwabWindow(WindowUnion):
         for plast in list(self.data_well.dict_perforation.keys()):
             for interval in self.data_well.dict_perforation[plast]['интервал']:
                 if abs(float(interval[1] - paker_depth)) < 10 or abs(float(interval[0] - paker_depth)) < 10:
-                    if privyazka_nkt(self) not in paker_list and data_list.privyazkaSKO == 0:
+                    if self.privyazka_nkt() not in paker_list and data_list.privyazkaSKO == 0:
                         data_list.privyazkaSKO += 1
-                        paker_list.insert(1, privyazka_nkt(self)[0])
+                        paker_list.insert(1, self.privyazka_nkt()[0])
 
         if need_change_zgs_combo == 'Да':
             # print(plast_new, fluid_new, pressure_new)
@@ -1862,9 +1799,9 @@ class SwabWindow(WindowUnion):
         for plast in list(self.data_well.dict_perforation.keys()):
             for interval in self.data_well.dict_perforation[plast]['интервал']:
                 if abs(float(interval[1] - paker1_depth)) < 10 or abs(float(interval[0] - paker1_depth)) < 10:
-                    if privyazka_nkt(self) not in paker_list and data_list.privyazkaSKO == 0:
+                    if self.privyazka_nkt() not in paker_list and data_list.privyazkaSKO == 0:
                         data_list.privyazkaSKO += 1
-                        paker_list.insert(1, *privyazka_nkt(self))
+                        paker_list.insert(1, self.privyazka_nkt())
         if need_change_zgs_combo == 'Да':
             paker_list.extend(Change_fluid_Window.fluid_change(self, plast_new, fluid_new, pressure_new))
             paker_list.append([None, None,

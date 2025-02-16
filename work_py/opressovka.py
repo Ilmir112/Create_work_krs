@@ -5,7 +5,7 @@ import data_list
 from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
     QPushButton, QHeaderView, QTableWidget, QTableWidgetItem
 
-from work_py.alone_oreration import privyazka_nkt
+
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm
 
@@ -287,7 +287,7 @@ class OpressovkaEK(WindowUnion):
                  'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
 
         if self.need_privyazka_q_combo == "Да":
-            paker_list.insert(1, privyazka_nkt(self)[0])
+            paker_list.insert(1, self.privyazka_nkt()[0])
 
         return paker_list
 
@@ -465,7 +465,7 @@ class OpressovkaEK(WindowUnion):
             paker_list.append(row)
 
         if self.need_privyazka_q_combo == "Да":
-            paker_list.insert(1, privyazka_nkt(self)[0])
+            paker_list.insert(1, self.privyazka_nkt()[0])
 
         return paker_list
 
@@ -500,39 +500,4 @@ class OpressovkaEK(WindowUnion):
 
         return check_true
 
-    def testing_pressure(self, depth):
 
-        interval_list = []
-
-        for plast in self.data_well.plast_all:
-            if self.data_well.dict_perforation[plast]['отключение'] is False:
-                for interval in self.data_well.dict_perforation[plast]['интервал']:
-                    if interval[0] < self.data_well.current_bottom:
-                        interval_list.append(interval)
-
-        if self.data_well.leakiness is True:
-            for nek in self.data_well.dict_leakiness['НЭК']['интервал']:
-                if self.data_well.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False and float(
-                        nek.split('-')[0]) < depth:
-                    interval_list.append(list(map(float, nek.split('-'))))
-
-        if any([float(interval[1]) < float(depth) for interval in interval_list]):
-            check_true = True
-            testing_pressure_str = f'Закачкой тех жидкости в затрубное пространство при Р=' \
-                                   f'{self.data_well.max_admissible_pressure.get_value}атм' \
-                                   f' удостоверить в отсутствии выхода тех жидкости и герметичности пакера, составить акт. ' \
-                                   f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа ' \
-                                   f'до начала работ)'
-            testing_pressure_short = f'Закачкой в затруб при Р=' \
-                                     f'{self.data_well.max_admissible_pressure.get_value}атм' \
-                                     f' удостоверить в герметичности пакера'
-        else:
-            check_true = False
-            testing_pressure_str = f'Опрессовать эксплуатационную колонну в интервале {depth}-0м на ' \
-                                   f'Р={self.data_well.max_admissible_pressure.get_value}атм' \
-                                   f' в течение 30 минут в присутствии представителя заказчика, составить акт. ' \
-                                   f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа ' \
-                                   f'до начала работ)'
-            testing_pressure_short = f'Опрессовать в {depth}-0м на Р={self.data_well.max_admissible_pressure.get_value}атм'
-
-        return testing_pressure_str, testing_pressure_short, check_true

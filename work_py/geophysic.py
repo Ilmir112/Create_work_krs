@@ -242,35 +242,8 @@ class GeophysicWindow(WindowUnion):
                                         None, None, None, None, None, None, None,
                                         'Мастер КРС, подрядчик по ГИС', 8])
 
-        text_width_dict = {20: (0, 100), 40: (101, 200), 60: (201, 300), 80: (301, 400), 100: (401, 500),
-                           120: (501, 600), 140: (601, 700)}
-        # print(research_gis_list)
-        for i, row_data in enumerate(geophysical_research):
-            row = self.insert_index + i
-            self.table_widget.insertRow(row)
-            row_max = self.table_widget.rowCount()
-            self.insert_data_in_database(row, row_max)
-            # lst = [1, 0, 2, len(geophysical_research)-1]
-            # if float(self.data_well.max_angle.get_value) >= 50:
-            #     lst.extend([3, 4])
-            # Объединение ячеек по горизонтали в столбце "отвественные и норма"
-            self.table_widget.setSpan(i + self.insert_index, 2, 1, 8)
-            for column, data in enumerate(row_data):
-
-                self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str(data)))
-
-                if column == 0 or column == 2 or column == 10 or column == 11 or column == 12:
-                    if not data is None:
-                        text = data
-                        for key, value in text_width_dict.items():
-                            if value[0] <= len(str(text)) <= value[1]:
-                                text_width = key
-                                self.table_widget.setRowHeight(row, int(text_width))
-                else:
-                    self.table_widget.setItem(row, column, QtWidgets.QTableWidgetItem(str('')))
-
-        self.table_widget.setRowHeight(self.insert_index, 60)
-        self.table_widget.setRowHeight(self.insert_index + 1, 60)
+        if  geophysical_research:
+            self.populate_row(self.insert_index, geophysical_research, self.table_widget)
 
         self.close()
 
