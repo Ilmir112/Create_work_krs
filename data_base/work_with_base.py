@@ -691,11 +691,12 @@ def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_di
             for col_index, cell_data in enumerate(row_data, 1):
                 cell = sheet_new.cell(row=int(row_index), column=int(col_index))
 
-                # Получение строки RGB из JSON
-                rgb_string = cell_data['font']['color']
-                hex_color = cell_data['fill']['color'][4:-1]
-
                 try:
+                    # Получение строки RGB из JSON
+                    rgb_string = cell_data['font']['color']
+                    hex_color = cell_data['fill']['color'][4:-1]
+                    cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
+                                     bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
                     if 'color' in list(cell_data['font'].keys()):
                         if hex_color != '00000000':
                             color = Color(rgb=hex_color)
@@ -710,6 +711,9 @@ def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_di
                         # Извлекаем шестнадцатеричный код цвета
                         hex_color = rgb_string[4:-1]
 
+                        cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
+                                         bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
+
                         if hex_color != '00000000':
 
                             try:
@@ -720,8 +724,7 @@ def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_di
                                 cell.fill = fill
                             except Exception:
                                 pass
-                        cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
-                                         bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
+
                 except:
                     pass
 

@@ -85,12 +85,12 @@ class ExcelWorker(QThread):
                                                         data_list.contractor, data_list.costumer, excel_data_dict)
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f"Ошибка при вставке данных в базу: {type(e).__name__}\n\n{str(e)}")
-
-        try:
-            data_well_base.insert_data_in_chemistry(data_well)
-        except Exception as e:
-            QMessageBox.warning(None, 'Ошибка', f"Ошибка при вставке данных химии в базу"
-                                                f": {type(e).__name__}\n\n{str(e)}")
+        if self.data_well.work_plan == 'krs':
+            try:
+                data_well_base.insert_data_in_chemistry(data_well)
+            except Exception as e:
+                QMessageBox.warning(None, 'Ошибка', f"Ошибка при вставке данных химии в базу"
+                                                    f": {type(e).__name__}\n\n{str(e)}")
 
         # Завершение работы потока
         self.finished.emit()
@@ -2014,7 +2014,8 @@ class MyWindow(MyMainWindow):
         temp_folder = r'C:\Windows\Temp'
 
         try:
-            if 'Зуфаров' in data_list.user:
+            adw = data_list.user
+            if 'Зуфаров' in data_list.user[1]:
                 for filename in os.listdir(temp_folder):
                     file_path = os.path.join(temp_folder, filename)
                     # Удаляем только файлы, а не директории
@@ -2023,7 +2024,7 @@ class MyWindow(MyMainWindow):
 
         except Exception as e:
             QMessageBox.critical(window, "Ошибка", f"Не удалось очистить папку с временными файлами: {e}")
-
+        self.rir_window = None
         if not self.table_widget is None:
             self.table_widget.clear()
             self.table_widget.resizeColumnsToContents()
@@ -2074,7 +2075,7 @@ class MyWindow(MyMainWindow):
             data_list.data_pvr_max = ProtectedIsNonNone(0)
             data_list.row_heights = []
             data_list.condition_of_wells = ProtectedIsNonNone(0)
-            path = f"{data_list.path_image}/imageFiles/image_work"[1:]
+
             try:
                 for file in os.listdir(path):
                     file_path = os.path.join(path, file)

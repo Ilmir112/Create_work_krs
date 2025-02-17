@@ -415,12 +415,17 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                 if i >= ind_ins:
                     if abs(i - ind_ins-1) >= 1 and stop_str > i:
                         if self.work_plan in ['dop_plan', 'dop_plan_in_base']:
-                            if 'Ранее проведенные работ' not in str(ws2[F"C{i}"].value):
-                                pass
-                                # ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins + 3}:C{i})'
+                            adwd = str(ws2[F"C{i}"].value)
+                            if 'Ранее проведенные работ' not in str(ws2[f"B{i}"].value) and \
+                                'Порядок работы' not in str(ws2[f"B{i}"].value):
+
+                                ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins + 2}:C{i})'
+
+
                         else:
                             if i != ind_ins:
                                 ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins+2}:C{i})'
+
                     if j != 1:
                         cell.border = data_list.thin_border
                     if j == 11:
@@ -472,9 +477,10 @@ def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
                         ws2.cell(row=i, column=j).font = Font(name=font_type, size=size_font, bold=True)
                         ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                         vertical='center')
-                        if 'Порядок работы' == cell.value:
-                            cell_num = i
-
+                        if 'Наименование работ' == cell.value:
+                            cell_num = i - 1
+                    if 'Ранее проведенные работ' in str(cell.value):
+                        cell.font = Font(name=font_type, size=size_font, bold=False)
 
                     else:
                         ws2.cell(row=i, column=j).font = Font(name=font_type, size=size_font, bold=False)

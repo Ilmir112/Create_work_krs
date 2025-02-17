@@ -41,7 +41,7 @@ class TabPageSo_raid(TabPageUnion):
             else:
                 self.downhole_motor_line.setText('Д-76')
         else:
-            if self.data_well.column_additional_diameter.value > 127:
+            if self.data_well.column_additional_diameter.get_value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')

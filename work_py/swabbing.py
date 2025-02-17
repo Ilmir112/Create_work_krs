@@ -3,18 +3,17 @@ from collections import namedtuple
 from PyQt5.QtCore import QEvent, Qt
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, \
-    QLineEdit, QGridLayout,  \
-     QPushButton, QApplication,  QTableWidget, QTableWidgetItem
+    QLineEdit, QGridLayout, \
+    QPushButton, QApplication, QTableWidget, QTableWidgetItem
 
 import data_list
 from H2S import calv_h2s
-
 
 from work_py.alone_oreration import well_volume
 
 from work_py.change_fluid import Change_fluid_Window
 
-from work_py.alone_oreration import  need_h2s
+from work_py.alone_oreration import need_h2s
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from work_py.template_work import TabPageSoWith
 from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
@@ -57,7 +56,6 @@ class TabPageSoSwab(TabPageUnion):
             else:
                 self.pakerEdit.setText(f'{int(self.data_well.current_bottom - 40)}')
 
-
             if (self.data_well.perforation_roof - 40) < self.data_well.current_bottom:
                 self.paker2Edit.setText(f'{int(self.data_well.perforation_roof - 40)}')
             else:
@@ -81,8 +79,8 @@ class TabPageSoSwab(TabPageUnion):
         self.swab_type_label = QLabel("задача при освоении", self)
         self.swab_type_combo = QComboBox(self)
         self.swab_type_combo.addItems(['', 'Задача №2.1.13', 'Задача №2.1.14', 'Задача №2.1.16', 'Задача №2.1.11',
-                                     'Задача №2.1.16 + герметичность пакера', 'ГРР'
-                                                                              'своя задача'])
+                                       'Задача №2.1.16 + герметичность пакера', 'ГРР'
+                                                                                'своя задача'])
         self.swab_type_combo.setCurrentIndex(data_list.swab_type_comboIndex)
 
         self.swab_volume_editLabel = QLabel("объем освоения", self)
@@ -122,7 +120,6 @@ class TabPageSoSwab(TabPageUnion):
         self.pressure_zumpf_question_label = QLabel("Нужно ли опрессовывать ЗУМПФ", self)
         self.pressure_zumpf_question_combo = QComboBox(self)
         self.pressure_zumpf_question_combo.addItems(['Нет', 'Да'])
-
 
         self.swab_true_edit_type.currentTextChanged.connect(self.swabTrueEdit_select)
 
@@ -165,7 +162,8 @@ class TabPageSoSwab(TabPageUnion):
             self.grid.addWidget(self.pressure_new_label, 9, 5)
             self.grid.addWidget(self.pressure_new_edit, 10, 5)
 
-            if all(self.data_well.dict_perforation[plast]['отрайбировано'] for plast in list(self.data_well.dict_perforation.keys())):
+            if all(self.data_well.dict_perforation[plast]['отрайбировано'] for plast in
+                   list(self.data_well.dict_perforation.keys())):
                 self.swab_true_edit_type.setCurrentIndex(0)
             else:
                 self.swab_true_edit_type.setCurrentIndex(1)
@@ -188,7 +186,8 @@ class TabPageSoSwab(TabPageUnion):
                 else:
                     if self.data_well.dict_leakiness:
                         paker_depth_zumpf = int(max([float(nek.split('-')[0]) + 10
-                                                     for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()]))
+                                                     for nek in
+                                                     self.data_well.dict_leakiness['НЭК']['интервал'].keys()]))
                     else:
                         paker_depth_zumpf = int(self.data_well.perforation_roof + 10)
 
@@ -623,7 +622,8 @@ class SwabWindow(WindowUnion):
 
         if swab_true_edit_type in ['однопакерная', 'пакер с заглушкой']:
             if rows != 0:
-                ques = QMessageBox.question(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно, продолжить')
+                ques = QMessageBox.question(self, 'ОШИБКА',
+                                            'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно, продолжить')
                 if ques == QMessageBox.StandardButton.No:
                     return
             paker_khost = self.check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
@@ -632,8 +632,8 @@ class SwabWindow(WindowUnion):
             if self.data_well.current_bottom < float(paker_khost + paker_depth) or \
                     0 < paker_khost + paker_depth < self.data_well.current_bottom is False:
                 QMessageBox.information(self, 'Внимание',
-                                              f'Компоновка ниже {paker_khost + paker_depth}м текущего забоя '
-                                              f'{self.data_well.current_bottom}м')
+                                        f'Компоновка ниже {paker_khost + paker_depth}м текущего забоя '
+                                        f'{self.data_well.current_bottom}м')
                 return
             if self.check_true_depth_template(paker_depth) is False:
                 return
@@ -662,15 +662,15 @@ class SwabWindow(WindowUnion):
                 return
             if self.check_true_depth_template(paker2_depth) is False:
                 return
-            if self.true_set_paker( paker2_depth) is False:
+            if self.true_set_paker(paker2_depth) is False:
                 return
             if self.check_depth_in_skm_interval(paker2_depth) is False:
                 return
 
             if self.data_well.current_bottom < float(paker_khost + paker2_depth):
                 QMessageBox.information(self, 'Внимание',
-                                              f'Компоновка ниже {paker_khost + paker_depth}м текущего забоя '
-                                              f'{self.data_well.current_bottom}м')
+                                        f'Компоновка ниже {paker_khost + paker_depth}м текущего забоя '
+                                        f'{self.data_well.current_bottom}м')
                 return
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(plast_combo))
@@ -743,7 +743,7 @@ class SwabWindow(WindowUnion):
             paker_depth_zumpf = ''
             pressure_zumph_combo = self.tabWidget.currentWidget().pressure_zumpf_question_combo.currentText()
 
-            if pressure_zumph_combo == 'Да':                
+            if pressure_zumph_combo == 'Да':
                 paker_khost = self.check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
                 paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
                 if paker_depth_zumpf == '':
@@ -755,10 +755,9 @@ class SwabWindow(WindowUnion):
                     QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
                     return
 
-
                 if self.check_true_depth_template(paker_depth_zumpf) is False:
                     return
-                if self.true_set_paker( paker_depth_zumpf) is False:
+                if self.true_set_paker(paker_depth_zumpf) is False:
                     return
                 if self.check_depth_in_skm_interval(paker_depth_zumpf) is False:
                     return
@@ -848,7 +847,8 @@ class SwabWindow(WindowUnion):
                 swab_volume_edit = int(float(self.tableWidget.item(row, 5).text()))
                 if row == 0:
                     work_list = self.swabbing_with_2paker(diameter_paker, paker_depth, paker2_depth, paker_khost,
-                                                          plast_combo, swab_type_combo, swab_volume_edit, depth_gauge_combo,
+                                                          plast_combo, swab_type_combo, swab_volume_edit,
+                                                          depth_gauge_combo,
                                                           need_change_zgs_combo,
                                                           plast_new_combo, fluid_new_edit, pressure_new_edit)
                 elif rows == row + 1:
@@ -905,10 +905,10 @@ class SwabWindow(WindowUnion):
                 elif row > 0:
                     work_list = work_list[:-2]
                     swab_list = self.swabbing_with_paker(diameter_paker, paker_depth, paker_khost, plast_combo,
-                                                              swab_type_combo, swab_volume_edit, depth_gauge_combo,
-                                                              need_change_zgs_combo,
-                                                              plast_new_combo, fluid_new_edit, pressure_new_edit)[
-                                     1:]
+                                                         swab_type_combo, swab_volume_edit, depth_gauge_combo,
+                                                         need_change_zgs_combo,
+                                                         plast_new_combo, fluid_new_edit, pressure_new_edit)[
+                                1:]
                     work_list.extend(swab_list)
 
 
@@ -978,8 +978,9 @@ class SwabWindow(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window  = None
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
+
     def swabbing_opy_with_paker(self, diameter_paker, paker_khost, paker_depth, depth_opy):
         if 'Ойл' in data_list.contractor:
             schema_swab = '8'
@@ -1006,9 +1007,9 @@ class SwabWindow(WindowUnion):
                 and self.data_well.head_column_additional.get_value < depth_opy is True) else '60'])
 
         if self.data_well.column_additional is False \
-                or (self.data_well.column_additional is True and 
+                or (self.data_well.column_additional is True and
                     paker_depth < self.data_well.head_column_additional.get_value and
-                                                    self.data_well.head_column_additional.get_value > 800) or \
+                    self.data_well.head_column_additional.get_value > 800) or \
                 (self.data_well.column_additional_diameter.get_value < 110 and
                  paker_depth > self.data_well.head_column_additional.get_value):
             paker_select = f'заглушка +  НКТ{nkt_diam} {paker_khost}м + пакер ' \
@@ -1132,7 +1133,6 @@ class SwabWindow(WindowUnion):
 
     def swabbing_opy(self, depth_opy, fluid_new, need_change_zgs_combo, plast_new,
                      pressure_new, template_second, length_template_second, template_second_need_combo):
-        
 
         template_second_str = ''
         if template_second_need_combo == 'Да':
@@ -1243,18 +1243,19 @@ class SwabWindow(WindowUnion):
                 self, fluid_new, plast_new, pressure_new)
 
             fluid_change_list = [
-                [f'Допустить до {self.data_well.current_bottom}м. Произвести смену объема  {self.data_well.fluid_work_short} '
-                 f'не менее {round(well_volume(self, self.data_well.current_bottom), 1)}м3', None,
-                 f'Допустить до {self.data_well.current_bottom}м. Произвести смену объема обратной '
-                 f'промывкой по круговой циркуляции  жидкостью  {self.data_well.fluid_work} '
-                 f'(по расчету по вскрываемому пласта {plast} Рожид- {expected_pressure}атм) в объеме не '
-                 f'менее {round(well_volume(self, self.data_well.current_bottom), 1)}м3  в присутствии '
-                 f'представителя заказчика, Составить акт. '
-                 f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 '
-                 f'часа до начала работ)',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС', round(well_volume_norm(well_volume(self, self.data_well.current_bottom))
-                                     + descentNKT_norm(self.data_well.current_bottom - depth_opy - 200, 1), 1)],
+                [
+                    f'Допустить до {self.data_well.current_bottom}м. Произвести смену объема  {self.data_well.fluid_work_short} '
+                    f'не менее {round(well_volume(self, self.data_well.current_bottom), 1)}м3', None,
+                    f'Допустить до {self.data_well.current_bottom}м. Произвести смену объема обратной '
+                    f'промывкой по круговой циркуляции  жидкостью  {self.data_well.fluid_work} '
+                    f'(по расчету по вскрываемому пласта {plast} Рожид- {expected_pressure}атм) в объеме не '
+                    f'менее {round(well_volume(self, self.data_well.current_bottom), 1)}м3  в присутствии '
+                    f'представителя заказчика, Составить акт. '
+                    f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 '
+                    f'часа до начала работ)',
+                    None, None, None, None, None, None, None,
+                    'мастер КРС', round(well_volume_norm(well_volume(self, self.data_well.current_bottom))
+                                        + descentNKT_norm(self.data_well.current_bottom - depth_opy - 200, 1), 1)],
                 [None, None,
                  f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {self.data_well.current_bottom}м с '
                  f'доливом скважины в '
@@ -1275,14 +1276,11 @@ class SwabWindow(WindowUnion):
                                liftingNKT_norm(depth_opy + 200, 1)])
         return paker_list
 
-
-
     def swabbing_with_paker_stub(self, diameter_paker, paker_depth, paker_khost, plast_combo, swab_type_combo,
                                  swab_volume_edit, depth_gauge_combo, need_change_zgs_combo,
                                  plast_new, fluid_new, pressure_new):
-        
 
-        swab_short, swab_select = self.swab_select( swab_type_combo, plast_combo, swab_volume_edit)
+        swab_short, swab_select = self.swab_select(swab_type_combo, plast_combo, swab_volume_edit)
 
         if depth_gauge_combo == 'Да':
             depth_gauge = 'контейнер с манометром МТГ-25 + '
@@ -1294,9 +1292,9 @@ class SwabWindow(WindowUnion):
                 self.data_well.head_column_additional.get_value > 800) else '60'])
 
         if self.data_well.column_additional is False or (self.data_well.column_additional is True and \
-                                                    paker_depth < self.data_well.head_column_additional.get_value and self.data_well.head_column_additional.get_value > 800) or \
+                                                         paker_depth < self.data_well.head_column_additional.get_value and self.data_well.head_column_additional.get_value > 800) or \
                 (self.data_well.column_additional_diameter.get_value < 110 and
-                        paker_depth > self.data_well.head_column_additional.get_value):
+                 paker_depth > self.data_well.head_column_additional.get_value):
             paker_select = f'заглушка + {depth_gauge} НКТ{nkt_diam} {paker_khost}м + пакер ' \
                            f'ПРО-ЯМО-{diameter_paker}мм (либо аналог) ' \
                            f'для ЭК {self.data_well.column_diameter.get_value}мм х ' \
@@ -1306,7 +1304,7 @@ class SwabWindow(WindowUnion):
                           f' {depth_gauge} щелевой фильтр  +НКТ 10м + репер'
 
             dict_nkt = {int(nkt_diam): paker_depth + paker_khost}
-        elif self.data_well.column_additional is True and\
+        elif self.data_well.column_additional is True and \
                 self.data_well.column_additional_diameter.get_value < 110 and \
                 paker_depth > self.data_well.head_column_additional.get_value:
             paker_select = f'заглушка + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
@@ -1432,7 +1430,8 @@ class SwabWindow(WindowUnion):
                                liftingNKT_norm(paker_depth, 1.2)])
         return paker_list
 
-    def swabbing_with_paker(self, diameter_paker, paker_depth, paker_khost, plast_combo, swab_type_combo, swab_volume_edit,
+    def swabbing_with_paker(self, diameter_paker, paker_depth, paker_khost, plast_combo, swab_type_combo,
+                            swab_volume_edit,
                             depth_gauge_combo, need_change_zgs_combo='нет', plast_new='', fluid_new='',
                             pressure_new='', pressure_zumph_combo='Нет', paker_depth_zumpf=0):
         from .opressovka import OpressovkaEK
@@ -1449,10 +1448,9 @@ class SwabWindow(WindowUnion):
                 self.data_well.column_additional is True and
                 self.data_well.head_column_additional.get_value > 800) else '60'])
 
-
         if self.data_well.column_additional is False or (self.data_well.column_additional is True and \
-                                                paker_depth < self.data_well.head_column_additional.get_value and \
-                                                self.data_well.head_column_additional.get_value > 800):
+                                                         paker_depth < self.data_well.head_column_additional.get_value and \
+                                                         self.data_well.head_column_additional.get_value > 800):
             paker_select = f'воронку со свабоограничителем + {depth_gauge} НКТ{nkt_diam} {paker_khost}м + пакер ' \
                            f'ПРО-ЯМО-{diameter_paker}мм (либо аналог) ' \
                            f'для ЭК {self.data_well.column_diameter.get_value}мм х ' \
@@ -1488,7 +1486,7 @@ class SwabWindow(WindowUnion):
                            f'{self.data_well.column_additional_wall_thickness.get_value}мм' \
                            f' + НКТ{self.data_well.nkt_diam}мм со ' \
                            f'снятыми фасками 10м + НКТ{self.data_well.nkt_diam}мм ' \
-                          f'со снятыми фасками' \
+                           f'со снятыми фасками' \
                            f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м '
             paker_short = f'в-ку со свабоогр.+ НКТ{self.data_well.nkt_diam}мм со ' \
                           f'снятыми фасками {paker_khost}м + ' \
@@ -1654,7 +1652,8 @@ class SwabWindow(WindowUnion):
 
         return paker_list
 
-    def swabbing_with_2paker(self, diameter_paker, paker1_depth, paker2_depth, paker_khost, plast_combo, swab_type_combo,
+    def swabbing_with_2paker(self, diameter_paker, paker1_depth, paker2_depth, paker_khost, plast_combo,
+                             swab_type_combo,
                              swab_volume_edit, depth_gauge_combo, need_change_zgs_combo,
                              plast_new, fluid_new, pressure_new):
 
@@ -1690,7 +1689,7 @@ class SwabWindow(WindowUnion):
             dict_nkt = {73: paker1_depth + paker_khost}
         elif self.data_well.column_additional is True and \
                 self.data_well.column_additional_diameter.get_value < 110 and paker1_depth > float(
-                self.data_well.head_column_additional.get_value):
+            self.data_well.head_column_additional.get_value):
             paker_select = f'заглушка +  НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-{diameter_paker}мм (либо аналог) ' \
                            f'для ЭК {self.data_well.column_diameter.get_value}мм х ' \
                            f'{self.data_well.column_wall_thickness.get_value}мм ' \
@@ -1827,7 +1826,7 @@ class SwabWindow(WindowUnion):
     def swabbing_with_voronka(self, paker_depth, plast_combo, swab_type_combo, swab_volume_edit, depth_gauge_combo,
                               need_change_zgs_combo, plast_new, fluid_new, pressure_new):
 
-        swab_short, swab_select = self.swab_select( swab_type_combo, plast_combo, swab_volume_edit)
+        swab_short, swab_select = self.swab_select(swab_type_combo, plast_combo, swab_volume_edit)
         nkt_diam = '73' if self.data_well.column_diameter.get_value > 110 or (
                 self.data_well.column_diameter.get_value > 110 and
                 self.data_well.column_additional is True and

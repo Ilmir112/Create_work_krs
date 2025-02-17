@@ -727,7 +727,7 @@ class RirWindow(WindowUnion):
             dict_nkt = {73: sole_rir_edit}
 
         volume_in_nkt, volume_in_ek = RirWindow.calc_buffer(self, roof_rir_edit, sole_rir_edit, dict_nkt)
-
+        self.ozc_str_short, self.ozc_str, self.time_ozc = self.calculate_time_ozc(roof_rir_edit)
         uzm_pero_list = [
             [f' СПО пера до глубины {sole_rir_edit}м Опрессовать НКТ на 200атм', None,
              f'Спустить {RirWindow.pero_select(self, sole_rir_edit)}  на тНКТ{nkt_diam}м до глубины {sole_rir_edit}м с '
@@ -1198,20 +1198,7 @@ class RirWindow(WindowUnion):
         self.data_well.for_paker_list = None
         return rir_list
 
-    @staticmethod
-    def calculate_time_ozc(roof_rir_edit):
-        if roof_rir_edit >= 1300:
-            string = f'ОЗЦ 24 часа: (по качеству пробы) с момента отстыковки пакера В случае не получения ' \
-                     f'технологического "СТОП" ОЗЦ без давления.'
-            string_short = 'ОЗЦ 24 часа'
-            time = 24
 
-        else:
-            string = f'ОЗЦ 12-16 часа: (по качеству пробы) с момента отстыковки пакера В случае не получения ' \
-                     f'технологического "СТОП" ОЗЦ без давления.'
-            string_short = 'ОЗЦ 12-16 часа'
-            time = 24
-        return string_short, string, time
 
     def add_work(self):
         try:
