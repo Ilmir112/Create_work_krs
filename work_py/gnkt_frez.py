@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QInputDialog, QApplication
 from openpyxl.utils import get_column_letter
 
 import data_list
+from main import SaveInExcel
 from perforation_correct_gnkt_frez import PerforationCorrectGnktFrez
 
 import plan
@@ -66,9 +67,9 @@ class WorkWithGnkt(GnktModel):
         self.ws_work = self.wb_gnkt.create_sheet(title="Ход работ")
         self.wb_gnkt.remove(self.wb_gnkt['Sheet'])
 
-        head = plan.head_ind(self.data_well.cat_well_min.get_value, self.data_well.cat_well_max.get_value)
+        head = SaveInExcel.head_ind(self.data_well.cat_well_min.get_value, self.data_well.cat_well_max.get_value)
 
-        plan.copy_true_ws(self.data_well, self.ws, self.ws_title, head)
+        SaveInExcel.copy_true_ws(self.data_well, self.ws, self.ws_title, head)
 
         self.create_title_list(self.ws_title)
         self.schema_well(self.ws_schema, self.data_gnkt)

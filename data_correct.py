@@ -896,14 +896,14 @@ class DataWindow(WindowUnion):
         date_commissioning_line = self.current_widget.date_commissioning_line.text()
         result_pressure_date = self.current_widget.result_pressure_date.text()
         curator = str(self.current_widget.curator_Combo.currentText())
-        if result_pressure_date.count('.') != 2:
+        if self.check_date_format(result_pressure_date) is False:
             if curator != 'ВНС':
-                QMessageBox.warning(self, 'Ошибка', 'Не корректна дата ввода в эскплуатацию')
+                QMessageBox.warning(self, 'Ошибка', 'Не корректна дата последней опрессовки')
                 return
             else:
                 self.data_well.result_pressure_date = self.data_well.date_drilling_cancel
 
-        if date_commissioning_line.count('.') != 2:
+        if self.check_date_format(date_commissioning_line) is False:
             if curator != 'ВНС':
                 QMessageBox.warning(self, 'Ошибка', 'Не корректна дата ввода в эскплуатацию')
                 return
@@ -1354,6 +1354,10 @@ class DataWindow(WindowUnion):
 
             data_list.pause = False
             self.close()
+    @staticmethod
+    def check_date_format(date_string):
+        pattern = r'^\d{2}\.\d{2}\.\d{4}$'
+        return bool(re.match(pattern, date_string))
 
     def check_if_none(self, value):
         if value is None or 'отс' in str(value).lower() or value == '-' or str(value) == '0':

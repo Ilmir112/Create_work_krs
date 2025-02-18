@@ -9,13 +9,13 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QInputDialog, QMessageBox
 from openpyxl.reader.excel import load_workbook
 from openpyxl.utils import column_index_from_string
+from openpyxl.utils.cell import range_boundaries, get_column_letter
 from openpyxl.workbook import Workbook
-from openpyxl.utils.cell import get_column_letter
 from openpyxl_image_loader import SheetImageLoader
 
 from decrypt import decrypt
 from main import ExcelWorker, MyMainWindow, MyWindow
-from plan import delete_rows_pz
+
 from data_list import ProtectedIsDigit, ProtectedIsNonNone
 
 
@@ -230,6 +230,41 @@ class FindIndexPZ(MyMainWindow):
             self.read_pz()
         else:
             self.read_pz_prs()
+
+
+    def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
+        boundaries_dict = {}
+
+        for ind, _range in enumerate(ws.merged_cells.ranges):
+            boundaries_dict[ind] = range_boundaries(str(_range))
+
+        # row_heights_top = [None, 18.0, 18, 18,None, 18.0, 18, 18,None, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18, 18.0, 18, 18]
+        row_heights1 = [ws.row_dimensions[i + 1].height for i in range(cat_well_min.get_value, ws.max_row)]
+        for key, value in boundaries_dict.items():
+            ws.unmerge_cells(start_column=value[0], start_row=value[1],
+                             end_column=value[2], end_row=value[3])
+
+        # print(f'индекс удаления {1, self.cat_well_min - 1} , {data_well_max + 2, ws.max_row - data_well_max}')
+
+        if 'prs' not in self.work_plan:
+            ws.delete_rows(data_x_max.get_value, ws.max_row - data_x_max.get_value)
+
+        ws.delete_rows(1, cat_well_min.get_value - 1)
+
+        # print(sorted(boundaries_dict))
+        data_list.row_heights = row_heights1
+
+        for _ in range(16):
+            ws.insert_rows(1, 1)
+
+        for key, value in boundaries_dict.items():
+            if value[1] <= data_well_max.get_value + 1 and value[1] >= cat_well_min.get_value:
+                ws.merge_cells(start_column=value[0], start_row=value[1] + 16 - cat_well_min.get_value + 1,
+                               end_column=value[2], end_row=value[3] + 16 - cat_well_min.get_value + 1)
+
+        # print(f'{ws.max_row, len(data_list.prow_heights)}dd')
+        for index_row, row in enumerate(ws.iter_rows()):  # Копирование высоты строки
+            ws.row_dimensions[index_row + 17].height = data_list.row_heights[index_row - 1]
 
     @staticmethod
     def insert_column_direction(text):
@@ -1089,7 +1124,6 @@ class WellHistoryData(FindIndexPZ):
                             col + 1, 1)
                     elif 'Дата опрессовки' in str(value):
                         self.result_pressure_date = ProtectedIsDigit(row[col + 2])
-                        aas = row[col + 2]
                         if type(self.result_pressure_date.get_value) is datetime:
                             self.result_pressure_date = ProtectedIsDigit(self.result_pressure_date.get_value.strftime(
                                 '%d.%m.%Y'))
@@ -1591,7 +1625,7 @@ class WellData(FindIndexPZ):
                     self.check_data_in_pz.append(
                         f'В план заказе не указано посадка пакера при cпуске ОРД ')
 
-        if str(self.well_number.get_value) in ['']:
+        if str(self.well_number.get_value) in ['1871', '1906', '1600', '3129', '2166', '1352', '1678']:
             QMessageBox.warning(self, 'Канатные технологии', f'Скважина согласована на канатные технологии')
             self.konte_true = True
 
@@ -2169,9 +2203,11 @@ class WellCategory(FindIndexPZ):
             # if self.work_plan == 'prs':
             #     self.data_well_max = self.data_x_max_prs
 
-            delete_rows_pz(self, self.ws, self.cat_well_min, self.data_well_max, self.data_x_max)
+            self.delete_rows_pz(self.ws, self.cat_well_min, self.data_well_max, self.data_x_max)
 
             self.insert_index = self.data_well_max.get_value - self.cat_well_min.get_value + 19
             self.insert_index2 = self.data_well_max.get_value - self.cat_well_min.get_value + 19 - 2
 
         return self
+
+
