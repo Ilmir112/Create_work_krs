@@ -279,7 +279,7 @@ class FindIndexPZ(MyMainWindow):
         for row_ind, row in enumerate(self.ws.iter_rows(values_only=True, max_row=300, max_col=20)):
             self.ws.row_dimensions[row_ind].hidden = False
             if self.cat_well_min.get_value != 0:
-                if self.data_x_max.get_value < row_ind and self.image_loader:
+                if float(self.data_x_max.get_value) < row_ind and self.image_loader:
                     self.work_with_img(self.image_loader, row_ind)
 
             if 'Категория скважины' in row:
@@ -326,6 +326,8 @@ class FindIndexPZ(MyMainWindow):
                   or self.check_text_in_row('Ранее проведенные работ', row)) and \
                     self.data_x_max.get_value == 0:
                 self.data_x_max = ProtectedIsDigit(row_ind)
+                if self.check_text_in_row('Ранее проведенные работ', row):
+                    self.data_x_max = ProtectedIsDigit(row_ind-2)
                 break
 
 
@@ -1087,9 +1089,10 @@ class WellHistoryData(FindIndexPZ):
                             col + 1, 1)
                     elif 'Дата опрессовки' in str(value):
                         self.result_pressure_date = ProtectedIsDigit(row[col + 2])
-                        if type(self.result_pressure_date) is datetime:
-                            self.result_pressure_date = self.result_pressure_date.strftime(
-                                '%d.%m.%Y')
+                        aas = row[col + 2]
+                        if type(self.result_pressure_date.get_value) is datetime:
+                            self.result_pressure_date = ProtectedIsDigit(self.result_pressure_date.get_value.strftime(
+                                '%d.%m.%Y'))
 
                     elif 'Первоначальное давление опрессовки э/колонны' == value:
                         self.first_pressure = ProtectedIsDigit(row[col + 3])

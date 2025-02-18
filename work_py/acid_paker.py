@@ -231,6 +231,15 @@ class TabPageSoAcid(TabPageUnion):
         self.pressure_zumpf_question_combo = QComboBox(self)
         self.pressure_zumpf_question_combo.addItems(["Нет", "Да"])
 
+        self.pressure_Label = QLabel("Давление закачки", self)
+        self.pressure_edit = QLineEdit(self)
+        self.pressure_edit.setClearButtonEnabled(True)
+        if self.data_well:
+            self.pressure_edit.setText(str(self.data_well.max_admissible_pressure.get_value))
+
+        self.grid.addWidget(self.pressure_Label, 6, 6)
+        self.grid.addWidget(self.pressure_edit, 7, 6)
+
         self.grid.addWidget(self.paker_layout_label, 0, 0, 1, 0)
         self.grid.addWidget(self.paker_layout_combo, 1, 0, 1, 0)
         self.swab_true_label_type = QLabel("необходимость освоения", self)
@@ -286,6 +295,7 @@ class TabPageSoAcid(TabPageUnion):
 
     def update_paker_need(self, index):
         if index == 'Да' and self.data_well:
+            paker_depth_zumpf = int(self.data_well.perforation_roof + 10)
             if len(self.data_well.plast_work) != 0:
                 paker_depth_zumpf = int(self.data_well.perforation_roof + 10)
             else:
@@ -593,7 +603,7 @@ class AcidPakerWindow(WindowUnion):
             self.tableWidget.setSortingEnabled(False)
         elif self.paker_layout_combo in ['двухпакерная', 'двухпакерная, упорные']:
             self.paker_khost = self.check_if_none((self.current_widget.paker_khost.text()))
-            self.paker_depth_edit = int(self.check_if_none(self.current_widget.paker_depth.text()))
+            self.paker_depth_edit = int(self.check_if_none(self.current_widget.paker_depth_edit.text()))
             self.paker2_depth = int(self.check_if_none(self.current_widget.paker2_depth.text()))
 
             if self.data_well:
@@ -617,14 +627,14 @@ class AcidPakerWindow(WindowUnion):
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(self.plast_combo))
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(self.paker_khost)))
-            self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(self.paker_depth)))
+            self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(self.paker_depth_edit)))
             self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(self.paker2_depth)))
             self.tableWidget.setCellWidget(rows, 4, self.svk_true_combo)
             self.tableWidget.setCellWidget(rows, 5, self.acid_combo)
             self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(self.acid_proc_edit)))
             self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(self.acid_volume_edit)))
         elif self.paker_layout_combo in ['воронка', 'без монтажа компоновки на спуск']:
-            self.paker_depth_edit = int(self.check_if_none(self.current_widget.paker_depth.text()))
+            self.paker_depth_edit = int(self.check_if_none(self.current_widget.paker_depth_edit.text()))
             self.paker_khost = self.check_if_none((self.current_widget.paker_khost.text()))
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(self.plast_combo))
@@ -643,7 +653,7 @@ class AcidPakerWindow(WindowUnion):
         event.accept()  # Принимаем событие закрытия
 
     def add_work(self):
-
+        self.current_widget = self.tabWidget.currentWidget()
         try:
             self.need_privyazka_q_combo = self.current_widget.need_privyazka_q_combo.currentText()
             if self.need_privyazka_q_combo == 'Да':
@@ -709,159 +719,201 @@ class AcidPakerWindow(WindowUnion):
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Ошибка сохранения данных {type(e).__name__}\n\n{str(e)}')
             return
-
+        work_template_list = []
         rows = self.tableWidget.rowCount()
+        if rows == 0 and self.svk_true_combo == 'Нужно СКВ' and self.sko_true_combo == 'Нет':
+            mes = QMessageBox.question(self, 'СКВ', 'Нужно произвести только СКВ?')
+            if mes == QMessageBox.StandardButton.No:
+                return
 
-        if rows == 0:
+        elif rows == 0:
             QMessageBox.warning(self, "ВНИМАНИЕ", 'Нужно добавить интервалы обработки')
             return
+        if rows == 0:
+            self.paker_khost = self.current_widget.paker_khost.text()
+            if self.paker_khost not in ['', 0, '0']:
+                self.paker_khost = float(self.paker_khost)
+            else:
+                QMessageBox.warning(self, 'Ошибка', 'Не указано глубина НКТ')
+                return
 
-        for row in range(rows):
-            if self.paker_layout_combo in ['двухпакерная', 'двухпакерная, упорные']:
-                self.plast_combo = self.tableWidget.item(row, 0).text()
-                if row == 0:
-                    self.paker_khost = int(float(self.tableWidget.item(row, 1).text()))
-                    if self.paker_khost < 0:
-                        QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
-                        return
-                    data_list.paker_khost = self.paker_khost
-                else:
-                    self.paker_khost = data_list.paker_khost
-
-                self.paker_depth_edit = int(float(self.tableWidget.item(row, 2).text()))
-                self.paker2_depth = int(float(self.tableWidget.item(row, 3).text()))
-                self.svk_true_combo = self.tableWidget.cellWidget(row, 4).currentText()
-                self.acid_edit = self.tableWidget.cellWidget(row, 5).currentText()
-                self.acid_proc_edit = int(float(self.tableWidget.item(row, 6).text()))
-                self.acid_volume_edit = round(float(self.tableWidget.item(row, 7).text()), 1)
-                if self.acid_edit == 'HCl':
-                    self.sko_volume_all += self.acid_volume_edit
-                try:
-                    self.acidOilProc = round(float(self.tableWidget.item(row, 8).text()))
-                except Exception:
-                    self.acidOilProc = 0
-
-                if row == 0:
-                    work_template_list = self.paker_layout_two()
-                else:
-                    work_template_list.append(
-                        [f'установить пакера на глубине {self.paker_depth_edit}/{self.paker2_depth}м',
-                         None, f'установить пакера на глубине {self.paker_depth_edit}/{self.paker2_depth}м', None, None,
-                         None, None, None, None, None,
-                         'мастер КРС', 1.2])
-            elif self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный']:
-                self.plast_combo = self.tableWidget.item(row, 0).text()
-                if row == 0:
-                    self.paker_khost = int(float(self.tableWidget.item(row, 1).text()))
-                    data_list.paker_khost = self.paker_khost
-                else:
-                    self.paker_khost = data_list.paker_khost
-                self.paker_depth_edit = int(float(self.tableWidget.item(row, 2).text().replace(',', '.')))
-                self.svk_true_combo = self.tableWidget.cellWidget(row, 3).currentText()
-                self.acid_edit = self.tableWidget.cellWidget(row, 4).currentText().replace(',', '.')
-                self.acid_proc_edit = int(float(self.tableWidget.item(row, 5).text()))
-                self.acid_volume_edit = round(float(self.tableWidget.item(row, 6).text().replace(',', '.')), 1)
-                if self.acid_edit == 'HCl':
-                    self.sko_volume_all += self.acid_volume_edit
-
-                try:
-                    self.acidOilProc = round(float(self.tableWidget.item(row, 7).text()))
-                except Exception as e:
-                    self.acidOilProc = 0
-
-                if row == 0:
-                    work_template_list = self.paker_layout_one()
-                else:
-                    work_template_list.append(
-                        [f'установить пакер на глубине {self.paker_depth_edit}, '
-                         f'хвост на глубине {self.paker_depth_edit + self.paker_khost}м', None,
-                         f'установить пакер на глубине {self.paker_depth_edit}, '
-                         f'хвост на глубине {self.paker_depth_edit + self.paker_khost}м', None, None,
-                         None, None, None, None, None,
-                         'мастер КРС', 1.2])
-            elif self.paker_layout_combo in ['пакер с заглушкой']:
-                self.plast_combo = self.tableWidget.item(row, 0).text()
-                if row == 0:
-                    self.paker_khost = int(float(self.tableWidget.item(row, 1).text()))
-                    data_list.paker_khost = self.paker_khost
-                else:
-                    self.paker_khost = data_list.paker_khost
-                self.paker_depth_edit = int(float(self.tableWidget.item(row, 2).text()))
-                self.svk_true_combo = self.tableWidget.cellWidget(row, 3).currentText()
-                self.acid_edit = self.tableWidget.cellWidget(row, 4).currentText()
-                self.acid_proc_edit = int(float(self.tableWidget.item(row, 5).text()))
-                self.acid_volume_edit = round(float(self.tableWidget.item(row, 6).text()), 1)
-                if self.acid_edit == 'HCl':
-                    self.sko_volume_all += self.acid_volume_edit
-
-                try:
-                    self.acidOilProc = round(float(self.tableWidget.item(row, 7).text()))
-                except Exception:
-                    self.acidOilProc = 0
-
-                work_template_list = self.paker_layout_one_with_zaglushka()
-
-            elif self.paker_layout_combo in ['воронка', 'без монтажа компоновки на спуск']:
-                self.plast_combo = self.tableWidget.item(row, 0).text()
-                if row == 0:
-                    self.paker_khost = int(float(self.tableWidget.item(row, 1).text()))
-                    data_list.paker_khost = self.paker_khost
-                else:
-                    self.paker_khost = data_list.paker_khost
-
-                self.svk_true_combo = self.tableWidget.cellWidget(row, 2).currentText()
-                self.acid_edit = self.tableWidget.cellWidget(row, 3).currentText()
-                self.acid_volume_edit = round(float(self.tableWidget.item(row, 5).text()), 1)
-                self.acid_proc_edit = int(float(self.tableWidget.item(row, 4).text()))
-                if self.acid_edit == 'HCl':
-                    self.sko_volume_all += self.acid_volume_edit
-
-                try:
-                    self.acidOilProc = round(float(self.tableWidget.item(row, 6).text()))
-                except Exception:
-                    self.acidOilProc = 0
-
-                work_template_list = self.voronka_layout()
-                if self.paker_layout_combo == 'без монтажа компоновки на спуск':
-                    work_template_list = []
-            if self.svk_true_combo == 'Нужно СКВ':
-                work_template_list.insert(-2, [f'Определить приемистость при Р-{self.pressure_edit}атм', None,
-                                                 f'Определить приемистость при Р-{self.pressure_edit}атм '
-                                                 f'в присутствии представителя заказчика.'
-                                                 f'при отсутствии приемистости произвести установку '
-                                                 f'СКВ по согласованию с заказчиком',
-                                                 None, None, None, None, None, None, None,
-                                                 'мастер КРС, УСРСиСТ', 1.2])
-                work_template_list.extend(self.skv_acid_work())
-            if self.QplastEdit == 'ДА':
-                work_template_list.insert(-2,
-                                          [f'Насыщение 5м3.  Q пласт {self.plast_combo} при '
-                                           f'Р={self.pressure_mode(self.expected_pressure, self.plast_combo)}атм', None,
-                                           f'Произвести насыщение скважины до стабилизации давления закачки '
-                                           f'не менее 5м3. Опробовать  '
-                                           f'пласт {self.plast_combo} на приемистость в трех режимах при '
-                                           f'Р={self.pressure_mode(self.expected_pressure, self.plast_combo)}атм в присутствии '
-                                           f'представителя ЦДНГ. '
-                                           f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
-                                           f'с подтверждением за 2 часа до '
-                                           f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {self.expected_pickup}м3/сут '
-                                           f'при давлении {self.expected_pressure}атм '
-                                           f'ДАЛЬНЕЙШИЕ РАБОТЫ СОГЛАСОВАТЬ С ЗАКАЗЧИКОМ',
+            nkt_diam, nkt_pod, nkt_template = self.select_diameter_nkt(self.paker_khost,
+                                                                       self.swab_true_edit_type)
+            if self.data_well.column_additional is False or \
+                    (self.data_well.column_additional and
+                     self.data_well.head_column_additional.get_value >= self.data_well.current_bottom):
+                self.dict_nkt = {nkt_diam: float(self.paker_khost) + float(self.paker_khost)}
+            else:
+                self.dict_nkt = {
+                    nkt_diam: round(self.data_well.head_column_additional.get_value, 0),
+                    nkt_pod: int(float(self.paker_khost - self.data_well.head_column_additional.get_value))}
+            work_template_list.insert(-2, [f'Определить приемистость при Р-{self.pressure_edit}атм', None,
+                                           f'Определить приемистость при Р-{self.pressure_edit}атм '
+                                           f'в присутствии представителя заказчика.'
+                                           f'при отсутствии приемистости произвести установку '
+                                           f'СКВ по согласованию с заказчиком',
                                            None, None, None, None, None, None, None,
-                                           'мастер КРС', 0.17 + 0.52 + 0.2 + 0.2 + 0.2])
-            if self.sko_true_combo == 'Да':
-                if "двух" in self.paker_layout_combo:
-                    if row == 0 and self.data_well.curator != 'ОР' and rows != 1:
-                        work_template_list.extend(self.acid_work()[:-1])
+                                           'мастер КРС, УСРСиСТ', 1.2])
+            work_template_list.extend(self.skv_acid_work())
+        else:
+
+            for row in range(rows):
+                if self.paker_layout_combo in ['двухпакерная', 'двухпакерная, упорные']:
+                    self.plast_combo = self.tableWidget.item(row, 0).text()
+                    if row == 0:
+                        self.paker_khost = int(float(self.tableWidget.item(row, 1).text()))
+                        if self.paker_khost < 0:
+                            QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
+                            return
+                        data_list.paker_khost = self.paker_khost
                     else:
-                        work_template_list.extend(self.acid_work())
-                elif "одно" in self.paker_layout_combo or "заглуш" in self.paker_layout_combo:
-                    if row == 0 and self.data_well.curator != 'ОР' and rows != 1:
-                        work_template_list.extend(self.acid_work()[:-1])
+                        self.paker_khost = data_list.paker_khost
+
+                    self.paker_depth_edit = int(float(self.tableWidget.item(row, 2).text()))
+                    self.paker2_depth = int(float(self.tableWidget.item(row, 3).text()))
+                    self.svk_true_combo = self.tableWidget.cellWidget(row, 4).currentText()
+                    self.acid_edit = self.tableWidget.cellWidget(row, 5).currentText()
+                    self.acid_proc_edit = int(float(self.tableWidget.item(row, 6).text()))
+                    self.acid_volume_edit = round(float(self.tableWidget.item(row, 7).text()), 1)
+                    if self.acid_edit == 'HCl':
+                        self.sko_volume_all += self.acid_volume_edit
+                    try:
+                        self.acidOilProc = round(float(self.tableWidget.item(row, 8).text()))
+                    except Exception:
+                        self.acidOilProc = 0
+
+                    if row == 0:
+                        work_template_list = self.paker_layout_two()
                     else:
+                        work_template_list.append(
+                            [f'установить пакера на глубине {self.paker_depth_edit}/{self.paker2_depth}м',
+                             None, f'установить пакера на глубине {self.paker_depth_edit}/{self.paker2_depth}м', None, None,
+                             None, None, None, None, None,
+                             'мастер КРС', 1.2])
+                elif self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный']:
+                    self.plast_combo = self.tableWidget.item(row, 0).text()
+                    if row == 0:
+                        self.paker_khost = int(float(self.tableWidget.item(row, 1).text()))
+                        data_list.paker_khost = self.paker_khost
+                    else:
+                        self.paker_khost = data_list.paker_khost
+                    self.paker_depth_edit = int(float(self.tableWidget.item(row, 2).text().replace(',', '.')))
+                    self.svk_true_combo = self.tableWidget.cellWidget(row, 3).currentText()
+                    self.acid_edit = self.tableWidget.cellWidget(row, 4).currentText().replace(',', '.')
+                    self.acid_proc_edit = int(float(self.tableWidget.item(row, 5).text()))
+                    self.acid_volume_edit = round(float(self.tableWidget.item(row, 6).text().replace(',', '.')), 1)
+                    if self.acid_edit == 'HCl':
+                        self.sko_volume_all += self.acid_volume_edit
+
+                    try:
+                        self.acidOilProc = round(float(self.tableWidget.item(row, 7).text()))
+                    except Exception as e:
+                        self.acidOilProc = 0
+
+                    if row == 0:
+                        work_template_list = self.paker_layout_one()
+                    else:
+                        work_template_list.append(
+                            [f'установить пакер на глубине {self.paker_depth_edit}, '
+                             f'хвост на глубине {self.paker_depth_edit + self.paker_khost}м', None,
+                             f'установить пакер на глубине {self.paker_depth_edit}, '
+                             f'хвост на глубине {self.paker_depth_edit + self.paker_khost}м', None, None,
+                             None, None, None, None, None,
+                             'мастер КРС', 1.2])
+                elif self.paker_layout_combo in ['пакер с заглушкой']:
+                    self.plast_combo = self.tableWidget.item(row, 0).text()
+                    if row == 0:
+                        self.paker_khost = int(float(self.tableWidget.item(row, 1).text()))
+                        data_list.paker_khost = self.paker_khost
+                    else:
+                        self.paker_khost = data_list.paker_khost
+                    self.paker_depth_edit = int(float(self.tableWidget.item(row, 2).text()))
+                    self.svk_true_combo = self.tableWidget.cellWidget(row, 3).currentText()
+                    self.acid_edit = self.tableWidget.cellWidget(row, 4).currentText()
+                    self.acid_proc_edit = int(float(self.tableWidget.item(row, 5).text()))
+                    self.acid_volume_edit = round(float(self.tableWidget.item(row, 6).text()), 1)
+                    if self.acid_edit == 'HCl':
+                        self.sko_volume_all += self.acid_volume_edit
+
+                    try:
+                        self.acidOilProc = round(float(self.tableWidget.item(row, 7).text()))
+                    except Exception:
+                        self.acidOilProc = 0
+
+                    work_template_list = self.paker_layout_one_with_zaglushka()
+
+                elif self.paker_layout_combo in ['воронка', 'без монтажа компоновки на спуск']:
+
+                    self.plast_combo = self.tableWidget.item(row, 0).text()
+                    if row == 0:
+                        self.paker_khost = int(float(self.tableWidget.item(row, 1).text()))
+                        data_list.paker_khost = self.paker_khost
+                    else:
+                        self.paker_khost = data_list.paker_khost
+
+                    self.svk_true_combo = self.tableWidget.cellWidget(row, 2).currentText()
+                    self.acid_edit = self.tableWidget.cellWidget(row, 3).currentText()
+                    self.acid_volume_edit = round(float(self.tableWidget.item(row, 5).text()), 1)
+                    self.acid_proc_edit = int(float(self.tableWidget.item(row, 4).text()))
+                    if self.acid_edit == 'HCl':
+                        self.sko_volume_all += self.acid_volume_edit
+
+                    try:
+                        self.acidOilProc = round(float(self.tableWidget.item(row, 6).text()))
+                    except Exception:
+                        self.acidOilProc = 0
+                    if self.paker_layout_combo == 'воронка':
+                        work_template_list = self.voronka_layout()
+                    elif self.paker_layout_combo == 'без монтажа компоновки на спуск':
+                        nkt_diam, nkt_pod, nkt_template = self.select_diameter_nkt(self.paker_khost,
+                                                                                   self.swab_true_edit_type)
+                        if self.data_well.column_additional is False or \
+                            (self.data_well.column_additional and
+                             self.data_well.head_column_additional.get_value >= self.data_well.current_bottom):
+                            self.dict_nkt = {nkt_diam: float(self.paker_khost) + float(self.paker_depth)}
+                        else:
+                            self.dict_nkt = {
+                                nkt_diam: round(self.data_well.head_column_additional.get_value, 0),
+                                nkt_pod: int(float(self.data_well.head_column_additional.get_value - self.paker_khost, 0))}
+                        work_template_list = []
+                if self.svk_true_combo == 'Нужно СКВ':
+                    work_template_list.insert(-2, [f'Определить приемистость при Р-{self.pressure_edit}атм', None,
+                                                     f'Определить приемистость при Р-{self.pressure_edit}атм '
+                                                     f'в присутствии представителя заказчика.'
+                                                     f'при отсутствии приемистости произвести установку '
+                                                     f'СКВ по согласованию с заказчиком',
+                                                     None, None, None, None, None, None, None,
+                                                     'мастер КРС, УСРСиСТ', 1.2])
+                    work_template_list.extend(self.skv_acid_work())
+                if self.QplastEdit == 'ДА':
+                    work_template_list.insert(-2,
+                                              [f'Насыщение 5м3.  Q пласт {self.plast_combo} при '
+                                               f'Р={self.pressure_three_edit}атм', None,
+                                               f'Произвести насыщение скважины до стабилизации давления закачки '
+                                               f'не менее 5м3. Опробовать  '
+                                               f'пласт {self.plast_combo} на приемистость в трех режимах при '
+                                               f'Р={self.pressure_three_edit}атм в присутствии '
+                                               f'представителя ЦДНГ. '
+                                               f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
+                                               f'с подтверждением за 2 часа до '
+                                               f'начала работ). В СЛУЧАЕ ПРИЕМИСТОСТИ НИЖЕ {self.expected_pickup}м3/сут '
+                                               f'при давлении {self.expected_pressure}атм '
+                                               f'ДАЛЬНЕЙШИЕ РАБОТЫ СОГЛАСОВАТЬ С ЗАКАЗЧИКОМ',
+                                               None, None, None, None, None, None, None,
+                                               'мастер КРС', 0.17 + 0.52 + 0.2 + 0.2 + 0.2])
+                if self.sko_true_combo == 'Да':
+                    if "двух" in self.paker_layout_combo:
+                        if row == 0 and self.data_well.curator != 'ОР' and rows != 1:
+                            work_template_list.extend(self.acid_work()[:-1])
+                        else:
+                            work_template_list.extend(self.acid_work())
+                    elif "одно" in self.paker_layout_combo or "заглуш" in self.paker_layout_combo:
+                        if row == 0 and self.data_well.curator != 'ОР' and rows != 1:
+                            work_template_list.extend(self.acid_work()[:-1])
+                        else:
+                            work_template_list.extend(self.acid_work())
+                    elif "воронка" in self.paker_layout_combo or 'без монтажа компоновки на спуск' in self.paker_layout_combo:
                         work_template_list.extend(self.acid_work())
-                elif "воронка" in self.paker_layout_combo or 'без монтажа компоновки на спуск' in self.paker_layout_combo:
-                    work_template_list.extend(self.acid_work())
         if self.sko_volume_all < 13 and self.acid_edit == 'HCl':
             mes = QMessageBox.question(self, 'Увеличение объема кислоты',
                                        'С целью проведения кислоты Крезолом необходимо согласовать '
@@ -1341,15 +1393,15 @@ class AcidPakerWindow(WindowUnion):
                 nkt_diam: round(self.data_well.head_column_additional.get_value, 0),
                 nkt_pod: float(self.paker_khost) - round(
                     self.data_well.head_column_additional.get_value, 0)}
-
-        paker_list = [
-            [f' СПО {self.paker_short} до глубины {self.paker_khost}м', None,
-             f'Спустить {self.paker_select} +  на НКТ{nkt_diam}мм до глубины '
-             f'{self.paker_khost}м'
-             f' с замером, шаблонированием шаблоном {nkt_template}. ',
-             None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(self.paker_khost, 1)],
-        ]
+        if self.paker_layout_combo != 'без монтажа компоновки на спуск':
+            paker_list = [
+                [f' СПО {self.paker_short} до глубины {self.paker_khost}м', None,
+                 f'Спустить {self.paker_select} +  на НКТ{nkt_diam}мм до глубины '
+                 f'{self.paker_khost}м'
+                 f' с замером, шаблонированием шаблоном {nkt_template}. ',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', descentNKT_norm(self.paker_khost, 1)],
+            ]
 
         if self.depth_gauge_combo == 'Да':
             if self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:

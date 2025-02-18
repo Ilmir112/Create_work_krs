@@ -162,11 +162,7 @@ class TabPageUnion(QWidget):
             self.pressure_three_edit = QLineEdit(self)
             self.expected_pressure_edit.setValidator(self.validator_int)
 
-            self.pressure_Label = QLabel("Давление закачки", self)
-            self.pressure_edit = QLineEdit(self)
-            self.pressure_edit.setClearButtonEnabled(True)
-            if self.data_well:
-                self.pressure_edit.setText(str(self.data_well.max_admissible_pressure.get_value))
+
 
             if self.__class__.__name__ == 'TabPageSoAcid':
                 self.paker_layout_combo.currentTextChanged.connect(self.update_paker_layout)
@@ -199,8 +195,7 @@ class TabPageUnion(QWidget):
             self.grid.addWidget(self.acid_proc_edit, 7, 4)
             self.grid.addWidget(self.acid_oil_proc_label, 6, 5)
             self.grid.addWidget(self.acid_oil_proc_edit, 7, 5)
-            self.grid.addWidget(self.pressure_Label, 6, 6)
-            self.grid.addWidget(self.pressure_edit, 7, 6)
+
             self.grid.addWidget(self.calculate_sko_label, 6, 8)
             self.grid.addWidget(self.calculate_sko_line, 7, 8)
             self.grid.addWidget(self.Qplast_labelType, 6, 1)
@@ -234,9 +229,9 @@ class TabPageUnion(QWidget):
             if self.data_well:
 
                 if self.data_well.curator == 'ОР':
-                    self.Qplast_after_edit.setCurrentIndex(0)
-                else:
                     self.Qplast_after_edit.setCurrentIndex(1)
+                else:
+                    self.Qplast_after_edit.setCurrentIndex(0)
             self.calculate_sko_line.editingFinished.connect(self.update_calculate_sko)
 
     def update_calculate_sko(self):
@@ -784,7 +779,7 @@ class WindowUnion(MyMainWindow):
             [f'СКВ {self.skv_acid_edit} {self.skv_proc_edit}%', None,
              f'Произвести установку СКВ {self.skv_acid_edit} {self.skv_proc_edit}% концентрации '
              f'в объеме'
-             f' {self.skv_volume_edit}м3 ({round(self.skv_volume_edit * 1.12 / 24, 1)}т HCL 24%) (по спец. плану, '
+             f' {self.skv_volume_edit}м3 ({round(self.skv_volume_edit * 1.12 *  self.skv_proc_edit/ 24, 2)}т HCL 24%) (по спец. плану, '
              f'составляет старший мастер)',
              None, None, None, None, None, None, None,
              'мастер КРС, УСРСиСТ', 0.5],
@@ -805,7 +800,7 @@ class WindowUnion(MyMainWindow):
              None, None, None, None, None, None, None,
              'мастер КРС, УСРСиСТ', 0.83 + 0.2 + 0.83 + 0.5 + 0.5]
         ]
-        self.calculate_chemistry(self.acid_edit, self.skv_volume_edit)
+        self.calculate_chemistry(self.skv_acid_edit, self.skv_volume_edit)
         return skv_list
 
 
@@ -1342,6 +1337,9 @@ class WindowUnion(MyMainWindow):
             self.skv_proc_edit = current_widget.skv_proc_edit.text()
             if self.skv_proc_edit != '':
                 self.skv_proc_edit = int(float(self.skv_proc_edit))
+            self.pressure_edit = current_widget.pressure_edit.text()
+            if self.pressure_edit != '':
+                self.pressure_edit = int(float(self.pressure_edit))
             return True
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'ошибка в прочтении данных СКВ {e}')
@@ -1384,3 +1382,4 @@ class WindowUnion(MyMainWindow):
         else:
             # print(pvo_2)
             return pvo_2, f'Монтаж ПВО по схеме №2'
+

@@ -309,10 +309,10 @@ class WorkDatabaseWell:
                                work_plan_str, data_list.user[1], type_kr, data_paragraph, cdng, category_dict,
                                well_oilfield, appointment_well, str(inv_number), wellhead_fittings, angle_data)
 
-                # # Выполнение запроса с использованием параметров
-                # cursor.execute(query, data_values)
-                # # Не забудьте сделать коммит
-                # self.db_connection.commit()
+                # Выполнение запроса с использованием параметров
+                cursor.execute(query, data_values)
+                # Не забудьте сделать коммит
+                self.db_connection.commit()
                 # # Закрытие соединения после завершения всех операций
                 # self.db_connection.close()
 

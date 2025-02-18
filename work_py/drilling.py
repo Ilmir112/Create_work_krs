@@ -381,7 +381,7 @@ class Drill_window(WindowUnion):
         self.tableWidget.removeRow(row)
 
     def drilling_nkt(self, drill_tuple, drill_type_combo, drillingBit_diam, downhole_motor, need_privyazka_q_combo = 'Нет' ):
-        from work_py.alone_oreration import privyazka_nkt
+
         from work_py.alone_oreration import well_volume
 
         currentBottom = self.data_well.current_bottom
@@ -474,7 +474,7 @@ class Drill_window(WindowUnion):
         ]
         if need_privyazka_q_combo == 'Да':
 
-            privyazka_nkt_list = privyazka_nkt(self)[0]
+            privyazka_nkt_list = self.privyazka_nkt()[0]
 
             drilling_list_end.insert(-1, privyazka_nkt_list)
             drilling_list_end.insert(-1, [f'Удостоверится в наличии необходимого забоя', None,
