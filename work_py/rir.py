@@ -918,7 +918,7 @@ class RirWindow(WindowUnion):
                     'мастер КРС', 0.5]
 
             for row in glin_list:
-                rir_list.insert(-3, row)
+                rir_list.insert(-2, row)
             self.calculate_chemistry('глина', 5)
         else:
             rir_list = []

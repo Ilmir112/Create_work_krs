@@ -13,6 +13,7 @@ import win32con
 import property_excel.property_excel_pvr
 import threading
 import win32gui
+import base64
 
 from openpyxl.reader.excel import load_workbook
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
@@ -107,6 +108,7 @@ class MyMainWindow(QMainWindow):
         self.data_window = None
         self.perforation_correct_window2 = None
         self.work_plan = None
+        self.gnkt_data = None
 
     @staticmethod
     def show_info_message(data_well, message):
@@ -1809,6 +1811,7 @@ class MyWindow(MyMainWindow):
             data_list.lift_ecn_can = False
             data_list.pause = True
             data_list.diameter_length = 0
+            self.operation_window = None
 
             data_list.pipe_mileage = 0
             data_list.pipe_fatigue = 0
@@ -2457,8 +2460,8 @@ class SaveInExcel(MyWindow):
 
             self.gnkt_data.wb_gnkt.close()
             print(f'Table data saved to Excel {full_path}')
-        if self.wb:
-            self.wb.close()
+        if self.gnkt_data.wb_gnkt:
+            self.gnkt_data.wb_gnkt.close()
 
     def save_to_krs(self):
         from open_pz import CreatePZ
@@ -2850,7 +2853,7 @@ class SaveInExcel(MyWindow):
 
                     self.insert_image(ws2, image, coord, width * 0.72, height * 0.48)
 
-                except ValueError as e:
+                except Exception as e:
                     print(f"Ошибка при вставке изображения: {type(e).__name__}\n\n{str(e)}")
 
         for index_row, row in enumerate(ws2.iter_rows()):  # Копирование высоты строки

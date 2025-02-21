@@ -326,7 +326,7 @@ class FindIndexPZ(MyMainWindow):
                 self.cat_well_max = ProtectedIsDigit(row_ind)
                 self.data_well_min = ProtectedIsDigit(row_ind + 1)
             elif any(['стабилизатор' in str(col).lower() and 'желез' in str(col).lower() for col in row]):
-                self.data_well.stabilizator_need = True
+                self.stabilizator_need = True
 
             elif any(['Ожидаемые показатели после' in str(col) for col in row]):
                 self.data_x_min = ProtectedIsDigit(row_ind)
@@ -363,15 +363,13 @@ class FindIndexPZ(MyMainWindow):
                 self.data_x_max = ProtectedIsDigit(row_ind)
                 if self.check_text_in_row('Ранее проведенные работ', row):
                     self.data_x_max = ProtectedIsDigit(row_ind-2)
-                break
-
 
             elif any(['II. История эксплуатации скважины' in str(col) for col in row]):
                 self.data_pvr_max = ProtectedIsDigit(row_ind)
 
             elif 'III. Состояние скважины к началу ремонта ' in row:
                 self.condition_of_wells = ProtectedIsDigit(row_ind)
-            elif any([('безопасный' in str(col).lower() and 'урове' in str(col).lower())
+            elif any([('безопасный' in str(col).lower() and ('урове' in str(col).lower() or 'Нст' in str(col).lower()))
                       or 'бсу ' in str(col).lower() for col in row]):
                 self.bcu_level = True
             for col, value in enumerate(row):
@@ -1209,7 +1207,7 @@ class WellCondition(FindIndexPZ):
                                 self.well_volume_in_pz.append(well_volume_in_pz)
 
         if self.static_level.get_value == 'не корректно':
-            self.check_data_in_pz.append('не указано статический уровень')
+            self.check_data_in_pz.append('не указан статический уровень')
         if self.pressure_mkp.get_value in [None, 'не корректно', '-', 'нет', 'отсут']:
             asde = self.pressure_mkp.get_value
             self.check_data_in_pz.append(
@@ -1539,81 +1537,81 @@ class WellData(FindIndexPZ):
                             self.column_additional_wall_thickness = ProtectedIsNonNone('отсут')
                             self.head_column_additional = ProtectedIsNonNone('отсут')
                             self.shoe_column_additional = ProtectedIsNonNone('отсут')
+        try:
+            if self.stol_rotor.get_value in ['не корректно', None, '']:
+                self.check_data_in_pz.append('не указано Стол ротора \n')
+            if self.max_angle.get_value in ['не корректно', None, '']:
+                self.check_data_in_pz.append('не указано максимальный угол \n')
+            if self.max_angle_depth.get_value in ['не корректно', None, '']:
+                self.check_data_in_pz.append('не указано глубина максимального угла\n')
+            if self.level_cement_column.get_value in ['не корректно', None, '']:
+                self.check_data_in_pz.append('не указан уровень цемент за колонной\n')
 
-        if self.stol_rotor.get_value in ['не корректно', None, '']:
-            self.check_data_in_pz.append('не указано Стол ротора \n')
-        if self.max_angle.get_value in ['не корректно', None, '']:
-            self.check_data_in_pz.append('не указано максимальный угол \n')
-        if self.max_angle_depth.get_value in ['не корректно', None, '']:
-            self.check_data_in_pz.append('не указано глубина максимального угла\n')
-        if self.level_cement_column.get_value in ['не корректно', None, '']:
-            self.check_data_in_pz.append('не указан уровень цемент за колонной\n')
+            if self.dict_pump_shgn['before'] not in ['0', 0] and self.dict_pump_shgn_depth['before'] not in ['0', 0]:
+                adwdr = abs(sum(list(self.dict_sucker_rod.values())) - self.dict_pump_shgn_depth['before'])
+                if self.dict_sucker_rod:
+                    if abs(sum(list(self.dict_sucker_rod.values())) - self.dict_pump_shgn_depth['before']) > 10:
+                        QMessageBox.warning(self, 'Ошибка', f'Длина штанг {sum(list(self.dict_sucker_rod.values()))}м '
+                                                            f'до ремонта не равно глубине насоса '
+                                                            f'{self.dict_pump_shgn_depth["before"]}м \n')
+                        self.check_data_in_pz.append(
+                            f'Ошибка в карте спуска: Длина штанг {sum(list(self.dict_sucker_rod.values()))}м '
+                            f'до ремонта не равно глубине насоса '
+                            f'{self.dict_pump_shgn_depth["before"]}м \n')
+                if self.dict_nkt_before:
+                    if sum(list((self.dict_nkt_before.values()))) - self.dict_pump_shgn_depth["before"] < 0:
+                        QMessageBox.warning(self, 'Ошибка',
+                                            f'Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
+                                            f'после ремонта меньше глубины насоса'
+                                            f'{self.dict_pump_shgn_depth["after"]}м')
+                        self.check_data_in_pz.append(
+                            f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
+                            f'после ремонта не равно глубине насоса '
+                            f'{self.dict_pump_shgn_depth["after"]}м')
+            if self.distance_from_well_to_sampling_point is None:
+                QMessageBox.warning(self, 'Ошибка', f'Не указано расстояние до пункта налива')
+                self.check_data_in_pz.append(f'Не указано расстояние до пункта налива')
 
-        if self.dict_pump_shgn['before'] not in ['0', 0] and self.dict_pump_shgn_depth['before'] not in ['0', 0]:
-            adwdr = abs(sum(list(self.dict_sucker_rod.values())) - self.dict_pump_shgn_depth['before'])
-            if self.dict_sucker_rod:
-                if abs(sum(list(self.dict_sucker_rod.values())) - self.dict_pump_shgn_depth['before']) > 10:
-                    QMessageBox.warning(self, 'Ошибка', f'Длина штанг {sum(list(self.dict_sucker_rod.values()))}м '
-                                                        f'до ремонта не равно глубине насоса '
-                                                        f'{self.dict_pump_shgn_depth["before"]}м \n')
-                    self.check_data_in_pz.append(
-                        f'Ошибка в карте спуска: Длина штанг {sum(list(self.dict_sucker_rod.values()))}м '
-                        f'до ремонта не равно глубине насоса '
-                        f'{self.dict_pump_shgn_depth["before"]}м \n')
+            if self.dict_pump_shgn['after'] not in ['0', 0] and self.dict_pump_shgn_depth['after'] not in ['0', 0]:
+                if self.dict_sucker_rod_after:
+                    if abs(sum(list(self.dict_sucker_rod_after.values())) - self.dict_pump_shgn_depth['after']) > 10:
+                        QMessageBox.warning(self, 'Ошибка',
+                                            f'Длина штанг {sum(list(self.dict_sucker_rod_after.values()))}м '
+                                            f'после ремонта не равно глубине насоса '
+                                            f'{self.dict_pump_shgn_depth["before"]}м')
+                        self.check_data_in_pz.append(
+                            f'Ошибка в карте спуска: \nОшибка в карте спуска: Длина штанг {sum(list(self.dict_sucker_rod.values()))}м '
+                            f'после ремонта не равно глубине насоса '
+                            f'{self.dict_pump_shgn_depth["before"]}м')
+                if self.dict_nkt_after:
+                    if sum(list((self.dict_nkt_after.values()))) - self.dict_pump_shgn_depth["after"] < 0:
+                        QMessageBox.warning(self, 'Ошибка',
+                                            f'Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
+                                            f'после ремонта не равно глубине насоса '
+                                            f'{self.dict_pump_shgn_depth["after"]}м')
+
+                        self.check_data_in_pz.append(
+                            f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
+                            f'после ремонта не равно глубине насоса '
+                            f'{self.dict_pump_shgn_depth["after"]}м')
             if self.dict_nkt_before:
-                if sum(list((self.dict_nkt_before.values()))) - self.dict_pump_shgn_depth["before"] < 0:
-                    QMessageBox.warning(self, 'Ошибка',
-                                        f'Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
-                                        f'после ремонта меньше глубины насоса'
-                                        f'{self.dict_pump_shgn_depth["after"]}м')
+                if sum(list(self.dict_nkt_before.values())) > self.current_bottom:
+                    QMessageBox.warning(self, 'Ошибка', f'Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
+                                                        f'до ремонта больше текущего забоя {self.current_bottom}м')
                     self.check_data_in_pz.append(
-                        f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
-                        f'после ремонта не равно глубине насоса '
-                        f'{self.dict_pump_shgn_depth["after"]}м')
-        if self.distance_from_well_to_sampling_point is None:
-            QMessageBox.warning(self, 'Ошибка', f'Не указано расстояние до пункта налива')
-            self.check_data_in_pz.append(f'Не указано расстояние до пункта налива')
+                        f'Ошибка в карте спуска: Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
+                        f'до ремонта больше текущего забоя {self.current_bottom}м')
 
-        if self.dict_pump_shgn['after'] not in ['0', 0] and self.dict_pump_shgn_depth['after'] not in ['0', 0]:
-            if self.dict_sucker_rod_after:
-                if abs(sum(list(self.dict_sucker_rod_after.values())) - self.dict_pump_shgn_depth['after']) > 10:
-                    QMessageBox.warning(self, 'Ошибка',
-                                        f'Длина штанг {sum(list(self.dict_sucker_rod_after.values()))}м '
-                                        f'после ремонта не равно глубине насоса '
-                                        f'{self.dict_pump_shgn_depth["before"]}м')
-                    self.check_data_in_pz.append(
-                        f'Ошибка в карте спуска: \nОшибка в карте спуска: Длина штанг {sum(list(self.dict_sucker_rod.values()))}м '
-                        f'после ремонта не равно глубине насоса '
-                        f'{self.dict_pump_shgn_depth["before"]}м')
-            if self.dict_nkt_after:
-                if sum(list((self.dict_nkt_after.values()))) - self.dict_pump_shgn_depth["after"] < 0:
-                    QMessageBox.warning(self, 'Ошибка',
-                                        f'Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
-                                        f'после ремонта не равно глубине насоса '
-                                        f'{self.dict_pump_shgn_depth["after"]}м')
-
-                    self.check_data_in_pz.append(
-                        f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
-                        f'после ремонта не равно глубине насоса '
-                        f'{self.dict_pump_shgn_depth["after"]}м')
-        if self.dict_nkt_before:
-            if sum(list(self.dict_nkt_before.values())) > self.current_bottom:
-                QMessageBox.warning(self, 'Ошибка', f'Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
-                                                    f'до ремонта больше текущего забоя {self.current_bottom}м')
-                self.check_data_in_pz.append(
-                    f'Ошибка в карте спуска: Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
-                    f'до ремонта больше текущего забоя {self.current_bottom}м')
-
-        if self.max_angle.get_value > 45 or 'gnkt' in self.work_plan:
-            angle_true_question = QMessageBox.question(self,
-                                                       'Зенитный угол',
-                                                       'Зенитный угол больше 45 градусов, '
-                                                       'для корректной работы необходимо '
-                                                       'загрузить данные инклинометрии. Загрузить?')
-            if angle_true_question == QMessageBox.StandardButton.Yes:
-                self.angle_data = WellData.read_angle_well()
-                if self.angle_data is None:
-                    self.pause_app()
+            if self.max_angle.get_value > 45 or 'gnkt' in self.work_plan:
+                angle_true_question = QMessageBox.question(self,
+                                                           'Зенитный угол',
+                                                           'Зенитный угол больше 45 градусов, '
+                                                           'для корректной работы необходимо '
+                                                           'загрузить данные инклинометрии. Загрузить?')
+                if angle_true_question == QMessageBox.StandardButton.Yes:
+                    self.angle_data = WellData.read_angle_well()
+                    if self.angle_data is None:
+                        self.pause_app()
 
             if self.dict_pump_ecn["before"] != '0' and self.dict_pump_shgn["before"] != '0':
                 if self.paker_before["before"] in ['0', None, 0]:
@@ -1625,30 +1623,32 @@ class WellData(FindIndexPZ):
                     self.check_data_in_pz.append(
                         f'В план заказе не указано посадка пакера при cпуске ОРД ')
 
-        if str(self.well_number.get_value) in ['1871', '1906', '1600', '3129', '2166', '1352', '1678']:
-            QMessageBox.warning(self, 'Канатные технологии', f'Скважина согласована на канатные технологии')
-            self.konte_true = True
+            if str(self.well_number.get_value) in ['1871', '1906', '1600', '3129', '2166', '1352', '1678']:
+                QMessageBox.warning(self, 'Канатные технологии', f'Скважина согласована на канатные технологии')
+                self.konte_true = True
 
-        if '0' != str(self.dict_pump_ecn['before']):
-            if sum(list((self.dict_nkt_before.values()))) - self.dict_pump_ecn_depth['before'] < 0:
-                QMessageBox.warning(self, 'Ошибка',
-                                    f'Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
-                                    f'до ремонта меньше глубины '
-                                    f'{self.dict_pump_ecn_depth["before"]}м')
-                self.check_data_in_pz.append(
-                    f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
-                    f'до ремонта меньше глубины'
-                    f'{self.dict_pump_ecn_depth["before"]}м')
-        if '0' != str(self.dict_pump_ecn['after']):
-            if sum(list((self.dict_nkt_after.values()))) - self.dict_pump_ecn_depth['after'] < 0:
-                QMessageBox.warning(self, 'Ошибка',
-                                    f'Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
-                                    f' меньше глубины насоса '
-                                    f'{self.dict_pump_ecn_depth["after"]}м')
-                self.check_data_in_pz.append(
-                    f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
-                    f'до ремонта меньше глубины '
-                    f'{self.dict_pump_shgn_depth["after"]}м')
+            if '0' != str(self.dict_pump_ecn['before']):
+                if sum(list((self.dict_nkt_before.values()))) - self.dict_pump_ecn_depth['before'] < 0:
+                    QMessageBox.warning(self, 'Ошибка',
+                                        f'Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
+                                        f'до ремонта меньше глубины '
+                                        f'{self.dict_pump_ecn_depth["before"]}м')
+                    self.check_data_in_pz.append(
+                        f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
+                        f'до ремонта меньше глубины'
+                        f'{self.dict_pump_ecn_depth["before"]}м')
+            if '0' != str(self.dict_pump_ecn['after']):
+                if sum(list((self.dict_nkt_after.values()))) - self.dict_pump_ecn_depth['after'] < 0:
+                    QMessageBox.warning(self, 'Ошибка',
+                                        f'Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
+                                        f' меньше глубины насоса '
+                                        f'{self.dict_pump_ecn_depth["after"]}м')
+                    self.check_data_in_pz.append(
+                        f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
+                        f'до ремонта меньше глубины '
+                        f'{self.dict_pump_shgn_depth["after"]}м')
+        except Exception as e:
+            QMessageBox.warning(self, 'Ошибка', 'Ошибка в расчетах')
 
         if self.data_window is None:
             from data_correct import DataWindow
@@ -2009,6 +2009,7 @@ class WellCategory(FindIndexPZ):
                         cell = self.ws.cell(row=row, column=col).value
                         if cell:
                             if str(cell).strip() in ['атм'] and self.ws.cell(row=row, column=col - 2).value:
+
                                 self.category_pressure_list.append(self.ws.cell(row=row, column=col - 2).value)
                                 self.category_pressure_well.append(self.ws.cell(row=row, column=col - 1).value)
 
@@ -2045,7 +2046,6 @@ class WellCategory(FindIndexPZ):
                                                 'Не указано значение сероводорода в мг/л')
 
                                     else:
-
                                         self.value_h2s_mg.append(
                                             float(str(self.ws.cell(row=row, column=col - 1).value).replace(',', '.')))
 

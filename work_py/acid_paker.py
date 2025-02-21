@@ -607,11 +607,11 @@ class AcidPakerWindow(WindowUnion):
             self.paker2_depth = int(self.check_if_none(self.current_widget.paker2_depth.text()))
 
             if self.data_well:
-                if self.check_true_depth_template(self.paker_depth) is False:
+                if self.check_true_depth_template(self.paker_depth_edit) is False:
                     return
-                if self.true_set_paker(self.paker_depth) is False:
+                if self.true_set_paker(self.paker_depth_edit) is False:
                     return
-                if self.check_depth_in_skm_interval(self.paker_depth) is False:
+                if self.check_depth_in_skm_interval(self.paker_depth_edit) is False:
                     return
                 if self.check_true_depth_template(self.paker2_depth) is False:
                     return
@@ -1059,7 +1059,7 @@ class AcidPakerWindow(WindowUnion):
             self.paker_short = f'заглушку + сбивной с ввертышем + НКТ{nkt_diam}м {self.paker_khost}м  + ' \
                                f'пакер {paker_type}-{self.diameter_paker}мм + щелевой фильтр НКТ {difference_paker}м ' \
                                f' + пакер ПУ - {self.diameter_paker} + НКТ{nkt_diam}мм 20м + репер'
-            self.dict_nkt = {nkt_diam: float(self.paker_khost) + float(self.paker_depth)}
+            self.dict_nkt = {nkt_diam: float(self.paker_khost) + float(self.paker_depth_edit)}
 
         else:
             gidroyakor_str = 'гидроякорь'
