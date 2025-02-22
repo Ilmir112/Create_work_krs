@@ -2739,6 +2739,8 @@ class SaveInExcel(MyWindow):
                 if cell and str(cell) != str(work_list[i - 1][j - 1]):
                     # print(work_list[i - 1][j - 1])
                     cell.value = self.reformated_string_data(work_list[i - 1][j - 1])
+                    if 'Ранее проведенные работ' in str(cell.value):
+                        cell.font = Font(name=font_type, size=size_font, bold=False)
                     if i >= ind_ins:
                         if abs(i - ind_ins - 1) >= 1 and stop_str > i:
                             if self.data_well.work_plan in ['dop_plan', 'dop_plan_in_base']:
@@ -2805,8 +2807,7 @@ class SaveInExcel(MyWindow):
                                                                             vertical='center')
                             if 'Наименование работ' == cell.value:
                                 cell_num = i - 1
-                        elif 'Ранее проведенные работ' in str(cell.value):
-                            cell.font = Font(name=font_type, size=size_font, bold=False)
+
                         else:
                             ws2.cell(row=i, column=j).font = Font(name=font_type, size=size_font, bold=False)
 
