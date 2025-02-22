@@ -6,7 +6,7 @@ from datetime import datetime
 
 import data_list
 
-from work_py.alone_oreration import lifting_unit, weigth_pipe, volume_pod_nkt, volume_jamming_well
+from work_py.alone_oreration import weigth_pipe, volume_pod_nkt, volume_jamming_well
 from work_py.calculate_work_parametrs import volume_nkt_metal, volume_nkt, volume_well_pod_nkt_calculate
 from work_py.mkp import mkp_revision_1_kateg
 from work_py.rationingKRS import liftingNKT_norm, well_jamming_norm, liftingGNO, lifting_sucker_rod
@@ -356,6 +356,35 @@ class GnoParent(ABC):
                 self.data_well.category_pvo, _ = QInputDialog.getInt(
                     None, 'Категория скважины', f'Категория скважины № {self.data_well.category_pvo}, корректно?',
                     self.data_well.category_pvo, 1, 2)
+
+    def lifting_unit(self):
+        aprs_40 = 'Установить подъёмный агрегат на устье не менее 40т.\n' \
+                  'ПРИМЕЧАНИЕ:  ПРИ ИСПОЛЬЗОВАНИИ ПОДЪЕМНОГО АГРЕТАТА АПРС-40, А5-40, АПРС-50 ДОПУСКАЕТСЯ РАБОТА ' \
+                  'БЕЗ ПРИМЕНЕНИЯ ВЕТРОВЫХ ОТТЯЖЕК при скорости ветра не более 14 м/с и плотности грунта не менее 5 ' \
+                  'кг см2.ПРИ ИСПОЛЬЗОВАНИИ подъемного АГРЕГАТА  УПА-60/80, А-50 РАБОТАТЬ ТОЛЬКО С ПРИМЕНЕНИЕМ 4 ' \
+                  'ОТТЯЖЕК. При использовании подъемного агрегата АПР 60/80, Барс-80 допускается работа без применения ' \
+                  'ветровых оттяжек до 50 тн. при скорости ветра менее 14 м/с и плотности грунта не менее 5 кг см2. ' \
+                  'При выполнении работ по ликвидации  аварии обязательно оснащение всех видов ПОДЪЕМНЫХ АГРЕГАТОВ 4 ' \
+                  'ОТТЯЖКАМИ. При превышении 75% от страгивающей нагрузки на все подъемные агрегаты оформляется ' \
+                  'наряд допуск на проведение работ повышенной опасности. МАКСИМАЛЬНУЮ НАГРУЗКА НЕ ДОЛЖНА ПРЕВЫШАТЬ ' \
+                  '80% ОТ СТРАГИВАЮЩЕЙ НАГРУЗКИ НА НКТ. После монтажа подъёмника якоря ветровых оттяжек должны ' \
+                  'быть испытаны на нагрузки, установленные инструкцией по эксплуатации завода - изготовителя в ' \
+                  'присутствии супервайзера Заказчика. '
+
+        upa_60 = 'Установить подъёмный агрегат на устье не менее 60т.  \n' \
+                 'ПРИМЕЧАНИЕ:  ПРИ ИСПОЛЬЗОВАНИИ ПОДЪЕМНОГО АГРЕТАТА АПРС-40, А5-40, АПРС-50 ДОПУСКАЕТСЯ РАБОТА ' \
+                 'БЕЗ ПРИМЕНЕНИЯ ВЕТРОВЫХ ОТТЯЖЕК при скорости ветра не более 14 м/с и плотности грунта не менее 5 ' \
+                 'кг см2.ПРИ ИСПОЛЬЗОВАНИИ подъемного АГРЕГАТА  УПА-60/80, А-50 РАБОТАТЬ ТОЛЬКО С ПРИМЕНЕНИЕМ 4 ' \
+                 'ОТТЯЖЕК. При использовании подъемного агрегата АПР 60/80, Барс-80 допускается работа без применения ' \
+                 'ветровых оттяжек до 50 тн. при скорости ветра менее 14 м/с и плотности грунта не менее 5 кг см2. ' \
+                 'При выполнении работ по ликвидации  аварии обязательно оснащение всех видов ПОДЪЕМНЫХ АГРЕГАТОВ 4 ' \
+                 'ОТТЯЖКАМИ. При превышении 75% от страгивающей нагрузки на все подъемные агрегаты оформляется ' \
+                 'наряд допуск на проведение работ повышенной опасности. МАКСИМАЛЬНУЮ НАГРУЗКА НЕ ДОЛЖНА ПРЕВЫШАТЬ ' \
+                 '80% ОТ СТРАГИВАЮЩЕЙ НАГРУЗКИ НА НКТ. После монтажа подъёмника якоря ветровых оттяжек должны ' \
+                 'быть испытаны на нагрузки, установленные инструкцией по эксплуатации завода - изготовителя в ' \
+                 'присутствии супервайзера Заказчика. '
+
+        return upa_60 if self.data_well.bottom_hole_artificial.get_value >= 2300 else aprs_40
 
     def append_posle_lift(self):
         posle_lift = [
@@ -768,7 +797,7 @@ class LiftPaker(GnoParent):
              None, None, None, None, None,
              'Мастер КРС, Представ заказчика', 1.2],
             [None, None,
-             f'{lifting_unit(self)}', None, None, None, None, None, None, None,
+             f'{self.lifting_unit()}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
             [None, None,
              f'За 24 часа до готовности бригады вызвать Пусковую комиссию и представителя супервайзерской '
@@ -893,7 +922,7 @@ class LiftOrz(GnoParent):
                  None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика ', 0.7],
                 [None, None,
-                 f'{lifting_unit(self)}', None, None, None, None, None, None, None,
+                 f'{self.lifting_unit()}', None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
                 [None, None,
                  f'За 24 часа до готовности бригады вызвать Пусковую комиссию и представителя супервайзерской '
@@ -1015,7 +1044,7 @@ class LiftOrd(GnoParent):
              None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика ', 0.67],
             [None, None,
-             f'{lifting_unit(self)}', None, None, None, None, None, None, None,
+             f'{self.lifting_unit()}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
             [None, None,
              f'За 24 часа до готовности бригады вызвать Пусковую комиссию и представителя супервайзерской '
@@ -1153,7 +1182,7 @@ class LiftVoronka(GnoParent):
              None, None, None, None, None, None, None,
              ' Мастер КРС', None],
             [None, None,
-             f'{lifting_unit(self)}', None, None, None, None, None, None, None,
+             f'{self.lifting_unit()}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
             [None, None,
              f'За 24 часа до готовности бригады вызвать Пусковую комиссию и представителя супервайзерской '
@@ -1260,7 +1289,7 @@ class LiftPumpNnWithPaker(GnoParent):
              None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика ', 0.7],
             [None, None,
-             f'{lifting_unit(self)}', None, None, None, None, None, None, None,
+             f'{self.lifting_unit()}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
             [None, None,
              f'За 24 часа до готовности бригады вызвать Пусковую комиссию и представителя супервайзерской '
@@ -1400,7 +1429,7 @@ class LiftPumpNvWithPaker(GnoParent):
              None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика ', 0.7],
             [None, None,
-             f'{lifting_unit(self)}', None, None, None, None, None, None, None,
+             f'{self.lifting_unit()}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
             [None, None,
              f'За 24 часа до готовности бригады вызвать Пусковую комиссию и представителя супервайзерской '
@@ -1536,7 +1565,7 @@ class LiftEcnWithPaker(GnoParent):
              None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика ', 0.7],
             [None, None,
-             f'{lifting_unit(self)}', None, None, None, None, None, None, None,
+             f'{self.lifting_unit()}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
             [None, None,
              f'За 24 часа до готовности бригады вызвать Пусковую комиссию и представителя супервайзерской '
@@ -1660,7 +1689,7 @@ class LiftEcn(GnoParent):
              None, None, None, None, None, None, None,
              ' Мастер КРС', None],
             [None, None,
-             f'{lifting_unit(self)}', None, None, None, None, None, None, None,
+             f'{self.lifting_unit()}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
             [None, None,
              f'За 24 часа до готовности бригады вызвать Пусковую комиссию и представителя супервайзерской '
@@ -1776,7 +1805,7 @@ class LiftPumpNv(GnoParent):
              ' Мастер КРС',
              [str(well_jamming_norm(volume_pod_nkt(self))) if self.without_damping_true is False else None][0]],
             [None, None,
-             f'{lifting_unit(self)}', None, None, None, None, None, None, None,
+             f'{self.lifting_unit()}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
             [None, None,
              f'За 24 часа до готовности бригады вызвать Пусковую комиссию и представителя супервайзерской '
@@ -1908,7 +1937,7 @@ class LiftPumpNn(GnoParent):
              None, None, None, None, None, None, None,
              ' Мастер КРС', None],
             [None, None,
-             f'{lifting_unit(self)}', None, None, None, None, None, None, None,
+             f'{self.lifting_unit()}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
             [None, None,
              f'За 24 часа до готовности бригады вызвать Пусковую комиссию и представителя супервайзерской '
@@ -2036,7 +2065,7 @@ class LiftEcnWith2Paker(GnoParent):
              None, None, None, None, None, None, None,
              ' Мастер КРС', None],
             [None, None,
-             f'{lifting_unit(self)}', None, None, None, None, None, None, None,
+             f'{self.lifting_unit()}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
             [None, None,
              f'За 24 часа до готовности бригады вызвать Пусковую комиссию и представителя супервайзерской '

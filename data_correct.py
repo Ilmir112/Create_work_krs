@@ -901,7 +901,7 @@ class DataWindow(WindowUnion):
                 QMessageBox.warning(self, 'Ошибка', 'Не корректна дата последней опрессовки')
                 return
             else:
-                self.data_well.result_pressure_date = self.data_well.date_drilling_cancel
+                self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(self.data_well.date_drilling_cancel)
 
         if self.check_date_format(date_commissioning_line) is False:
             if curator != 'ВНС':
@@ -1166,7 +1166,7 @@ class DataWindow(WindowUnion):
             self.data_well.max_admissible_pressure = ProtectedIsDigit(
                 self.check_if_none(max_admissible_pressure))
             self.data_well.date_commissioning = date_commissioning_line
-            self.data_well.result_pressure_date = result_pressure_date
+            self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(result_pressure_date)
 
             # print(f'макс {self.data_well.max_expected_pressure.get_value}')
             self.data_well.dict_pump_shgn["before"] = self.check_if_none(dict_pump_shgn_do)
@@ -1308,7 +1308,7 @@ class DataWindow(WindowUnion):
                 'статика': self.data_well.static_level.get_value,
                 'динамика': self.data_well.dinamic_level.get_value,
                 'дата ввода в эксплуатацию': self.data_well.date_commissioning,
-                'дата опрессовки': self.data_well.result_pressure_date,
+                'дата опрессовки': self.data_well.result_pressure_date.get_value,
                 'НКТ': {
                     'До': self.data_well.dict_nkt_before,
                     "После": self.data_well.dict_nkt_after

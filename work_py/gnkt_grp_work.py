@@ -1135,7 +1135,7 @@ class GnktModel(WindowUnion):
              None,
              None])
         else:
-            schema_well_list.insert(10, [None, None, None, None, None, None, None, None, None, nkt_schema, None, None,
+            schema_well_list.insert(10, [None, None, None, None, None, None, None, None, None, None, None, None,
                                         'Шахтное направление', None, None, '-', '-', '-', None, None, '-', '-', None])
 
         if self.data_well.work_plan == 'gnkt_bopz':

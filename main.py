@@ -149,7 +149,7 @@ class MyMainWindow(QMainWindow):
         # Паттерн для проверки: допустимы только цифры, точка и запятая
         pattern = r'^[\d.,]+$'
         # Проверка строки на соответствие паттерну
-        if re.match(pattern, string):
+        if re.match(pattern, str(string)):
             return True
         else:
             return False
@@ -2162,24 +2162,25 @@ class MyWindow(MyMainWindow):
         from find import WellCondition
         from work_py.leakage_column import LeakageWindow
 
-        if WellCondition.leakage_window is None:
-            WellCondition.leakage_window = LeakageWindow(self.data_well)
-            WellCondition.leakage_window.setWindowTitle("Корректировка негерметичности")
+        if self.leakage_window is None:
+            self.leakage_window = LeakageWindow(self.data_well)
+            self.leakage_window.setWindowTitle("Корректировка негерметичности")
             # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
-            self.set_modal_window(WellCondition.leakage_window)
-            self.data_well.dict_leakiness = WellCondition.leakage_window.add_work()
-            # print(f'словарь нарушений {self.data_well.dict_leakiness}')
-            data_list.pause = False
-            self.pause_app()
+            self.set_modal_window(self.leakage_window)
 
+            # print(f'словарь нарушений {self.data_well.dict_leakiness}')
+            data_list.pause = True
+            self.pause_app()
+            self.data_well.dict_leakiness = self.leakage_window.add_work()
+            self.data_well.data_list[-1][5] = json.dumps(self.data_well.dict_leakiness, default=str,
+                                                         ensure_ascii=False, indent=4)
             # print(f'словарь нарушений {self.data_well.dict_leakiness}')
 
         else:
             data_list.pause = True
-            WellCondition.leakage_window.close()  # Close window.
-            WellCondition.leakage_window = None  # Discard reference.
-        self.data_well.data_list[-1][5] = json.dumps(self.data_well.dict_leakiness, default=str,
-                                                     ensure_ascii=False, indent=4)
+            self.leakage_window.close()  # Close window.
+            self.leakage_window = None  # Discard reference.
+
 
     def correctData(self):
         from data_correct import DataWindow
@@ -2804,11 +2805,11 @@ class SaveInExcel(MyWindow):
                                                                             vertical='center')
                             if 'Наименование работ' == cell.value:
                                 cell_num = i - 1
-                        if 'Ранее проведенные работ' in str(cell.value):
+                        elif 'Ранее проведенные работ' in str(cell.value):
                             cell.font = Font(name=font_type, size=size_font, bold=False)
-
                         else:
                             ws2.cell(row=i, column=j).font = Font(name=font_type, size=size_font, bold=False)
+
 
         # print(merged_cells_dict)
         for row, col in merged_cells_dict.items():
