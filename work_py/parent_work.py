@@ -377,7 +377,7 @@ class WindowUnion(MyMainWindow):
 
         return testing_pressure_str, testing_pressure_short, check_true
 
-    def privyazka_nkt(self):
+    def privyazka_nkt_work(self):
 
         priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
                       f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '

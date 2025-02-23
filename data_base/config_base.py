@@ -523,7 +523,7 @@ class CheckWellExistence:
         if not self.db_connection:
             return None
         with CursorContext(self.db_connection.cursor()) as cursor:
-            # self.drop_table(cursor, region_name)
+            self.drop_table(cursor, region_name)
 
             # Создание таблицы в базе данных
             cursor.execute(f'CREATE TABLE IF NOT EXISTS {region_name}'
@@ -542,7 +542,6 @@ class CheckWellExistence:
                     f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
                     f"{self.path_index})"
 
-
             cursor.execute(query,
                            (well_number, area_well, version_year, region_name, costumer))
             # Не забудьте сделать коммит
@@ -557,7 +556,7 @@ class CheckWellExistence:
             # Создание таблицы, если она не существует
             cursor.execute(f"""
                             CREATE TABLE IF NOT EXISTS {region_name} (
-                                ID SERIAL PRIMARY KEY NOT NULL,
+                                ID SERIAL PRIMARY KEY,
                                 cdng TEXT,
                                 well_number TEXT,
                                 deposit_area TEXT,
@@ -631,8 +630,8 @@ class CheckWellExistence:
                             categoty_gf = col
                             gas_factor = col + 1
         return check_param, well_column, cdng, area_column, oilfield, categoty_pressure, \
-               pressure_Gst, date_measurement, pressure_Ppl, categoty_h2s, h2s_pr, h2s_mg_l, \
-               h2s_mg_m, categoty_gf, gas_factor, area_row, check_file
+            pressure_Gst, date_measurement, pressure_Ppl, categoty_h2s, h2s_pr, h2s_mg_l, \
+            h2s_mg_m, categoty_gf, gas_factor, area_row, check_file
 
     def insert_data_in_classification(self, region_name, cdng, well_number, area_well,
                                       oilfield_str, categoty_pressure, pressure_Ppl, pressure_Gst,
@@ -642,8 +641,7 @@ class CheckWellExistence:
         if not self.db_connection:
             return None
         with CursorContext(self.db_connection.cursor()) as cursor:
-            cursor.execute(f"""
-                            INSERT INTO {region_name} (
+            query = f"""INSERT INTO {region_name} (
                                 cdng, well_number, deposit_area, oilfield,
                                 categoty_pressure, pressure_Ppl, pressure_Gst, date_measurement,
                                 categoty_h2s, h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, gas_factor,
@@ -654,13 +652,14 @@ class CheckWellExistence:
                             {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, 
                             {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, 
                             {self.path_index});
-                        """, (
-                cdng, well_number, area_well,
-                oilfield_str, categoty_pressure, pressure_Ppl, pressure_Gst,
-                date_measurement, categoty_h2s,
-                h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf,
-                gas_factor, version_year, region, costumer
-            ))
+                        """
+            data = (cdng, well_number, area_well,
+                    oilfield_str, categoty_pressure, pressure_Ppl, pressure_Gst,
+                    date_measurement, categoty_h2s,
+                    h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf,
+                    gas_factor, version_year, region, costumer)
+
+            cursor.execute(query, data)
 
             # print(cdng, well_number, area_well,
             #     oilfield_str, categoty_pressure, pressure_Ppl, pressure_Gst,

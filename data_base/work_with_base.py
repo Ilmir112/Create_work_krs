@@ -235,61 +235,61 @@ class ClassifierWell(MyMainWindow):
             if index_row > 18:
                 break
 
-        if data_list.connect_in_base:
-            try:
-                # Подключение к базе данных
-                db = connection_to_database(decrypt("DB_CLASSIFICATION"))
-                self.classification_well = CheckWellExistence(db)
 
-                REGION_LIST = ['ЧГМ', 'АГМ', 'ТГМ', 'ИГМ', 'КГМ', ]
+        try:
+            # Подключение к базе данных
+            db = connection_to_database(decrypt("DB_CLASSIFICATION"))
+            self.classification_well = CheckWellExistence(db)
 
-                for region_name in REGION_LIST:
-                    if region_name == region:
-                        if check_param in region_name:
-                            self.classification_well.create_table_without_juming(region_name)
-                            QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
-                                                f'регион выбран корректно  {region_name}')
-                            try:
-                                # Получение данных из Excel и запись их в базу данных
-                                for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
-                                    if 'ПЕРЕЧЕНЬ' in row:
-                                        check_file = True
-                                    if 'Скважина' in row:
-                                        area_row = index_row + 2
-                                        for col, value in enumerate(row):
-                                            if not value is None and col <= 20:
-                                                if 'Скважина' == value:
-                                                    well_column = col
-                                                elif 'Площадь' == value:
-                                                    area_column = col
+            REGION_LIST = ['ЧГМ', 'АГМ', 'ТГМ', 'ИГМ', 'КГМ', ]
 
-                                for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
-                                    if index_row > area_row:
-                                        well_number = row[well_column]
-                                        area_well = row[area_column]
+            for region_name in REGION_LIST:
+                if region_name == region:
+                    if check_param in region_name:
+                        self.classification_well.create_table_without_juming(region_name)
+                        QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
+                                            f'регион выбран корректно  {region_name}')
+                        try:
+                            # Получение данных из Excel и запись их в базу данных
+                            for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
+                                if 'ПЕРЕЧЕНЬ' in row:
+                                    check_file = True
+                                if 'Скважина' in row:
+                                    area_row = index_row + 2
+                                    for col, value in enumerate(row):
+                                        if not value is None and col <= 20:
+                                            if 'Скважина' == value:
+                                                well_column = col
+                                            elif 'Площадь' == value:
+                                                area_column = col
 
-                                        if well_number:
-                                            print(well_number)
-                                            self.classification_well.insert_data_in_table_without_juming(
-                                                str(well_number), area_well, version_year, region_name, costumer)
+                            for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
+                                if index_row > area_row:
+                                    well_number = row[well_column]
+                                    area_well = row[area_column]
 
-                                QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
-                            except Exception as e:
-                                QMessageBox.warning(self, 'ОШИБКА', f'Выбран файл с не корректными данными {e}')
+                                    if well_number and len(str(well_number)) <=5:
+                                        print(well_number)
+                                        self.classification_well.insert_data_in_table_without_juming(
+                                            str(well_number), area_well, version_year, region_name, costumer)
 
-                        else:
-                            QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
-                                                f'в Данном перечне отсутствую скважины {region_name}')
+                            QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
+                        except Exception as e:
+                            QMessageBox.warning(self, 'ОШИБКА', f'Выбран файл с не корректными данными {e}')
+
+                    else:
+                        QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
+                                            f'в Данном перечне отсутствую скважины {region_name}')
 
 
-            except psycopg2.Error as e:
-                # Выведите сообщение об ошибке
-                QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
+        except psycopg2.Error as e:
+            # Выведите сообщение об ошибке
+            QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
 
-            except sqlite3.Error as e:
-                # Выведите сообщение об ошибке
-                QMessageBox.warning(None, 'Ошибка',
-                                    f'Ошибка подключения к базе данных: /n {type(e).__name__}\n\n{str(e)}')
+        except sqlite3.Error as e:
+            # Выведите сообщение об ошибке
+            QMessageBox.warning(None, 'Ошибка',
+                                f'Ошибка подключения к базе данных: /n {type(e).__name__}\n\n{str(e)}')
 
     def filter(self, filter_text):
         for i in range(1, self.table_class.rowCount() + 1):
@@ -373,7 +373,7 @@ class ClassifierWell(MyMainWindow):
                                                 if version_year[-1] == '.':
                                                     version_year = version_year[:-1]
 
-                                    if well_number:
+                                    if well_number and len(str(well_number)) < 6:
                                         self.classification_well.insert_data_in_classification(
                                             region_name, row[cdng], well_number, area_well, oilfield_str,
                                             row[categoty_pressure],
@@ -383,8 +383,8 @@ class ClassifierWell(MyMainWindow):
                                             row[gas_factor],
                                             version_year, region, costumer
                                         )
-                        except Exception:
-                            QMessageBox.warning(self, 'ОШИБКА', 'Выбран файл с не корректными данными')
+                        except Exception as e:
+                            QMessageBox.warning(self, 'ОШИБКА', f'Выбран файл с не корректными данными {e}')
 
                     else:
                         QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',

@@ -2195,9 +2195,19 @@ class MyWindow(MyMainWindow):
         definition_bottom_gklm_list = definition_bottom_gklm(self)
         self.populate_row(self.insert_index, definition_bottom_gklm_list, self.table_widget)
 
+    def privyazka_nkt_work(self):
+
+        priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
+                      f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
+                      f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
+                      f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
+                      None, None, None, None, None, None, None,
+                      'Мастер КРС, подрядчик по ГИС', 4]]
+        return priv_list
+
     def privyazka_nkt(self):
-        from work_py.alone_oreration import privyazka_nkt
-        privyazka_nkt_list = privyazka_nkt(self)
+        privyazka_nkt_list = self.privyazka_nkt_work()
         self.populate_row(self.insert_index, privyazka_nkt_list, self.table_widget)
 
     def definition_q(self):
