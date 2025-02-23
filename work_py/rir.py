@@ -24,7 +24,7 @@ class TabPageSoRir(TabPageUnion):
         self.paker_need_combo.addItems(['Нужно СПО', 'без СПО'])
 
         if self.difference_date_days(self.data_well.date_commissioning) < 365.25 * 20 and \
-                self.difference_date_days(self.data_well.result_pressure_date) < 365 * 3 and \
+                self.difference_date_days(self.data_well.result_pressure_date.get_value) < 365 * 3 and \
                 len(self.data_well.leakiness_interval) == 0:
             self.paker_need_combo.setCurrentIndex(1)
 
@@ -426,12 +426,12 @@ class RirWindow(WindowUnion):
              'Мастер КРС, подрядчик РИР, УСРСиСТ', 8],
 
             [f'{self.need_opressovki(rir_rpk_plast_true)}',
-                None,
-                f'{self.need_opressovki(rir_rpk_plast_true)} '
-                f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с '
-                f'подтверждением за 2 часа до начала работ) ',
-                None, None, None, None, None, None, None,
-                'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
+             None,
+             f'{self.need_opressovki(rir_rpk_plast_true)} '
+             f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с '
+             f'подтверждением за 2 часа до начала работ) ',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', 0.67],
             [None, None,
              f'Поднять стыковочное устройство с глубины {roof_rir_edit}м с доливом скважины в объеме '
              f'{round(self.data_well.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.data_well.fluid_work} ',
@@ -466,40 +466,40 @@ class RirWindow(WindowUnion):
 
         rir_list = [
             [f'УЦМ в инт {roof_rir_edit}-{sole_rir_edit}м', None,
-                     f'Произвести цементную заливку с целью изоляции пласта {plast_combo}  в интервале '
-                     f'{roof_rir_edit}-{sole_rir_edit}м в присутствии '
-                     f'представителя УСРС и СТ',
-                     None, None, None, None, None, None, None,
-                     'мастер КРС', 2.5],
-                    [None, None,
-                     f'Приготовить цементный раствор у=1,82г/см3 в объёме {volume_cement}м3'
-                     f' (сухой цемент {round(volume_cement / 1.25, 1)}т) ',
-                     None, None, None, None, None, None, None,
-                     'мастер КРС', 0.5],
-                    [None, None,
-                     f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме {volume_in_ek}м3,'
-                     f' цементный раствор в '
-                     f'объеме {volume_cement}м3, '
-                     f'довести тех.жидкостью у=1,00г/см3 в объёме {volume_in_nkt}м3, тех. жидкостью  в объёме '
-                     f'{round(volume_vn_nkt(dict_nkt, roof_rir_edit, sole_rir_edit) - volume_in_nkt, 1)}м3. '
-                     f'Уравновешивание цементного раствора',
-                     None, None, None, None, None, None, None,
-                     'мастер КРС', 0.5],
-                    [None, None,
-                     f'Приподнять перо до гл.{roof_rir_edit}м. Закрыть трубное пространство. '
-                     f'Продавить по затрубному пространству '
-                     f'тех.жидкостью  при давлении не более {self.data_well.max_admissible_pressure.get_value}атм '
-                     f'(до получения технологического СТОП).',
-                     None, None, None, None, None, None, None,
-                     'мастер КРС', 0.5],
-                    [None, None,
-                     f'Открыть трубное пространство. Промыть скважину обратной промывкой (срезка) по круговой циркуляции '
-                     f'тех.жидкостью  в объеме не менее {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 уд.весом '
-                     f'{self.data_well.fluid_work} '
-                     f'(Полуторакратный объем НКТ) '
-                     f'с расходом жидкости 8л/с (срезка) до чистой воды.',
-                     None, None, None, None, None, None, None,
-                     'мастер КРС', well_volume_norm(16)]]
+             f'Произвести цементную заливку с целью изоляции пласта {plast_combo}  в интервале '
+             f'{roof_rir_edit}-{sole_rir_edit}м в присутствии '
+             f'представителя УСРС и СТ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 2.5],
+            [None, None,
+             f'Приготовить цементный раствор у=1,82г/см3 в объёме {volume_cement}м3'
+             f' (сухой цемент {round(volume_cement / 1.25, 1)}т) ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.5],
+            [None, None,
+             f'Вызвать циркуляцию. Закачать в НКТ тех. воду у=1,00г/см3 в объеме {volume_in_ek}м3,'
+             f' цементный раствор в '
+             f'объеме {volume_cement}м3, '
+             f'довести тех.жидкостью у=1,00г/см3 в объёме {volume_in_nkt}м3, тех. жидкостью  в объёме '
+             f'{round(volume_vn_nkt(dict_nkt, roof_rir_edit, sole_rir_edit) - volume_in_nkt, 1)}м3. '
+             f'Уравновешивание цементного раствора',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.5],
+            [None, None,
+             f'Приподнять перо до гл.{roof_rir_edit}м. Закрыть трубное пространство. '
+             f'Продавить по затрубному пространству '
+             f'тех.жидкостью  при давлении не более {self.data_well.max_admissible_pressure.get_value}атм '
+             f'(до получения технологического СТОП).',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.5],
+            [None, None,
+             f'Открыть трубное пространство. Промыть скважину обратной промывкой (срезка) по круговой циркуляции '
+             f'тех.жидкостью  в объеме не менее {round(volume_vn_nkt(dict_nkt) * 1.5, 1)}м3 уд.весом '
+             f'{self.data_well.fluid_work} '
+             f'(Полуторакратный объем НКТ) '
+             f'с расходом жидкости 8л/с (срезка) до чистой воды.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', well_volume_norm(16)]]
 
         for row in rir_list:
             work_list.insert(-1, row)
@@ -727,7 +727,7 @@ class RirWindow(WindowUnion):
             dict_nkt = {73: sole_rir_edit}
 
         volume_in_nkt, volume_in_ek = RirWindow.calc_buffer(self, roof_rir_edit, sole_rir_edit, dict_nkt)
-
+        self.ozc_str_short, self.ozc_str, self.time_ozc = self.calculate_time_ozc(roof_rir_edit)
         uzm_pero_list = [
             [f' СПО пера до глубины {sole_rir_edit}м Опрессовать НКТ на 200атм', None,
              f'Спустить {RirWindow.pero_select(self, sole_rir_edit)}  на тНКТ{nkt_diam}м до глубины {sole_rir_edit}м с '
@@ -918,7 +918,7 @@ class RirWindow(WindowUnion):
                     'мастер КРС', 0.5]
 
             for row in glin_list:
-                rir_list.insert(-3, row)
+                rir_list.insert(-2, row)
             self.calculate_chemistry('глина', 5)
         else:
             rir_list = []
@@ -1198,21 +1198,6 @@ class RirWindow(WindowUnion):
         self.data_well.for_paker_list = None
         return rir_list
 
-    @staticmethod
-    def calculate_time_ozc(roof_rir_edit):
-        if roof_rir_edit >= 1300:
-            string = f'ОЗЦ 24 часа: (по качеству пробы) с момента отстыковки пакера В случае не получения ' \
-                     f'технологического "СТОП" ОЗЦ без давления.'
-            string_short = 'ОЗЦ 24 часа'
-            time = 24
-
-        else:
-            string = f'ОЗЦ 12-16 часа: (по качеству пробы) с момента отстыковки пакера В случае не получения ' \
-                     f'технологического "СТОП" ОЗЦ без давления.'
-            string_short = 'ОЗЦ 12-16 часа'
-            time = 24
-        return string_short, string, time
-
     def add_work(self):
         try:
             current_widget = self.tabWidget.currentWidget()
@@ -1234,7 +1219,7 @@ class RirWindow(WindowUnion):
 
             if paker_need_combo == 'без СПО':
                 difference_date_well = self.difference_date_days(self.data_well.date_commissioning)
-                difference_date_pressuar = self.difference_date_days(self.data_well.result_pressure_date)
+                difference_date_pressuar = self.difference_date_days(self.data_well.result_pressure_date.get_value)
                 if difference_date_well > 365.25 * 20:
                     mes = QMessageBox.question(self, 'Критерии',
                                                f'Скважина в эксплуатации более {difference_date_well / 365:.0f}лет '
@@ -1267,8 +1252,8 @@ class RirWindow(WindowUnion):
                 plast_new_combo = current_widget.plast_new_combo.text()
             fluid_new_edit = current_widget.fluid_new_edit.text().replace(',', '.')
             pressure_new_edit = current_widget.pressure_new_edit.text()
-        except Exception:
-            QMessageBox.warning(self, 'ОШИБКА', 'Введены не все данные')
+        except Exception as e :
+            QMessageBox.warning(self, 'ОШИБКА', f'Введены не все данные {e}')
 
         self.ozc_str_short, self.ozc_str, self.time_ozc = self.calculate_time_ozc(roof_rir_edit)
 
@@ -1361,8 +1346,8 @@ class RirWindow(WindowUnion):
 
         elif self.rir_type_combo == 'РИР с РПП + ЦМ':
             work_list = self.rir_rpp_cm(paker_need_combo, plast_combo, roof_rir_edit, sole_rir_edit, volume_cement,
-                            need_change_zgs_combo, plast_new_combo, fluid_new_edit, pressure_new_edit,
-                            pressure_zumpf_question, diameter_paker, paker_khost, paker_depth)
+                                        need_change_zgs_combo, plast_new_combo, fluid_new_edit, pressure_new_edit,
+                                        pressure_zumpf_question, diameter_paker, paker_khost, paker_depth)
 
         self.populate_row(self.insert_index, work_list, self.table_widget)
         data_list.pause = False

@@ -393,6 +393,7 @@ class DopPlanWindow(WindowUnion):
         if self.work_plan == 'dop_plan_in_base':
             self.data_well.number_dp = 0
             self.insert_index = 0
+
         else:
             self.insert_index = self.data_well.insert_index
 
@@ -438,7 +439,7 @@ class DopPlanWindow(WindowUnion):
         self.pressure_pvr_edit = current_widget.pressure_pvr_edit.text().replace(',', '.')
         self.date_pressure_edit = current_widget.date_pressure_edit.text()
         vertical_line = current_widget.vertical_line.text().replace(',', '.')
-        self.perforation_list = []
+
         if '' in [self.plast_line, self.roof_edit, self.sole_edit, self.count_pvr_edit, self.type_pvr_edit]:
             QMessageBox.warning(self, 'Ошибка', 'Не введены все данные')
             return
@@ -501,7 +502,7 @@ class DopPlanWindow(WindowUnion):
         self.target_row_index = 5000
         self.target_row_index_cancel = 5000
         self.bottom_row_index = 5000
-
+        self.perforation_list = []
 
         for i, row in self.data.items():
             if i != 'image':
@@ -520,16 +521,27 @@ class DopPlanWindow(WindowUnion):
                             self.data_well.work_plan not in ['plan_change']:
                         self.target_row_index_cancel = int(i)
                         break
-                    elif 'Порядок работы' in str(row[2]['value']) or 'Порядок работы' in str(row[1]['value']):
+                    elif 'Порядок работы' in str(row[2]['value']) or 'Порядок работы' in str(row[1]['value']) or\
+                            'Ранее проведенные работ' in str(row[1]['value']) or 'Ранее проведенные работ' in str(row[2]['value']):
                         self.data_well.data_x_max = data_list.ProtectedIsDigit(int(i) - 1)
+
+                        if self.data_well.work_plan != 'plan_change':
+                            self.data_well.data_x_max = data_list.ProtectedIsDigit(self.data_well.data_x_max.get_value + 1)
+                            if 'Ранее проведенные работ' in str(row[1]['value']) or 'Ранее проведенные работ' in str(
+                                    row[2]['value']):
+                                self.data_well.data_x_max = data_list.ProtectedIsDigit(
+                                    self.data_well.data_x_max.get_value-2)
+                        asdded = self.data_well.data_x_max.get_value
+
                         break
+
                     elif 'ИТОГО:' in str(row[col]['value']) and self.data_well.work_plan in ['plan_change']:
                         self.target_row_index_cancel = int(i) + 1
                         break
                     elif 'Текущий забой ' == str(row[col]['value']):
                         self.bottom_row_index = int(i)
 
-                    if int(i) > self.target_row_index and self.target_row_index_cancel > int(i):
+                    if int(i) > self.target_row_index:
                         list_row.append(row[col]['value'])
 
                     if int(i) > self.target_row_index_cancel:
@@ -538,7 +550,7 @@ class DopPlanWindow(WindowUnion):
 
                 self.data_well.image_list = row
             self.count_diam = 0
-            self.perforation_list = []
+
             if len(list_row) > 4:
 
                 if list_row:
@@ -548,7 +560,7 @@ class DopPlanWindow(WindowUnion):
                                 self.perforation_list.append(list_row)
                     else:
                         self.count_diam = 1
-        self.data_well.insert_index2 = self.data_well.data_x_max.get_value
+        self.data_well.insert_index2 = self.data_well.data_x_max.get_value -1
         self.data_well.count_template = 1
 
         if self.data_well.work_plan != 'plan_change':
@@ -605,7 +617,7 @@ class DopPlanWindow(WindowUnion):
                         value = [value[0], value[1], value[0], value[3]]
                     boundaries_dict_new[key] = value
             len_rows = len(plast_list) - (self.target_row_index_cancel - self.target_row_index) + self.count_diam
-            asdef = self.target_row_index_cancel - self.target_row_index
+
             index_key_change = self.target_row_index + len_rows
 
             while index_key_change != self.target_row_index:
@@ -768,7 +780,7 @@ class DopPlanWindow(WindowUnion):
 
             current_bottom_date_edit = current_widget.current_bottom_date_edit.text()
 
-            template_depth_edit = int(current_widget.template_depth_edit.text().replace(',', '.'))
+            template_depth_edit = int(float(current_widget.template_depth_edit.text().replace(',', '.')))
             if str(template_depth_edit).isdigit() is False:
                 QMessageBox.critical(self, 'Ошибка', 'ошибка в глубине диаметра')
                 return
@@ -1080,10 +1092,10 @@ class DopPlanWindow(WindowUnion):
                                                                             vertical='center')
 
     def work_list(self, work_earlier):
-        krs_begin = [[None, None,
+        krs_begin = [[None,
                       f'Ранее проведенные работы: \n {work_earlier}',
                       None, None, None, None, None, None, None,
-                      None, None],
+                      None, None, None],
                      [None,  'Порядок работы', None, None, None, None, None, None, None, None, None, None],
                      [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
                       'Ответственный',

@@ -367,7 +367,7 @@ class GrpWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер КРС, представ. заказчика', 8],
             [None, None,
-             krs.lifting_unit(self),
+             krs.GnoParent.lifting_unit(self),
              None, None, None, None, None, None, None,
              'Мастер КРС, представ. заказчика', 4.2],
             [None, None,

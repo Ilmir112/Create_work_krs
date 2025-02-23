@@ -13,12 +13,9 @@ from data_base.config_base import connect_to_database
 
 
 import data_list
-from gnkt_data.gnkt_data import gnkt_dict, read_database_gnkt, insert_data_base_gnkt
 from gnkt_opz import GnktOpz
-from krs import TabPageGno, GnoWindow
 
-import main
-import plan
+from main import SaveInExcel
 
 from openpyxl.styles import Font, Alignment
 from openpyxl.reader.excel import load_workbook
@@ -200,9 +197,9 @@ class GnktOsvWindow(GnktModel):
         bvo_int = 0
         # if self.data_well.bvo:
         #     bvo_int += 5
-        head = plan.head_ind(self.data_well.cat_well_min.get_value - 1 + bvo_int, self.data_well.cat_well_max.get_value)
+        head = SaveInExcel.head_ind(self.data_well.cat_well_min.get_value - 1 + bvo_int, self.data_well.cat_well_max.get_value)
 
-        plan.copy_true_ws(self.data_well, self.sheet, self.ws_title, head)
+        SaveInExcel.copy_true_ws(self.data_well, self.sheet, self.ws_title, head)
 
     def gnkt_work(self, fluid_work_insert, current_bottom_edit):
         from cdng import events_gnvp_frez

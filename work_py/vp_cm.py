@@ -279,6 +279,9 @@ class VpWindow(WindowUnion):
                  f'Определить приемистость НЭК.',
                  None, None, None, None, None, None, None,
                  'мастер КРС', None]]
+            if self.data_well.perforation_roof > vp_depth:
+                vp_list.pop(-1)
+                vp_list.pop(-1)
             self.data_well.current_bottom = vp_depth
 
         RirWindow.perf_new(self, self.data_well.current_bottom, vp_depth)

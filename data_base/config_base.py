@@ -313,8 +313,8 @@ class WorkDatabaseWell:
                 cursor.execute(query, data_values)
                 # Не забудьте сделать коммит
                 self.db_connection.commit()
-                # Закрытие соединения после завершения всех операций
-                self.db_connection.close()
+                # # Закрытие соединения после завершения всех операций
+                # self.db_connection.close()
 
 
 

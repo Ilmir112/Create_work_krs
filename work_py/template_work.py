@@ -827,8 +827,8 @@ class TabPageSoWith(TabPageUnion):
                 self.dictance_three_edit.textChanged.connect(self.update_paker_depth)
 
             else:
-                self.dictance_three_Label.setParent(None)
-                self.dictance_three_edit.setParent(None)
+                # self.dictance_three_Label.setParent(None)
+                # self.dictance_three_edit.setParent(None)
                 self.diameter_paker_label_type.setParent(None)
                 self.diameter_paker_edit.setParent(None)
 

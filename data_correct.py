@@ -294,6 +294,10 @@ class TabPageSoCorrect(TabPageUnion):
         self.date_commissioning_line = QLineEdit(self)
         self.date_commissioning_line.setText(self.data_well.date_commissioning)
 
+        self.result_pressure_date_label = QLabel('Дата последней опрессовки')
+        self.result_pressure_date = QLineEdit(self)
+        self.result_pressure_date.setText(self.data_well.result_pressure_date.get_value)
+
         self.curator_Label = QLabel('Куратор ремонта')
         self.curator_Combo = QComboBox(self)
         self.curator_Combo.setMinimumWidth(50)
@@ -425,6 +429,9 @@ class TabPageSoCorrect(TabPageUnion):
 
         self.grid.addWidget(self.date_commissioning_Label, 21, 5)
         self.grid.addWidget(self.date_commissioning_line, 22, 5)
+
+        self.grid.addWidget(self.result_pressure_date_label, 21, 6)
+        self.grid.addWidget(self.result_pressure_date, 22, 6)
 
         self.grid.addWidget(self.curator_Label, 23, 1)
         self.grid.addWidget(self.curator_Combo, 24, 1)
@@ -828,6 +835,8 @@ class DataWindow(WindowUnion):
         column_wall_thickness = self.current_widget.column_wall_thickness_edit_type2.text()
         shoe_column = self.current_widget.shoe_column_edit_type2.text().strip()
         level_cement = self.current_widget.level_cement_edit.text()
+        if '-' in level_cement:
+            level_cement = level_cement.split("-")[0]
         head_column = float(self.current_widget.head_column_edit_type2.text())
         column_add_True = str(self.current_widget.column_add_true_comboBox.currentText())
         if column_add_True == 'в наличии':
@@ -885,8 +894,16 @@ class DataWindow(WindowUnion):
         static_level = self.current_widget.static_level_edit_type.text()
         dinamic_level = self.current_widget.dinamic_level_edit_type.text()
         date_commissioning_line = self.current_widget.date_commissioning_line.text()
+        result_pressure_date = self.current_widget.result_pressure_date.text()
         curator = str(self.current_widget.curator_Combo.currentText())
-        if date_commissioning_line.count('.') != 2:
+        if self.check_date_format(result_pressure_date) is False:
+            if curator != 'ВНС':
+                QMessageBox.warning(self, 'Ошибка', 'Не корректна дата последней опрессовки')
+                return
+            else:
+                self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(self.data_well.date_drilling_cancel)
+
+        if self.check_date_format(date_commissioning_line) is False:
             if curator != 'ВНС':
                 QMessageBox.warning(self, 'Ошибка', 'Не корректна дата ввода в эскплуатацию')
                 return
@@ -1149,6 +1166,7 @@ class DataWindow(WindowUnion):
             self.data_well.max_admissible_pressure = ProtectedIsDigit(
                 self.check_if_none(max_admissible_pressure))
             self.data_well.date_commissioning = date_commissioning_line
+            self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(result_pressure_date)
 
             # print(f'макс {self.data_well.max_expected_pressure.get_value}')
             self.data_well.dict_pump_shgn["before"] = self.check_if_none(dict_pump_shgn_do)
@@ -1290,6 +1308,7 @@ class DataWindow(WindowUnion):
                 'статика': self.data_well.static_level.get_value,
                 'динамика': self.data_well.dinamic_level.get_value,
                 'дата ввода в эксплуатацию': self.data_well.date_commissioning,
+                'дата опрессовки': self.data_well.result_pressure_date.get_value,
                 'НКТ': {
                     'До': self.data_well.dict_nkt_before,
                     "После": self.data_well.dict_nkt_after
@@ -1335,6 +1354,10 @@ class DataWindow(WindowUnion):
 
             data_list.pause = False
             self.close()
+    @staticmethod
+    def check_date_format(date_string):
+        pattern = r'^\d{2}\.\d{2}\.\d{4}$'
+        return bool(re.match(pattern, date_string))
 
     def check_if_none(self, value):
         if value is None or 'отс' in str(value).lower() or value == '-' or str(value) == '0':

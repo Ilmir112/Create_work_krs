@@ -555,7 +555,9 @@ def insert_data_well_dop_plan(self, data_well):
         self.data_well.column_direction_true = True
 
     self.data_well.level_cement_column = ProtectedIsDigit(well_data_dict["ЭК"]["цемент"])
-    asd = self.data_well.level_cement_column
+    if '-' in str(self.data_well.level_cement_column.get_value):
+        self.data_well.level_cement_column = ProtectedIsDigit(self.data_well.level_cement_column.get_value.split('-')[1])
+
     self.data_well.column_conductor_length = ProtectedIsDigit(well_data_dict["кондуктор"]["башмак"])
     self.data_well.level_cement_conductor = ProtectedIsDigit(well_data_dict["кондуктор"]["цемент"])
     self.data_well.column_diameter = ProtectedIsDigit(well_data_dict["ЭК"]["диаметр"])
@@ -638,8 +640,15 @@ def insert_data_well_dop_plan(self, data_well):
         print(f'отсутствуют данные в базе по голове хвостовика и диаметру долото')
     if 'дата ввода в эксплуатацию' in list(well_data_dict.keys()):
         self.data_well.date_commissioning = well_data_dict['дата ввода в эксплуатацию']
+
     else:
         self.data_well.date_commissioning = '01.01.2000'
+
+    if 'дата опрессовки' in list(well_data_dict.keys()):
+        self.data_well.result_pressure_date = well_data_dict['дата опрессовки']
+    else:
+        self.data_well.result_pressure_date = '01.01.2000'
+
     self.data_well.data_well_dict = well_data_dict
 
     self.data_well.well_volume_in_pz = [well_volume(self, self.data_well.head_column_additional.get_value)]
@@ -691,11 +700,12 @@ def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_di
             for col_index, cell_data in enumerate(row_data, 1):
                 cell = sheet_new.cell(row=int(row_index), column=int(col_index))
 
-                # Получение строки RGB из JSON
-                rgb_string = cell_data['font']['color']
-                hex_color = cell_data['fill']['color'][4:-1]
-
                 try:
+                    # Получение строки RGB из JSON
+                    rgb_string = cell_data['font']['color']
+                    hex_color = cell_data['fill']['color'][4:-1]
+                    cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
+                                     bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
                     if 'color' in list(cell_data['font'].keys()):
                         if hex_color != '00000000':
                             color = Color(rgb=hex_color)
@@ -710,6 +720,9 @@ def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_di
                         # Извлекаем шестнадцатеричный код цвета
                         hex_color = rgb_string[4:-1]
 
+                        cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
+                                         bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
+
                         if hex_color != '00000000':
 
                             try:
@@ -720,8 +733,7 @@ def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_di
                                 cell.fill = fill
                             except Exception:
                                 pass
-                        cell.font = Font(name=cell_data['font']['name'], size=cell_data['font']['size'],
-                                         bold=cell_data['font']['bold'], italic=cell_data['font']['italic'])
+
                 except:
                     pass
 

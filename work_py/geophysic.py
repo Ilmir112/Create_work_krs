@@ -242,8 +242,9 @@ class GeophysicWindow(WindowUnion):
                                         None, None, None, None, None, None, None,
                                         'Мастер КРС, подрядчик по ГИС', 8])
 
-        if  geophysical_research:
+        if geophysical_research:
             self.populate_row(self.insert_index, geophysical_research, self.table_widget)
+            data_list.pause = False
 
         self.close()
 

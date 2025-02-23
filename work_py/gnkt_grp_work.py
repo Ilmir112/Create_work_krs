@@ -526,6 +526,7 @@ class GnktModel(WindowUnion):
             return
         else:
             self.current_bottom_edit = float(self.current_bottom_edit.replace(',', '.'))
+            self.data_well.current_bottom = self.current_bottom_edit
             if self.current_bottom_edit > float(self.data_well.bottom_hole_drill.get_value):
                 QMessageBox.warning(self, 'Некорректные данные',
                                     f'Текущий забой ниже пробуренного забоя {self.data_well.bottom_hole_drill.get_value}')
@@ -752,21 +753,24 @@ class GnktModel(WindowUnion):
         pressure = []
         vertikal = []
         koef_anomal = []
+
         for ind, plast_ind in enumerate(self.data_well.plast_work):
             if self.data_well.paker_before["before"] != 0:
-                if self.data_well.dict_perforation[plast_ind]['кровля'] > \
+                if self.data_well.dict_perforation[plast_ind]['подошва'] > \
                         self.data_well.depth_fond_paker_before["before"]:
                         if pressure != 0:
                             pressure.append(max(list(map(
                                 float, self.data_well.dict_perforation[plast_ind]["давление"]))))
                             if "вертикаль" in list(self.data_well.dict_perforation[plast_ind].keys()):
                                 vertikal.append(min(self.data_well.dict_perforation[plast_ind]["вертикаль"]))
+
+
             else:
                 pressure.append(max(list(map(
                     float, self.data_well.dict_perforation[plast_ind]["давление"]))))
                 vertikal.append(min(list(map(
                     float, self.data_well.dict_perforation[plast_ind]["вертикаль"]))))
-        if pressure is None:
+        if len(pressure) == 0:
             QMessageBox.warning(self, 'ошибка', 'Приложение не смогло найти рабочие интервалы под пакером. '
                                                 'Небходимо уточнить спущенную компоновку')
             return
@@ -774,6 +778,7 @@ class GnktModel(WindowUnion):
             self.pressure = max(pressure)
         else:
             self.pressure = max(self.data_well.dict_perforation[plast_ind]['давление'])
+
         vertikal = min(vertikal)
         koef_anomal.append(round(float(self.pressure) * 101325 / (float(vertikal) * 9.81 * 1000), 1))
 
@@ -1118,7 +1123,7 @@ class GnktModel(WindowUnion):
              None, None, None, None, None],
         ]
         if self.data_well.column_direction_mine_true:
-            schema_well_list.insert(10, [None, None, None, None, None, None, None, None, None, nkt_schema, None, None, 'Шахтное направление', None,
+            schema_well_list.insert(10, [None, None, None, None, None, None, None, None, None, None, None, None, 'Шахтное направление', None,
              None,
              f'{self.data_well.column_direction_mine_diameter.get_value}',
              self.data_well.column_direction_mine_wall_thickness.get_value,
@@ -1130,7 +1135,7 @@ class GnktModel(WindowUnion):
              None,
              None])
         else:
-            schema_well_list.insert(10, [None, None, None, None, None, None, None, None, None, nkt_schema, None, None,
+            schema_well_list.insert(10, [None, None, None, None, None, None, None, None, None, None, None, None,
                                         'Шахтное направление', None, None, '-', '-', '-', None, None, '-', '-', None])
 
         if self.data_well.work_plan == 'gnkt_bopz':

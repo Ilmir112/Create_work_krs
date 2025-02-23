@@ -673,7 +673,7 @@ class DescentPaker(DescentParent):
                 for row in rgd_with_paker(self):
                     paker_descent.append(row)
         else:
-            QMessageBox.warning(self, 'РГД не проводиться', 'При не проведении РГД при бригаде кислотную обработку '
+            QMessageBox.warning(None, 'РГД не проводиться', 'При не проведении РГД при бригаде кислотную обработку '
                                                             'нужно запланировать на фондовом НКТ с обранной арматурой')
         return paker_descent
 
