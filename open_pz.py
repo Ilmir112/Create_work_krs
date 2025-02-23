@@ -325,6 +325,7 @@ class CreatePZ(MyMainWindow):
                                         ws.row_dimensions[i].height = int(key*1.1)
 
                     elif 'РН' in data_list.contractor:
+
                         # Устанавливаем красный цвет для текста
                         red_font = Font(name='Arial Cyr', size=13, color='FF0000', bold=True)
                         for i in range(self.data_well.insert_index,
