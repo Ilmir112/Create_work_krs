@@ -330,6 +330,7 @@ class CreatePZ(MyMainWindow):
                         for i in range(self.data_well.insert_index,
                                        self.data_well.insert_index + len(dict_events_gnvp[work_plan])):
                             for col in range(12):
+
                                 data = ws.cell(row=i, column=col + 1)
                                 data.border = thin_border
                                 data.value = dict_events_gnvp[work_plan][i - self.data_well.insert_index][col]
