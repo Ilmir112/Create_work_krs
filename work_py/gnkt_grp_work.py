@@ -56,18 +56,20 @@ class TabPageGnkt(TabPageUnion):
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
         self.fluid_edit = QLineEdit(self)
         self.fluid_edit.setValidator(self.validator_float)
-        self.fluid_edit.setText(str(self.data_well.fluid))
+        if len(self.data_well.well_volume_in_pz) != 0:
+            self.fluid_edit.setText(str(self.data_well.well_volume_in_pz[0]))
 
         self.fluid_work_label = QLabel("уд.вес рабочей жидкости", self)
         self.fluid_work_edit = QLineEdit(self)
         if self.data_well.work_plan == 'gnkt_opz':
-            self.fluid_work_edit.setText('1.18')
+            self.fluid_work_edit.setText(f'{self.data_well.water_density.get_value:.2f}')
         else:
             self.fluid_work_edit.setText('1.01')
 
         self.distance_pntzh_label = QLabel('Расстояние до ПНТЖ')
         self.distance_pntzh_line = QLineEdit(self)
         self.distance_pntzh_line.setValidator(self.validator_int)
+        self.distance_pntzh_line.setText(f'{self.data_well.distance_from_well_to_sampling_point}')
 
         # self.grid = QGridLayout(self)
         self.grid.addWidget(self.gnkt_number_label, 0, 2, 1, 5)
@@ -572,6 +574,11 @@ class GnktModel(WindowUnion):
         fluid_question = QMessageBox.question(self, 'Удельный вес',
                                               f'Работы необходимо производить на тех воде {self.fluid_work_edit}г/см3?')
         if fluid_question == QMessageBox.StandardButton.No:
+            return
+
+        question = QMessageBox.question(self, 'Забой',
+                                              f'Забой нужно нормализовать до глубины {self.current_bottom_edit}м?')
+        if question == QMessageBox.StandardButton.No:
             return
 
         self.data_well.gnkt_number_combo = self.gnkt_number_combo

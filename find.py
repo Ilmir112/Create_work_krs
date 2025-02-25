@@ -30,6 +30,7 @@ class FindIndexPZ(MyMainWindow):
         self.number_dp = 0
         self.head_column = 0
         self.image_loader = None
+        self.water_density = ProtectedIsDigit(1.18)
         self.result_pressure_date = None
         self.column_direction_mine_diameter, self.column_direction_mine_wall_thickness, \
         self.column_direction_mine_length, self.level_cement_direction_mine = None, None, None, None
@@ -97,7 +98,7 @@ class FindIndexPZ(MyMainWindow):
 
         self.leakiness_count = 0
         self.emergency_count = 0
-        self.distance_from_well_to_sampling_point = None
+        self.distance_from_well_to_sampling_point = 0
 
         self.date_drilling_cancel = ''
         self.date_drilling_run = ''
@@ -1024,7 +1025,7 @@ class WellFondData(FindIndexPZ):
                                     self.check_str_none(row[col_plan])[0]
                                 depth_fond_paker2_do["after"] = \
                                     self.check_str_none(row[col_plan])[1]
-                        except Exception:
+                        except Exception as e:
                             if paker_do["after"] != 0:
                                 depth_fond_paker_do["after"] = row[col_plan]
 
@@ -1175,6 +1176,8 @@ class WellCondition(FindIndexPZ):
                                 self.static_level = ProtectedIsDigit(row[col + 1].split('/')[0])
                             else:
                                 self.static_level = ProtectedIsDigit(row[col + 1])
+                        elif 'плотн.воды' in str(value):
+                            self.water_density = ProtectedIsDigit(row[col + 1])
                         elif 'Рмкп ' in str(value):
                             self.pressure_mkp = ProtectedIsNonNone(row[col + 3])
 
@@ -1568,7 +1571,7 @@ class WellData(FindIndexPZ):
                             f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
                             f'после ремонта не равно глубине насоса '
                             f'{self.dict_pump_shgn_depth["after"]}м')
-            if self.distance_from_well_to_sampling_point is None:
+            if self.distance_from_well_to_sampling_point == 0:
                 QMessageBox.warning(self, 'Ошибка', f'Не указано расстояние до пункта налива')
                 self.check_data_in_pz.append(f'Не указано расстояние до пункта налива')
 

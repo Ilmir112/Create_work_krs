@@ -14,6 +14,7 @@ import property_excel.property_excel_pvr
 import threading
 import win32gui
 import base64
+from io import BytesIO
 
 from openpyxl.reader.excel import load_workbook
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
@@ -1802,6 +1803,7 @@ class MyWindow(MyMainWindow):
         except Exception as e:
             QMessageBox.critical(window, "Ошибка", f"Не удалось очистить папку с временными файлами: {e}")
         self.rir_window = None
+        self.data_well = None
         if not self.table_widget is None:
             self.table_widget.clear()
             self.table_widget.resizeColumnsToContents()
