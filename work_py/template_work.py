@@ -1143,7 +1143,7 @@ class TemplateKrs(WindowUnion):
                 QMessageBox.warning(self, 'ПСШ + пакер', 'Нельзя спускать ПСШ в осложненный фонд')
                 return
 
-            difference_date_well = self.difference_date_days(self.data_well.date_commissioning)
+            difference_date_well = self.difference_date_days(self.data_well.date_commissioning.get_value)
             if difference_date_well > 365.25 * 20 and self.data_well.category_h2s == "3":
                 mes = QMessageBox.question(self, 'Критерии',
                                        f'Скважина в эксплуатации более {difference_date_well / 365:.0f}лет '
