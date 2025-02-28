@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import QWidget, QTabWidget, QInputDialog, QMessageBox, QLab
 
 from main import MyMainWindow
 from data_list import contractor, ProtectedIsDigit
+
 from work_py.advanted_file import definition_plast_work
 from work_py.alone_oreration import volume_vn_nkt, well_volume
 from work_py.calc_fond_nkt import CalcFond
@@ -26,7 +27,6 @@ class TabPageUnion(QWidget):
         self.need_privyazka_q_combo = None
         self.need_privyazka_Label = None
         self.grid = QGridLayout(self)
-
 
         self.validator_float = QDoubleValidator(0.0, 8000.0, 2)
         self.validator_int = QIntValidator(0, 8000)
@@ -100,6 +100,7 @@ class TabPageUnion(QWidget):
 
             self.iron_volume_label.setParent(None)
             self.iron_volume_edit.setParent(None)
+            self.plast_combo.setParent(None)
             self.expected_pressure_label.setParent(None)
             self.expected_pressure_edit.setParent(None)
             self.expected_pickup_label.setParent(None)
@@ -158,18 +159,16 @@ class TabPageUnion(QWidget):
             self.expected_pressure_edit = QLineEdit(self)
 
             self.expected_pressure_edit.textChanged.connect(self.update_pressure)
-            self.pressure_three_label = QLabel('Режимы ')
+            self.pressure_three_label = QLabel('в трех режимам давлений')
             self.pressure_three_edit = QLineEdit(self)
             self.expected_pressure_edit.setValidator(self.validator_int)
-
-
 
             if self.__class__.__name__ == 'TabPageSoAcid':
                 self.paker_layout_combo.currentTextChanged.connect(self.update_paker_layout)
 
             self.Qplast_after_labelType = QLabel("Нужно ли определять приемистость после СКО", self)
             self.Qplast_after_edit = QComboBox(self)
-            self.Qplast_after_edit.addItems(['НЕТ','ДА'])
+            self.Qplast_after_edit.addItems(['НЕТ', 'ДА'])
 
             self.calculate_sko_label = QLabel('Расчет на п.м.')
             self.calculate_sko_line = QLineEdit(self)
@@ -178,9 +177,15 @@ class TabPageUnion(QWidget):
             self.iron_true_combo = QComboBox(self)
             self.iron_true_combo.addItems(['Нет', 'Да'])
 
+            self.pressure_Label = QLabel("Давление закачки", self)
+            self.pressure_edit = QLineEdit(self)
+
             if self.data_well:
                 if self.data_well.stabilizator_need:
                     self.iron_true_combo.setCurrentIndex(1)
+
+            self.grid.addWidget(self.pressure_Label, 6, 6)
+            self.grid.addWidget(self.pressure_edit, 7, 6)
 
             self.grid.addWidget(self.iron_label_type, 4, 4)
             self.grid.addWidget(self.iron_true_combo, 5, 4)
@@ -195,6 +200,10 @@ class TabPageUnion(QWidget):
             self.grid.addWidget(self.acid_proc_edit, 7, 4)
             self.grid.addWidget(self.acid_oil_proc_label, 6, 5)
             self.grid.addWidget(self.acid_oil_proc_edit, 7, 5)
+            if self.__class__.__name__ == 'TabPageSo':
+                from work_py.acid_paker import CheckableComboBox
+                self.plast_combo = CheckableComboBox(self)
+                self.grid.addWidget(self.plast_combo, 7, 7)
 
             self.grid.addWidget(self.calculate_sko_label, 6, 8)
             self.grid.addWidget(self.calculate_sko_line, 7, 8)
@@ -247,7 +256,6 @@ class TabPageUnion(QWidget):
         if calculate_sko != '':
             calculate_sko = calculate_sko.replace(',', '.')
             self.acid_volume_edit.setText(f'{round(metr_pvr * float(calculate_sko), 1)}')
-
 
     def update_sko_type(self, type_sko):
         if type_sko == 'ВТ':
@@ -412,8 +420,6 @@ class TabPageUnion(QWidget):
 
             self.grid.addWidget(self.paker_depth_zumpf_label, 1, 5)
             self.grid.addWidget(self.paker_depth_zumpf_edit, 2, 5)
-
-
 
     def update_paker(self):
         paker_depth = self.paker_depth_edit.text()
@@ -630,15 +636,15 @@ class WindowUnion(MyMainWindow):
                              f'{self.acid_volume_edit}м3 - {20}% не ' \
                              f'более Р={self.pressure_edit}атм.\n'
             # print(f'Ожидаемое показатели {self.data_well.expected_pick_up.values()}')
-        layout_select = f'посадить пакер на глубине {self.paker_depth_edit}м'
+        layout_select = f'посадить пакер на глубине {self.paker_depth}м'
 
         if self.__class__.__name__ == 'AcidPakerWindow':
             if self.paker_layout_combo in ['воронка', 'пакер с заглушкой', 'без монтажа компоновки на спуск']:
                 layout_select = 'Закрыть затрубное пространство'
             if 'одно' in self.paker_layout_combo:
-                layout_select = f'посадить пакер на глубине {self.paker_depth_edit}м'
+                layout_select = f'посадить пакер на глубине {self.paker_depth}м'
             elif 'дву' in self.paker_layout_combo:
-                layout_select = f'посадить пакера на глубине {self.paker_depth_edit}/{self.paker2_depth}м'
+                layout_select = f'посадить пакера на глубине {self.paker_depth}/{self.paker2_depth}м'
 
         acid_list_1 = [
             [acid_sel_short, None,
@@ -779,7 +785,7 @@ class WindowUnion(MyMainWindow):
             [f'СКВ {self.skv_acid_edit} {self.skv_proc_edit}%', None,
              f'Произвести установку СКВ {self.skv_acid_edit} {self.skv_proc_edit}% концентрации '
              f'в объеме'
-             f' {self.skv_volume_edit}м3 ({round(self.skv_volume_edit * 1.12 *  self.skv_proc_edit/ 24, 2)}т HCL 24%) (по спец. плану, '
+             f' {self.skv_volume_edit}м3 ({round(self.skv_volume_edit * 1.12 * self.skv_proc_edit / 24, 2)}т HCL 24%) (по спец. плану, '
              f'составляет старший мастер)',
              None, None, None, None, None, None, None,
              'мастер КРС, УСРСиСТ', 0.5],
@@ -803,69 +809,67 @@ class WindowUnion(MyMainWindow):
         self.calculate_chemistry(self.skv_acid_edit, self.skv_volume_edit)
         return skv_list
 
-
-    def swab_select(self, swab_type_combo, plast_combo, swab_volume_edit):
-
-        if swab_type_combo == 'Задача №2.1.13':  # , 'Задача №2.1.16', 'Задача №2.1.11', 'своя задача']'
-            swab_select = f'Произвести  геофизические исследования пласта {plast_combo} по технологической ' \
+    def swab_select(self):
+        if self.swab_type_combo == 'Задача №2.1.13':  # , 'Задача №2.1.16', 'Задача №2.1.11', 'своя задача']'
+            swab_select = f'Произвести  геофизические исследования пласта {self.plast_combo} по технологической ' \
                           f'задаче № 2.1.13 Определение профиля ' \
                           f'и состава притока, дебита, источника обводнения и технического состояния ' \
                           f'эксплуатационной колонны и НКТ ' \
-                          f'после свабирования с отбором жидкости не менее {swab_volume_edit}м3. \n' \
-                          f'Пробы при свабировании отбирать в стандартной таре на {swab_volume_edit - 10}, ' \
-                          f'{swab_volume_edit - 5}, {swab_volume_edit}м3,' \
+                          f'после свабирования с отбором жидкости не менее {self.swab_volume_edit}м3. \n' \
+                          f'Пробы при свабировании отбирать в стандартной таре на {self.swab_volume_edit - 10}, ' \
+                          f'{self.swab_volume_edit - 5}, {self.swab_volume_edit}м3,' \
                           f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
-            swab_short = f'сваб не менее {swab_volume_edit}м3 + профиль притока'
-        elif swab_type_combo == 'Задача №2.1.14':
-            swab_select = f'Произвести  геофизические исследования {plast_combo} по технологической задаче № 2.1.14 ' \
+            swab_short = f'сваб не менее {self.swab_volume_edit}м3 + профиль притока'
+        elif self.swab_type_combo == 'Задача №2.1.14':
+            swab_select = f'Произвести  геофизические исследования {self.plast_combo} по технологической задаче № 2.1.14 ' \
                           f'Определение профиля и состава притока, дебита, источника обводнения и технического ' \
                           f'состояния эксплуатационной колонны и НКТ с использованием малогабаритного пакерного ' \
-                          f'расходомера (РН) после свабирования не менее {swab_volume_edit}м3. \n' \
-                          f'Пробы при свабировании отбирать в стандартной таре на {swab_volume_edit - 10}, ' \
-                          f'{swab_volume_edit - 5}, {swab_volume_edit}м3,' \
+                          f'расходомера (РН) после свабирования не менее {self.swab_volume_edit}м3. \n' \
+                          f'Пробы при свабировании отбирать в стандартной таре на {self.swab_volume_edit - 10}, ' \
+                          f'{self.swab_volume_edit - 5}, {self.swab_volume_edit}м3,' \
                           f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
-            swab_short = f'сваб не менее {swab_volume_edit}м3 + профиль притока Малогабаритный прибор'
+            swab_short = f'сваб не менее {self.swab_volume_edit}м3 + профиль притока Малогабаритный прибор'
 
-        elif swab_type_combo == 'Задача №2.1.16':
-            swab_select = f'Произвести  геофизические исследования {plast_combo} по технологической задаче № 2.1.16 ' \
+        elif self.swab_type_combo == 'Задача №2.1.16':
+            swab_select = f'Произвести  геофизические исследования {self.plast_combo} по технологической задаче № 2.1.16 ' \
                           f'Определение дебита и ' \
                           f'обводнённости по прослеживанию уровней, ВНР и по регистрации забойного ' \
                           f'давления после освоения ' \
-                          f'свабированием  не менее {swab_volume_edit}м3. \n' \
-                          f'Пробы при свабировании отбирать в стандартной таре на {swab_volume_edit - 10}, ' \
-                          f'{swab_volume_edit - 5}, {swab_volume_edit}м3,' \
+                          f'свабированием  не менее {self.swab_volume_edit}м3. \n' \
+                          f'Пробы при свабировании отбирать в стандартной таре на {self.swab_volume_edit - 10}, ' \
+                          f'{self.swab_volume_edit - 5}, {self.swab_volume_edit}м3,' \
                           f' своевременно подавать телефонограммы на завоз тары и вывоз проб'
-            swab_short = f'сваб не менее {swab_volume_edit}м3 + КВУ, ВНР'
-        elif swab_type_combo == 'Задача №2.1.11':
-            swab_select = f'Произвести  геофизические исследования {plast_combo} по технологической задаче № 2.1.11' \
+            swab_short = f'сваб не менее {self.swab_volume_edit}м3 + КВУ, ВНР'
+        elif self.swab_type_combo == 'Задача №2.1.11':
+            swab_select = f'Произвести  геофизические исследования {self.plast_combo} по технологической задаче № 2.1.11' \
                           f' свабирование в объеме не ' \
-                          f'менее  {swab_volume_edit}м3. \n ' \
+                          f'менее  {self.swab_volume_edit}м3. \n ' \
                           f'Отобрать пробу на химический анализ воды на ОСТ-39 при последнем рейсе сваба ' \
                           f'(объем не менее 10литров).' \
                           f'Обязательная сдача в этот день в ЦДНГ'
-            swab_short = f'сваб не менее {swab_volume_edit}м3'
+            swab_short = f'сваб не менее {self.swab_volume_edit}м3'
 
-        elif swab_type_combo == 'Задача №2.1.16 + герметичность пакера':
+        elif self.swab_type_combo == 'Задача №2.1.16 + герметичность пакера':
             swab_select = f'Произвести фоновую запись. Понизить до стабильного динамического уровня. ' \
                           f'Произвести записи по определению герметичности пакера. При герметичности произвести ' \
-                          f'геофизические исследования {plast_combo} по технологической задаче № 2.1.16' \
-                          f'свабирование в объеме не менее  {swab_volume_edit}м3. \n ' \
+                          f'геофизические исследования {self.plast_combo} по технологической задаче № 2.1.16' \
+                          f'свабирование в объеме не менее  {self.swab_volume_edit}м3. \n ' \
                           f'Отобрать пробу на химический анализ воды на ОСТ-39 при последнем рейсе сваба ' \
                           f'(объем не менее 10литров).' \
                           f'Обязательная сдача в этот день в ЦДНГ'
-            swab_short = f'сваб не менее {swab_volume_edit}м3'
+            swab_short = f'сваб не менее {self.swab_volume_edit}м3'
 
-        elif swab_type_combo == 'ГРР':
-            swab_select = f'Провести освоение объекта {plast_combo} свабированием ' \
+        elif self.swab_type_combo == 'ГРР':
+            swab_select = f'Провести освоение объекта {self.plast_combo} свабированием ' \
                           f'(объем согласовать с ОГРР) не менее ' \
-                          f'{swab_volume_edit}м3 с отбором поверхностных ' \
+                          f'{self.swab_volume_edit}м3 с отбором поверхностных ' \
                           f'проб через каждые 5м3 сваб и передачей представителю ЦДНГ, выполнить ' \
                           f'прослеживание уровней ' \
                           f'и ВНР с регистрацией КВУ глубинными манометрами, записать профиль притока, в случае ' \
                           f'получения притока нефти отобрать глубинные пробы (при выполнении условий отбора), ' \
                           f'провести ГДИС (КВДз).'
             swab_short = f'сваб профиль не менее ' \
-                         f'{swab_volume_edit}'
+                         f'{self.swab_volume_edit}'
 
         return swab_short, swab_select
 
@@ -886,13 +890,13 @@ class WindowUnion(MyMainWindow):
                                          f'по круговой циркуляции  жидкостью уд.весом {self.data_well.fluid_work} п' \
                                          f'ри расходе жидкости не ' \
                                          f'менее 6-8 л/сек в объеме не менее ' \
-                                         f'{round(well_volume(self, self.paker_depth_edit + self.paker_khost) * 1.5, 1)}м3 ' \
+                                         f'{round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 ' \
                                          f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ. '
                 flushing_downhole_short = f'При наличии ЦИРКУЛЯЦИИ: Допустить ' \
                                           f'до Н- {self.data_well.current_bottom}м. ' \
                                           f'Промыть уд.весом ' \
                                           f'{self.data_well.fluid_work[:4]}' \
-                                          f'не менее {round(well_volume(self, self.paker_depth_edit+ self.paker_khost) * 1.5, 1)}м3 '
+                                          f'не менее {round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 '
 
             elif self.data_well.perforation_roof - 5 + self.paker_khost < self.data_well.current_bottom:
                 flushing_downhole_list = f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
@@ -905,7 +909,7 @@ class WindowUnion(MyMainWindow):
                                          f'Промыть скважину обратной промывкой по круговой циркуляции ' \
                                          f'жидкостью уд.весом {self.data_well.fluid_work} при расходе жидкости не ' \
                                          f'менее 6-8 л/сек в объеме не менее ' \
-                                         f'{round(well_volume(self, self.paker_depth_edit + self.paker_khost) * 1.5, 1)}м3 ' \
+                                         f'{round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 ' \
                                          f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ. \n' \
                                          f'в случае ГНО с НВ промывку от забоя делаем с допуском замковой опоры, ' \
                                          f'в случае НН и ЭЦН и наличия пакера в компоновке выполняем отдельное ' \
@@ -916,7 +920,7 @@ class WindowUnion(MyMainWindow):
                                           f' низ НКТ до H' \
                                           f' {self.data_well.perforation_roof - 5 + self.paker_khost}м) ' \
                                           f'Промыть уд.весом {self.data_well.fluid_work} не менее ' \
-                                          f'{round(well_volume(self, self.paker_depth_edit + self.paker_khost) * 1.5, 1)}м3 ' \
+                                          f'{round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 ' \
                                           f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
                                           f'При отсутствии циркуляции на скважине промывку исключить, ' \
                                           f'увеличить объем продавки кислотного состава в 1,5 кратном объеме НКТ'
@@ -927,7 +931,7 @@ class WindowUnion(MyMainWindow):
                                      f'по круговой циркуляции  жидкостью уд.весом {self.data_well.fluid_work} п' \
                                      f'ри расходе жидкости не ' \
                                      f'менее 6-8 л/сек в объеме не менее ' \
-                                     f'{round(well_volume(self, self.paker_depth_edit + self.paker_khost) * 1.5, 1)}м3 ' \
+                                     f'{round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 ' \
                                      f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.' \
                                      f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
                                      f'При отсутствии циркуляции произвести замещения продуктов реакции тех ' \
@@ -935,21 +939,21 @@ class WindowUnion(MyMainWindow):
 
             flushing_downhole_short = f'При наличии ЦИРКУЛЯЦИИ: Допустить до Н- {self.data_well.current_bottom}м. Промыть уд.весом ' \
                                       f'{self.data_well.fluid_work}' \
-                                      f'не менее {round(well_volume(self, self.paker_depth_edit + self.paker_khost) * 1.5, 1)}м3 '
+                                      f'не менее {round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 '
         else:
             flushing_downhole_list = f'При наличии ЦИРКУЛЯЦИИ: При наличии избыточного давления:' \
                                      f'Промыть скважину обратной промывкой ' \
                                      f'по круговой циркуляции  жидкостью уд.весом {self.data_well.fluid_work} п' \
                                      f'ри расходе жидкости не ' \
                                      f'менее 6-8 л/сек в объеме не менее ' \
-                                     f'{round(well_volume(self, self.paker_depth_edit + self.paker_khost) * 1.5, 1)}м3 ' \
+                                     f'{round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 ' \
                                      f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.' \
                                      f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
                                      f'При отсутствии циркуляции произвести замещения продуктов реакции тех ' \
                                      f'жидкостью большей плотностью с последующей промывкой'
             flushing_downhole_short = f'При наличии избыточного давления: Промыть уд.весом ' \
                                       f'{self.data_well.fluid_work_short} ' \
-                                      f'не менее {round(well_volume(self, self.paker_depth_edit + self.paker_khost) * 1.5, 1)}м3 '
+                                      f'не менее {round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 '
 
         return flushing_downhole_list, flushing_downhole_short
 
@@ -994,14 +998,11 @@ class WindowUnion(MyMainWindow):
             self.pressure_edit = current_widget.pressure_edit.text()
             self.Qplast_after_edit = current_widget.Qplast_after_edit.currentText()
 
-
             self.iron_true_combo = current_widget.iron_true_combo.currentText()
             return True
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Ошибка в обработке данных СКО {e}')
             return False
-
-
 
     def testing_pressure(self, depth):
 
@@ -1359,7 +1360,7 @@ class WindowUnion(MyMainWindow):
                 f'задвижек на Р-{self.data_well.max_admissible_pressure.get_value}атм на максимально ' \
                 f'допустимое давление ' \
                 f'опрессовки эксплуатационной колонны в течении ' \
-                f'30мин), сорвать пакер. ' \
+                f'30мин), сорвать пакер. '
 
         pvo_1 = f'Установить ПВО по схеме №2 утвержденной главным инженером {contractor} {date_str} ' \
                 f'(тип плашечный сдвоенный ПШП-2ФТ-160х21Г Крестовина КР160х21Г, ' \
@@ -1382,4 +1383,3 @@ class WindowUnion(MyMainWindow):
         else:
             # print(pvo_2)
             return pvo_2, f'Монтаж ПВО по схеме №2'
-

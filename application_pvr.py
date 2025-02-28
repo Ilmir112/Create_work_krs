@@ -214,7 +214,7 @@ class PvrApplication(WindowUnion):
                 for col in range(2, 9):
                     row_list.append(str(self.data_well.ws.cell(row=row + 1, column=col + 1).value))
                 self.data_well.pvr_row_list.append(row_list)
-        if len(self.data_well.pvr_row_list) == 0:
+        if not self.data_well.pvr_row_list:
 
             QMessageBox.warning(self, 'Ошибка', 'Перфорация в плане работ не найдены')
             return

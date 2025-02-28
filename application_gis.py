@@ -186,7 +186,7 @@ class GisApplication(MyMainWindow):
                         type_pvr = self.data_well.ws.cell(row=row_ind + 1, column=3).value
                         self.data_well.gis_list.append(type_pvr)
 
-        if len(self.data_well.gis_list) == 0:
+        if not self.data_well.gis_list:
             QMessageBox.warning(self, 'Ошибка', 'Исследования в плане работ не найдены')
             return
 

@@ -27,7 +27,7 @@ class TabPageSoChange(TabPageUnion):
 
         self.plast_new_label = QLabel('индекс нового пласта', self)
         aaddf = self.data_well.plast_project
-        if len(self.data_well.plast_project) != 0:
+        if self.data_well.plast_project:
             self.plast_new_combo = QComboBox(self)
             self.plast_new_combo.addItems(self.data_well.plast_project)
         else:
@@ -72,7 +72,7 @@ class TabPageSoChange(TabPageUnion):
                           self.data_well.plast_project if self.data_well.dict_category.get(plast) and
                           self.data_well.dict_category[plast]['отключение'] == 'планируемый']))
 
-            if len(category_h2s_list_plan) == 0:
+            if not category_h2s_list_plan:
                 self.category_pressure_Label = QLabel('По Рпл')
                 self.category_pressure_line_combo = QComboBox(self)
                 self.category_pressure_line_combo.addItems(['1', '2', '3'])
@@ -229,7 +229,7 @@ class Change_fluid_Window(WindowUnion):
                 mes = QMessageBox.critical(self, 'Ошибка', 'Ожидаемое давление слишком низкое')
                 return
 
-            if len(self.data_well.plast_project) != 0:
+            if self.data_well.plast_project:
                 plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.currentText()
             else:
                 plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.text()

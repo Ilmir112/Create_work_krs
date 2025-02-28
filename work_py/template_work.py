@@ -240,9 +240,9 @@ class TabPageSoWith(TabPageUnion):
                 (self.data_well.column_additional and
                  self.data_well.current_bottom < self.data_well.head_column_additional.get_value) ) \
                 and self.data_well.open_trunk_well is False and \
-                ((self.difference_date_days(self.data_well.date_commissioning)/365 < 20 and \
+                ((self.difference_date_days(self.data_well.date_commissioning.get_value)/365 < 20 and \
                   self.data_well.category_h2s == "3") or (
-                         self.difference_date_days(self.data_well.date_commissioning)/365 < 10 \
+                         self.difference_date_days(self.data_well.date_commissioning.get_value)/365 < 10 \
                          and self.data_well.category_h2s != "3")):
             template_key = 'ПСШ + пакер'
 

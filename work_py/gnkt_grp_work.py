@@ -1079,7 +1079,7 @@ class GnktModel(WindowUnion):
              self.date_dmy(self.data_well.date_drilling_cancel),
              None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Дата ввода в эксплуатацию', None,
-             None, None, None, f'{self.data_well.date_commissioning}', None, None, None, None, None],
+             None, None, None, f'{self.data_well.date_commissioning.get_value}', None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Р в межколонном пространстве',
              None, None, None, None, self.data_well.pressure_mkp.get_value, None, ' ', None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Первоначальное Р опр-ки ЭК', None,
@@ -1135,7 +1135,7 @@ class GnktModel(WindowUnion):
              f'{self.data_well.column_direction_mine_diameter.get_value}',
              self.data_well.column_direction_mine_wall_thickness.get_value,
              round(
-                 self.data_well.column_direction_mine_diameter.get_value - 2 * self.data_well.column_direction_mine_wall_thickness.get_value,
+                 float(self.data_well.column_direction_mine_diameter.get_value) - 2 * float(self.data_well.column_direction_mine_wall_thickness.get_value),
                  1),
              f'0-', self.data_well.column_direction_mine_length.get_value,
              f'{self.data_well.level_cement_direction_mine.get_value}-{self.data_well.column_direction_mine_length.get_value}',

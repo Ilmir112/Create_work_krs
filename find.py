@@ -102,7 +102,7 @@ class FindIndexPZ(MyMainWindow):
 
         self.date_drilling_cancel = ''
         self.date_drilling_run = ''
-        self.date_commissioning = ''
+
         self.max_expected_pressure = ProtectedIsNonNone('не корректно')
         self.max_admissible_pressure = ProtectedIsNonNone('не корректно')
         self.result_pressure = ProtectedIsNonNone('не корректно')
@@ -121,7 +121,7 @@ class FindIndexPZ(MyMainWindow):
         self.angle_data = []
         self.expected_oil = 0
         self.water_cut = 0
-        self.date_commissioning = '01.01.2000'
+        self.date_commissioning = ProtectedIsNonNone('01.01.2000')
         self.expected_pressure = 0
         self.appointment_well = ProtectedIsNonNone('')
         self.expected_pickup = 0
@@ -315,7 +315,9 @@ class FindIndexPZ(MyMainWindow):
         for row_ind, row in enumerate(self.ws.iter_rows(values_only=True, max_row=300, max_col=20)):
             self.ws.row_dimensions[row_ind].hidden = False
             if self.cat_well_min.get_value != 0:
-                if float(self.data_x_max.get_value) < row_ind and self.image_loader:
+                coord_image = list(map(
+                    lambda x: int("".join([y for y in x if y.isdigit()])),  list(self.image_loader._images.keys())))
+                if self.data_x_max.get_value == 0 and row_ind in coord_image:
                     self.work_with_img(self.image_loader, row_ind)
 
             if 'Категория скважины' in row:
@@ -364,7 +366,8 @@ class FindIndexPZ(MyMainWindow):
                 self.data_x_max = ProtectedIsDigit(row_ind)
                 if self.check_text_in_row('Ранее проведенные работ', row):
                     self.data_x_max = ProtectedIsDigit(row_ind-2)
-
+            elif  any(['Должность' == str(col) for col in row]):
+                break
             elif any(['II. История эксплуатации скважины' in str(col) for col in row]):
                 self.data_pvr_max = ProtectedIsDigit(row_ind)
 
@@ -493,7 +496,9 @@ class FindIndexPZ(MyMainWindow):
         for row_ind, row in enumerate(self.ws.iter_rows(values_only=True, max_row=300, max_col=20)):
             self.ws.row_dimensions[row_ind].hidden = False
             if self.cat_well_min.get_value != 0:
-                if self.data_x_max.get_value < row_ind and self.image_loader:
+                coord_image = list(map(
+                    lambda x: int("".join([y for y in x if y.isdigit()])), list(self.image_loader._images.keys())))
+                if self.data_x_max.get_value == 0 and row_ind in coord_image:
                     self.work_with_img(self.image_loader, row_ind)
 
             if 'Категория скважины' in row:
@@ -1106,8 +1111,8 @@ class WellHistoryData(FindIndexPZ):
                     elif 'Дата ввода в экспл' in str(value):
                         self.date_commissioning = row[col + 2]
                         if type(self.date_commissioning) is datetime:
-                            self.date_commissioning = self.date_commissioning.strftime(
-                                '%d.%m.%Y')
+                            self.date_commissioning = ProtectedIsNonNone(self.date_commissioning.strftime(
+                                '%d.%m.%Y'))
                     elif 'ствол скважины' in str(row[col]).lower() and 'буров' in str(row[col]).lower():
                         self.bur_rastvor = row[col]
 
@@ -1138,7 +1143,7 @@ class WellHistoryData(FindIndexPZ):
         if self.date_drilling_cancel == '':
             self.check_data_in_pz.append('не указано окончание бурения\n')
 
-        if self.date_commissioning == '':
+        if self.date_commissioning.get_value == '':
             self.check_data_in_pz.append('не указано дата ввода\n')
         if self.max_expected_pressure == '':
             self.check_data_in_pz.append('не указано максимально ожидаемое давление на устье\n')
@@ -1388,7 +1393,7 @@ class WellData(FindIndexPZ):
                         self.stol_rotor = FindIndexPZ.definition_is_none(
                             self, ProtectedIsDigit(row[col + 5]), row_index, col + 1, 1)
                     elif 'Шахтное направление' in str(value):
-                        if row[col + 3] not in ['-', None, '0', 0, '']:
+                        if row[col + 3] not in ['-', None, '0', 0, '', 'отсутствует', '(мм), (мм), -(м)', 'отсут']:
                             self.column_direction_mine_true = True
                             if self.column_direction_mine_true:
                                 column_direction_mine_data = row[col + 3]

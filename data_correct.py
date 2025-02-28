@@ -292,7 +292,7 @@ class TabPageSoCorrect(TabPageUnion):
 
         self.date_commissioning_Label = QLabel('Дата ввода в эксплуатацию')
         self.date_commissioning_line = QLineEdit(self)
-        self.date_commissioning_line.setText(self.data_well.date_commissioning)
+        self.date_commissioning_line.setText(self.data_well.date_commissioning.get_value)
 
         self.result_pressure_date_label = QLabel('Дата последней опрессовки')
         self.result_pressure_date = QLineEdit(self)
@@ -820,540 +820,544 @@ class DataWindow(WindowUnion):
 
         region_combo = self.current_widget.region_combo.currentText()
         type_kr_combo = self.current_widget.type_kr_combo.currentText()
-
-        if region_combo == '':
-            QMessageBox.warning(self, 'ОШИБКА', 'Не выбран регион')
-            return
-        self.data_well.region = region_combo
-        if type_kr_combo == '':
-            QMessageBox.warning(self, 'ОШИБКА', 'Не выбран Вид и категория ремонта')
-            return
-        else:
-            self.data_well.type_kr = type_kr_combo
-
-        column_type = self.current_widget.column_type.text()
-        column_wall_thickness = self.current_widget.column_wall_thickness_edit_type2.text()
-        shoe_column = self.current_widget.shoe_column_edit_type2.text().strip()
-        level_cement = self.current_widget.level_cement_edit.text()
-        if '-' in level_cement:
-            level_cement = level_cement.split("-")[0]
-        head_column = float(self.current_widget.head_column_edit_type2.text())
-        column_add_True = str(self.current_widget.column_add_true_comboBox.currentText())
-        if column_add_True == 'в наличии':
-            self.data_well.column_additional = True
-        else:
-            self.data_well.column_additional = False
-
-        column_additional_diameter = self.current_widget.column_add_edit_type.text()
-        column_additional_wall_thickness = self.current_widget.column_add_wall_thicknessedit_type2.text()
-        shoe_column_additional = self.current_widget.shoe_column_add_edit_type2.text()
-        head_column_additional = self.current_widget.head_column_add_edit_type2.text()
-        bottomhole_drill = self.current_widget.bottomhole_drill_edit_type.text()
-        if bottomhole_drill == 'отсут':
-            QMessageBox.warning(self, 'Ошибка', 'Ошибка в пробуренном забое')
-            return
-        bottomhole_artificial = self.current_widget.bottomhole_artificial_edit_type.text().replace(',', '.')
-        current_bottom = self.current_widget.current_bottom_edit_type.text().replace(',', '.')
-        max_angle_depth = self.current_widget.max_angle_depth_edit_type.text()
-        max_angle = self.current_widget.max_angle_edit_type.text()
-        max_expected_pressure = self.current_widget.max_expected_pressure_edit_type.text()
-        max_admissible_pressure = self.current_widget.max_admissible_pressure_edit_type.text()
-
-        column_direction_diameter = self.current_widget.column_direction_diameter_edit.text()
-        column_direction_wall_thickness = self.current_widget.column_direction_wall_thickness_edit.text()
-        column_direction_length = self.current_widget.column_direction_length_edit.text()
-        level_cement_direction = self.current_widget.level_cement_direction_edit.text()
-        column_conductor_diameter = self.current_widget.column_conductor_diameter_edit.text()
-        column_conductor_wall_thickness = self.current_widget.column_conductor_wall_thickness_edit.text()
-        column_conductor_length = self.current_widget.column_conductor_length_edit.text()
-        level_cement_conductor = self.current_widget.level_cement_conductor_edit.text()
-
-        dict_pump_shgn_do = str(self.current_widget.pump_SHGN_do_edit_type.text())
-        dict_pump_shgn_h_do = self.current_widget.pump_SHGN_depth_do_edit_type.text()
-
-        dict_pump_shgn_posle = str(self.current_widget.pump_SHGN_posle_edit_type.text())
-        dict_pump_shgn_h_posle = str(self.current_widget.pump_SHGN_depth_posle_edit_type.text())
-
-        dict_pump_ecn_do = str(self.current_widget.pump_ECN_do_edit_type.text())
-        dict_pump_ecn_h_do = self.current_widget.pump_ECN_depth_do_edit_type.text()
-
-        dict_pump_ecn_posle = str(self.current_widget.pump_ECN_posle_edit_type.text())
-        dict_pump_ecn_h_posle = str(self.current_widget.pump_ECN_depth_posle_edit_type.text())
-
-        # print(f'прио {type(dict_pump_h_posle)}')
-        paker_do = str(self.current_widget.paker_do_edit_type.text())
-        depth_fond_paker_do = str(self.current_widget.paker_depth_do_edit_type.text())
-        paker_posle = self.current_widget.paker_posle_edit_type.text()
-        depth_fond_paker_posle = self.current_widget.paker_depth_posle_edit_type.text()
-
-        paker2_do = str(self.current_widget.paker2_do_edit_type.text())
-        depth_fond_paker2_do = self.current_widget.paker2_depth_do_edit_type.text()
-        paker2_posle = self.current_widget.paker2_posle_edit_type.text()
-        depth_fond_paker2_posle = self.current_widget.paker2_depth_posle_edit_type.text()
-
-        static_level = self.current_widget.static_level_edit_type.text()
-        dinamic_level = self.current_widget.dinamic_level_edit_type.text()
-        date_commissioning_line = self.current_widget.date_commissioning_line.text()
-        result_pressure_date = self.current_widget.result_pressure_date.text()
-        curator = str(self.current_widget.curator_Combo.currentText())
-        if self.check_date_format(result_pressure_date) is False:
-            if curator != 'ВНС':
-                QMessageBox.warning(self, 'Ошибка', 'Не корректна дата последней опрессовки')
-                return
-            else:
-                self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(self.data_well.date_drilling_cancel)
-
-        if self.check_date_format(date_commissioning_line) is False:
-            if curator != 'ВНС':
-                QMessageBox.warning(self, 'Ошибка', 'Не корректна дата ввода в эскплуатацию')
-                return
-            else:
-                self.data_well.date_commissioning = self.data_well.date_drilling_cancel
-
-            # try:
-            #     # Попытка распарсить строку в формате 'ДД.ММ.ГГГГ'
-            #     datetime.strptime(self.data_well.date_commissioning, '%d.%m.%Y')
-            # 
-            # except:
-            #     QMessageBox.warning(self, 'Ошибка', 'Не корректна дата ввода в эскплуатацию')
-            #     return
-
-        if curator == 'ОР':
-            expected_pickup_edit = self.current_widget.expected_pickup_edit.text()
-            expected_pressure_edit = self.current_widget.expected_pressure_edit.text()
-        else:
-            water_cut_edit = self.current_widget.water_cut_edit.text()
-            expected_oil_edit = self.current_widget.expected_oil_edit.text()
-            proc_water_edit = self.current_widget.proc_water_edit.text()
-
-        a = self.current_widget.labels_nkt
-
-        # Пересохранение данных по НКТ и штангам
-        self.data_well.dict_sucker_rod = {}
-        self.data_well.dict_sucker_rod_after = {}
-        self.data_well.dict_nkt_before = {}
-        self.data_well.dict_nkt_after = {}
-
-        if self.current_widget.labels_nkt:
-            for key, value in self.current_widget.labels_nkt.values():
-                asdf = key.text(), value.text()
-                if key.text() != '' and value.text() != '':
-                    self.data_well.dict_nkt_before[key.text()] = self.check_if_none(float(value.text()))
-
-        if all([pump for pump in [self.ifNum(dict_pump_ecn_posle), self.ifNum(paker2_posle),
-                                  self.ifNum(dict_pump_shgn_posle), self.ifNum(paker_posle)]]):
-
-            voronka_question = QMessageBox.question(self, 'Внимание',
-                                                    'Программа определила что в скважине '
-                                                    'После ремонта воронка, верно ли')
-            if voronka_question == QMessageBox.StandardButton.No:
-                return
-
-        if self.current_widget.labels_nkt_po:
-            for key, value in self.current_widget.labels_nkt_po.values():
-                if key.text() != '' and value.text() != '':
-                    self.data_well.dict_nkt_after[key.text()] = self.check_if_none(float(value.text()))
-
-        if self.current_widget.labels_sucker:
-            for key, value in self.current_widget.labels_sucker.values():
-                if key.text() != '' and value.text() != '':
-                    self.data_well.dict_sucker_rod[key.text()] = self.check_if_none(int(float(value.text())))
-
-        if self.current_widget.labels_sucker_po:
-            for key, value in self.current_widget.labels_sucker_po.values():
-                if key.text() != '' and value.text() != '':
-                    self.data_well.dict_sucker_rod_after[key.text()] = self.check_if_none(int(float(value.text())))
-
-        question = QMessageBox.question(self, 'выбор куратора', f'Куратор ремонта сектор {curator}, верно ли?')
-        if question == QMessageBox.StandardButton.No:
-            return
-
-        close_file = True
-
-        if any([self.ifNum(data_well) is False or data_well in ['не корректно', 0, 'отсут'] for data_well in
-                [column_type, column_wall_thickness, shoe_column]]):
-            QMessageBox.information(self, 'Внимание', 'Не все поля в данных колонне соответствуют значениям')
-            close_file = False
-
-        if float(bottomhole_artificial) > 10000 or float(bottomhole_drill) > 10000:
-            QMessageBox.information(self, 'Внимание', 'Забой не корректный')
-            close_file = False
-
-        if any([self.ifNum(data_well) is False for data_well in
-                [column_additional_diameter, column_additional_wall_thickness,
-                 shoe_column_additional, head_column_additional]]) and self.data_well.column_additional:
-            QMessageBox.information(self, 'Внимание', 'Не все поля в доп колонне соответствуют значениям')
-            close_file = False
-
-        if self.ifNum(bottomhole_artificial) is False \
-                or self.ifNum(bottomhole_drill) is False \
-                or self.ifNum(current_bottom) is False \
-                or self.ifNum(max_angle_depth) is False \
-                or self.ifNum(max_angle) is False \
-                or self.ifNum(max_admissible_pressure) is False \
-                or self.ifNum(max_expected_pressure) is False:
-            QMessageBox.information(self, 'Внимание', 'Не все поля в забое соответствуют значениям')
-            close_file = False
-        if self.ifNum(static_level) is False \
-                or self.ifNum(dinamic_level) is False:
-            QMessageBox.information(self, 'Внимание', 'Не все поля в уровнях соответствуют значениям')
-            close_file = False
-        if self.ifNum(dict_pump_ecn_h_do) is False \
-                or self.ifNum(dict_pump_ecn_h_posle) is False \
-                or self.ifNum(dict_pump_shgn_h_do) is False \
-                or self.ifNum(dict_pump_shgn_h_posle) is False \
-                or self.ifNum(depth_fond_paker_do) is False \
-                or self.ifNum(depth_fond_paker_posle) is False \
-                or self.ifNum(depth_fond_paker2_do) is False \
-                or self.ifNum(depth_fond_paker2_posle) is False:
-            QMessageBox.information(self, 'Внимание', 'Не все поля в спущенном оборудовании соответствуют значениям')
-            close_file = False
-        if self.ifNum(level_cement) is False:
-            QMessageBox.information(self, 'Внимание', 'Уровень цемента за ЭК не соответствуют значениям')
-            close_file = False
-        if self.ifNum(column_direction_diameter) is False \
-                or self.ifNum(column_direction_wall_thickness) is False \
-                or self.ifNum(column_direction_length) is False \
-                or self.ifNum(level_cement_direction) is False:
-            QMessageBox.information(self, 'Внимание', 'Не все поля в Направлении соответствуют значениям')
-            close_file = False
-        if self.ifNum(column_conductor_diameter) is False \
-                or self.ifNum(column_conductor_wall_thickness) is False \
-                or self.ifNum(column_conductor_length) is False \
-                or self.ifNum(column_direction_length) is False \
-                or self.ifNum(level_cement_conductor) is False:
-            QMessageBox.information(self, 'Внимание', 'Не все поля в кондукторе соответствуют значениям')
-            close_file = False
-
-        if any(['НВ' in dict_pump_shgn_do.upper(), 'ШГН' in dict_pump_shgn_do.upper(),
-                'НН' in dict_pump_shgn_do.upper(), dict_pump_shgn_do == 'отсут',
-                'RH' in dict_pump_shgn_do.upper()]) is False \
-                or any(['НВ' in dict_pump_shgn_posle.upper(), 'ШГН' in dict_pump_shgn_posle.upper(),
-                        'НН' in dict_pump_shgn_posle.upper(), dict_pump_shgn_posle == 'отсут',
-                        'RHAM' in dict_pump_shgn_do]) is False \
-                or any(['ЭЦН' in dict_pump_ecn_posle.upper(), 'ВНН' in dict_pump_ecn_posle.upper(),
-                        dict_pump_ecn_posle == 'отсут']) is False \
-                or (dict_pump_ecn_do != 'отсут' and dict_pump_ecn_h_do == 'отсут') \
-                or (dict_pump_ecn_posle != 'отсут' and dict_pump_ecn_h_posle == 'отсут') \
-                or (dict_pump_shgn_do != 'отсут' and dict_pump_shgn_h_do == 'отсут') \
-                or (dict_pump_shgn_posle != 'отсут' and dict_pump_shgn_h_posle == 'отсут') \
-                or (paker_do != 'отсут' and depth_fond_paker_do == 'отсут') \
-                or (paker_posle != 'отсут' and depth_fond_paker_posle == 'отсут') \
-                or (paker2_do != 'отсут' and depth_fond_paker2_do == 'отсут') \
-                or (paker2_posle != 'отсут' and depth_fond_paker2_posle == 'отсут') \
-                or any(['ЭЦН' in dict_pump_ecn_do.upper(), 'ВНН' in dict_pump_ecn_do.upper(),
-                        dict_pump_ecn_do == 'отсут']) is False:
-            QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
-            close_file = False
-        if isinstance(self.ifNum(head_column_additional), str):
-            # print(self.check_if_none(head_column_additional), isinstance(self.ifNum(head_column_additional), str))
-            if self.check_if_none(20 if self.ifNum(head_column_additional) else head_column_additional) < 5:
-                # print(self.check_if_none(head_column_additional))
-                QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
-                close_file = False
-            else:
-                QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
-                close_file = False
-
-        if (data_list.nkt_mistake is True and len(self.data_well.dict_nkt_before) == 0):
-            QMessageBox.information(self, 'Внимание',
-                                    'При вызванной ошибке НКТ до ремонта не может быть пустым')
-            close_file = False
-        if data_list.nkt_mistake is True and len(self.data_well.dict_nkt_after) == 0:
-            QMessageBox.information(self, 'Внимание',
-                                    'При вызванной ошибке НКТ после ремонта не может быть пустым')
-            close_file = False
-
-        if self.data_well.column_additional:
-            asdedf = [self.check_str_isdigit(column_additional_diameter),
-                   self.check_str_isdigit(head_column_additional),
-                   self.check_str_isdigit(shoe_column_additional),
-                   self.check_str_isdigit(column_additional_wall_thickness)]
-            if all([self.check_str_isdigit(column_additional_diameter),
-                   self.check_str_isdigit(head_column_additional),
-                   self.check_str_isdigit(shoe_column_additional),
-                   self.check_str_isdigit(column_additional_wall_thickness)]):
-
-                if int(float(column_additional_diameter)) >= float(column_type):
-                    QMessageBox.information(self, 'Внимание', 'Ошибка в диаметре доп колонны')
-                    close_file = False
-
-                if any([70 > float(column_additional_diameter), float(column_additional_diameter) > 150,
-                        5 > float(column_additional_wall_thickness), float(column_additional_wall_thickness) > 13,
-                        5 > float(column_conductor_wall_thickness), float(column_conductor_wall_thickness) > 13,
-                        5 > float(column_wall_thickness), float(column_wall_thickness) > 13]):
-                    QMessageBox.information(self, 'Внимание', 'Проверьте толщину колонны')
-                    close_file = False
-
-                if int(float(str(head_column_additional).replace(',', '.'))) < 10:
-                    msg = QMessageBox.question(self, 'Внимание', 'доп колонна начинается с устья?')
-                    if msg == QMessageBox.StandardButton.Yes:
-                        column_direction_length = column_conductor_length
-                        column_direction_diameter = column_conductor_diameter
-                        column_direction_wall_thickness = column_conductor_wall_thickness
-                        level_cement_direction = level_cement_conductor
-                        column_conductor_length = shoe_column
-                        column_conductor_diameter = column_type
-                        column_conductor_wall_thickness = column_wall_thickness
-
-                        shoe_column = shoe_column_additional
-                        column_type = column_additional_diameter
-                        column_wall_thickness = column_additional_wall_thickness
-                        self.data_well.column_additional = False
-            else:
-                QMessageBox.warning(self, 'Ошибка', 'Ошибка в доп колонне')
-                close_file = False
-
-        if type_kr_combo in ['КР13-1  Подготовительные работы к ГРП (ПР)',
-                             'КР13-2  Освоение скважины после ГРП (ЗР)',
-                             'КР13-1  Подготовительные работы к ГРП (ПР) КР13-2  Освоение скважины после ГРП (ЗР)',
-                             'КР13-5  Подготовка скважины к проведению работ по повышению н/отдачи пластов',
-                             'КР13-6  Подготовительные работы к ГГРП (ПР)',
-                             'КР13-7  Заключительные работы (ЗР) после ГГРП (освоение скважины и т.д.)',
-                             'КР7-2  Проведение ГРП',
-                             'КР7-3  Проведение ГГРП',
-                             'КР7-4  Проведение ГПП']:
-            self.data_well.grp_plan = True
-
-        if curator == 'ОР':
-            if self.ifNum(expected_pickup_edit) is False or self.ifNum(expected_pressure_edit) is False:
-                QMessageBox.information(self, 'Внимание',
-                                        'Не все поля в Ожидаемых показателях соответствуют значениям')
-                close_file = False
-        else:
-            if self.ifNum(water_cut_edit) is False or self.ifNum(expected_oil_edit) is False or \
-                    self.ifNum(proc_water_edit) is False:
-                QMessageBox.information(self, 'Внимание',
-                                        'Не все поля в Ожидаемых показателях соответствуют значениям')
-                close_file = False
         try:
-            if float(shoe_column) < 30:
-                QMessageBox.warning(self, 'Ошибка', 'Башмак ЭК слишком короткий')
+            if region_combo == '':
+                QMessageBox.warning(self, 'ОШИБКА', 'Не выбран регион')
                 return
-        except Exception as e:
-            QMessageBox.warning(self, 'Ошибка', f'Башмак ЭК не корректен {type(e).__name__}\n\n{str(e)}')
-
-        if close_file is False:
-            return
-        elif close_file is True:
-            self.data_well.column_diameter = ProtectedIsDigit(self.check_if_none(column_type))
-            self.data_well.column_wall_thickness = ProtectedIsDigit(self.check_if_none(column_wall_thickness))
-            self.data_well.shoe_column = ProtectedIsDigit(float(self.check_if_none(shoe_column)))
-            self.data_well.head_column = ProtectedIsDigit(head_column)
-            self.data_well.diameter_doloto_ek = ProtectedIsDigit(0)
-            if self.data_well.column_additional:
-                self.data_well.column_additional_diameter = ProtectedIsDigit(
-                    self.check_if_none(column_additional_diameter))
-                self.data_well.column_additional_wall_thickness = ProtectedIsDigit(
-                    self.check_if_none(column_additional_wall_thickness))
-                self.data_well.shoe_column_additional = ProtectedIsDigit(
-                    int(float(self.check_if_none(shoe_column_additional))))
-                self.data_well.head_column_additional = ProtectedIsDigit(
-                    int(float(self.check_if_none(head_column_additional))))
+            self.data_well.region = region_combo
+            if type_kr_combo == '':
+                QMessageBox.warning(self, 'ОШИБКА', 'Не выбран Вид и категория ремонта')
+                return
             else:
-                self.data_well.column_additional_diameter = ProtectedIsDigit(0)
-                self.data_well.column_additional_wall_thickness = ProtectedIsDigit(0)
-                self.data_well.shoe_column_additional = ProtectedIsDigit(0)
-                self.data_well.head_column_additional = ProtectedIsDigit(head_column)
+                self.data_well.type_kr = type_kr_combo
 
-            self.data_well.bottom_hole_drill = ProtectedIsDigit(self.check_if_none(bottomhole_drill))
-            self.data_well.bottom_hole_artificial = ProtectedIsDigit(self.check_if_none(bottomhole_artificial))
-            self.data_well.current_bottom = self.check_if_none(current_bottom)
-            self.data_well.bottom = self.check_if_none(current_bottom)
-            self.data_well.level_cement_column = ProtectedIsDigit(self.check_if_none(level_cement))
-            self.data_well.max_angle = ProtectedIsDigit(self.check_if_none(max_angle))
-            self.data_well.max_expected_pressure = ProtectedIsDigit(self.check_if_none(max_expected_pressure))
-            self.data_well.max_admissible_pressure = ProtectedIsDigit(
-                self.check_if_none(max_admissible_pressure))
-            self.data_well.date_commissioning = date_commissioning_line
-            self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(result_pressure_date)
+            column_type = self.current_widget.column_type.text()
+            column_wall_thickness = self.current_widget.column_wall_thickness_edit_type2.text()
+            shoe_column = self.current_widget.shoe_column_edit_type2.text().strip()
+            level_cement = self.current_widget.level_cement_edit.text()
+            if '-' in level_cement:
+                level_cement = level_cement.split("-")[0]
+            head_column = float(self.current_widget.head_column_edit_type2.text())
+            column_add_True = str(self.current_widget.column_add_true_comboBox.currentText())
+            if column_add_True == 'в наличии':
+                self.data_well.column_additional = True
+            else:
+                self.data_well.column_additional = False
 
-            # print(f'макс {self.data_well.max_expected_pressure.get_value}')
-            self.data_well.dict_pump_shgn["before"] = self.check_if_none(dict_pump_shgn_do)
-            self.data_well.dict_pump_shgn_depth["before"] = self.check_if_none(dict_pump_shgn_h_do)
-            self.data_well.dict_pump_shgn_depth["after"] = self.check_if_none(dict_pump_shgn_h_posle)
-            self.data_well.dict_pump_shgn["after"] = self.check_if_none(dict_pump_shgn_posle)
+            column_additional_diameter = self.current_widget.column_add_edit_type.text()
+            column_additional_wall_thickness = self.current_widget.column_add_wall_thicknessedit_type2.text()
+            shoe_column_additional = self.current_widget.shoe_column_add_edit_type2.text()
+            head_column_additional = self.current_widget.head_column_add_edit_type2.text()
+            bottomhole_drill = self.current_widget.bottomhole_drill_edit_type.text()
+            if bottomhole_drill == 'отсут':
+                QMessageBox.warning(self, 'Ошибка', 'Ошибка в пробуренном забое')
+                return
+            bottomhole_artificial = self.current_widget.bottomhole_artificial_edit_type.text().replace(',', '.')
+            current_bottom = self.current_widget.current_bottom_edit_type.text().replace(',', '.')
+            max_angle_depth = self.current_widget.max_angle_depth_edit_type.text()
+            max_angle = self.current_widget.max_angle_edit_type.text()
+            max_expected_pressure = self.current_widget.max_expected_pressure_edit_type.text()
+            max_admissible_pressure = self.current_widget.max_admissible_pressure_edit_type.text()
 
-            self.data_well.dict_pump_ecn["before"] = self.check_if_none(dict_pump_ecn_do)
-            self.data_well.dict_pump_ecn_depth["before"] = self.check_if_none(dict_pump_ecn_h_do)
-            self.data_well.dict_pump_ecn["after"] = self.check_if_none(dict_pump_ecn_posle)
-            self.data_well.dict_pump_ecn_depth["after"] = self.check_if_none(dict_pump_ecn_h_posle)
+            column_direction_diameter = self.current_widget.column_direction_diameter_edit.text()
+            column_direction_wall_thickness = self.current_widget.column_direction_wall_thickness_edit.text()
+            column_direction_length = self.current_widget.column_direction_length_edit.text()
+            level_cement_direction = self.current_widget.level_cement_direction_edit.text()
+            column_conductor_diameter = self.current_widget.column_conductor_diameter_edit.text()
+            column_conductor_wall_thickness = self.current_widget.column_conductor_wall_thickness_edit.text()
+            column_conductor_length = self.current_widget.column_conductor_length_edit.text()
+            level_cement_conductor = self.current_widget.level_cement_conductor_edit.text()
 
-            self.data_well.paker_before["before"] = self.check_if_none(paker_do)
-            self.data_well.depth_fond_paker_before["before"] = self.check_if_none(depth_fond_paker_do)
-            self.data_well.paker_before["after"] = self.check_if_none(paker_posle)
-            self.data_well.depth_fond_paker_before["after"] = self.check_if_none(depth_fond_paker_posle)
+            dict_pump_shgn_do = str(self.current_widget.pump_SHGN_do_edit_type.text())
+            dict_pump_shgn_h_do = self.current_widget.pump_SHGN_depth_do_edit_type.text()
 
-            self.data_well.paker_second_before["before"] = self.check_if_none(paker2_do)
-            self.data_well.depth_fond_paker_second_before["before"] = self.check_if_none(depth_fond_paker2_do)
-            self.data_well.paker_second_before["after"] = self.check_if_none(paker2_posle)
-            self.data_well.depth_fond_paker_second_before["after"] = self.check_if_none(depth_fond_paker2_posle)
-            self.data_well.static_level = ProtectedIsDigit(self.check_if_none(static_level))
-            self.data_well.dinamic_level = ProtectedIsDigit(self.check_if_none(dinamic_level))
+            dict_pump_shgn_posle = str(self.current_widget.pump_SHGN_posle_edit_type.text())
+            dict_pump_shgn_h_posle = str(self.current_widget.pump_SHGN_depth_posle_edit_type.text())
 
-            self.data_well.column_direction_diameter = ProtectedIsDigit(
-                self.check_if_none(column_direction_diameter))
-            self.data_well.column_direction_wall_thickness = ProtectedIsDigit(
-                self.check_if_none(column_direction_wall_thickness))
-            self.data_well.column_direction_length = ProtectedIsDigit(
-                self.check_if_none(column_direction_length))
-            self.data_well.level_cement_direction = ProtectedIsDigit(self.check_if_none(level_cement_direction))
-            self.data_well.column_conductor_diameter = ProtectedIsDigit(
-                self.check_if_none(column_conductor_diameter))
-            self.data_well.column_conductor_wall_thickness = ProtectedIsDigit(
-                self.check_if_none(column_conductor_wall_thickness))
-            self.data_well.column_conductor_length = ProtectedIsDigit(
-                self.check_if_none(column_conductor_length))
-            self.data_well.level_cement_conductor = ProtectedIsDigit(self.check_if_none(level_cement_conductor))
+            dict_pump_ecn_do = str(self.current_widget.pump_ECN_do_edit_type.text())
+            dict_pump_ecn_h_do = self.current_widget.pump_ECN_depth_do_edit_type.text()
+
+            dict_pump_ecn_posle = str(self.current_widget.pump_ECN_posle_edit_type.text())
+            dict_pump_ecn_h_posle = str(self.current_widget.pump_ECN_depth_posle_edit_type.text())
+
+            # print(f'прио {type(dict_pump_h_posle)}')
+            paker_do = str(self.current_widget.paker_do_edit_type.text())
+            depth_fond_paker_do = str(self.current_widget.paker_depth_do_edit_type.text())
+            paker_posle = self.current_widget.paker_posle_edit_type.text()
+            depth_fond_paker_posle = self.current_widget.paker_depth_posle_edit_type.text()
+
+            paker2_do = str(self.current_widget.paker2_do_edit_type.text())
+            depth_fond_paker2_do = self.current_widget.paker2_depth_do_edit_type.text()
+            paker2_posle = self.current_widget.paker2_posle_edit_type.text()
+            depth_fond_paker2_posle = self.current_widget.paker2_depth_posle_edit_type.text()
+
+            static_level = self.current_widget.static_level_edit_type.text()
+            dinamic_level = self.current_widget.dinamic_level_edit_type.text()
+            date_commissioning_line = self.current_widget.date_commissioning_line.text()
+            result_pressure_date = self.current_widget.result_pressure_date.text()
+            curator = str(self.current_widget.curator_Combo.currentText())
+            if self.check_date_format(result_pressure_date) is False:
+                if curator != 'ВНС':
+                    QMessageBox.warning(self, 'Ошибка', 'Не корректна дата последней опрессовки')
+                    return
+                else:
+                    self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(self.data_well.date_drilling_cancel)
+
+            if self.check_date_format(date_commissioning_line) is False:
+                if curator != 'ВНС':
+                    QMessageBox.warning(self, 'Ошибка', 'Не корректна дата ввода в эскплуатацию')
+                    return
+                else:
+                    self.data_well.date_commissioning = data_list.ProtectedIsNonNone(self.data_well.date_drilling_cancel)
+
+                # try:
+                #     # Попытка распарсить строку в формате 'ДД.ММ.ГГГГ'
+                #     datetime.strptime(self.data_well.date_commissioning, '%d.%m.%Y')
+                #
+                # except:
+                #     QMessageBox.warning(self, 'Ошибка', 'Не корректна дата ввода в эскплуатацию')
+                #     return
+
             if curator == 'ОР':
-                self.data_well.expected_pressure = self.check_if_none(expected_pressure_edit)
-                self.data_well.expected_pickup = self.check_if_none(expected_pickup_edit)
-                self.data_well.expected_pick_up[self.data_well.expected_pickup] = self.data_well.expected_pressure
-                self.data_well.percent_water = 100
+                expected_pickup_edit = self.current_widget.expected_pickup_edit.text()
+                expected_pressure_edit = self.current_widget.expected_pressure_edit.text()
             else:
-                self.data_well.expected_oil = self.check_if_none(expected_oil_edit)
-                self.data_well.water_cut = self.check_if_none(water_cut_edit)
-                self.data_well.percent_water = int(self.check_if_none(proc_water_edit))
+                water_cut_edit = self.current_widget.water_cut_edit.text()
+                expected_oil_edit = self.current_widget.expected_oil_edit.text()
+                proc_water_edit = self.current_widget.proc_water_edit.text()
 
-            if str(self.data_well.dict_pump_shgn["before"]) != '0' and len(
-                    self.data_well.dict_sucker_rod) == 0:
-                assdf = str(self.data_well.dict_pump_shgn["before"]), len(self.data_well.dict_sucker_rod), \
-                        self.data_well.dict_sucker_rod
-                QMessageBox.warning(self, 'ОШИБКА',
-                                    f'при спущенном насосе {self.data_well.dict_pump_shgn["before"]} '
-                                    f'не указаны штанги, либо не корректно прочитаны данные ')
-                self.pause_app()
+            a = self.current_widget.labels_nkt
 
+            # Пересохранение данных по НКТ и штангам
+            self.data_well.dict_sucker_rod = {}
+            self.data_well.dict_sucker_rod_after = {}
+            self.data_well.dict_nkt_before = {}
+            self.data_well.dict_nkt_after = {}
+
+            if self.current_widget.labels_nkt:
+                for key, value in self.current_widget.labels_nkt.values():
+                    asdf = key.text(), value.text()
+                    if key.text() != '' and value.text() != '':
+                        self.data_well.dict_nkt_before[key.text()] = self.check_if_none(float(value.text()))
+
+            if all([pump for pump in [self.ifNum(dict_pump_ecn_posle), self.ifNum(paker2_posle),
+                                      self.ifNum(dict_pump_shgn_posle), self.ifNum(paker_posle)]]):
+
+                voronka_question = QMessageBox.question(self, 'Внимание',
+                                                        'Программа определила что в скважине '
+                                                        'После ремонта воронка, верно ли')
+                if voronka_question == QMessageBox.StandardButton.No:
+                    return
+
+            if self.current_widget.labels_nkt_po:
+                for key, value in self.current_widget.labels_nkt_po.values():
+                    if key.text() != '' and value.text() != '':
+                        self.data_well.dict_nkt_after[key.text()] = self.check_if_none(float(value.text()))
+
+            if self.current_widget.labels_sucker:
+                for key, value in self.current_widget.labels_sucker.values():
+                    if key.text() != '' and value.text() != '':
+                        self.data_well.dict_sucker_rod[key.text()] = self.check_if_none(int(float(value.text())))
+
+            if self.current_widget.labels_sucker_po:
+                for key, value in self.current_widget.labels_sucker_po.values():
+                    if key.text() != '' and value.text() != '':
+                        self.data_well.dict_sucker_rod_after[key.text()] = self.check_if_none(int(float(value.text())))
+
+            question = QMessageBox.question(self, 'выбор куратора', f'Куратор ремонта сектор {curator}, верно ли?')
+            if question == QMessageBox.StandardButton.No:
                 return
-            if str(self.data_well.dict_pump_shgn["after"]) != '0' and len(
-                    self.data_well.dict_sucker_rod_after) == 0:
-                QMessageBox.warning(self, 'ОШИБКА',
-                                    f'при плановом насосе {self.data_well.dict_pump_shgn["before"]} '
-                                    f'не указаны штанги, либо не корректно прочитаны данные ')
-                self.pause_app()
 
-                return
-            if self.data_well.column_additional is False or\
-                (self.data_well.column_additional and
-                 self.data_well.current_bottom > self.data_well.head_column_additional.get_value):
-                if self.data_well.dict_pump_ecn != '0':
-                    self.data_well.template_depth = self.data_well.dict_pump_ecn_depth["before"]
-                    self.data_well.template_length = 30
+            close_file = True
+
+            if any([self.ifNum(data_well) is False or data_well in ['не корректно', 0, 'отсут'] for data_well in
+                    [column_type, column_wall_thickness, shoe_column]]):
+                QMessageBox.information(self, 'Внимание', 'Не все поля в данных колонне соответствуют значениям')
+                close_file = False
+
+            if float(bottomhole_artificial) > 10000 or float(bottomhole_drill) > 10000:
+                QMessageBox.information(self, 'Внимание', 'Забой не корректный')
+                close_file = False
+
+            if any([self.ifNum(data_well) is False for data_well in
+                    [column_additional_diameter, column_additional_wall_thickness,
+                     shoe_column_additional, head_column_additional]]) and self.data_well.column_additional:
+                QMessageBox.information(self, 'Внимание', 'Не все поля в доп колонне соответствуют значениям')
+                close_file = False
+
+            if self.ifNum(bottomhole_artificial) is False \
+                    or self.ifNum(bottomhole_drill) is False \
+                    or self.ifNum(current_bottom) is False \
+                    or self.ifNum(max_angle_depth) is False \
+                    or self.ifNum(max_angle) is False \
+                    or self.ifNum(max_admissible_pressure) is False \
+                    or self.ifNum(max_expected_pressure) is False:
+                QMessageBox.information(self, 'Внимание', 'Не все поля в забое соответствуют значениям')
+                close_file = False
+            if self.ifNum(static_level) is False \
+                    or self.ifNum(dinamic_level) is False:
+                QMessageBox.information(self, 'Внимание', 'Не все поля в уровнях соответствуют значениям')
+                close_file = False
+            if self.ifNum(dict_pump_ecn_h_do) is False \
+                    or self.ifNum(dict_pump_ecn_h_posle) is False \
+                    or self.ifNum(dict_pump_shgn_h_do) is False \
+                    or self.ifNum(dict_pump_shgn_h_posle) is False \
+                    or self.ifNum(depth_fond_paker_do) is False \
+                    or self.ifNum(depth_fond_paker_posle) is False \
+                    or self.ifNum(depth_fond_paker2_do) is False \
+                    or self.ifNum(depth_fond_paker2_posle) is False:
+                QMessageBox.information(self, 'Внимание', 'Не все поля в спущенном оборудовании соответствуют значениям')
+                close_file = False
+            if self.ifNum(level_cement) is False:
+                QMessageBox.information(self, 'Внимание', 'Уровень цемента за ЭК не соответствуют значениям')
+                close_file = False
+            if self.ifNum(column_direction_diameter) is False \
+                    or self.ifNum(column_direction_wall_thickness) is False \
+                    or self.ifNum(column_direction_length) is False \
+                    or self.ifNum(level_cement_direction) is False:
+                QMessageBox.information(self, 'Внимание', 'Не все поля в Направлении соответствуют значениям')
+                close_file = False
+            if self.ifNum(column_conductor_diameter) is False \
+                    or self.ifNum(column_conductor_wall_thickness) is False \
+                    or self.ifNum(column_conductor_length) is False \
+                    or self.ifNum(column_direction_length) is False \
+                    or self.ifNum(level_cement_conductor) is False:
+                QMessageBox.information(self, 'Внимание', 'Не все поля в кондукторе соответствуют значениям')
+                close_file = False
+
+            if any(['НВ' in dict_pump_shgn_do.upper(), 'ШГН' in dict_pump_shgn_do.upper(),
+                    'НН' in dict_pump_shgn_do.upper(), dict_pump_shgn_do == 'отсут',
+                    'RH' in dict_pump_shgn_do.upper()]) is False \
+                    or any(['НВ' in dict_pump_shgn_posle.upper(), 'ШГН' in dict_pump_shgn_posle.upper(),
+                            'НН' in dict_pump_shgn_posle.upper(), dict_pump_shgn_posle == 'отсут',
+                            'RHAM' in dict_pump_shgn_do]) is False \
+                    or any(['ЭЦН' in dict_pump_ecn_posle.upper(), 'ВНН' in dict_pump_ecn_posle.upper(),
+                            dict_pump_ecn_posle == 'отсут']) is False \
+                    or (dict_pump_ecn_do != 'отсут' and dict_pump_ecn_h_do == 'отсут') \
+                    or (dict_pump_ecn_posle != 'отсут' and dict_pump_ecn_h_posle == 'отсут') \
+                    or (dict_pump_shgn_do != 'отсут' and dict_pump_shgn_h_do == 'отсут') \
+                    or (dict_pump_shgn_posle != 'отсут' and dict_pump_shgn_h_posle == 'отсут') \
+                    or (paker_do != 'отсут' and depth_fond_paker_do == 'отсут') \
+                    or (paker_posle != 'отсут' and depth_fond_paker_posle == 'отсут') \
+                    or (paker2_do != 'отсут' and depth_fond_paker2_do == 'отсут') \
+                    or (paker2_posle != 'отсут' and depth_fond_paker2_posle == 'отсут') \
+                    or any(['ЭЦН' in dict_pump_ecn_do.upper(), 'ВНН' in dict_pump_ecn_do.upper(),
+                            dict_pump_ecn_do == 'отсут']) is False:
+                QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
+                close_file = False
+            if isinstance(self.ifNum(head_column_additional), str):
+                # print(self.check_if_none(head_column_additional), isinstance(self.ifNum(head_column_additional), str))
+                if self.check_if_none(20 if self.ifNum(head_column_additional) else head_column_additional) < 5:
+                    # print(self.check_if_none(head_column_additional))
+                    QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
+                    close_file = False
+                else:
+                    QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
+                    close_file = False
+
+            if (data_list.nkt_mistake is True and len(self.data_well.dict_nkt_before) == 0):
+                QMessageBox.information(self, 'Внимание',
+                                        'При вызванной ошибке НКТ до ремонта не может быть пустым')
+                close_file = False
+            if data_list.nkt_mistake is True and len(self.data_well.dict_nkt_after) == 0:
+                QMessageBox.information(self, 'Внимание',
+                                        'При вызванной ошибке НКТ после ремонта не может быть пустым')
+                close_file = False
+
+            if self.data_well.column_additional:
+                asdedf = [self.check_str_isdigit(column_additional_diameter),
+                       self.check_str_isdigit(head_column_additional),
+                       self.check_str_isdigit(shoe_column_additional),
+                       self.check_str_isdigit(column_additional_wall_thickness)]
+                if all([self.check_str_isdigit(column_additional_diameter),
+                       self.check_str_isdigit(head_column_additional),
+                       self.check_str_isdigit(shoe_column_additional),
+                       self.check_str_isdigit(column_additional_wall_thickness)]):
+
+                    if int(float(column_additional_diameter)) >= float(column_type):
+                        QMessageBox.information(self, 'Внимание', 'Ошибка в диаметре доп колонны')
+                        close_file = False
+
+                    if any([70 > float(column_additional_diameter), float(column_additional_diameter) > 150,
+                            5 > float(column_additional_wall_thickness), float(column_additional_wall_thickness) > 13,
+                            5 > float(column_conductor_wall_thickness), float(column_conductor_wall_thickness) > 13,
+                            5 > float(column_wall_thickness), float(column_wall_thickness) > 13]):
+                        QMessageBox.information(self, 'Внимание', 'Проверьте толщину колонны')
+                        close_file = False
+
+                    if int(float(str(head_column_additional).replace(',', '.'))) < 10:
+                        msg = QMessageBox.question(self, 'Внимание', 'доп колонна начинается с устья?')
+                        if msg == QMessageBox.StandardButton.Yes:
+                            column_direction_length = column_conductor_length
+                            column_direction_diameter = column_conductor_diameter
+                            column_direction_wall_thickness = column_conductor_wall_thickness
+                            level_cement_direction = level_cement_conductor
+                            column_conductor_length = shoe_column
+                            column_conductor_diameter = column_type
+                            column_conductor_wall_thickness = column_wall_thickness
+
+                            shoe_column = shoe_column_additional
+                            column_type = column_additional_diameter
+                            column_wall_thickness = column_additional_wall_thickness
+                            self.data_well.column_additional = False
+                else:
+                    QMessageBox.warning(self, 'Ошибка', 'Ошибка в доп колонне')
+                    close_file = False
+
+            if type_kr_combo in ['КР13-1  Подготовительные работы к ГРП (ПР)',
+                                 'КР13-2  Освоение скважины после ГРП (ЗР)',
+                                 'КР13-1  Подготовительные работы к ГРП (ПР) КР13-2  Освоение скважины после ГРП (ЗР)',
+                                 'КР13-5  Подготовка скважины к проведению работ по повышению н/отдачи пластов',
+                                 'КР13-6  Подготовительные работы к ГГРП (ПР)',
+                                 'КР13-7  Заключительные работы (ЗР) после ГГРП (освоение скважины и т.д.)',
+                                 'КР7-2  Проведение ГРП',
+                                 'КР7-3  Проведение ГГРП',
+                                 'КР7-4  Проведение ГПП']:
+                self.data_well.grp_plan = True
+
+            if curator == 'ОР':
+                if self.ifNum(expected_pickup_edit) is False or self.ifNum(expected_pressure_edit) is False:
+                    QMessageBox.information(self, 'Внимание',
+                                            'Не все поля в Ожидаемых показателях соответствуют значениям')
+                    close_file = False
             else:
-                if self.data_well.dict_pump_ecn != 0:
-                    if self.data_well.dict_pump_ecn_depth["before"] > self.data_well.head_column_additional.get_value:
-                        self.data_well.template_depth_addition = self.data_well.dict_pump_ecn_depth
-                        self.data_well.template_length_addition = 30
-                    else:
+                if self.ifNum(water_cut_edit) is False or self.ifNum(expected_oil_edit) is False or \
+                        self.ifNum(proc_water_edit) is False:
+                    QMessageBox.information(self, 'Внимание',
+                                            'Не все поля в Ожидаемых показателях соответствуют значениям')
+                    close_file = False
+            try:
+                if float(shoe_column) < 30:
+                    QMessageBox.warning(self, 'Ошибка', 'Башмак ЭК слишком короткий')
+                    return
+            except Exception as e:
+                QMessageBox.warning(self, 'Ошибка', f'Башмак ЭК не корректен {type(e).__name__}\n\n{str(e)}')
+
+            if close_file is False:
+                return
+            elif close_file is True:
+                self.data_well.column_diameter = ProtectedIsDigit(self.check_if_none(column_type))
+                self.data_well.column_wall_thickness = ProtectedIsDigit(self.check_if_none(column_wall_thickness))
+                self.data_well.shoe_column = ProtectedIsDigit(float(self.check_if_none(shoe_column)))
+                self.data_well.head_column = ProtectedIsDigit(head_column)
+                self.data_well.diameter_doloto_ek = ProtectedIsDigit(0)
+                if self.data_well.column_additional:
+                    self.data_well.column_additional_diameter = ProtectedIsDigit(
+                        self.check_if_none(column_additional_diameter))
+                    self.data_well.column_additional_wall_thickness = ProtectedIsDigit(
+                        self.check_if_none(column_additional_wall_thickness))
+                    self.data_well.shoe_column_additional = ProtectedIsDigit(
+                        int(float(self.check_if_none(shoe_column_additional))))
+                    self.data_well.head_column_additional = ProtectedIsDigit(
+                        int(float(self.check_if_none(head_column_additional))))
+                else:
+                    self.data_well.column_additional_diameter = ProtectedIsDigit(0)
+                    self.data_well.column_additional_wall_thickness = ProtectedIsDigit(0)
+                    self.data_well.shoe_column_additional = ProtectedIsDigit(0)
+                    self.data_well.head_column_additional = ProtectedIsDigit(head_column)
+
+                self.data_well.bottom_hole_drill = ProtectedIsDigit(self.check_if_none(bottomhole_drill))
+                self.data_well.bottom_hole_artificial = ProtectedIsDigit(self.check_if_none(bottomhole_artificial))
+                self.data_well.current_bottom = self.check_if_none(current_bottom)
+                self.data_well.bottom = self.check_if_none(current_bottom)
+                self.data_well.level_cement_column = ProtectedIsDigit(self.check_if_none(level_cement))
+                self.data_well.max_angle = ProtectedIsDigit(self.check_if_none(max_angle))
+                self.data_well.max_expected_pressure = ProtectedIsDigit(self.check_if_none(max_expected_pressure))
+                self.data_well.max_admissible_pressure = ProtectedIsDigit(
+                    self.check_if_none(max_admissible_pressure))
+                self.data_well.date_commissioning = ProtectedIsNonNone(date_commissioning_line)
+                self.data_well.result_pressure_date = ProtectedIsNonNone(result_pressure_date)
+
+                # print(f'макс {self.data_well.max_expected_pressure.get_value}')
+                self.data_well.dict_pump_shgn["before"] = self.check_if_none(dict_pump_shgn_do)
+                self.data_well.dict_pump_shgn_depth["before"] = self.check_if_none(dict_pump_shgn_h_do)
+                self.data_well.dict_pump_shgn_depth["after"] = self.check_if_none(dict_pump_shgn_h_posle)
+                self.data_well.dict_pump_shgn["after"] = self.check_if_none(dict_pump_shgn_posle)
+
+                self.data_well.dict_pump_ecn["before"] = self.check_if_none(dict_pump_ecn_do)
+                self.data_well.dict_pump_ecn_depth["before"] = self.check_if_none(dict_pump_ecn_h_do)
+                self.data_well.dict_pump_ecn["after"] = self.check_if_none(dict_pump_ecn_posle)
+                self.data_well.dict_pump_ecn_depth["after"] = self.check_if_none(dict_pump_ecn_h_posle)
+
+                self.data_well.paker_before["before"] = self.check_if_none(paker_do)
+                self.data_well.depth_fond_paker_before["before"] = self.check_if_none(depth_fond_paker_do)
+                self.data_well.paker_before["after"] = self.check_if_none(paker_posle)
+                self.data_well.depth_fond_paker_before["after"] = self.check_if_none(depth_fond_paker_posle)
+
+                self.data_well.paker_second_before["before"] = self.check_if_none(paker2_do)
+                self.data_well.depth_fond_paker_second_before["before"] = self.check_if_none(depth_fond_paker2_do)
+                self.data_well.paker_second_before["after"] = self.check_if_none(paker2_posle)
+                self.data_well.depth_fond_paker_second_before["after"] = self.check_if_none(depth_fond_paker2_posle)
+                self.data_well.static_level = ProtectedIsDigit(self.check_if_none(static_level))
+                self.data_well.dinamic_level = ProtectedIsDigit(self.check_if_none(dinamic_level))
+
+                self.data_well.column_direction_diameter = ProtectedIsDigit(
+                    self.check_if_none(column_direction_diameter))
+                self.data_well.column_direction_wall_thickness = ProtectedIsDigit(
+                    self.check_if_none(column_direction_wall_thickness))
+                self.data_well.column_direction_length = ProtectedIsDigit(
+                    self.check_if_none(column_direction_length))
+                self.data_well.level_cement_direction = ProtectedIsDigit(self.check_if_none(level_cement_direction))
+                self.data_well.column_conductor_diameter = ProtectedIsDigit(
+                    self.check_if_none(column_conductor_diameter))
+                self.data_well.column_conductor_wall_thickness = ProtectedIsDigit(
+                    self.check_if_none(column_conductor_wall_thickness))
+                self.data_well.column_conductor_length = ProtectedIsDigit(
+                    self.check_if_none(column_conductor_length))
+                self.data_well.level_cement_conductor = ProtectedIsDigit(self.check_if_none(level_cement_conductor))
+                if curator == 'ОР':
+                    self.data_well.expected_pressure = self.check_if_none(expected_pressure_edit)
+                    self.data_well.expected_pickup = self.check_if_none(expected_pickup_edit)
+                    self.data_well.expected_pick_up[self.data_well.expected_pickup] = self.data_well.expected_pressure
+                    self.data_well.percent_water = 100
+                else:
+                    self.data_well.expected_oil = self.check_if_none(expected_oil_edit)
+                    self.data_well.water_cut = self.check_if_none(water_cut_edit)
+                    self.data_well.percent_water = int(self.check_if_none(proc_water_edit))
+
+                if str(self.data_well.dict_pump_shgn["before"]) != '0' and len(
+                        self.data_well.dict_sucker_rod) == 0:
+                    assdf = str(self.data_well.dict_pump_shgn["before"]), len(self.data_well.dict_sucker_rod), \
+                            self.data_well.dict_sucker_rod
+                    QMessageBox.warning(self, 'ОШИБКА',
+                                        f'при спущенном насосе {self.data_well.dict_pump_shgn["before"]} '
+                                        f'не указаны штанги, либо не корректно прочитаны данные ')
+                    self.pause_app()
+
+                    return
+                if str(self.data_well.dict_pump_shgn["after"]) != '0' and len(
+                        self.data_well.dict_sucker_rod_after) == 0:
+                    QMessageBox.warning(self, 'ОШИБКА',
+                                        f'при плановом насосе {self.data_well.dict_pump_shgn["before"]} '
+                                        f'не указаны штанги, либо не корректно прочитаны данные ')
+                    self.pause_app()
+
+                    return
+                if self.data_well.column_additional is False or\
+                    (self.data_well.column_additional and
+                     self.data_well.current_bottom > self.data_well.head_column_additional.get_value):
+                    if self.data_well.dict_pump_ecn != '0':
                         self.data_well.template_depth = self.data_well.dict_pump_ecn_depth["before"]
                         self.data_well.template_length = 30
+                else:
+                    if self.data_well.dict_pump_ecn != 0:
+                        if self.data_well.dict_pump_ecn_depth["before"] > self.data_well.head_column_additional.get_value:
+                            self.data_well.template_depth_addition = self.data_well.dict_pump_ecn_depth
+                            self.data_well.template_length_addition = 30
+                        else:
+                            self.data_well.template_depth = self.data_well.dict_pump_ecn_depth["before"]
+                            self.data_well.template_length = 30
 
-            self.data_well.curator = curator
-            if curator in ['ВНС']:
-                self.data_well.bvo = True
-            elif curator in ['ГРР'] and self.data_well.work_plan in ['gnkt_after_grp']:
-                self.data_well.bvo = True
-            elif self.data_well.work_plan in ['gnkt_frez']:
-                self.data_well.bvo = True
-            self.data_well.data_well_dict = {
-                'направление': {
-                    'диаметр': self.data_well.column_direction_diameter.get_value,
-                    'толщина стенки': self.data_well.column_direction_wall_thickness.get_value,
-                    'башмак': self.data_well.column_direction_length.get_value,
-                    'цемент': self.data_well.level_cement_direction.get_value},
-                'кондуктор': {
-                    'диаметр': self.data_well.column_conductor_diameter.get_value,
-                    'толщина стенки': self.data_well.column_conductor_wall_thickness.get_value,
-                    'башмак': self.data_well.column_conductor_length.get_value,
-                    'цемент': self.data_well.level_cement_conductor.get_value},
-                'ЭК': {
-                    'диаметр': self.data_well.column_diameter.get_value,
-                    'толщина стенки': self.data_well.column_wall_thickness.get_value,
-                    'башмак': self.data_well.shoe_column.get_value,
-                    'цемент': self.data_well.level_cement_column.get_value,
-                    'голова ЭК': self.data_well.head_column.get_value
-                },
-                'допколонна': {
-                    'наличие': self.data_well.column_additional,
-                    'диаметр': self.data_well.column_additional_diameter.get_value,
-                    'толщина стенки': self.data_well.column_additional_wall_thickness.get_value,
-                    'голова': self.data_well.head_column_additional.get_value,
-                    'башмак': self.data_well.shoe_column_additional.get_value},
-                'куратор': curator,
-                'регион': self.data_well.region,
-                'ЦДНГ': self.data_well.cdng.get_value,
-                'оборудование': {
-                    'ЭЦН':
-                        {
-                            'тип': self.data_well.dict_pump_ecn,
-                            'глубина ': self.data_well.dict_pump_ecn_depth
-                        },
-                    'ШГН':
-                        {
-                            'тип': self.data_well.dict_pump_shgn,
-                            'глубина ': self.data_well.dict_pump_shgn_depth
-                        },
-                    'пакер':
-                        {
-                            'тип': self.data_well.paker_before,
-                            'глубина ': self.data_well.depth_fond_paker_before
-                        },
-                    'пакер2':
-                        {
-                            'тип': self.data_well.paker_second_before,
-                            'глубина ': self.data_well.depth_fond_paker_second_before
-                        },
+                self.data_well.curator = curator
+                if curator in ['ВНС']:
+                    self.data_well.bvo = True
+                elif curator in ['ГРР'] and self.data_well.work_plan in ['gnkt_after_grp']:
+                    self.data_well.bvo = True
+                elif self.data_well.work_plan in ['gnkt_frez']:
+                    self.data_well.bvo = True
+                self.data_well.data_well_dict = {
+                    'направление': {
+                        'диаметр': self.data_well.column_direction_diameter.get_value,
+                        'толщина стенки': self.data_well.column_direction_wall_thickness.get_value,
+                        'башмак': self.data_well.column_direction_length.get_value,
+                        'цемент': self.data_well.level_cement_direction.get_value},
+                    'кондуктор': {
+                        'диаметр': self.data_well.column_conductor_diameter.get_value,
+                        'толщина стенки': self.data_well.column_conductor_wall_thickness.get_value,
+                        'башмак': self.data_well.column_conductor_length.get_value,
+                        'цемент': self.data_well.level_cement_conductor.get_value},
+                    'ЭК': {
+                        'диаметр': self.data_well.column_diameter.get_value,
+                        'толщина стенки': self.data_well.column_wall_thickness.get_value,
+                        'башмак': self.data_well.shoe_column.get_value,
+                        'цемент': self.data_well.level_cement_column.get_value,
+                        'голова ЭК': self.data_well.head_column.get_value
+                    },
+                    'допколонна': {
+                        'наличие': self.data_well.column_additional,
+                        'диаметр': self.data_well.column_additional_diameter.get_value,
+                        'толщина стенки': self.data_well.column_additional_wall_thickness.get_value,
+                        'голова': self.data_well.head_column_additional.get_value,
+                        'башмак': self.data_well.shoe_column_additional.get_value},
+                    'куратор': curator,
+                    'регион': self.data_well.region,
+                    'ЦДНГ': self.data_well.cdng.get_value,
+                    'оборудование': {
+                        'ЭЦН':
+                            {
+                                'тип': self.data_well.dict_pump_ecn,
+                                'глубина ': self.data_well.dict_pump_ecn_depth
+                            },
+                        'ШГН':
+                            {
+                                'тип': self.data_well.dict_pump_shgn,
+                                'глубина ': self.data_well.dict_pump_shgn_depth
+                            },
+                        'пакер':
+                            {
+                                'тип': self.data_well.paker_before,
+                                'глубина ': self.data_well.depth_fond_paker_before
+                            },
+                        'пакер2':
+                            {
+                                'тип': self.data_well.paker_second_before,
+                                'глубина ': self.data_well.depth_fond_paker_second_before
+                            },
 
-                },
-                'статика': self.data_well.static_level.get_value,
-                'динамика': self.data_well.dinamic_level.get_value,
-                'дата ввода в эксплуатацию': self.data_well.date_commissioning,
-                'дата опрессовки': self.data_well.result_pressure_date.get_value,
-                'НКТ': {
-                    'До': self.data_well.dict_nkt_before,
-                    "После": self.data_well.dict_nkt_after
-                },
-                'штанги': {
-                    'До': self.data_well.dict_sucker_rod,
-                    "После": self.data_well.dict_sucker_rod_after
-                },
-                'ожидаемые': {
-                    'нефть': self.data_well.expected_oil,
-                    'вода': self.data_well.water_cut,
-                    'обводненность': self.data_well.percent_water,
-                    'давление': self.data_well.expected_pressure,
-                    'приемистость': self.data_well.expected_pickup
-                },
-                'данные': {
-                    'пробуренный забой': self.data_well.bottom_hole_drill.get_value,
-                    'искусственный забой': self.data_well.bottom_hole_artificial.get_value,
-                    'максимальный угол': self.data_well.max_angle.get_value,
-                    'глубина': self.data_well.max_angle_depth.get_value,
-                    'максимальное ожидаемое давление': self.data_well.max_expected_pressure.get_value,
-                    'максимальное допустимое давление': self.data_well.max_admissible_pressure.get_value,
-                    'диаметр долото при бурении': self.data_well.diameter_doloto_ek.get_value
+                    },
+                    'статика': self.data_well.static_level.get_value,
+                    'динамика': self.data_well.dinamic_level.get_value,
+                    'дата ввода в эксплуатацию': self.data_well.date_commissioning.get_value,
+                    'дата опрессовки': self.data_well.result_pressure_date.get_value,
+                    'НКТ': {
+                        'До': self.data_well.dict_nkt_before,
+                        "После": self.data_well.dict_nkt_after
+                    },
+                    'штанги': {
+                        'До': self.data_well.dict_sucker_rod,
+                        "После": self.data_well.dict_sucker_rod_after
+                    },
+                    'ожидаемые': {
+                        'нефть': self.data_well.expected_oil,
+                        'вода': self.data_well.water_cut,
+                        'обводненность': self.data_well.percent_water,
+                        'давление': self.data_well.expected_pressure,
+                        'приемистость': self.data_well.expected_pickup
+                    },
+                    'данные': {
+                        'пробуренный забой': self.data_well.bottom_hole_drill.get_value,
+                        'искусственный забой': self.data_well.bottom_hole_artificial.get_value,
+                        'максимальный угол': self.data_well.max_angle.get_value,
+                        'глубина': self.data_well.max_angle_depth.get_value,
+                        'максимальное ожидаемое давление': self.data_well.max_expected_pressure.get_value,
+                        'максимальное допустимое давление': self.data_well.max_admissible_pressure.get_value,
+                        'диаметр долото при бурении': self.data_well.diameter_doloto_ek.get_value
+                    }
                 }
-            }
-
-            if str(self.data_well.paker_before["before"]).lower() not in ['0', 0, '-', 'отсут', '', None]:
-
-                try:
-
-                    paker_diameter = TabPageSo.paker_diameter_select(self, float(
-                        self.data_well.depth_fond_paker_before["before"]))
-                    if str(paker_diameter) not in str(self.data_well.paker_before["before"]):
-                        self.data_well.check_data_in_pz.append(
-                            f'Не корректно указан диаметр фондового пакера в карте спуска '
-                            f'ремонта {self.data_well.paker_before["after"].split("/")[0]} требуется пакер '
-                            f'диаметром {paker_diameter}')
-
-                except Exception as e:
-                    QMessageBox.information(self, 'Ошибка обработки', f'ошибка проверки ПЗ в части соответствия '
-                                                                      f'диаметра пакера \n {type(e).__name__}\n\n{str(e)}')
-            self.definition_open_trunk_well()
-
+        except Exception as e:
+            QMessageBox.warning(self, 'Ошибка', f'Ошибка в обработке {e}')
             data_list.pause = False
-            self.close()
+            return
+
+        if str(self.data_well.paker_before["before"]).lower() not in ['0', 0, '-', 'отсут', '', None]:
+
+            try:
+
+                paker_diameter = TabPageSo.paker_diameter_select(self, float(
+                    self.data_well.depth_fond_paker_before["before"]))
+                if str(paker_diameter) not in str(self.data_well.paker_before["before"]):
+                    self.data_well.check_data_in_pz.append(
+                        f'Не корректно указан диаметр фондового пакера в карте спуска '
+                        f'ремонта {self.data_well.paker_before["after"].split("/")[0]} требуется пакер '
+                        f'диаметром {paker_diameter}')
+
+            except Exception as e:
+                QMessageBox.information(self, 'Ошибка обработки', f'ошибка проверки ПЗ в части соответствия '
+                                                                  f'диаметра пакера \n {type(e).__name__}\n\n{str(e)}')
+        self.definition_open_trunk_well()
+
+        data_list.pause = False
+        self.close()
     @staticmethod
     def check_date_format(date_string):
         pattern = r'^\d{2}\.\d{2}\.\d{4}$'

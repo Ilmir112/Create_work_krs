@@ -23,7 +23,7 @@ class TabPageSoRir(TabPageUnion):
         self.paker_need_combo = QComboBox(self)
         self.paker_need_combo.addItems(['Нужно СПО', 'без СПО'])
 
-        if self.difference_date_days(self.data_well.date_commissioning) < 365.25 * 20 and \
+        if self.difference_date_days(self.data_well.date_commissioning.get_value) < 365.25 * 20 and \
                 self.difference_date_days(self.data_well.result_pressure_date.get_value) < 365 * 3 and \
                 len(self.data_well.leakiness_interval) == 0:
             self.paker_need_combo.setCurrentIndex(1)
@@ -1218,7 +1218,7 @@ class RirWindow(WindowUnion):
             paker_need_combo = current_widget.paker_need_combo.currentText()
 
             if paker_need_combo == 'без СПО':
-                difference_date_well = self.difference_date_days(self.data_well.date_commissioning)
+                difference_date_well = self.difference_date_days(self.data_well.date_commissioning.get_value)
                 difference_date_pressuar = self.difference_date_days(self.data_well.result_pressure_date.get_value)
                 if difference_date_well > 365.25 * 20:
                     mes = QMessageBox.question(self, 'Критерии',
