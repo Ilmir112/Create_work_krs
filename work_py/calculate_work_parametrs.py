@@ -99,7 +99,7 @@ class VolumeWellWithExstraColumn(VolumeWell):
     def volume_well_calculate(self):
         return round(self.area_column * self.head_column_additional +
                      self.area_column_additional *
-                     (self.head_column_additional - self.current_bottom), 1)
+                     (self.current_bottom - self.head_column_additional), 1)
 
     def volume_well_pod_nkt(self):
         nkt_length = round(sum(list(self.data_well.dict_nkt_before.values())), 1)
@@ -108,7 +108,8 @@ class VolumeWellWithExstraColumn(VolumeWell):
                     float(self.data_well.current_bottom - int(nkt_length)))
         else:
             volume_add = self.area_column_additional * (
-                    float(self.data_well.current_bottom) - int(nkt_length))
+                    float(self.data_well.current_bottom) - int(self.data_well.head_column_additional.get_value))
+
             volume_ek = self.area_column * (float(self.data_well.head_column_additional.get_value - nkt_length))
 
             volume_well_pod_nkt = round(volume_add + volume_ek, 1)

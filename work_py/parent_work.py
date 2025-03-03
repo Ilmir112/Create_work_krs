@@ -11,6 +11,7 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QWidget, QTabWidget, QInputDialog, QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayout
 
 from main import MyMainWindow
+from work_py.calculate_work_parametrs import volume_work, volume_well_pod_nkt_calculate
 from data_list import contractor, ProtectedIsDigit
 
 from work_py.advanted_file import definition_plast_work
@@ -81,6 +82,85 @@ class TabPageUnion(QWidget):
         self.grid.addWidget(self.pressure_zumpf_question_combo, 2, 4)
         self.grid.addWidget(self.need_privyazka_Label, 1, 6)
         self.grid.addWidget(self.need_privyazka_q_combo, 2, 6)
+
+    def calculate_h2s(self, type_absorbent, category_h2s, h2s_mg, h2s_pr):
+        if '2' in str(category_h2s) or '1' in str(category_h2s):
+            if type_absorbent == 'EVASORB марки 121':
+                koeff_zapas = 1.05
+            else:
+                koeff_zapas = 1
+
+            volume_pod_nkt = volume_well_pod_nkt_calculate(self.data_well)
+            udel_vodoiz_nkt = 0
+            volume_well = volume_work(self.data_well)
+            vodoiz_nkt = 0
+
+            for nkt_key, nkt_values in self.data_well.dict_nkt_before.items():
+                if '73' in nkt_key:
+                    nkt_1 = 73
+                    nkt_width = 5.5
+                elif '60' in nkt_key:
+                    nkt_1 = 60
+                    nkt_width = 5
+                elif '48' in nkt_key:
+                    nkt_1 = 48
+                    nkt_width = 4
+                elif '89' in nkt_key:
+                    nkt_1 = 89
+                    nkt_width = 6.5
+
+                vodoiz_nkt = round(10 * 3.14 * ((nkt_1 * 0.01) ** 2 - (nkt_1 * 0.01 - nkt_width * 2 * 0.01) ** 2) / 4,
+                                   2)
+                udel_vodoiz_nkt += vodoiz_nkt * nkt_values / 1000
+
+            sucker_rod_l_25 = 0
+            sucker_rod_l_22 = 0
+            sucker_rod_l_19 = 0
+
+            for sucker_key, sucker_value in self.data_well.dict_sucker_rod.items():
+                if '25' in sucker_key:
+                    sucker_rod_l_25 = sucker_value
+                elif '22' in sucker_key:
+                    sucker_rod_l_22 = sucker_value
+                elif '19' in sucker_key:
+                    sucker_rod_l_19 = sucker_value
+
+            vodoiz_sucker = (10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_25 / 1000) + (
+                    10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_22 / 1000) + (
+                                    10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_19 / 1000)
+
+            oil_mass = round(float(udel_vodoiz_nkt * (100 - self.data_well.percent_water) * 0.9 / 100), 2)
+
+            try:
+                volume_h2s = self.data_well.gaz_factor_percent[0] * oil_mass * (float(h2s_pr)) / 100
+            except Exception:
+                self.data_well.gaz_factor_percent = [11]
+                volume_h2s = self.data_well.gaz_factor_percent[0] * oil_mass * (float(h2s_pr)) / 100
+
+            h2s_mass_in_oil = round(34 * volume_h2s * 1000 / 22.14, 0)
+
+            h2s_mass_in_water = round(float(vodoiz_sucker + udel_vodoiz_nkt) * h2s_mg, 0)
+
+            mass_oil_pog_gno = volume_pod_nkt * (100 - self.data_well.percent_water) * 0.9 / 100
+            h2s_volume_pod_gno = mass_oil_pog_gno * self.data_well.gaz_factor_percent[0] * h2s_pr / 100
+            mass_h2s_gas = round(34 * h2s_volume_pod_gno * 1000 / 22.14, 0)
+            mass_h2s_water = round(volume_pod_nkt * h2s_mg, 0)
+
+            mass_h2s_all = h2s_mass_in_water + h2s_mass_in_oil + mass_h2s_gas + mass_h2s_water
+
+            emk_reag = 24
+            plotn_reag = 1.065
+            raschet_mass = mass_h2s_all * emk_reag / 1000
+            mass_reag_s_zapas = raschet_mass * koeff_zapas
+            # print(f'mass{mass_reag_s_zapas}')
+            udel_mas_raskhod = mass_reag_s_zapas / volume_well / plotn_reag
+            # print(udel_mas_raskhod)
+
+            if udel_mas_raskhod <= 0.01:
+                udel_mas_raskhod = 0.01
+            return round(udel_mas_raskhod, 3)
+        else:
+            return 0
 
     def update_sko_true(self, index):
         if index == 'Нет':

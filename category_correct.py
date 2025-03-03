@@ -4,12 +4,12 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QGridLayout, QMessageBox, QInputDialog, QLineEdit, QTabWidget, QPushButton
 
 from main import MyMainWindow
-
+from work_py.calculate_work_parametrs import volume_work, volume_well_pod_nkt_calculate
 
 from collections import namedtuple
 
 import data_list
-from H2S import calv_h2s
+
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 
 
@@ -28,7 +28,6 @@ class TabPageSo(TabPageUnion):
             self.type_absorbent.setCurrentIndex(1)
         else:
             self.type_absorbent.setCurrentIndex(1)
-
 
         self.plast_all = []
         for plast in self.data_well.plast_all[::-1]:
@@ -86,7 +85,8 @@ class TabPageSo(TabPageUnion):
                         any([plast not in self.data_well.plast_work for plast in self.data_well.plast_project]):
 
                     if abs(self.cat_P_P[num] - list([self.data_well.dict_perforation_project[
-                                                         plast]['давление'] for plast in self.data_well.plast_project][0])[
+                                                         plast]['давление'] for plast in self.data_well.plast_project][
+                                                        0])[
                         0]) < 1:
                         work_plast = self.data_well.plast_project[0]
                         work_plast_index = 1
@@ -103,7 +103,7 @@ class TabPageSo(TabPageUnion):
                         self.plast_all.append(work_plast)
 
             plast_index.combo_box.addItems(self.plast_all)
-            aaaa = self.plast_all
+
             try:
                 plast_index.combo_box.setCurrentIndex(self.plast_all.index(work_plast))
             except:
@@ -207,10 +207,9 @@ class TabPageSo(TabPageUnion):
             setattr(self, f"{units_gaz}_{n}_line", units_gaz)
             setattr(self, f"{isolated_plast}_{n}_line", isolated_plast)
 
-            aaa = h2s_mg_edit.text(), h2s_pr_edit.text()
             try:
-                calc_plast_h2s.setText(str(calv_h2s(self, category_h2s_edit.text(),
-                                                    float(h2s_mg_edit.text()), float(h2s_pr_edit.text()))))
+                calc_plast_h2s.setText(str(self.calculate_h2s(self.type_absorbent.currentText(), category_h2s_edit.text(),
+                                                         float(h2s_mg_edit.text()), float(h2s_pr_edit.text()))))
             except Exception as e:
                 QMessageBox.warning(self, 'Ошибка', f'Приложение не смогла произвести расчет поглотителя H2S, '
                                                     f'Нужно проверить таблицу по категорийности, {e}')
@@ -295,8 +294,12 @@ class CategoryWindow(WindowUnion):
                             self.data_well.plast_project.append(plast)
                     try:
                         self.dict_category.setdefault(plast, {}).setdefault('по давлению',
-                            pressure(int(self.tabWidget.currentWidget().labels_category[index][1].text()),
-                                     float(self.tabWidget.currentWidget().labels_category[index][7].text())))
+                                                                            pressure(int(
+                                                                                self.tabWidget.currentWidget().labels_category[
+                                                                                    index][1].text()),
+                                                                                float(
+                                                                                    self.tabWidget.currentWidget().labels_category[
+                                                                                        index][7].text())))
 
                         self.dict_category.setdefault(plast, {}).setdefault(
                             'по сероводороду', Data_h2s(

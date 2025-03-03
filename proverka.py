@@ -93,6 +93,7 @@
 #     '''
 #
 #     return html
+import openpyxl
 
 ade='15.СОГЛАСНО ПИСЬМА ООО "БАШНЕФТЬ-ДОБЫЧА" № 02-03-05/0134 ОТ 30.09.2024. ПРИ ОСВОЕНИИ (СВАБИРОВАНИИ ' \
     'ИЛИ КОМПРЕССИРОВАНИИ) СКВАЖИН, СОДЕРЖАЩИХ СЕРОВОДОРОД ПРИМЕНЯТЬ МЕРЫ БЕЗОПАСНОСТИ: \n'\
@@ -110,12 +111,15 @@ ade='15.СОГЛАСНО ПИСЬМА ООО "БАШНЕФТЬ-ДОБЫЧА" №
              'зоны (внутри ПКС) каждые 30 мин с фиксацией в журнале ГВС. '
 print(len(ade))
 
-wb = openpyxl.load_workbook('Копия Телефоны АР (00000002).xlsx')
+wb = openpyxl.load_workbook('D:\Documents\Create_work_krs\Копия Приложение 1 - Расчёт расходной нормы НС в ЖГ при ТиКРС.xlsx')
 ws = wb.active
 
 dict_tel = {}
+colii2 = []
 for row_ind, row in enumerate(ws.iter_rows(values_only=True, min_row=1, max_row=300, max_col=8)):
+    colii = []
     for col in row:
+        colii.append(col)
         if col == 'Начальник':
             dict_tel.setdefault(
                 'ОАО "Башнефть"', {}).setdefault(
@@ -140,8 +144,10 @@ for row_ind, row in enumerate(ws.iter_rows(values_only=True, min_row=1, max_row=
                 "регион", {}).setdefault(
                 row[0], {}).setdefault("ЦДНГ", {}).setdefault(row[1], {}).setdefault("Ведущий инженер-технолог", {
                 "post": row[2], "surname": row[3], "telephone": row[4], "email": row[5]})
+    colii2.append(colii)
 
-print(json.dumps(dict_tel['ОАО "Башнефть"']["регион"]["ТГМ"], indent=4,ensure_ascii=False))
+asdw = colii2
+
 
 
 
