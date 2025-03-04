@@ -98,8 +98,8 @@ class TabPageGno(TabPageUnion):
         self.current_bottom_ecn_edit = QLineEdit(self)
 
         if index == 'ЭЦН с автономными пакерами':
-            self.grid.addWidget(self.current_bottom_ecn_label, 4, 8)
-            self.grid.addWidget(self.current_bottom_ecn_edit, 5, 8)
+            self.grid.addWidget(self.current_bottom_ecn_label, 4, 10)
+            self.grid.addWidget(self.current_bottom_ecn_edit, 5, 10)
         else:
             # self.grid.addWidget(self.current_bottom_ecn_label, 4, 7)
             # self.grid.addWidget(self.current_bottom_ecn_edit, 5, 7)

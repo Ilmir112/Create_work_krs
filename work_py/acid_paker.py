@@ -1028,7 +1028,7 @@ class AcidPakerWindow(WindowUnion):
                                f'Подать заявку на вывоз глубиныx манометров',
                                None, None, None, None, None, None, None,
                                'мастер КРС', None]])
-        if not work_template_list:
+        if work_template_list:
             self.populate_row(self.insert_index, work_template_list, self.table_widget)
             data_list.pause = False
             self.close()
