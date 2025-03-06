@@ -801,7 +801,7 @@ class DataWindow(WindowUnion):
         self.setCentralWidget(self.centralWidget)
         self.setWindowModality(QtCore.Qt.ApplicationModal)  # Устанавливаем модальность окна
 
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         # self.tableWidget = QTableWidget(0, 4)
         # self.labels_nkt = labels_nkt
 
@@ -809,14 +809,14 @@ class DataWindow(WindowUnion):
         self.buttonAdd.clicked.connect(self.add_row_table)
 
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         # vbox.addWidget(self.tableWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 3, 0)
 
     def add_row_table(self):
         from find import ProtectedIsNonNone, ProtectedIsDigit
         from work_py.opressovka import TabPageSo
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
 
         region_combo = self.current_widget.region_combo.currentText()
         type_kr_combo = self.current_widget.type_kr_combo.currentText()

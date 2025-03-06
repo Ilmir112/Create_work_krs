@@ -5,7 +5,7 @@ import data_list
 from main import MyMainWindow
 from .calculate_work_parametrs import volume_work
 from .parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
-from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from .rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
 from .template_work import TemplateKrs
 
 
@@ -109,7 +109,7 @@ class KompressWindow(WindowUnion):
 
 
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -120,7 +120,7 @@ class KompressWindow(WindowUnion):
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def closeEvent(self, event):
@@ -131,15 +131,15 @@ class KompressWindow(WindowUnion):
     def add_work(self):
         from main import MyMainWindow
 
-        kompress_true_combo = self.tabWidget.currentWidget().kompress_true_combo.currentText()
-        depth_gauge_combo = self.tabWidget.currentWidget().depth_gauge_combo.currentText()
-        khvost_edit = int(float(self.tabWidget.currentWidget().khvost_edit.text()))
-        kompress_TypeCombo = self.tabWidget.currentWidget().kompress_TypeCombo.currentText()
-        kompress_volume = int(float(self.tabWidget.currentWidget().kompress_volumeEdit.text()))
-        count_muft = int(float(self.tabWidget.currentWidget().count_muft_edit.text()))
-        dictance_without_murt = int(float(self.tabWidget.currentWidget().dictance_without_murt_edit.text()))
-        plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
-        depth_gauge_combo = str(self.tabWidget.currentWidget().depth_gauge_combo.currentText())
+        kompress_true_combo = self.tab_widget.currentWidget().kompress_true_combo.currentText()
+        depth_gauge_combo = self.tab_widget.currentWidget().depth_gauge_combo.currentText()
+        khvost_edit = int(float(self.tab_widget.currentWidget().khvost_edit.text()))
+        kompress_TypeCombo = self.tab_widget.currentWidget().kompress_TypeCombo.currentText()
+        kompress_volume = int(float(self.tab_widget.currentWidget().kompress_volumeEdit.text()))
+        count_muft = int(float(self.tab_widget.currentWidget().count_muft_edit.text()))
+        dictance_without_murt = int(float(self.tab_widget.currentWidget().dictance_without_murt_edit.text()))
+        plast_combo = str(self.tab_widget.currentWidget().plast_combo.combo_box.currentText())
+        depth_gauge_combo = str(self.tab_widget.currentWidget().depth_gauge_combo.currentText())
 
         if int(khvost_edit) - (count_muft * int(dictance_without_murt)) - 100 < self.data_well.static_level.get_value:
             QMessageBox.warning(self, 'Некорректные данные',
@@ -263,7 +263,7 @@ class KompressWindow(WindowUnion):
              f'объеме {round(khvost_edit * 1.12 / 1000, 1)}м3 удельным весом {self.data_well.fluid_work}',
              None, None, None, None, None, None, None,
              'мастер КРС',
-             liftingNKT_norm(khvost_edit, 1)]
+             lifting_nkt_norm(khvost_edit, 1)]
         ]
 
         return paker_list

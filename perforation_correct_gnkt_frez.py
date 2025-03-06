@@ -174,13 +174,13 @@ class PerforationCorrectGnktFrez(WindowUnion):
         self.setCentralWidget(self.centralWidget)
         self.setWindowModality(QtCore.Qt.ApplicationModal)  # Устанавливаем модальность окна
 
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.buttonAdd = QPushButton('сохранить данные')
         self.buttonAdd.clicked.connect(self.add_row_table)
 
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         # vbox.addWidget(self.tableWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 3, 0)
 
@@ -188,18 +188,18 @@ class PerforationCorrectGnktFrez(WindowUnion):
         # Пересохранение данных по интервалам портам
         self.dict_perforation = self.data_well.dict_perforation
         plast_work = list(self.dict_perforation.keys())[0]
-        manufacturer = self.tabWidget.currentWidget().manufacturer_combo.currentText()
-        type_column = self.tabWidget.currentWidget().type_column_edit.text()
+        manufacturer = self.tab_widget.currentWidget().manufacturer_combo.currentText()
+        type_column = self.tab_widget.currentWidget().type_column_edit.text()
 
         ports_tuple = sorted(list(self.dict_perforation[plast_work]['интервал']), key=lambda x: x[0], reverse=True)
         dict_ports = {}
         # print(f'порты собрать {ports_tuple}')
         for index, port in enumerate(ports_tuple):
-            roof = self.tabWidget.currentWidget().labels_plast[index][1]
-            sole = self.tabWidget.currentWidget().labels_plast[index][2]
-            type_sanddles = self.tabWidget.currentWidget().labels_plast[index][3]
-            ball = self.tabWidget.currentWidget().labels_plast[index][4]
-            saddle = self.tabWidget.currentWidget().labels_plast[index][5]
+            roof = self.tab_widget.currentWidget().labels_plast[index][1]
+            sole = self.tab_widget.currentWidget().labels_plast[index][2]
+            type_sanddles = self.tab_widget.currentWidget().labels_plast[index][3]
+            ball = self.tab_widget.currentWidget().labels_plast[index][4]
+            saddle = self.tab_widget.currentWidget().labels_plast[index][5]
 
             dict_ports.setdefault(manufacturer, {}).setdefault(type_column, {}).setdefault(f'№{index + 1}',
                                                                                            {}).setdefault(

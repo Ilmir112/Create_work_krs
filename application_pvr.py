@@ -163,7 +163,7 @@ class PvrApplication(WindowUnion):
         # self.model = self.table_pvr.model()
         # self.table_pvr.setColumnCount(42)
         # self.table_pvr.setRowCount(113)
-        self.tabWidget = TabWidget(parent)
+        self.tab_widget = TabWidget(parent)
 
 
         self.tableWidget = QTableWidget(0, 7)
@@ -188,7 +188,7 @@ class PvrApplication(WindowUnion):
 
 
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
         vbox.addWidget(self.buttonDel, 2, 1)
@@ -231,12 +231,12 @@ class PvrApplication(WindowUnion):
 
     def add_row_table(self):
 
-        edit_type = self.tabWidget.currentWidget().lineedit_type.text().replace(',', '.')
-        edit_type2 = self.tabWidget.currentWidget().lineedit_type2.text().replace(',', '.')
-        chargesx = str(self.tabWidget.currentWidget().ComboBoxCharges.currentText())
-        editHolesMetr = self.tabWidget.currentWidget().lineEditHolesMetr.currentText()
-        editIndexFormation = self.tabWidget.currentWidget().lineEditIndexFormation.text()
-        dopInformation = self.tabWidget.currentWidget().lineEditDopInformation.text()
+        edit_type = self.tab_widget.currentWidget().lineedit_type.text().replace(',', '.')
+        edit_type2 = self.tab_widget.currentWidget().lineedit_type2.text().replace(',', '.')
+        chargesx = str(self.tab_widget.currentWidget().ComboBoxCharges.currentText())
+        editHolesMetr = self.tab_widget.currentWidget().lineEditHolesMetr.currentText()
+        editIndexFormation = self.tab_widget.currentWidget().lineEditIndexFormation.text()
+        dopInformation = self.tab_widget.currentWidget().lineEditDopInformation.text()
         if not edit_type or not edit_type2 or not chargesx or not editIndexFormation:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
@@ -279,18 +279,18 @@ class PvrApplication(WindowUnion):
         wb = openpyxl.load_workbook(f'{data_list.path_image}property_excel/template_pvr.xlsx')
         # Выбираем активный лист
         self.ws_pvr = wb.active
-        number_brigada = str(self.tabWidget.currentWidget().number_brigada_combo.currentText())
-        number_telephone = self.tabWidget.currentWidget().number_telephone_edit.text()
-        date_new_edit = self.tabWidget.currentWidget().date_new_edit.text()
-        time_new_edit = self.tabWidget.currentWidget().time_new_edit.text()
-        work_edit = self.tabWidget.currentWidget().work_edit.text()
-        nkt_edit = self.tabWidget.currentWidget().nkt_edit.text()
-        nkt_shoe_edit = self.tabWidget.currentWidget().nkt_shoe_edit.text()
-        nkt_com_edit = self.tabWidget.currentWidget().nkt_com_edit.text()
-        paker_type = self.tabWidget.currentWidget().paker_type.text()
-        paker_depth = self.tabWidget.currentWidget().paker_depth.text()
-        fluid = self.tabWidget.currentWidget().fluid_edit.text()
-        type_pvr = self.tabWidget.currentWidget().combo_pvr_type.currentText()
+        number_brigada = str(self.tab_widget.currentWidget().number_brigada_combo.currentText())
+        number_telephone = self.tab_widget.currentWidget().number_telephone_edit.text()
+        date_new_edit = self.tab_widget.currentWidget().date_new_edit.text()
+        time_new_edit = self.tab_widget.currentWidget().time_new_edit.text()
+        work_edit = self.tab_widget.currentWidget().work_edit.text()
+        nkt_edit = self.tab_widget.currentWidget().nkt_edit.text()
+        nkt_shoe_edit = self.tab_widget.currentWidget().nkt_shoe_edit.text()
+        nkt_com_edit = self.tab_widget.currentWidget().nkt_com_edit.text()
+        paker_type = self.tab_widget.currentWidget().paker_type.text()
+        paker_depth = self.tab_widget.currentWidget().paker_depth.text()
+        fluid = self.tab_widget.currentWidget().fluid_edit.text()
+        type_pvr = self.tab_widget.currentWidget().combo_pvr_type.currentText()
         if type_pvr == "На кабеле":
             type_pvr_str = '2.9.1'
         else:

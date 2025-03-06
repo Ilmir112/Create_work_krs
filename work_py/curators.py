@@ -33,18 +33,18 @@ class SelectCurator(WindowUnion):
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
-        self.tabWidget = TabWidget(parent)
+        self.tab_widget = TabWidget(parent)
 
         self.buttonadd_work = QPushButton('Изменить')
         self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
 
         vbox = QGridLayout(self.centralWidget)
 
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonadd_work, 3, 0)
 
     def add_work(self):
-        curator_combo = self.tabWidget.currentWidget().curator_combo.currentText()
+        curator_combo = self.tab_widget.currentWidget().curator_combo.currentText()
         self.data_well.curator = curator_combo
 
         data_list.pause = False

@@ -8,7 +8,7 @@ import H2S
 import data_list
 from selectPlast import CheckBoxDialog
 
-from .rationingKRS import liftingNKT_norm, descentNKT_norm, well_volume_norm
+from .rationingKRS import lifting_nkt_norm, descentNKT_norm, well_volume_norm
 
 
 def kot_select(self, current_bottom):
@@ -59,7 +59,7 @@ def kot_work(self, current_bottom=0):
          f'{current_bottom}м с доливом скважины в объеме {round(float(current_bottom) * 1.12 / 1000, 1)}м3 '
          f'удельным весом {self.data_well.fluid_work}',
          None, None, None, None, None, None, None,
-         'мастер КРС', liftingNKT_norm(float(current_bottom), 1)],
+         'мастер КРС', lifting_nkt_norm(float(current_bottom), 1)],
         [None, None,
          f'По согласованию с УСРСиСТ СПО КОТ повторить',
          None, None, None, None, None, None, None,

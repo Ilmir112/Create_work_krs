@@ -146,7 +146,7 @@ class GisApplication(MyMainWindow):
         self.setCentralWidget(self.centralWidget)
         self.table_pvr = table_pvr
         self.data_well = parent
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.tableWidget = QTableWidget(0, 3)
         self.tableWidget.setHorizontalHeaderLabels(
@@ -168,7 +168,7 @@ class GisApplication(MyMainWindow):
         self.buttonAddProject.clicked.connect(self.addPerfProject)
 
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
         vbox.addWidget(self.buttonDel, 2, 1)
@@ -208,9 +208,9 @@ class GisApplication(MyMainWindow):
 
     def add_row_table(self):
 
-        edit_type = self.tabWidget.currentWidget().lineedit_type.text().replace(',', '.')
-        edit_type2 = self.tabWidget.currentWidget().lineedit_type2.text().replace(',', '.')
-        researchGis = self.tabWidget.currentWidget().ComboBoxGeophygist.currentText()
+        edit_type = self.tab_widget.currentWidget().lineedit_type.text().replace(',', '.')
+        edit_type2 = self.tab_widget.currentWidget().lineedit_type2.text().replace(',', '.')
+        researchGis = self.tab_widget.currentWidget().ComboBoxGeophygist.currentText()
 
 
         if not edit_type or not edit_type2 or not researchGis:
@@ -315,17 +315,17 @@ class GisApplication(MyMainWindow):
         # Выбираем активный лист
         self.ws_pvr = wb.active
 
-        number_brigada = str(self.tabWidget.currentWidget().number_brigada_combo.currentText())
-        number_telephone = self.tabWidget.currentWidget().number_telephone_edit.text()
-        date_new_edit = self.tabWidget.currentWidget().date_new_edit.text()
-        time_new_edit = self.tabWidget.currentWidget().time_new_edit.text()
-        work_edit = self.tabWidget.currentWidget().work_edit.text()
-        nkt_edit = self.tabWidget.currentWidget().nkt_edit.text()
-        nkt_shoe_edit = self.tabWidget.currentWidget().nkt_shoe_edit.text()
-        nkt_com_edit = self.tabWidget.currentWidget().nkt_com_edit.text()
-        paker_type = self.tabWidget.currentWidget().paker_type.text()
-        paker_depth = self.tabWidget.currentWidget().paker_depth.text()
-        fluid = self.tabWidget.currentWidget().fluid_edit.text()
+        number_brigada = str(self.tab_widget.currentWidget().number_brigada_combo.currentText())
+        number_telephone = self.tab_widget.currentWidget().number_telephone_edit.text()
+        date_new_edit = self.tab_widget.currentWidget().date_new_edit.text()
+        time_new_edit = self.tab_widget.currentWidget().time_new_edit.text()
+        work_edit = self.tab_widget.currentWidget().work_edit.text()
+        nkt_edit = self.tab_widget.currentWidget().nkt_edit.text()
+        nkt_shoe_edit = self.tab_widget.currentWidget().nkt_shoe_edit.text()
+        nkt_com_edit = self.tab_widget.currentWidget().nkt_com_edit.text()
+        paker_type = self.tab_widget.currentWidget().paker_type.text()
+        paker_depth = self.tab_widget.currentWidget().paker_depth.text()
+        fluid = self.tab_widget.currentWidget().fluid_edit.text()
         note_to_gis = ''
         if "СКО" in work_edit.lower() or "кислот" in work_edit.lower() or 'опз' in work_edit.lower():
             note_to_gis = 'Работать на противокислотном кабеле '

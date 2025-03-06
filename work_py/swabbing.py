@@ -16,7 +16,7 @@ from work_py.change_fluid import Change_fluid_Window
 from work_py.alone_oreration import need_h2s
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from work_py.template_work import TabPageSoWith
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
 
 
 class TabPageSoSwab(TabPageUnion):
@@ -583,7 +583,7 @@ class SwabWindow(WindowUnion):
         self.dict_nkt = {}
         self.table_widget = table_widget
         self.tableWidget = QTableWidget(0, 8)
-        self.tabWidget = TabWidget(self.tableWidget, self.data_well)
+        self.tab_widget = TabWidget(self.tableWidget, self.data_well)
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
@@ -595,7 +595,7 @@ class SwabWindow(WindowUnion):
         self.buttonadd_string.clicked.connect(self.add_string)
 
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
         vbox.addWidget(self.buttonadd_string, 2, 0)
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
@@ -605,9 +605,9 @@ class SwabWindow(WindowUnion):
 
     def add_string(self):
 
-        swab_true_edit_type = self.tabWidget.currentWidget().swab_true_edit_type.currentText()
-        plast_combo = self.tabWidget.currentWidget().plast_combo.combo_box.currentText()
-        swab_type_combo = self.tabWidget.currentWidget().swab_type_combo.currentText()
+        swab_true_edit_type = self.tab_widget.currentWidget().swab_true_edit_type.currentText()
+        plast_combo = self.tab_widget.currentWidget().plast_combo.combo_box.currentText()
+        swab_type_combo = self.tab_widget.currentWidget().swab_type_combo.currentText()
         swab_list = ['', 'Задача №2.1.13', 'Задача №2.1.14', 'Задача №2.1.16', 'Задача №2.1.11',
                      'Задача №2.1.16 + герметичность пакера', 'ГРР'
                                                               'своя задача']
@@ -616,7 +616,7 @@ class SwabWindow(WindowUnion):
         swab_edit_combo.addItems(swab_list)
         swab_edit_combo.setCurrentIndex(swab_list.index(swab_type_combo))
 
-        swab_volume_edit = int(float(self.tabWidget.currentWidget().swab_volume_edit.text().replace(',', '.')))
+        swab_volume_edit = int(float(self.tab_widget.currentWidget().swab_volume_edit.text().replace(',', '.')))
 
         if (not plast_combo or not swab_volume_edit) and swab_true_edit_type in ['однопакерная', 'пакер с заглушкой',
                                                                                  'воронка', 'двухпакерная']:
@@ -632,8 +632,8 @@ class SwabWindow(WindowUnion):
                                             'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно, продолжить')
                 if ques == QMessageBox.StandardButton.No:
                     return
-            paker_khost = self.check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
-            paker_depth = self.check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
+            paker_khost = self.check_if_none(self.tab_widget.currentWidget().khvostEdit.text())
+            paker_depth = self.check_if_none(self.tab_widget.currentWidget().pakerEdit.text())
             if self.data_well:
                 if self.data_well.current_bottom < float(paker_khost + paker_depth) or \
                         0 < paker_khost + paker_depth < self.data_well.current_bottom is False:
@@ -657,9 +657,9 @@ class SwabWindow(WindowUnion):
 
 
         elif swab_true_edit_type in ['двухпакерная']:
-            paker_khost = self.check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
-            paker_depth = self.check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
-            paker2_depth = self.check_if_none(self.tabWidget.currentWidget().paker2Edit.text())
+            paker_khost = self.check_if_none(self.tab_widget.currentWidget().khvostEdit.text())
+            paker_depth = self.check_if_none(self.tab_widget.currentWidget().pakerEdit.text())
+            paker2_depth = self.check_if_none(self.tab_widget.currentWidget().paker2Edit.text())
             if self.check_true_depth_template(paker_depth) is False:
                 return
             if self.true_set_paker(paker_depth) is False:
@@ -690,7 +690,7 @@ class SwabWindow(WindowUnion):
             if rows != 0:
                 QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
                 return
-            paker_depth = self.check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
+            paker_depth = self.check_if_none(self.tab_widget.currentWidget().pakerEdit.text())
 
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(plast_combo))
@@ -701,14 +701,14 @@ class SwabWindow(WindowUnion):
         elif swab_true_edit_type in ['Опрессовка снижением уровня на шаблоне']:
 
             self.data_well.template_length = \
-                float(self.tabWidget.currentWidget().length_template_second_edit.text())
+                float(self.tab_widget.currentWidget().length_template_second_edit.text())
             # self.data_well.template_length_addition = length_template_first
             if rows != 0:
                 ques = QMessageBox.question(self, 'ОШИБКА',
                                             'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно, продолжить')
                 if ques == QMessageBox.StandardButton.No:
                     return
-            paker_opy = self.tabWidget.currentWidget().paker2Edit.text()
+            paker_opy = self.tab_widget.currentWidget().paker2Edit.text()
             if paker_opy != '':
                 paker_opy = int(float(str(paker_opy).replace(',', '.')))
 
@@ -717,12 +717,12 @@ class SwabWindow(WindowUnion):
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_opy)))
 
         elif swab_true_edit_type in ['Опрессовка снижением уровня на пакере с заглушкой']:
-            paker_depth = self.check_if_none(self.tabWidget.currentWidget().pakerEdit.text())
-            paker_khost = self.check_if_none(self.tabWidget.currentWidget().khvostEdit.text())
+            paker_depth = self.check_if_none(self.tab_widget.currentWidget().pakerEdit.text())
+            paker_khost = self.check_if_none(self.tab_widget.currentWidget().khvostEdit.text())
 
             if rows != 0:
                 QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
-            paker_opy = self.tabWidget.currentWidget().paker2Edit.text()
+            paker_opy = self.tab_widget.currentWidget().paker2Edit.text()
             if paker_opy != '':
                 paker_opy = int(float(str(paker_opy).replace(',', '.')))
 
@@ -740,7 +740,7 @@ class SwabWindow(WindowUnion):
         self.tableWidget.removeRow(row)
 
     def add_work(self):
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
 
         try:
             self.need_privyazka_q_combo = self.current_widget.need_privyazka_q_combo.currentText()
@@ -1110,7 +1110,7 @@ class SwabWindow(WindowUnion):
                  f'{self.data_well.fluid_work}',
                  None, None, None, None, None, None, None,
                  'мастер КРС',
-                 liftingNKT_norm(self.data_well.current_bottom, 1)]
+                 lifting_nkt_norm(self.data_well.current_bottom, 1)]
             ]
 
             for row in fluid_change_list:
@@ -1123,7 +1123,7 @@ class SwabWindow(WindowUnion):
                  f'удельным весом {self.data_well.fluid_work}',
                  None, None, None, None, None, None, None,
                  'мастер КРС',
-                 liftingNKT_norm(self.depth_opy + 200, 1)])
+                 lifting_nkt_norm(self.depth_opy + 200, 1)])
         return paker_list
 
     def swabbing_opy(self):
@@ -1199,7 +1199,7 @@ class SwabWindow(WindowUnion):
             [f'Приподнять  воронку до глубины {self.depth_opy + 200}м', None,
              f'Приподнять  воронку до глубины {self.depth_opy + 200}м',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(float(self.data_well.current_bottom) - (self.depth_opy + 200), 1)],
+             'мастер КРС', lifting_nkt_norm(float(self.data_well.current_bottom) - (self.depth_opy + 200), 1)],
             [None, None,
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
              f' Составить акт готовности скважины и передать его начальнику партии',
@@ -1256,7 +1256,7 @@ class SwabWindow(WindowUnion):
                  f'объеме {round((self.data_well.current_bottom) * 1.12 / 1000, 1)}м3 удельным весом {self.data_well.fluid_work}',
                  None, None, None, None, None, None, None,
                  'мастер КРС',
-                 liftingNKT_norm(self.data_well.current_bottom, 1)]
+                 lifting_nkt_norm(self.data_well.current_bottom, 1)]
             ]
 
             paker_list.extend(fluid_change_list)
@@ -1267,7 +1267,7 @@ class SwabWindow(WindowUnion):
                                f'объеме {round((self.depth_opy + 200) * 1.12 / 1000, 1)}м3 удельным весом {self.data_well.fluid_work}',
                                None, None, None, None, None, None, None,
                                'мастер КРС',
-                               liftingNKT_norm(self.depth_opy + 200, 1)])
+                               lifting_nkt_norm(self.depth_opy + 200, 1)])
         return paker_list
 
     def swabbing_with_paker_stub(self):
@@ -1399,7 +1399,7 @@ class SwabWindow(WindowUnion):
                                f' {self.data_well.fluid_work}',
                                None, None, None, None, None, None, None,
                                'мастер КРС',
-                               liftingNKT_norm(self.paker_depth, 1.2)])
+                               lifting_nkt_norm(self.paker_depth, 1.2)])
         else:
             paker_list.append([None, None,
                                f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {self.paker_depth}м с доливом скважины в '
@@ -1407,7 +1407,7 @@ class SwabWindow(WindowUnion):
                                f'{self.data_well.fluid_work}',
                                None, None, None, None, None, None, None,
                                'мастер КРС',
-                               liftingNKT_norm(self.paker_depth, 1.2)])
+                               lifting_nkt_norm(self.paker_depth, 1.2)])
         return paker_list
 
     def swabbing_with_paker(self):
@@ -1606,7 +1606,7 @@ class SwabWindow(WindowUnion):
                                f'удельным весом {self.data_well.fluid_work}',
                                None, None, None, None, None, None, None,
                                'мастер КРС',
-                               liftingNKT_norm(self.paker_depth, 1.2)])
+                               lifting_nkt_norm(self.paker_depth, 1.2)])
         else:
             paker_list.append([None, None,
                                f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {self.paker_depth}м с доливом скважины в '
@@ -1614,7 +1614,7 @@ class SwabWindow(WindowUnion):
                                f'удельным весом {self.data_well.fluid_work}',
                                None, None, None, None, None, None, None,
                                'мастер КРС',
-                               liftingNKT_norm(self.paker_depth, 1.2)])
+                               lifting_nkt_norm(self.paker_depth, 1.2)])
 
         return paker_list
 
@@ -1762,7 +1762,7 @@ class SwabWindow(WindowUnion):
                                f' {self.data_well.fluid_work}',
                                None, None, None, None, None, None, None,
                                'мастер КРС',
-                               liftingNKT_norm(self.paker_depth, 1.2)])
+                               lifting_nkt_norm(self.paker_depth, 1.2)])
         else:
             paker_list.append([None, None,
                                f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {self.paker_depth}м с '
@@ -1771,7 +1771,7 @@ class SwabWindow(WindowUnion):
                                f'{self.data_well.fluid_work}',
                                None, None, None, None, None, None, None,
                                'мастер КРС',
-                               liftingNKT_norm(self.paker_depth, 1.2)])
+                               lifting_nkt_norm(self.paker_depth, 1.2)])
 
         return paker_list
 
@@ -1872,7 +1872,7 @@ class SwabWindow(WindowUnion):
                                f'{self.data_well.fluid_work}',
                                None, None, None, None, None, None, None,
                                'мастер КРС',
-                               liftingNKT_norm(self.paker_depth, 1.2)])
+                               lifting_nkt_norm(self.paker_depth, 1.2)])
         else:
             paker_list.append([None, None,
                                f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {self.paker_depth}м с доливом скважины в '
@@ -1880,7 +1880,7 @@ class SwabWindow(WindowUnion):
                                f' {self.data_well.fluid_work}',
                                None, None, None, None, None, None, None,
                                'мастер КРС',
-                               liftingNKT_norm(self.paker_depth, 1.2)])
+                               lifting_nkt_norm(self.paker_depth, 1.2)])
         return paker_list
 
 

@@ -244,12 +244,12 @@ class GnktModel(WindowUnion):
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def insert_image_schema(self, ws):
@@ -514,7 +514,7 @@ class GnktModel(WindowUnion):
         self.plast_combo = str(current_widget.plast_combo.combo_box.currentText())
 
     def add_work(self):
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
         self.gnkt_number_combo = self.current_widget.gnkt_number_combo.currentText()
         self.length_gnkt_edit = self.current_widget.length_gnkt_edit.text()
         self.iznos_gnkt_edit = self.current_widget.iznos_gnkt_edit.text().replace(',', '.')
@@ -756,7 +756,7 @@ class GnktModel(WindowUnion):
 
     def schema_well(self, current_bottom_edit, fluid_edit, gnkt_number_combo,
                     gnkt_length, iznos_gnkt_edit, pvo_number, diameter_length, pipe_mileage_edit):
-        self.gnkt = self.tabWidget.currentWidget()
+        self.gnkt = self.tab_widget.currentWidget()
         pressure = []
         vertikal = []
         koef_anomal = []

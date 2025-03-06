@@ -21,7 +21,6 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction,
     QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog, QTabWidget, QTableWidgetItem
 from PyQt5 import QtCore, QtWidgets
 
-
 from datetime import datetime
 from decrypt import decrypt
 from openpyxl.utils import get_column_letter
@@ -493,8 +492,6 @@ class MyMainWindow(QMainWindow):
                     f' {string_work} {contractor}.xlsx'
         return filenames
 
-
-
     @staticmethod
     def calculate_chemistry(type_chemistry, volume):
         if type_chemistry in ['HCl', 'Нефтекислотка']:
@@ -552,6 +549,7 @@ class MyMainWindow(QMainWindow):
             QtCore.QCoreApplication.instance().processEvents()
 
     def check_pvo_schema(self, ws5, ind):
+        global schema_path
         schema_pvo_set = set()
         for row in range(self.table_widget.rowCount()):
             if row > ind:
@@ -644,14 +642,14 @@ class MyMainWindow(QMainWindow):
             if float(interval[0]) <= float(depth) <= float(interval[1]):
                 check_ribbing = True
 
-        # if check_true is False:# and check_ribbing is False:
-        #     QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
-        #                         f'Проверка посадки показала, что пакер сажается не '
-        #                         f'в интервал скреперования {self.data_well.skm_interval}, и '
-        #                         f'райбирования {self.data_well.ribbing_interval} \n'
-        #                         f'Нужно скорректировать интервалы скреперования ')
-        #     return False
-        if check_true is True and check_ribbing is False:
+        if check_true is False and check_ribbing is False:
+            QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
+                                f'Проверка посадки показала, что пакер сажается не '
+                                f'в интервал скреперования {"".join(self.data_well.skm_interval)}, и '
+                                f'райбирования {"".join(self.data_well.ribbing_interval)} \n'
+                                f'Нужно скорректировать интервалы скреперования или глубину посадки пакера')
+            return False
+        if check_true is False or check_ribbing is True:
             false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
                                                   f'Проверка посадки показала, что пакер сажается не '
                                                   f'в интервал скреперования {self.data_well.skm_interval}, '
@@ -710,7 +708,7 @@ class MyMainWindow(QMainWindow):
                 table_widget.setSpan(i + insert_index, 2, 1, 11)
             elif 'Порядок работы' in row_data or 'Ранее проведенные работы' in str(row_data[1]):
                 table_widget.setSpan(i + insert_index, 1, 1, 12)
-            elif len([row_str for row_str in row_data if row_str not in ['', None]]) >6:
+            elif len([row_str for row_str in row_data if row_str not in ['', None]]) > 6:
                 pass
 
             else:
@@ -932,7 +930,6 @@ class MyWindow(MyMainWindow):
         # self.thread.started.connect(self.excepthook.handleException)
         self.thread.start()
 
-
     def insert_data_in_chemistry(self):
 
         if self.data_well.work_plan in ['dop_plan', 'dop_plan_in_base']:
@@ -1033,7 +1030,7 @@ class MyWindow(MyMainWindow):
         self.setWindowTitle("ZIMA")
         self.setGeometry(200, 100, 800, 800)
 
-        self.createMenuBar()
+        self.create_menu_bar()
         self.le = QLineEdit()
 
         self.toolbar = QToolBar()
@@ -1063,7 +1060,7 @@ class MyWindow(MyMainWindow):
         self.closeFileButton.clicked.connect(self.close_file)
         self.toolbar.addWidget(self.closeFileButton)
 
-    def createMenuBar(self):
+    def create_menu_bar(self):
         self.menuBar = QMenuBar(self)
         self.setMenuBar(self.menuBar)
         self.fileMenu = QMenu('&Файл', self)
@@ -1153,48 +1150,48 @@ class MyWindow(MyMainWindow):
 
         if action == self.create_KRS and self.table_widget is None:
             self.work_plan = 'krs'
-            self.tableWidgetOpen(self.work_plan)
+            self.table_widget_open(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
         elif action == self.create_KRS_DP and self.table_widget is None:
             self.work_plan = 'dop_plan'
 
-            self.tableWidgetOpen(self.work_plan)
+            self.table_widget_open(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
         elif action == self.create_KRS_DP_in_base and self.table_widget is None:
             self.work_plan = 'dop_plan_in_base'
 
-            self.tableWidgetOpen(self.work_plan)
+            self.table_widget_open(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
         elif action == self.create_KRS_change and self.table_widget is None:
             self.work_plan = 'plan_change'
-            self.tableWidgetOpen(self.work_plan)
+            self.table_widget_open(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
         elif action == self.create_gnkt_opz and self.table_widget is None:
             self.work_plan = 'gnkt_opz'
-            self.tableWidgetOpen(self.work_plan)
+            self.table_widget_open(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
         elif action == self.create_GNKT_GRP and self.table_widget is None:
             self.work_plan = 'gnkt_after_grp'
-            self.tableWidgetOpen(self.work_plan)
+            self.table_widget_open(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
         elif action == self.create_GNKT_BOPZ and self.table_widget is None:
             self.work_plan = 'gnkt_bopz'
-            self.tableWidgetOpen(self.work_plan)
+            self.table_widget_open(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
         elif action == self.create_GNKT_frez and self.table_widget is None:
             self.work_plan = 'gnkt_frez'
-            self.tableWidgetOpen(self.work_plan)
+            self.table_widget_open(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
         elif action == self.create_PRS and self.table_widget is None:
             self.work_plan = 'prs'
-            self.tableWidgetOpen(self.work_plan)
+            self.table_widget_open(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
 
 
@@ -1255,14 +1252,14 @@ class MyWindow(MyMainWindow):
 
         elif action == self.application_pvr:
             self.work_plan = 'application_pvr'
-            # self.tableWidgetOpenPvr()
+            # self.table_widget_open_pvr()
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
                 self.open_pvr_application(self.fname)
         elif action == self.application_gis:
             self.work_plan = 'application_gis'
-            # self.tableWidgetOpenPvr()
+            # self.table_widget_open_pvr()
             self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                                   "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
             if self.fname:
@@ -1394,54 +1391,18 @@ class MyWindow(MyMainWindow):
             except FileNotFoundError:
                 print('Файл не найден')
 
-    def tableWidgetOpenNormir(self, work_plan):
-
-        if self.table_widget is None:
-            # Создание объекта TabWidget
-            self.tabWidget = QTabWidget()
-            self.table_widget = QTableWidget()
-
-            self.table_widget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-            self.table_widget.customContextMenuRequested.connect(self.openContextMenuNormir)
-            self.setCentralWidget(self.tabWidget)
-            self.model = self.table_widget.model()
-
-            # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
-            # Указанная строка и столбец - это ячейка, которая была нажата.
-            self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
-            self.tabWidget.addTab(self.table_widget, 'Нормирование')
-
-    def tableWidgetOpenPvr(self):
-
-        if self.table_pvr is None:
-            # Создание объекта TabWidget
-            self.tabWidget = QTabWidget()
-            self.table_pvr = QTableWidget()
-
-            self.table_pvr.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-            self.table_pvr.customContextMenuRequested.connect(self.openContextMenu)
-            self.setCentralWidget(self.tabWidget)
-            self.model = self.table_pvr.model()
-
-            # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
-            # Указанная строка и столбец - это ячейка, которая была нажата.
-            self.table_pvr.cellPressed[int, int].connect(self.clickedRowColumn)
-
-            if self.work_plan == 'application_pvr':
-                self.tabWidget.addTab(self.table_pvr, 'заявка на ПВР')
-
-    def tableWidgetOpen(self, work_plan='krs'):
+    def table_widget_open(self, work_plan='krs'):
 
         if self.table_widget is None:
 
             # Создание объекта TabWidget
-            self.tabWidget = QTabWidget()
+            self.tab_widget = QTabWidget()
             self.table_widget = QTableWidget()
             self.table_pvr = QTableWidget()
 
             self.table_widget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-            self.table_widget.customContextMenuRequested.connect(self.openContextMenu)
-            self.setCentralWidget(self.tabWidget)
+            self.table_widget.customContextMenuRequested.connect(self.open_context_menu)
+            self.setCentralWidget(self.tab_widget)
             self.model = self.table_widget.model()
 
             # Этот сигнал испускается всякий раз, когда ячейка в таблице нажата.
@@ -1449,27 +1410,24 @@ class MyWindow(MyMainWindow):
             self.table_widget.cellPressed[int, int].connect(self.clickedRowColumn)
             if work_plan in ['gnkt_frez', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
                 self.table_title = QTableWidget()
-                self.tabWidget.addTab(self.table_title, 'Титульник')
+                self.tab_widget.addTab(self.table_title, 'Титульник')
                 self.table_schema = QTableWidget()
-                self.tabWidget.addTab(self.table_schema, 'Схема скважины')
-                self.tabWidget.addTab(self.table_widget, 'Ход работ')
+                self.tab_widget.addTab(self.table_schema, 'Схема скважины')
+                self.tab_widget.addTab(self.table_widget, 'Ход работ')
 
             else:
-                self.tabWidget.addTab(self.table_widget, 'Ход работ')
+                self.tab_widget.addTab(self.table_widget, 'Ход работ')
 
     def save_to_excel(self):
         excel_save_work = SaveInExcel(self.data_well, self.ws, self.table_widget,
-                                      self.table_title, self.table_schema,  self.gnkt_data)
+                                      self.table_title, self.table_schema, self.gnkt_data)
 
         if self.work_plan in ['gnkt_frez', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz']:
             excel_save_work.save_to_gnkt()
         else:
             excel_save_work.save_to_krs()
 
-
-
-    def openContextMenu(self, position):
-
+    def open_context_menu(self, position):
         context_menu = QMenu(self)
 
         action_menu = context_menu.addMenu("вид работ")
@@ -1728,8 +1686,8 @@ class MyWindow(MyMainWindow):
                                         rows_to_span.append((start_row, start_column, end_row, end_column))
                             else:
                                 rows_to_span.append((start_row, start_column, end_row, end_column))
-                    index_row = row-self.data_well.count_row_well
-                    self.data_copy.append(self.data_well.data_list[row-self.data_well.count_row_well])
+                    index_row = row - self.data_well.count_row_well
+                    self.data_copy.append(self.data_well.data_list[row - self.data_well.count_row_well])
 
                     if rows_to_span:
                         self.merge_rows[row] = rows_to_span
@@ -1776,7 +1734,6 @@ class MyWindow(MyMainWindow):
             else:
                 QMessageBox.warning(self, "Ошибка", "Сначала вырежьте строки.")
 
-
     def clickedRowColumn(self, r, c):
 
         self.insert_index = r + 1
@@ -1808,7 +1765,7 @@ class MyWindow(MyMainWindow):
             self.table_widget.clear()
             self.table_widget.resizeColumnsToContents()
             self.table_widget = None
-            self.tabWidget = None
+            self.tab_widget = None
 
             data_list.lift_ecn_can = False
             data_list.pause = True
@@ -1856,15 +1813,6 @@ class MyWindow(MyMainWindow):
             data_list.row_heights = []
             data_list.condition_of_wells = ProtectedIsNonNone(0)
 
-            try:
-                for file in os.listdir(path):
-                    file_path = os.path.join(path, file)
-                    if path in file_path:
-                        if os.path.isfile(file_path):
-                            os.remove(file_path)
-            except:
-                pass
-
             QMessageBox.information(self, 'Обновление', 'Данные обнулены')
 
     def on_finished(self):
@@ -1892,7 +1840,7 @@ class MyWindow(MyMainWindow):
 
         self.data_well.fluid_work = data[row][7]
         self.data_well.template_depth, self.data_well.template_length, \
-        self.data_well.template_depth_addition, self.data_well.template_length_addition = json.loads(
+            self.data_well.template_depth_addition, self.data_well.template_length_addition = json.loads(
             data[row][11])
         self.data_well.skm_interval = json.loads(data[row][12])
 
@@ -1915,13 +1863,13 @@ class MyWindow(MyMainWindow):
         # print(self.data_well.skm_interval)
 
     def frezering_port_action(self):
-        from work_py.drilling import Drill_window
-        drilling_work_list = Drill_window.frezer_ports(self)
+        from work_py.drilling import DrillWindow
+        drilling_work_list = DrillWindow.frezer_ports(self)
         self.populate_row(self.insert_index, drilling_work_list, self.table_widget)
 
     def drilling_action_nkt(self):
-        from work_py.drilling import Drill_window
-        self.add_window(Drill_window)
+        from work_py.drilling import DrillWindow
+        self.add_window(DrillWindow)
 
     def magnet_action(self):
         from work_py.emergency_magnit import EmergencyMagnit
@@ -2193,7 +2141,6 @@ class MyWindow(MyMainWindow):
             self.leakage_window.close()  # Close window.
             self.leakage_window = None  # Discard reference.
 
-
     def correctData(self):
         from data_correct import DataWindow
         if self.work_window is None:
@@ -2439,7 +2386,6 @@ class SaveInExcel(MyWindow):
                 work_list.append(row_lst)
             self.gnkt_data.count_row_height(worksheet, work_list, sheet_name)
         if "СХЕМЫ КНК_38,1" not in self.gnkt_data.wb_gnkt.sheetnames:
-
             ws7 = self.gnkt_data.wb_gnkt.create_sheet(title="СХЕМЫ КНК_38,1")
             self.insert_image(ws7, f'{data_list.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png', 'A1',
                               550, 900)
@@ -2477,10 +2423,9 @@ class SaveInExcel(MyWindow):
             self.gnkt_data.wb_gnkt.close()
 
     def save_to_krs(self):
-        from open_pz import CreatePZ
+
         from work_py.alone_oreration import is_number
         from data_base.work_with_base import excel_in_json
-
 
         if not self.table_widget is None:
             self.wb2 = Workbook()
@@ -2686,7 +2631,9 @@ class SaveInExcel(MyWindow):
                 return int(float(num))
         except:
             return num
+
     def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
+        global cell_num
         from openpyxl.utils.cell import range_boundaries, get_column_letter
         from PIL import Image
 
@@ -2822,7 +2769,6 @@ class SaveInExcel(MyWindow):
 
                         else:
                             ws2.cell(row=i, column=j).font = Font(name=font_type, size=size_font, bold=False)
-
 
         # print(merged_cells_dict)
         for row, col in merged_cells_dict.items():
@@ -2981,7 +2927,7 @@ class SaveInExcel(MyWindow):
              None, None, None, None, None, None, None, None]]
         return add_itog_list
 
-    def add_itog(self, ws, insert_index, work_plan, ws2 = None):
+    def add_itog(self, ws, insert_index, work_plan, ws2=None):
         if ws.merged_cells.ranges:
             merged_cells_copy = list(ws.merged_cells.ranges)  # Создаем копию множества объединенных ячеек
             for merged_cell in merged_cells_copy:
@@ -3029,7 +2975,7 @@ class SaveInExcel(MyWindow):
                         ws.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                        vertical='center')
 
-                    ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=merge_column+1)
+                    ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=merge_column + 1)
                     ws.cell(row=i, column=j).alignment = Alignment(wrap_text=False, horizontal='left',
                                                                    vertical='center')
 
@@ -3068,14 +3014,16 @@ class SaveInExcel(MyWindow):
 
         ws.delete_rows(insert_index, aaa - insert_index)
         if 'prs' in self.data_well.work_plan:
-
+            from open_pz import CreatePZ
             CreatePZ.copy_data_excel_in_excel(
-                self.data_well.ws, ws, self.data_well.prs_copy_index.get_value, self.data_well.data_fond_min.get_value, 1, 17,
-                                                          ws.max_row + 1)
-
-            CreatePZ.copy_data_excel_in_excel(
-                self.data_well.ws, ws,  self.data_well.condition_of_wells.get_value, self.data_well.ws.max_row, 1, 17,
+                self.data_well.ws, ws, self.data_well.prs_copy_index.get_value, self.data_well.data_fond_min.get_value,
+                1, 17,
                 ws.max_row + 1)
+
+            CreatePZ.copy_data_excel_in_excel(
+                self.data_well.ws, ws, self.data_well.condition_of_wells.get_value, self.data_well.ws.max_row, 1, 17,
+                ws.max_row + 1)
+
     @staticmethod
     def curator_sel(curator, region):
 

@@ -182,20 +182,20 @@ class PerforationCorrect(WindowUnion):
         self.setCentralWidget(self.centralWidget)
         self.setWindowModality(QtCore.Qt.ApplicationModal)  # Устанавливаем модальность окна
 
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.buttonAdd = QPushButton('сохранить данные')
         self.buttonAdd.clicked.connect(self.add_row_table)
 
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         # vbox.addWidget(self.tableWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 3, 0)
 
     def add_row_table(self):
 
         self.dict_perforation = self.data_well.dict_perforation
-        plast_all = self.tabWidget.currentWidget().labels_plast
+        plast_all = self.tab_widget.currentWidget().labels_plast
         self.dict_perforation_project = {}
 
         plast_list = []

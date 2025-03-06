@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdi
 from main import MyMainWindow
 from work_py.emergencyWork import magnet_select, sbt_select
 from work_py.parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
 
 
 class TabPageSoLar(TabPageUnion):
@@ -126,7 +126,7 @@ class EmergencyLarWork(WindowUnion):
     def __init__(self, data_well, table_widget, parent=None):
         super().__init__(data_well)
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -138,7 +138,7 @@ class EmergencyLarWork(WindowUnion):
 
         vbox = QGridLayout(self.centralWidget)
 
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonadd_work, 3, 0)
 
     def closeEvent(self, event):
@@ -146,20 +146,20 @@ class EmergencyLarWork(WindowUnion):
         data_list.operation_window  = None
         event.accept()  # Принимаем событие закрытия
     def add_work(self):
-        gidroayss_combo = self.tabWidget.currentWidget().gidroayss_combo.currentText()
-        ubt_combo = self.tabWidget.currentWidget().gidroayss_combo.currentText()
-        nkt_str_combo = self.tabWidget.currentWidget().nkt_str_combo.currentText()
-        lar_diameter_line = self.tabWidget.currentWidget().lar_diameter_line.text()
-        udlinitelel = self.tabWidget.currentWidget().udlinitelel.currentText()
-        udlinitelel_length = self.tabWidget.currentWidget().udlinitelel_length.text()
+        gidroayss_combo = self.tab_widget.currentWidget().gidroayss_combo.currentText()
+        ubt_combo = self.tab_widget.currentWidget().gidroayss_combo.currentText()
+        nkt_str_combo = self.tab_widget.currentWidget().nkt_str_combo.currentText()
+        lar_diameter_line = self.tab_widget.currentWidget().lar_diameter_line.text()
+        udlinitelel = self.tab_widget.currentWidget().udlinitelel.currentText()
+        udlinitelel_length = self.tab_widget.currentWidget().udlinitelel_length.text()
         if lar_diameter_line == '':
             QMessageBox.warning(self, 'Ошибка',
                                       'Выберете диаметр ловильного оборудования')
             return
-        nkt_key = self.tabWidget.currentWidget().nkt_select_combo.currentText()
-        lar_type_combo = self.tabWidget.currentWidget().lar_type_combo.currentText()
-        emergency_bottom_line = self.tabWidget.currentWidget().emergency_bottom_line.text().replace(',', '.')
-        bottom_line = self.tabWidget.currentWidget().bottom_line.text().replace(',', '.')
+        nkt_key = self.tab_widget.currentWidget().nkt_select_combo.currentText()
+        lar_type_combo = self.tab_widget.currentWidget().lar_type_combo.currentText()
+        emergency_bottom_line = self.tab_widget.currentWidget().emergency_bottom_line.text().replace(',', '.')
+        bottom_line = self.tab_widget.currentWidget().bottom_line.text().replace(',', '.')
         if lar_type_combo in ['метчик', 'колокол', 'МЭС', 'МБУ'] and nkt_str_combo == 'НКТ':
             QMessageBox.warning(self, 'Недопустимая операция', f'Нельзя спускать {lar_type_combo} '
                                                                f'на не извлекаемые ловитель на НКТ')
@@ -271,7 +271,7 @@ class EmergencyLarWork(WindowUnion):
              f'объеме {round(self.data_well.current_bottom * 1.25 / 1000, 1)}м3'
              f' удельным весом {self.data_well.fluid_work}.',
              None, None, None, None, None, None, None,
-             'Мастер', liftingNKT_norm(self.data_well.current_bottom, 1)],
+             'Мастер', lifting_nkt_norm(self.data_well.current_bottom, 1)],
             [None, None,
              f'При необходимости: Сборка и спуск компоновки: кольцевой фрезер с удлинителем '
              f'L= {udlinitelel_str}м + СБТ, до глубины нахождения аварийной "головы". (Компоновку согласовать дополнительно с УСРСиСТ',
@@ -286,7 +286,7 @@ class EmergencyLarWork(WindowUnion):
              f'Поднять компоновку с доливом тех жидкости в объеме {round(self.data_well.current_bottom * 1.25 / 1000, 1)}м3'
              f' удельным весом {self.data_well.fluid_work}.',
              None, None, None, None, None, None, None,
-             'Мастер, подрядчик по ГИС', liftingNKT_norm(self.data_well.current_bottom, 1)],
+             'Мастер, подрядчик по ГИС', lifting_nkt_norm(self.data_well.current_bottom, 1)],
             [None, None,
              f'По согласованию заказчиком повторить ловильные аварийные работы'
              f' с подбором аварийного оборудования',
@@ -336,7 +336,7 @@ class EmergencyLarWork(WindowUnion):
              f'объеме {round(self.data_well.current_bottom * 1.25 / 1000, 1)}м3'
              f' удельным весом {self.data_well.fluid_work}.',
              None, None, None, None, None, None, None,
-             'Мастер', liftingNKT_norm(self.data_well.current_bottom, 1)],
+             'Мастер', lifting_nkt_norm(self.data_well.current_bottom, 1)],
         ]
         self.data_well.current_bottom = bottom_line
 
@@ -369,7 +369,7 @@ class EmergencyLarWork(WindowUnion):
              f'объеме {round(self.data_well.current_bottom * 0.25 / 1000, 1)}м3'
              f' удельным весом {self.data_well.fluid_work}.',
              None, None, None, None, None, None, None,
-             'Мастер', liftingNKT_norm(self.data_well.current_bottom, 1)],
+             'Мастер', lifting_nkt_norm(self.data_well.current_bottom, 1)],
         ]
         self.data_well.current_bottom = bottom_line
 

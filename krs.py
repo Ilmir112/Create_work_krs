@@ -9,7 +9,7 @@ import data_list
 from work_py.alone_oreration import weigth_pipe, volume_pod_nkt, volume_jamming_well
 from work_py.calculate_work_parametrs import volume_nkt_metal, volume_nkt, volume_well_pod_nkt_calculate
 from work_py.mkp import mkp_revision_1_kateg
-from work_py.rationingKRS import liftingNKT_norm, well_jamming_norm, liftingGNO, lifting_sucker_rod
+from work_py.rationingKRS import lifting_nkt_norm, well_jamming_norm, liftingGNO, lifting_sucker_rod
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 
 
@@ -210,12 +210,12 @@ class GnoWindow(WindowUnion):
         self.data_well.insert_index2 = insert_index
         self.table_widget = table_widget
         self.work_plan = parent.work_plan
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
@@ -228,7 +228,7 @@ class GnoWindow(WindowUnion):
                     check_str += f'{ind + 1}. {check_data} \n'
             self.show_info_message(self.data_well, check_str)
 
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
         try:
             self.lift_key = self.current_widget.gno_combo.currentText()
 
@@ -309,7 +309,7 @@ class GnoParent(ABC):
         self.fluid = parent.fluid
 
         self.calculate_chemistry = parent.calculate_chemistry
-        self.current_widget = parent.tabWidget.currentWidget()
+        self.current_widget = parent.tab_widget.currentWidget()
         if float(self.fluid) > 1.18:
             self.pntzh_combo = self.current_widget.pntzh_combo.currentText()
 
@@ -1012,7 +1012,7 @@ class LiftOrz(GnoParent):
                  f'с контролем АСПО на стенках НКТ.',
                  None, None,
                  None, None, None, None, None,
-                 'Мастер КРС', round(liftingNKT_norm(self.data_well.depth_fond_paker_before["before"], 1.3), 2)],
+                 'Мастер КРС', round(lifting_nkt_norm(self.data_well.depth_fond_paker_before["before"], 1.3), 2)],
             ]
             if self.without_damping_true:
                 lift_orz = lift_orz[1:]

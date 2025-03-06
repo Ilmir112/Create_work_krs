@@ -9,7 +9,7 @@ from work_py.calculate_work_parametrs import volume_calculate_roof_of_sole
 from work_py.parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
 from work_py.rir import RirWindow
 
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
 
 
 class TabPageSoClay(TabPageUnion):
@@ -154,7 +154,7 @@ class ClayWindow(WindowUnion):
     def __init__(self, data_well, table_widget, parent=None):
         super().__init__(data_well)
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -162,12 +162,12 @@ class ClayWindow(WindowUnion):
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
         self.roof_rir_edit, self.sole_rir_edit, self.volume_cement = '', '', ''
 
     def add_work(self):
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
         self.purpose_of_clay = self.current_widget.purpose_of_clay_combo.currentText()
 
         self.strategies = {
@@ -248,7 +248,7 @@ class ClayWindow(WindowUnion):
              f'{round(current_bottom_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
              f'уд.весом {self.data_well.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(current_bottom_edit, 1)]
+             'мастер КРС', lifting_nkt_norm(current_bottom_edit, 1)]
         ]
 
         if volume_vn_nkt(dict_nkt) <= 5:
@@ -423,7 +423,7 @@ class ClaySolutionForRir(ClayWork):
             #  f'{round(self.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью '
             #  f'уд.весом {self.data_well.fluid_work}',
             #  None, None, None, None, None, None, None,
-            #  'мастер КРС', liftingNKT_norm(self.current_bottom, 1)]
+            #  'мастер КРС', lifting_nkt_norm(self.current_bottom, 1)]
         ]
 
         if volume_vn_nkt(dict_nkt) <= 5:

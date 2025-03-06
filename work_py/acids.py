@@ -1,5 +1,4 @@
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QGridLayout, QLineEdit, QTabWidget, \
-    QMainWindow, QPushButton
+from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QGridLayout, QLineEdit, QPushButton
 
 
 import data_list
@@ -7,10 +6,11 @@ import data_list
 from work_py.acid_paker import CheckableComboBox
 from work_py.alone_oreration import well_volume
 
-from work_py.rationingKRS import liftingNKT_norm, descentNKT_norm
+from work_py.rationingKRS import lifting_nkt_norm, descentNKT_norm
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
 
+# noinspection PyUnresolvedReferences
 class TabPageDp(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -111,12 +111,12 @@ class TabWidget(TabWidgetUnion):
 
 
 class GonsWindow(WindowUnion):
-    def __init__(self, data_well, table_widget, parent=None):
+    def __init__(self, data_well, table_widget):
         super().__init__(data_well)
 
 
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -127,21 +127,21 @@ class GonsWindow(WindowUnion):
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
 
-        plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
-        acid_edit = self.tabWidget.currentWidget().acid_edit.currentText()
-        acid_volume_edit = float(self.tabWidget.currentWidget().acid_volume_edit.text().replace(',', '.'))
-        acid_proc_edit = int(self.tabWidget.currentWidget().acid_proc_edit.text().replace(',', '.'))
-        bottom_point = self.tabWidget.currentWidget().point_bottom_edit.text()
-        acid_calcul_edit = self.tabWidget.currentWidget().acid_calcul_edit.text()
-        points_sko_edit = self.tabWidget.currentWidget().points_sko_edit.text()
-        pressure_edit = int(self.tabWidget.currentWidget().pressure_edit.text())
-        iron_true_combo = self.tabWidget.currentWidget().iron_true_combo.currentText()
-        iron_volume_edit = self.tabWidget.currentWidget().iron_volume_edit.text()
+        plast_combo = str(self.tab_widget.currentWidget().plast_combo.combo_box.currentText())
+        acid_edit = self.tab_widget.currentWidget().acid_edit.currentText()
+        acid_volume_edit = float(self.tab_widget.currentWidget().acid_volume_edit.text().replace(',', '.'))
+        acid_proc_edit = int(self.tab_widget.currentWidget().acid_proc_edit.text().replace(',', '.'))
+        bottom_point = self.tab_widget.currentWidget().point_bottom_edit.text()
+        acid_calcul_edit = self.tab_widget.currentWidget().acid_calcul_edit.text()
+        points_sko_edit = self.tab_widget.currentWidget().points_sko_edit.text()
+        pressure_edit = int(self.tab_widget.currentWidget().pressure_edit.text())
+        iron_true_combo = self.tab_widget.currentWidget().iron_true_combo.currentText()
+        iron_volume_edit = self.tab_widget.currentWidget().iron_volume_edit.text()
 
         if int(bottom_point) >= self.data_well.current_bottom:
             QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
@@ -151,7 +151,7 @@ class GonsWindow(WindowUnion):
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
 
-        work_list = self.acidGons(plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, points_sko_edit, bottom_point,
+        work_list = self.acid_gons(plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, points_sko_edit, bottom_point,
                                   acid_calcul_edit, pressure_edit, iron_true_combo, iron_volume_edit)
         self.populate_row(self.insert_index, work_list, self.table_widget)
         self.calculate_chemistry(acid_edit, acid_volume_edit)
@@ -163,16 +163,23 @@ class GonsWindow(WindowUnion):
                 # Закрываем основное окно при закрытии окна входа
         data_list.operation_window  = None
         event.accept()  # Принимаем событие закрытия
-    def acidGons(self, plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, points_sko_edit, bottom_point,
+    def acid_gons(self, plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, points_sko_edit, bottom_point,
                                   acid_calcul_edit, pressure_edit, iron_true_combo, iron_volume_edit):
         if iron_true_combo == 'Да':
             iron_str = f' с добавлением стабилизатор железа (Hi-Iron)  из расчета 10кг на 1тн ({iron_volume_edit}кг)'
         else:
             iron_str = ""
 
-        nkt_combo = f' + НКТ60мм {round(self.data_well.current_bottom -self.data_well.head_column_additional.get_value, 0)}' \
+        nkt_combo = ""
+        if self.data_well.column_additional is False or\
+            (self.data_well.column_additional and self.data_well.head_column_additional.get_value > self.data_well.current_bottom):
+            nkt_pod = '60мм' if self.data_well.column_additional_diameter.get_value < 110 else '73мм со снятыми фасками'
+        
+            nkt_combo = f' + НКТ{nkt_pod} {round(self.data_well.current_bottom -self.data_well.head_column_additional.get_value, 0)}м' \
             if self.data_well.column_additional is True else ''
-        gons_list = [[f'Спуск гидромониторную насадку yf {nkt_combo} до глубины нижней точки до {bottom_point}', None,
+        gons_list = [
+            [f'Спуск гидромониторную насадку {nkt_combo} на НКТ{self.data_well.nkt_diam}мм до глубины нижней '
+             f'точки до {bottom_point}', None,
          f'Спустить  гидромониторную насадку {nkt_combo}'         
          f'на НКТ{self.data_well.nkt_diam}мм до глубины нижней точки до {bottom_point}'
          f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм.',
@@ -200,6 +207,6 @@ class GonsWindow(WindowUnion):
           f'объеме {round(self.data_well.current_bottom * 1.12 / 1000, 1)}м3 удельным весом {self.data_well.fluid_work}',
           None, None, None, None, None, None, None,
           'мастер КРС',
-          liftingNKT_norm(self.data_well.current_bottom, 1)]]
+          lifting_nkt_norm(self.data_well.current_bottom, 1)]]
 
         return gons_list

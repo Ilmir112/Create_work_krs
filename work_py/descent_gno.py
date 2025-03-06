@@ -156,7 +156,7 @@ class GnoDescentWindow(WindowUnion):
 
         self.data_well = data_well
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -165,7 +165,7 @@ class GnoDescentWindow(WindowUnion):
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def closeEvent(self, event):
@@ -234,7 +234,7 @@ class GnoDescentWindow(WindowUnion):
 
     def add_work(self):
 
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
         self.lift_key = self.current_widget.gno_combo.currentText()
         if sum(list(self.data_well.dict_nkt_after.values())) > self.data_well.current_bottom and \
                 self.lift_key not in ['ОРД', 'ОРЗ']:

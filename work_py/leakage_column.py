@@ -1,4 +1,4 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import  QtWidgets
 from PyQt5.Qt import *
 from PyQt5.QtGui import QDoubleValidator
 
@@ -52,7 +52,7 @@ class LeakageWindow(WindowUnion):
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
-        self.tabWidget = TabWidget(parent)
+        self.tab_widget = TabWidget(parent)
         self.tableWidget = QTableWidget(0, 3)
         self.tableWidget.setHorizontalHeaderLabels(
             ["Кровля", "Подошва", "изоляция"])
@@ -71,17 +71,17 @@ class LeakageWindow(WindowUnion):
         self.buttonadd_string = QPushButton('Добавить строкой')
         self.buttonadd_string.clicked.connect(self.add_string)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
         vbox.addWidget(self.buttonDel, 2, 1)
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonadd_string, 3, 1)
 
-        asd = self.data_well.dict_leakiness
+
         if len(self.data_well.dict_leakiness) != 0:
 
-            ffa = self.data_well.dict_leakiness['НЭК']
+
             for nek in self.data_well.dict_leakiness['НЭК']['интервал']:
                 rows = self.tableWidget.rowCount()
 
@@ -99,11 +99,11 @@ class LeakageWindow(WindowUnion):
 
     def add_row_table(self):
 
-        roof_leakage = self.tabWidget.currentWidget().roof_leakage_line.text().replace(',', '.')
-        sole_leakage_line = self.tabWidget.currentWidget().sole_leakage_line.text().replace(',', '.')
+        roof_leakage = self.tab_widget.currentWidget().roof_leakage_line.text().replace(',', '.')
+        sole_leakage_line = self.tab_widget.currentWidget().sole_leakage_line.text().replace(',', '.')
         insulation_combo1 = QComboBox(self)
         insulation_combo1.addItems(['не изолирован', 'изолирован'])
-        index_insulation = self.tabWidget.currentWidget().insulation_combo.currentIndex()
+        index_insulation = self.tab_widget.currentWidget().insulation_combo.currentIndex()
         # print(index_insulation)
         insulation_combo1.setCurrentIndex(index_insulation)
         if float(roof_leakage) > float(sole_leakage_line):

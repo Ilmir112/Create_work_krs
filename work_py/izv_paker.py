@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdi
 from main import MyMainWindow
 from work_py.alone_oreration import well_volume
 from work_py.parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
 from work_py.rir import RirWindow
 from  work_py.opressovka import TabPageSo
 
@@ -182,7 +182,7 @@ class PakerIzvlek(WindowUnion):
 
 
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -192,7 +192,7 @@ class PakerIzvlek(WindowUnion):
 
         vbox = QGridLayout(self.centralWidget)
 
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonadd_work, 3, 0)
 
     def closeEvent(self, event):
@@ -200,18 +200,18 @@ class PakerIzvlek(WindowUnion):
         data_list.operation_window  = None
         event.accept()  # Принимаем событие закрытия
     def add_work(self):
-        type_work_combo = self.tabWidget.currentWidget().type_work_combo.currentText()
-        pero_diameter_line = self.tabWidget.currentWidget().pero_diameter_line.text()
-        nkt_key = self.tabWidget.currentWidget().nkt_select_combo.currentText()
-        paker_depth_line = self.tabWidget.currentWidget().paker_depth_line.text()
-        nkt_select_combo = self.tabWidget.currentWidget().nkt_select_combo.currentText()
-        roof_sand_edit = int(float(self.tabWidget.currentWidget().roof_sand_edit.text()))
+        type_work_combo = self.tab_widget.currentWidget().type_work_combo.currentText()
+        pero_diameter_line = self.tab_widget.currentWidget().pero_diameter_line.text()
+        nkt_key = self.tab_widget.currentWidget().nkt_select_combo.currentText()
+        paker_depth_line = self.tab_widget.currentWidget().paker_depth_line.text()
+        nkt_select_combo = self.tab_widget.currentWidget().nkt_select_combo.currentText()
+        roof_sand_edit = int(float(self.tab_widget.currentWidget().roof_sand_edit.text()))
 
-        paker_type_combo = self.tabWidget.currentWidget().paker_type_combo.currentText()
-        sand_question = self.tabWidget.currentWidget().need_sand_filing_combo.currentText()
+        paker_type_combo = self.tab_widget.currentWidget().paker_type_combo.currentText()
+        sand_question = self.tab_widget.currentWidget().need_sand_filing_combo.currentText()
 
         if type_work_combo != 'установка':
-            current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
+            current_bottom = self.tab_widget.currentWidget().current_bottom_edit.text()
             if current_bottom != '':
                 current_bottom = round(float(current_bottom), 1)
 
@@ -284,7 +284,7 @@ class PakerIzvlek(WindowUnion):
              f' глубины {paker_depth_line}м с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм.'
              f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
-             'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(paker_depth_line, 1.2)],
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', lifting_nkt_norm(paker_depth_line, 1.2)],
             [f'Привязка', None,
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
              f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
@@ -385,28 +385,28 @@ class PakerIzvlek(WindowUnion):
              f' в объеме {round((paker_depth_line - 10) * 1.12 / 1000, 1)}м3 тех. '
              f'жидкостью  уд.весом {self.data_well.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(paker_depth_line - 10, 1)]]
+             'мастер КРС', lifting_nkt_norm(paker_depth_line - 10, 1)]]
 
         emer_list = [
             [f'СПО лов. инст до до Н= {paker_depth_line-10}', None,
               f'Спустить с замером ловильный инструмент {TemplateKrs.calc_combo_nkt(self, "НКТ", paker_depth_line)} на '
               f'НКТ{self.data_well.nkt_diam} до Н= {paker_depth_line-10}м с замером. ',
               None, None, None, None, None, None, None,
-              'мастер КРС', liftingNKT_norm(self.data_well.current_bottom, 1)],
+              'мастер КРС', lifting_nkt_norm(self.data_well.current_bottom, 1)],
              [f'Вымыв песка до {paker_depth_line}м. Извлечение пакера', None,
               f'Произвести нормализацию (вымыв кварцевого песка) на ловильном инструменте до глубины '
               f'{paker_depth_line}м обратной '
               f'промывкой уд.весом {self.data_well.fluid_work} \n'
               f'Произвести  ловильный работы при представителе заказчика на глубине {paker_depth_line}м.',
               None, None, None, None, None, None, None,
-              'мастер КРС', liftingNKT_norm(paker_depth_line, 1)],
+              'мастер КРС', lifting_nkt_norm(paker_depth_line, 1)],
              [None, None,
               f'Расходить и поднять компоновку {TemplateKrs.calc_combo_nkt(self,"НКТ", paker_depth_line)} '
               f'НКТ{self.data_well.nkt_diam}мм с глубины {paker_depth_line}м с '
               f'доливом скважины в объеме {round(paker_depth_line * 1.12 / 1000, 1)}м3 тех. жидкостью '
               f'уд.весом {self.data_well.fluid_work}',
               None, None, None, None, None, None, None,
-              'мастер КРС', liftingNKT_norm(paker_depth_line, 1)]]
+              'мастер КРС', lifting_nkt_norm(paker_depth_line, 1)]]
         for row in emer_list:
             rir_list.append(row)
 

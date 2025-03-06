@@ -199,7 +199,7 @@ class PerforationWindow(WindowUnion):
 
         self.tableWidget.setSortingEnabled(True)
         self.tableWidget.setAlternatingRowColors(True)
-        self.tabWidget = TabWidget(self.tableWidget, self.data_well)
+        self.tab_widget = TabWidget(self.tableWidget, self.data_well)
 
         self.buttonAdd = QPushButton('Добавить интервалы перфорации в таблицу')
         self.buttonAdd.clicked.connect(self.add_row_table)
@@ -211,7 +211,7 @@ class PerforationWindow(WindowUnion):
         self.buttonAddProject.clicked.connect(self.addPerfProject)
 
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
         vbox.addWidget(self.buttonDel, 2, 1)
@@ -359,7 +359,7 @@ class PerforationWindow(WindowUnion):
                 return f'{diam} ПП{zar}ГП', f'{diam} ПП{zar}БО'
 
     def add_row_table(self):
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
 
         edit_type = self.current_widget.lineedit_type.text().replace(',', '.')
         edit_type2 = self.current_widget.lineedit_type2.text().replace(',', '.')
@@ -394,7 +394,7 @@ class PerforationWindow(WindowUnion):
         # print(edit_type, spinYearOfIssue, editSerialNumber, editSpecifications)
 
     def add_work(self):
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
         rows = self.tableWidget.rowCount()
         self.type_perforation = self.current_widget.combobox_type_perforation.currentText()
         if len(self.data_well.category_pressure_list) > 1:

@@ -10,7 +10,7 @@ import data_list
 from main import MyMainWindow
 from .parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
 
-from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from .rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
 from .opressovka import TabPageSo
 from .grp import GrpWindow
 
@@ -73,7 +73,7 @@ class GppWindow(WindowUnion):
     def __init__(self, data_well, table_widget, parent=None):
         super().__init__(data_well)
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -84,7 +84,7 @@ class GppWindow(WindowUnion):
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def closeEvent(self, event):
@@ -93,10 +93,10 @@ class GppWindow(WindowUnion):
         event.accept()  # Принимаем событие закрытия
         
     def add_work(self):
-        diameter_paker = int(float(self.tabWidget.currentWidget().diameter_paker_edit.text()))
-        paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
-        current_depth = int(float(self.tabWidget.currentWidget().current_depth_edit.text()))
-        gis_otz_after_true_quest = self.tabWidget.currentWidget().otz_after_question_qcombo.currentText()
+        diameter_paker = int(float(self.tab_widget.currentWidget().diameter_paker_edit.text()))
+        paker_depth = int(float(self.tab_widget.currentWidget().paker_depth_edit.text()))
+        current_depth = int(float(self.tab_widget.currentWidget().current_depth_edit.text()))
+        gis_otz_after_true_quest = self.tab_widget.currentWidget().otz_after_question_qcombo.currentText()
 
         if int(paker_depth) > self.data_well.current_bottom:
             QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
@@ -277,7 +277,7 @@ class GppWindow(WindowUnion):
              f'{round(gpp_depth * 1.12 / 1000, 1)}м3. \n'
              f'На демонтаж пригласить представителя подрядчика по ГРП',
              None, None, None, None, None, None, None,
-             'Мастер КРС, представ. заказчика', liftingNKT_norm(gpp_depth, 1.2)],
+             'Мастер КРС, представ. заказчика', lifting_nkt_norm(gpp_depth, 1.2)],
         ]
 
         for row in GrpWindow.normalization(self, current_depth, diameter_paker, gis_otz_after_true_quest):

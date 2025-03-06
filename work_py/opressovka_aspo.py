@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QMessageBox, QInputDialog, QMainWindow, QWidget, QLa
 from work_py.alone_oreration import privyazka_nkt
 from .opressovka import OpressovkaEK, TabPageSo
 from .parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
-from .rationingKRS import descentNKT_norm, liftingNKT_norm
+from .rationingKRS import descentNKT_norm, lifting_nkt_norm
 
 
 class TabPageSo_aspo(TabPageUnion):
@@ -78,7 +78,7 @@ class PakerAspo(WindowUnion):
 
 
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -86,13 +86,13 @@ class PakerAspo(WindowUnion):
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-        diameter_paker = int(float(self.tabWidget.currentWidget().diameter_paker_edit.text()))
-        paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
-        paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
+        diameter_paker = int(float(self.tab_widget.currentWidget().diameter_paker_edit.text()))
+        paker_khost = int(float(self.tab_widget.currentWidget().paker_khost_edit.text()))
+        paker_depth = int(float(self.tab_widget.currentWidget().paker_depth_edit.text()))
 
         if int(paker_khost) + int(paker_depth) > self.data_well.current_bottom:
             QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
@@ -189,6 +189,6 @@ class PakerAspo(WindowUnion):
              f'Поднять {paker_select} на НКТ{self.data_well.nkt_diam}мм c глубины {paker_depth}м с доливом скважины в '
              f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {self.data_well.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
+             'мастер КРС', lifting_nkt_norm(paker_depth, 1.2)]]
 
         return paker_list

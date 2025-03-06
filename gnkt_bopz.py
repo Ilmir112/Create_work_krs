@@ -186,37 +186,37 @@ class GnktBopz(GnktModel):
         self.fluid_edit = self.data_gnkt.fluid_edit
 
         self.table_widget = table_widget
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         self.dict_nkt = {}
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
         try:
-            self.roof_plast = float(self.tabWidget.currentWidget().roof_edit.text())
-            self.sole_plast = float(self.tabWidget.currentWidget().sole_edit.text())
-            self.sole_plast = float(self.tabWidget.currentWidget().sole_edit.text())
-            self.drilling_contractor_combo = self.tabWidget.currentWidget().drilling_contractor_combo.currentText()
-            self.need_drilling_mud_combo = str(self.tabWidget.currentWidget().need_drilling_mud_combo.currentText())
+            self.roof_plast = float(self.tab_widget.currentWidget().roof_edit.text())
+            self.sole_plast = float(self.tab_widget.currentWidget().sole_edit.text())
+            self.sole_plast = float(self.tab_widget.currentWidget().sole_edit.text())
+            self.drilling_contractor_combo = self.tab_widget.currentWidget().drilling_contractor_combo.currentText()
+            self.need_drilling_mud_combo = str(self.tab_widget.currentWidget().need_drilling_mud_combo.currentText())
             if self.need_drilling_mud_combo == '':
                 return
             elif self.need_drilling_mud_combo == 'Нужно':
-                self.data_well.bur_rastvor = self.tabWidget.currentWidget().acid_proc_edit.text()
+                self.data_well.bur_rastvor = self.tab_widget.currentWidget().acid_proc_edit.text()
 
-            self.volume_drilling_mud_edit = float(self.tabWidget.currentWidget().volume_drilling_mud_edit.text())
-            self.acid_true_edit = str(self.tabWidget.currentWidget().acid_true_edit.currentText())
-            self.acid_edit = self.tabWidget.currentWidget().acid_edit.currentText()
+            self.volume_drilling_mud_edit = float(self.tab_widget.currentWidget().volume_drilling_mud_edit.text())
+            self.acid_true_edit = str(self.tab_widget.currentWidget().acid_true_edit.currentText())
+            self.acid_edit = self.tab_widget.currentWidget().acid_edit.currentText()
 
-            self.acid_volume_edit = float(self.tabWidget.currentWidget().acid_volume_edit.text().replace(',', '.'))
-            self.acid_proc_edit = int(self.tabWidget.currentWidget().acid_proc_edit.text().replace(',', '.'))
-            self.pressure_edit = int(self.tabWidget.currentWidget().pressure_edit.text())
-            self.plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
+            self.acid_volume_edit = float(self.tab_widget.currentWidget().acid_volume_edit.text().replace(',', '.'))
+            self.acid_proc_edit = int(self.tab_widget.currentWidget().acid_proc_edit.text().replace(',', '.'))
+            self.pressure_edit = int(self.tab_widget.currentWidget().pressure_edit.text())
+            self.plast_combo = str(self.tab_widget.currentWidget().plast_combo.combo_box.currentText())
 
-            self.fluid_project = self.tabWidget.currentWidget().fluid_project_edit.text().replace(',', '.')
+            self.fluid_project = self.tab_widget.currentWidget().fluid_project_edit.text().replace(',', '.')
             if self.fluid_project == "":
                 QMessageBox.critical(self, "Ошибка", "Нужно указать расчетный ЖГС")
                 return
@@ -231,7 +231,7 @@ class GnktBopz(GnktModel):
             QMessageBox.information(self, 'Ошибка', 'Введите корректные данные')
 
         if self.acid_edit == 'ВТ':
-            self.vt = self.tabWidget.currentWidget().sko_vt_edit.text()
+            self.vt = self.tab_widget.currentWidget().sko_vt_edit.text()
             if self.vt == '':
                 mes = QMessageBox.critical(self, "Ошибка", "Нужно расписать объемы и вид кислоты")
                 return

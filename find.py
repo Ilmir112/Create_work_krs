@@ -25,6 +25,8 @@ class FindIndexPZ(MyMainWindow):
     def __init__(self, ws, work_plan, parent=None):
         super().__init__()
 
+        self.insert_index2 = None
+        self.count_row_well = None
         self.prs_copy_index = ProtectedIsDigit(0)
         self.perforation_sole = 5000
         self.number_dp = 0
@@ -266,40 +268,8 @@ class FindIndexPZ(MyMainWindow):
         # print(f'{ws.max_row, len(data_list.prow_heights)}dd')
         for index_row, row in enumerate(ws.iter_rows()):  # Копирование высоты строки
             ws.row_dimensions[index_row + 17].height = data_list.row_heights[index_row - 1]
-
     @staticmethod
-    def insert_column_direction(text):
-        try:
-            column_direction_data = text.split('(мм),')
-            try:
-                diameter = ProtectedIsDigit(
-                    column_direction_data[0].replace(' ', ''))
-            except Exception:
-                diameter = ProtectedIsNonNone('не корректно')
-
-            try:
-                wall_thickness = ProtectedIsDigit(
-                    column_direction_data[1].replace(' ', ''))
-            except Exception:
-                wall_thickness = ProtectedIsNonNone(
-                    'не корректно')
-            try:
-                try:
-                    length = ProtectedIsDigit(
-                        column_direction_data[2].split('-')[1].replace('(м)', '').replace(" ", ""))
-                except Exception:
-                    length = ProtectedIsDigit(
-                        column_direction_data[2].replace('(м)', '').replace(" ", ""))
-
-            except Exception:
-                length = ProtectedIsNonNone('не корректно')
-        except Exception:
-            diameter = ProtectedIsNonNone('не корректно')
-            wall_thickness = ProtectedIsNonNone('не корректно')
-            length = ProtectedIsNonNone('не корректно')
-        return diameter, wall_thickness, length
-
-    def check_text_in_row(self, text, row):
+    def check_text_in_row(text, row):
         return any([text.lower() in str(col).lower() for col in row])
 
     def read_pz(self):
@@ -359,9 +329,9 @@ class FindIndexPZ(MyMainWindow):
             elif 'ШТАНГИ' == str(row[1]).upper():
                 self.sucker_rod_ind = ProtectedIsDigit(row_ind + 1)
 
-            elif (self.check_text_in_row('Планируемый объём работ', row) or \
-                  self.check_text_in_row('Порядок работы', row) \
-                  or self.check_text_in_row('Ранее проведенные работ', row)) and \
+            elif (self.check_text_in_row('Планируемый объём работ', row) or\
+                  self.check_text_in_row('Порядок работы', row)\
+                  or self.check_text_in_row('Ранее проведенные работ', row)) and\
                     self.data_x_max.get_value == 0:
                 self.data_x_max = ProtectedIsDigit(row_ind)
                 if self.check_text_in_row('Ранее проведенные работ', row):
@@ -764,6 +734,38 @@ class FindIndexPZ(MyMainWindow):
                 data = self.ws.cell(row=row, column=col + step).value
                 step += 1
             return data
+
+
+def insert_column_direction(text):
+    try:
+        column_direction_data = text.split('(мм),')
+        try:
+            diameter = ProtectedIsDigit(
+                column_direction_data[0].replace(' ', ''))
+        except Exception:
+            diameter = ProtectedIsNonNone('не корректно')
+
+        try:
+            wall_thickness = ProtectedIsDigit(
+                column_direction_data[1].replace(' ', ''))
+        except Exception:
+            wall_thickness = ProtectedIsNonNone(
+                'не корректно')
+        try:
+            try:
+                length = ProtectedIsDigit(
+                    column_direction_data[2].split('-')[1].replace('(м)', '').replace(" ", ""))
+            except Exception:
+                length = ProtectedIsDigit(
+                    column_direction_data[2].replace('(м)', '').replace(" ", ""))
+
+        except Exception:
+            length = ProtectedIsNonNone('не корректно')
+    except Exception:
+        diameter = ProtectedIsNonNone('не корректно')
+        wall_thickness = ProtectedIsNonNone('не корректно')
+        length = ProtectedIsNonNone('не корректно')
+    return diameter, wall_thickness, length
 
 
 class WellNkt(FindIndexPZ):
@@ -1400,7 +1402,7 @@ class WellData(FindIndexPZ):
                                 column_direction_mine_data = FindIndexPZ.definition_is_none(self, column_direction_mine_data,
                                                                                        row_index, col, 2)
                                 self.column_direction_mine_diameter, self.column_direction_mine_wall_thickness, \
-                                self.column_direction_mine_length = self.insert_column_direction(column_direction_mine_data)
+                                self.column_direction_mine_length = insert_column_direction(column_direction_mine_data)
                                 self.level_cement_direction_mine = ProtectedIsNonNone(row[col + 9])
                         else:
                             self.column_direction_mine_true = None
@@ -1412,7 +1414,7 @@ class WellData(FindIndexPZ):
                             column_direction_data = FindIndexPZ.definition_is_none(self, column_direction_data,
                                                                                    row_index, col, 2)
                             self.column_direction_diameter, self.column_direction_wall_thickness, \
-                            self.column_direction_length = self.insert_column_direction(column_direction_data)
+                            self.column_direction_length = insert_column_direction(column_direction_data)
                             self.level_cement_direction = ProtectedIsNonNone(0)
                     elif 'Кондуктор (диаметр наружный(мм), ' in str(value):
                         self.column_conductor_true = True
@@ -1421,7 +1423,7 @@ class WellData(FindIndexPZ):
                             column_conductor_data = FindIndexPZ.definition_is_none(self, column_conductor_data,
                                                                                    row_index, col, 2)
                             self.column_conductor_diameter, self.column_conductor_wall_thickness, \
-                            self.column_conductor_length = self.insert_column_direction(column_conductor_data)
+                            self.column_conductor_length = insert_column_direction(column_conductor_data)
                             self.level_conductor_direction = ProtectedIsNonNone(0)
 
                     elif 'Направление' in str(value) and 'Шахтное направление' not in str(value) and \
@@ -1446,7 +1448,7 @@ class WellData(FindIndexPZ):
                         else:
                             self.level_cement_direction = ProtectedIsNonNone('отсут')
                         self.column_direction_diameter, self.column_direction_wall_thickness, \
-                        self.column_direction_length = self.insert_column_direction(column_direction_data)
+                        self.column_direction_length = insert_column_direction(column_direction_data)
 
                     elif 'Кондуктор' in str(value) and \
                             self.check_str_none(row[col + 3]) != '0':
@@ -1464,7 +1466,7 @@ class WellData(FindIndexPZ):
                         try:
                             column_conductor_data = str(row[col + 3])
                             self.column_conductor_diameter, self.column_conductor_wall_thickness, \
-                            self.column_conductor_length = self.insert_column_direction(column_conductor_data)
+                            self.column_conductor_length = insert_column_direction(column_conductor_data)
 
                         except Exception:
                             self.column_conductor_diameter = ProtectedIsNonNone('не корректно')
@@ -1474,13 +1476,13 @@ class WellData(FindIndexPZ):
                         data_main_production_string = self.ws.cell(row=row_index + 1,
                                                                    column=2).value
                         self.column_diameter, self.column_wall_thickness, \
-                        self.shoe_column = self.insert_column_direction(data_main_production_string)
+                        self.shoe_column = insert_column_direction(data_main_production_string)
                     elif 'Эксплуатационная колонна (' in str(value):
 
                         data_main_production_string = str(
                             self.ws.cell(row=row_index + 1, column=col + 1).value)
                         self.column_diameter, self.column_wall_thickness, \
-                        self.shoe_column = self.insert_column_direction(data_main_production_string)
+                        self.shoe_column = insert_column_direction(data_main_production_string)
 
 
                     elif 'Уровень цемента за колонной' in str(value):

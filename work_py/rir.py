@@ -8,7 +8,7 @@ from work_py.change_fluid import Change_fluid_Window
 from work_py.opressovka import OpressovkaEK
 
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
 from work_py.acid_paker import CheckableComboBox
 
 
@@ -329,7 +329,7 @@ class RirWindow(WindowUnion):
 
         self.rir_type_combo = None
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -337,7 +337,7 @@ class RirWindow(WindowUnion):
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def rir_kkt(self, paker_need_combo, plast_combo, roof_rir_edit, pressure_zumpf_question,
@@ -436,7 +436,7 @@ class RirWindow(WindowUnion):
              f'Поднять стыковочное устройство с глубины {roof_rir_edit}м с доливом скважины в объеме '
              f'{round(self.data_well.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.data_well.fluid_work} ',
              None, None, None, None, None, None, None,
-             'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit, 1.2)]]
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', lifting_nkt_norm(roof_rir_edit, 1.2)]]
 
         for row in rir_work_list:
             rir_list.append(row)
@@ -536,7 +536,7 @@ class RirWindow(WindowUnion):
                 f'Поднять перо на тНКТ с глубины {roof_rir_edit}м с доливом скважины в '
                 f'объеме {round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью уд.весом {self.data_well.fluid_work}',
                 None, None, None, None, None, None, None,
-                'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
+                'мастер КРС', lifting_nkt_norm(roof_rir_edit, 1)])
         else:
             work_list.append([
                 None, None,
@@ -544,7 +544,7 @@ class RirWindow(WindowUnion):
                 f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
                 f'уд.весом {self.data_well.fluid_work}',
                 None, None, None, None, None, None, None,
-                'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
+                'мастер КРС', lifting_nkt_norm(roof_rir_edit, 1)])
         return work_list
 
     def rir_rpk(self, paker_need_combo, plast_combo,
@@ -638,7 +638,7 @@ class RirWindow(WindowUnion):
              f'Во время ОЗЦ поднять стыковочное устройство с глубины {roof_rir_edit}м с доливом скважины в объеме '
              f'{round(self.data_well.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.data_well.fluid_work} ',
              None, None, None, None, None, None, None,
-             'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit, 1)]]
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', lifting_nkt_norm(roof_rir_edit, 1)]]
         for row in rir_work_list:
             rir_list.append(row)
         self.perf_new(roof_rir_edit, self.data_well.current_bottom)
@@ -828,7 +828,7 @@ class RirWindow(WindowUnion):
                 f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
                 f'уд.весом {self.data_well.fluid_work}',
                 None, None, None, None, None, None, None,
-                'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
+                'мастер КРС', lifting_nkt_norm(roof_rir_edit, 1)])
         else:
             uzm_pero_list.append([
                 None, None,
@@ -836,7 +836,7 @@ class RirWindow(WindowUnion):
                 f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
                 f'уд.весом {self.data_well.fluid_work}',
                 None, None, None, None, None, None, None,
-                'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
+                'мастер КРС', lifting_nkt_norm(roof_rir_edit, 1)])
         self.data_well.for_paker_list = None
         return uzm_pero_list
 
@@ -1032,7 +1032,7 @@ class RirWindow(WindowUnion):
              f'Поднять перо на тНКТ{nkt_diam}м с глубины {roof_rir_edit}м с доливом скважины в объеме '
              f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью '
              f'уд.весом {self.data_well.fluid_work}', None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(roof_rir_edit, 1)])
+             'мастер КРС', lifting_nkt_norm(roof_rir_edit, 1)])
         self.data_well.for_paker_list = None
         return rir_list
 
@@ -1059,7 +1059,7 @@ class RirWindow(WindowUnion):
         from work_py.opressovka import OpressovkaEK
 
         try:
-            paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
+            paker_depth_zumpf = int(float(self.tab_widget.currentWidget().paker_depth_zumpf_edit.text()))
         except Exception:
             paker_depth_zumpf = 0
         if paker_need_combo == 'Нужно СПО':
@@ -1128,7 +1128,7 @@ class RirWindow(WindowUnion):
              f'с доливом скважины в объеме '
              f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью уд.весом {self.data_well.fluid_work}',
              None, None, None, None, None, None, None,
-             'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit, 1.2)]
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', lifting_nkt_norm(roof_rir_edit, 1.2)]
         ]
         RirWindow.perf_new(self, roof_rir_edit, sole_rir_edit)
         self.data_well.current_bottom = roof_rir_edit
@@ -1185,7 +1185,7 @@ class RirWindow(WindowUnion):
              f'с доливом скважины в объеме '
              f'{round(roof_rir_edit * 1.12 / 1000, 1)}м3 тех. жидкостью уд.весом {self.data_well.fluid_work}',
              None, None, None, None, None, None, None,
-             'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(roof_rir_edit, 1.2)]
+             'Мастер КРС, подрядчик РИР, УСРСиСТ', lifting_nkt_norm(roof_rir_edit, 1.2)]
         ]
 
         self.data_well.current_bottom = roof_rir_edit
@@ -1200,7 +1200,7 @@ class RirWindow(WindowUnion):
 
     def add_work(self):
         try:
-            current_widget = self.tabWidget.currentWidget()
+            current_widget = self.tab_widget.currentWidget()
             plast_combo = str(current_widget.plast_combo.combo_box.currentText())
             self.rir_type_combo = str(current_widget.rir_type_combo.currentText())
             self.need_privyazka_q_combo = current_widget.need_privyazka_q_combo.currentText()
@@ -1375,7 +1375,7 @@ class RirWindow(WindowUnion):
                      f' глубины {paker_izv_paker}м с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм.'
                      f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
                      None, None, None, None, None, None, None,
-                     'Мастер КРС, подрядчик РИР, УСРСиСТ', liftingNKT_norm(paker_izv_paker, 1.2)],
+                     'Мастер КРС, подрядчик РИР, УСРСиСТ', lifting_nkt_norm(paker_izv_paker, 1.2)],
                     [f'Привязка', None,
                      f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
                      f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
@@ -1470,26 +1470,26 @@ class RirWindow(WindowUnion):
              f' в объеме {round((data_list.paker_izv_paker - 10) * 1.12 / 1000, 1)}м3 тех. '
              f'жидкостью  уд.весом {self.data_well.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(data_list.paker_izv_paker - 10, 1)]]
+             'мастер КРС', lifting_nkt_norm(data_list.paker_izv_paker - 10, 1)]]
 
         emer_list = [
             [f'СПО лов. инст до до Н= {self.data_well.current_bottom}', None,
              f'Спустить с замером ловильный инструмент на НКТ до Н= {self.data_well.current_bottom}м с замером. ',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(self.data_well.current_bottom, 1)],
+             'мастер КРС', lifting_nkt_norm(self.data_well.current_bottom, 1)],
             [f'Вымыв песка до {data_list.paker_izv_paker}м. Извлечение пакера', None,
              f'Произвести нормализацию (вымыв кварцевого песка) на ловильном инструменте до глубины '
              f'{data_list.paker_izv_paker}м обратной '
              f'промывкой уд.весом {self.data_well.fluid_work} \n'
              f'Произвести  ловильный работы при представителе заказчика на глубине {data_list.paker_izv_paker}м.',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(data_list.paker_izv_paker, 1)],
+             'мастер КРС', lifting_nkt_norm(data_list.paker_izv_paker, 1)],
             [None, None,
              f'Расходить и поднять компоновку НКТ{self.data_well.nkt_diam}мм с глубины {data_list.paker_izv_paker}м с '
              f'доливом скважины в объеме {round(data_list.paker_izv_paker * 1.12 / 1000, 1)}м3 тех. жидкостью '
              f'уд.весом {self.data_well.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(data_list.paker_izv_paker, 1)]]
+             'мастер КРС', lifting_nkt_norm(data_list.paker_izv_paker, 1)]]
         for row in emer_list:
             rir_list.append(row)
 

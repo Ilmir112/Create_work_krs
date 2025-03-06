@@ -9,7 +9,7 @@ from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 from .rir import RirWindow
 
 from .opressovka import OpressovkaEK
-from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from .rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
 
 
 class TabPageSoTorpedo(TabPageUnion):
@@ -46,7 +46,7 @@ class TorpedoWindow(WindowUnion):
         self.roof_torpedo = None
 
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -54,12 +54,12 @@ class TorpedoWindow(WindowUnion):
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-        self.roof_torpedo = self.tabWidget.currentWidget().roof_torpedo_edit.text()
-        self.diameter_doloto_ek = self.tabWidget.currentWidget().diameter_doloto_ek_line.text()
+        self.roof_torpedo = self.tab_widget.currentWidget().roof_torpedo_edit.text()
+        self.diameter_doloto_ek = self.tab_widget.currentWidget().diameter_doloto_ek_line.text()
         if '' in [self.roof_torpedo, self.diameter_doloto_ek]:
             QMessageBox.warning(self, 'Ошибка', 'Не введены все значения')
             return

@@ -250,14 +250,14 @@ class CategoryWindow(WindowUnion):
         self.setCentralWidget(self.centralWidget)
         self.setWindowModality(QtCore.Qt.ApplicationModal)  # Устанавливаем модальность окна
 
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         self.dict_category = {}
 
         self.buttonAdd = QPushButton('сохранить данные')
         self.buttonAdd.clicked.connect(self.add_row_table)
 
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         # vbox.addWidget(self.tableWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 3, 0)
 
@@ -266,27 +266,27 @@ class CategoryWindow(WindowUnion):
         # Пересохранение по сереводорода
 
         cat_P_1 = self.data_well.category_pressure_well
-        self.data_well.type_absorbent = self.tabWidget.currentWidget().type_absorbent.currentText()
+        self.data_well.type_absorbent = self.tab_widget.currentWidget().type_absorbent.currentText()
         plast_index = []
         pressure = namedtuple("pressure", "category data_pressure")
         Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
         Data_gaz = namedtuple("Data_gaz", "category data")
-        aaasse = self.tabWidget.currentWidget().labels_category
+        aaasse = self.tab_widget.currentWidget().labels_category
         if cat_P_1:
             for index in data_list.number_indez:
                 for ind in range(1, 6):
-                    if self.ifNum(self.tabWidget.currentWidget().labels_category[index][ind].text()) is False:
+                    if self.ifNum(self.tab_widget.currentWidget().labels_category[index][ind].text()) is False:
                         QMessageBox.warning(self, 'Ошибка', 'ошибка в сохранении данных, не корректные данные ')
                         return
 
-                plast_sel = self.tabWidget.currentWidget().labels_category[index][0].combo_box.currentText()
+                plast_sel = self.tab_widget.currentWidget().labels_category[index][0].combo_box.currentText()
                 if plast_sel == '':
                     QMessageBox.warning(self, 'Выбрать пласты', 'Необходимо выбрать пласты выбрать пласты')
                     return
                 for plast in plast_sel.split(', '):
                     plast_index.append(plast)
 
-                    if self.tabWidget.currentWidget().labels_category[index][8].currentText() == 'планируемый':
+                    if self.tab_widget.currentWidget().labels_category[index][8].currentText() == 'планируемый':
                         if ',' in plast:
                             for i in plast.split(','):
                                 self.data_well.plast_project.append(i)
@@ -295,27 +295,27 @@ class CategoryWindow(WindowUnion):
                     try:
                         self.dict_category.setdefault(plast, {}).setdefault('по давлению',
                                                                             pressure(int(
-                                                                                self.tabWidget.currentWidget().labels_category[
+                                                                                self.tab_widget.currentWidget().labels_category[
                                                                                     index][1].text()),
                                                                                 float(
-                                                                                    self.tabWidget.currentWidget().labels_category[
+                                                                                    self.tab_widget.currentWidget().labels_category[
                                                                                         index][7].text())))
 
                         self.dict_category.setdefault(plast, {}).setdefault(
                             'по сероводороду', Data_h2s(
-                                int(self.tabWidget.currentWidget().labels_category[index][2].text()),
-                                float(self.tabWidget.currentWidget().labels_category[index][4].text()),
-                                float(self.tabWidget.currentWidget().labels_category[index][5].text()),
+                                int(self.tab_widget.currentWidget().labels_category[index][2].text()),
+                                float(self.tab_widget.currentWidget().labels_category[index][4].text()),
+                                float(self.tab_widget.currentWidget().labels_category[index][5].text()),
                                 float(
-                                    self.tabWidget.currentWidget().labels_category[index][9].text().replace(',', '.'))))
+                                    self.tab_widget.currentWidget().labels_category[index][9].text().replace(',', '.'))))
 
                         self.dict_category.setdefault(plast, {}).setdefault(
                             'по газовому фактору', Data_gaz(
-                                int(self.tabWidget.currentWidget().labels_category[index][3].text()),
-                                float(self.tabWidget.currentWidget().labels_category[index][6].text())))
+                                int(self.tab_widget.currentWidget().labels_category[index][3].text()),
+                                float(self.tab_widget.currentWidget().labels_category[index][6].text())))
 
                         self.dict_category.setdefault(plast, {}).setdefault(
-                            'отключение', self.tabWidget.currentWidget().labels_category[index][8].currentText())
+                            'отключение', self.tab_widget.currentWidget().labels_category[index][8].currentText())
 
                         self.data_well.dict_category = self.dict_category
                         data_list.pause = False

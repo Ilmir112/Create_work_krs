@@ -8,7 +8,7 @@ from PyQt5.QtCore import Qt
 
 from work_py.opressovka import OpressovkaEK
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
 from PyQt5.QtGui import QDoubleValidator
 from work_py.calculate_work_parametrs import volume_work
 
@@ -1021,7 +1021,7 @@ class TemplateKrs(WindowUnion):
         super().__init__(data_well)
         if data_well:
             self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -1047,16 +1047,16 @@ class TemplateKrs(WindowUnion):
         self.buttonadd_string.clicked.connect(self.add_string)
 
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
         vbox.addWidget(self.buttonDel, 2, 1)
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonadd_string, 3, 1)
 
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
 
     def add_row_table(self):
         roof_skm = self.current_widget.roof_skm_line.text()
@@ -1323,7 +1323,7 @@ class TemplateKrs(WindowUnion):
              f'Поднять {template_str} на НКТ{self.data_well.nkt_diam}мм с глубины {current_bottom}м с доливом скважины в '
              f'объеме {round(current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.data_well.fluid_work}',
              None, None, None, None, None, None, None,
-             'Мастер КРС', liftingNKT_norm(float(current_bottom), 1.2)]
+             'Мастер КРС', lifting_nkt_norm(float(current_bottom), 1.2)]
         ]
         if self.template_key == 'ПСШ + пакер':
             list_template_ek.insert(
@@ -1485,7 +1485,7 @@ class TemplateKrs(WindowUnion):
 
     def pero(self):
         from work_py.rir import RirWindow
-        from work_py.drilling import Drill_window, TabPageSoDrill
+        from work_py.drilling import DrillWindow, TabPageSoDrill
 
         pero_list = RirWindow.pero_select(self, self.data_well.current_bottom, 'перо + КОТ')
         if self.data_well.gips_in_well:
@@ -1540,7 +1540,7 @@ class TemplateKrs(WindowUnion):
              None]
         ]
         if self.data_well.gips_in_well is True:
-            template_diameter = TabPageSoDrill.drillingBit_diam_select(self, self.data_well.current_bottom)
+            template_diameter = TabPageSoDrill.drilling_bit_diam_select(self, self.data_well.current_bottom)
 
             if self.data_well.column_diameter.get_value > 127 or (self.data_well.column_additional and \
                                                                   self.data_well.column_additional_diameter > 127):
@@ -1550,13 +1550,13 @@ class TemplateKrs(WindowUnion):
 
             if self.data_well.dict_pump_shgn["before"] != 0 and self.data_well.paker_before["before"] == 0:
                 gips_pero_list = [gips_pero_list[-1]]
-                drill_list = Drill_window.drilling_nkt(self,
+                drill_list = DrillWindow.drilling_nkt(self,
                                                        [(self.data_well.current_bottom, 'гипсовых отложений')],
                                                        'долото', template_diameter, downhole_motor)
                 for row in drill_list:
                     gips_pero_list.append(row)
             else:
-                drill_list = Drill_window.drilling_nkt(self,
+                drill_list = DrillWindow.drilling_nkt(self,
                                                        [(self.data_well.current_bottom, 'гипсовых отложений')],
                                                        'долото', template_diameter, downhole_motor)
 

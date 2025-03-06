@@ -56,7 +56,7 @@ class GeophysicWindow(WindowUnion):
     def __init__(self, data_well, table_widget, parent=None):
         super().__init__(data_well)
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -77,7 +77,7 @@ class GeophysicWindow(WindowUnion):
         self.buttonadd_work = QPushButton('Добавить в план работ')
         self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
         vbox.addWidget(self.buttonDel, 2, 1)
@@ -94,11 +94,11 @@ class GeophysicWindow(WindowUnion):
 
     def add_row_table(self):
 
-        edit_type = self.tabWidget.currentWidget().lineedit_type.text().replace(',', '.')
-        edit_type2 = self.tabWidget.currentWidget().lineedit_type2.text().replace(',', '.')
-        researchGis = self.geophysicalSelect(str(self.tabWidget.currentWidget().ComboBoxGeophygist.currentText()))
+        edit_type = self.tab_widget.currentWidget().lineedit_type.text().replace(',', '.')
+        edit_type2 = self.tab_widget.currentWidget().lineedit_type2.text().replace(',', '.')
+        researchGis = self.geophysicalSelect(str(self.tab_widget.currentWidget().ComboBoxGeophygist.currentText()))
 
-        dopInformation = self.tabWidget.currentWidget().lineEditDopInformation.text()
+        dopInformation = self.tab_widget.currentWidget().lineEditDopInformation.text()
         if not edit_type or not edit_type2 or not researchGis:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return

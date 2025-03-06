@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import  QMessageBox, QLabel, QLineEdit, QComboBox, QGridLay
 
 from work_py.alone_oreration import kot_select
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
 from work_py.opressovka import OpressovkaEK, TabPageSo
 
 
@@ -106,7 +106,7 @@ class GrpWindow(WindowUnion):
 
 
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -116,7 +116,7 @@ class GrpWindow(WindowUnion):
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def closeEvent(self, event):
@@ -125,13 +125,13 @@ class GrpWindow(WindowUnion):
         event.accept() 
                 # Принимаем событие закрытия
     def add_work(self):
-        diameter_paker = int(float(self.tabWidget.currentWidget().diameter_paker_edit.text().replace(',', '.')))
-        paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text().replace(',', '.')))
-        paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text().replace(',', '.')))
-        gis_otz_true_quest = self.tabWidget.currentWidget().otz_question_qcombo.currentText()
-        gis_otz_after_true_quest = self.tabWidget.currentWidget().otz_after_question_qcombo.currentText()
-        normalization_true_quest = self.tabWidget.currentWidget().normalization_qcombo.currentText()
-        current_depth = int(float(self.tabWidget.currentWidget().current_depth_edit.text().replace(',', '.')))
+        diameter_paker = int(float(self.tab_widget.currentWidget().diameter_paker_edit.text().replace(',', '.')))
+        paker_khost = int(float(self.tab_widget.currentWidget().paker_khost_edit.text().replace(',', '.')))
+        paker_depth = int(float(self.tab_widget.currentWidget().paker_depth_edit.text().replace(',', '.')))
+        gis_otz_true_quest = self.tab_widget.currentWidget().otz_question_qcombo.currentText()
+        gis_otz_after_true_quest = self.tab_widget.currentWidget().otz_after_question_qcombo.currentText()
+        normalization_true_quest = self.tab_widget.currentWidget().normalization_qcombo.currentText()
+        current_depth = int(float(self.tab_widget.currentWidget().current_depth_edit.text().replace(',', '.')))
         if self.check_true_depth_template(paker_depth) is False:
             return
         if self.true_set_paker(paker_depth) is False:
@@ -184,7 +184,7 @@ class GrpWindow(WindowUnion):
              f'доливом скважины в '
              f'объеме {round(current_depth * 1.12 / 1000, 1)}м3 удельным весом {self.data_well.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(current_depth, 1)],
+             'мастер КРС', lifting_nkt_norm(current_depth, 1)],
             [None, None,
              f'В случае наличия ЗУМПФа 10м и более продолжить работы с п. по отбивки забоя '
              f'В случае ЗУМПФа менее 10м: и не жесткая посадка компоновки СПО КОТ повторить. '
@@ -209,7 +209,7 @@ class GrpWindow(WindowUnion):
              f' {self.data_well.fluid_work}  в объеме '
              f'{round(self.data_well.current_bottom * 1.12 / 1000, 1)}м3',
              None, None, None, None, None, None, None,
-             'Мастер КРС', liftingNKT_norm(current_depth, 1.2)],
+             'Мастер КРС', lifting_nkt_norm(current_depth, 1.2)],
             [f'по согласованию с заказчиком: Отбивка забоя',
              None, f'по согласованию с заказчиком: \n'
                    f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
@@ -416,7 +416,7 @@ class GrpWindow(WindowUnion):
              f'{round(self.data_well.current_bottom * 1.12 / 1000, 1)}м3. \n'
              f'На демонтаж пригласить представителя подрядчика по ГРП',
              None, None, None, None, None, None, None,
-             'Мастер КРС, представ. заказчика', liftingNKT_norm(paker_depth, 1.2)],
+             'Мастер КРС, представ. заказчика', lifting_nkt_norm(paker_depth, 1.2)],
             [None, None,
              f'Опрессовать глухие плашки превентора на максимально допустимое давление '
              f'{self.data_well.max_admissible_pressure.get_value}атм, но не выше '

@@ -125,7 +125,7 @@ class BlockPackWindow(WindowUnion):
         super().__init__(data_well)
 
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -135,31 +135,31 @@ class BlockPackWindow(WindowUnion):
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
         try:
-            pero_combo_combo = self.tabWidget.currentWidget().pero_combo_combo.currentText()
-            current_edit = int(float(self.tabWidget.currentWidget().current_edit.text().replace(',', '.')))
+            pero_combo_combo = self.tab_widget.currentWidget().pero_combo_combo.currentText()
+            current_edit = int(float(self.tab_widget.currentWidget().current_edit.text().replace(',', '.')))
             if current_edit >= self.data_well.bottom_hole_artificial.get_value:
                 QMessageBox.warning(self, 'Ошибка',
                                     f'Необходимый забой-{current_edit}м ниже искусственного '
                                     f'{self.data_well.bottom_hole_artificial.get_value}м')
                 return
-            plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
+            plast_combo = str(self.tab_widget.currentWidget().plast_combo.combo_box.currentText())
             type_of_block_processing_combo = str(
-                self.tabWidget.currentWidget().type_of_block_processing_combo.currentText())
-            block_volume_edit = self.tabWidget.currentWidget().block_volume_edit.text().replace(',', '.')
+                self.tab_widget.currentWidget().type_of_block_processing_combo.currentText())
+            block_volume_edit = self.tab_widget.currentWidget().block_volume_edit.text().replace(',', '.')
             if block_volume_edit != '':
                 block_volume_edit = round(float(block_volume_edit), 1)
-            oil_volume_edit = self.tabWidget.currentWidget().oil_volume_edit.text().replace(',', '.')
+            oil_volume_edit = self.tab_widget.currentWidget().oil_volume_edit.text().replace(',', '.')
             if oil_volume_edit != '':
                 oil_volume_edit = round(float(oil_volume_edit), 1)
 
-            fluid_new_edit = float(self.tabWidget.currentWidget().fluid_new_edit.text().replace(',', '.'))
+            fluid_new_edit = float(self.tab_widget.currentWidget().fluid_new_edit.text().replace(',', '.'))
             block_type_edit = round(
-                float(self.tabWidget.currentWidget().block_type_volume_edit.text().replace(',', '.')), 1)
+                float(self.tab_widget.currentWidget().block_type_volume_edit.text().replace(',', '.')), 1)
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
 

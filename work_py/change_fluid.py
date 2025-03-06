@@ -187,7 +187,7 @@ class Change_fluid_Window(WindowUnion):
         super().__init__(data_well)
 
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -198,13 +198,13 @@ class Change_fluid_Window(WindowUnion):
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-        currentWidget = self.tabWidget.currentWidget()
+        currentWidget = self.tab_widget.currentWidget()
         self.need_change_zgs_combo = currentWidget.need_change_zgs_combo.currentText()
-        self.data_well.type_absorbent = self.tabWidget.currentWidget().type_absorbent.currentText()
+        self.data_well.type_absorbent = self.tab_widget.currentWidget().type_absorbent.currentText()
         fluid_new_edit = currentWidget.fluid_new_edit.text().replace(',', '.')
         if fluid_new_edit == '':
             QMessageBox.information(self, 'Ошибка', 'Не введен расчетный уд.вес')
@@ -217,7 +217,7 @@ class Change_fluid_Window(WindowUnion):
             else:
                 plast_new_combo = currentWidget.plast_new_combo.text()
 
-            pressure_new_edit = float(self.tabWidget.currentWidget().pressure_new_edit.text())
+            pressure_new_edit = float(self.tab_widget.currentWidget().pressure_new_edit.text())
 
             if (plast_new_combo == '' or fluid_new_edit == '' or pressure_new_edit == ''):
                 mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
@@ -230,15 +230,15 @@ class Change_fluid_Window(WindowUnion):
                 return
 
             if self.data_well.plast_project:
-                plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.currentText()
+                plast_new_combo = self.tab_widget.currentWidget().plast_new_combo.currentText()
             else:
-                plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.text()
+                plast_new_combo = self.tab_widget.currentWidget().plast_new_combo.text()
 
                 self.data_well.dict_category.setdefault(plast_new_combo, {}).setdefault('отключение',
                                                                                                 False)
                 self.data_well.plast_project.append(plast_new_combo)
 
-            pressure_new_edit = self.tabWidget.currentWidget().pressure_new_edit.text()
+            pressure_new_edit = self.tab_widget.currentWidget().pressure_new_edit.text()
 
             if pressure_new_edit != '':
                 pressure_new_edit = int(float(pressure_new_edit.replace(',', '.')))
@@ -246,10 +246,10 @@ class Change_fluid_Window(WindowUnion):
             aassdaad = self.data_well.dict_category
 
             if self.data_well.dict_category[plast_new_combo]['отключение'] != 'планируемый':
-                h2s_pr_edit = self.tabWidget.currentWidget().h2s_pr_edit.text().replace(',', '.')
-                h2s_mg_edit = self.tabWidget.currentWidget().h2s_mg_edit.text().replace(',', '.')
-                gf_edit = self.tabWidget.currentWidget().gf_edit.text().replace(',', '.')
-                calc_plast_h2s = self.tabWidget.currentWidget().calc_plast_h2s.text()
+                h2s_pr_edit = self.tab_widget.currentWidget().h2s_pr_edit.text().replace(',', '.')
+                h2s_mg_edit = self.tab_widget.currentWidget().h2s_mg_edit.text().replace(',', '.')
+                gf_edit = self.tab_widget.currentWidget().gf_edit.text().replace(',', '.')
+                calc_plast_h2s = self.tab_widget.currentWidget().calc_plast_h2s.text()
                 if h2s_pr_edit != '' and h2s_mg_edit and gf_edit != '' and calc_plast_h2s != '' and pressure_new_edit != '':
 
                     asdwd = self.data_well.dict_category
@@ -258,11 +258,11 @@ class Change_fluid_Window(WindowUnion):
                     Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
                     Data_gaz = namedtuple("Data_gaz", "category data")
 
-                    category_pressure_line_combo = self.tabWidget.currentWidget().category_pressure_line_combo.currentText()
-                    category_h2s_edit = self.tabWidget.currentWidget().category_h2s_edit.currentText()
+                    category_pressure_line_combo = self.tab_widget.currentWidget().category_pressure_line_combo.currentText()
+                    category_h2s_edit = self.tab_widget.currentWidget().category_h2s_edit.currentText()
 
-                    self.data_well.category_gas_factor = self.tabWidget.currentWidget().data_well.category_gas_factor.currentText()
-                    gf_edit = self.tabWidget.currentWidget().gf_edit.text().replace(',', '.')
+                    self.data_well.category_gas_factor = self.tab_widget.currentWidget().data_well.category_gas_factor.currentText()
+                    gf_edit = self.tab_widget.currentWidget().gf_edit.text().replace(',', '.')
 
                     self.data_well.dict_category.setdefault(plast_new_combo, {}).setdefault(
                         'по давлению',

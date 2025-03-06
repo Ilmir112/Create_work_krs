@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QInputDialog
 
 import data_list
-from .rationingKRS import descentNKT_norm, liftingNKT_norm
+from .rationingKRS import descentNKT_norm, lifting_nkt_norm
 
 
 def magnet_select(self, nkt_str):
@@ -89,7 +89,7 @@ def emergency_hook(self):
                        f' {round(self.data_well.current_bottom * 1.25 / 1000, 1)}м3'
                        f' удельным весом {self.data_well.fluid_work}.',
                        None, None, None, None, None, None, None,
-                       'Мастер, подрядчик по ГИС', liftingNKT_norm(self.data_well.current_bottom, 1)],
+                       'Мастер, подрядчик по ГИС', lifting_nkt_norm(self.data_well.current_bottom, 1)],
                       [None, None,
                        f'При результатам ревизии поднятого количества аварийного оборудования произвести, по согласованию с аварийной '
                        f'службой супервайзинга, повторить цикл работ - до полного извлечения из скважины '
@@ -138,7 +138,7 @@ def emergency_sticking(self, lar_diameter_line, nkt_key, lar_type_combo,
          f'Поднять аварийные НКТ до устья. \nПри выявлении отложений солей и гипса, отобрать шлам. '
          f'Сдать в лабораторию для проведения хим. анализа.',
          None, None, None, None, None, None, None,
-         'Мастер КРС', liftingNKT_norm(self.data_well.current_bottom, 1.2)],
+         'Мастер КРС', lifting_nkt_norm(self.data_well.current_bottom, 1.2)],
         [f'Завоз на скважину СБТ', None,
          f'Завоз на скважину СБТ – Укладка труб на стеллажи.',
          None, None, None, None, None, None, None,
@@ -169,7 +169,7 @@ def emergency_sticking(self, lar_diameter_line, nkt_key, lar_type_combo,
           f'объеме{round(self.data_well.current_bottom * 1.25 / 1000, 1)}м3'
           f' удельным весом {self.data_well.fluid_work}.',
           None, None, None, None, None, None, None,
-          'Мастер КРС', liftingNKT_norm(self.data_well.current_bottom, 1.2)],
+          'Мастер КРС', lifting_nkt_norm(self.data_well.current_bottom, 1.2)],
          [None, None,
           f'По результату ревизии печати, согласовать с ПТО  и УСРСиСТ и '
           f'подобрать ловильный инструмент',
@@ -226,7 +226,7 @@ def lapel_tubing(self):
                f'объеме {round(self.data_well.current_bottom * 1.25 / 1000, 1)}м3'
                f' удельным весом {self.data_well.fluid_work}.',
                None, None, None, None, None, None, None,
-               'Мастер', liftingNKT_norm(self.data_well.current_bottom, 1)],
+               'Мастер', lifting_nkt_norm(self.data_well.current_bottom, 1)],
               [None, None,
                f'При необходимости по согласованию с УСРСиСТ работы повторить',
                None, None, None, None, None, None, None,

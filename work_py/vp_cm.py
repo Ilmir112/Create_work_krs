@@ -90,7 +90,7 @@ class VpWindow(WindowUnion):
     def __init__(self, data_well, table_widget, parent=None):
         super().__init__(data_well)
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -99,14 +99,14 @@ class VpWindow(WindowUnion):
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-        vp_type_qcombo = self.tabWidget.currentWidget().vp_type_qcombo.currentText()
-        need_question_qcombo = self.tabWidget.currentWidget().need_question_qcombo.currentText()
-        vp_depth = int(float(self.tabWidget.currentWidget().vp_depth_edit.text()))
-        cement_vp = int(float(self.tabWidget.currentWidget().cement_vp_edit.text()))
+        vp_type_qcombo = self.tab_widget.currentWidget().vp_type_qcombo.currentText()
+        need_question_qcombo = self.tab_widget.currentWidget().need_question_qcombo.currentText()
+        vp_depth = int(float(self.tab_widget.currentWidget().vp_depth_edit.text()))
+        cement_vp = int(float(self.tab_widget.currentWidget().cement_vp_edit.text()))
 
         self.cable_type_text = ''
         self.angle_text = ''

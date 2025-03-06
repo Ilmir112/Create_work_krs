@@ -11,7 +11,7 @@ def liftingGNO(dict_nkt):
             norm += value/10 * 0.048
     return round(norm, 2)
 #Подьем труб
-def liftingNKT_norm(depth, layout):
+def lifting_nkt_norm(depth, layout):
     norm = 0.14 + 0.14
     if depth > 2000:
         norm += 1000 / 10 * 0.028

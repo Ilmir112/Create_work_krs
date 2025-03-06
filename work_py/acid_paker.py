@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox,
 import data_list
 from work_py.alone_oreration import volume_vn_nkt, well_volume, kot_work
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
-from work_py.rationingKRS import descentNKT_norm, well_volume_norm, liftingNKT_norm
+from work_py.rationingKRS import descentNKT_norm, well_volume_norm, lifting_nkt_norm
 from work_py.swabbing import SwabWindow
 
 
@@ -517,7 +517,7 @@ class AcidPakerWindow(WindowUnion):
 
         self.table_widget = table_widget
         self.tableWidget = QTableWidget(0, 8)
-        self.tabWidget = TabWidget(self.tableWidget, self.data_well)
+        self.tab_widget = TabWidget(self.tableWidget, self.data_well)
 
         if self.data_well:
 
@@ -537,16 +537,16 @@ class AcidPakerWindow(WindowUnion):
         self.buttonadd_string.clicked.connect(self.add_string)
 
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonadd_string, 2, 0)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
 
         vbox.addWidget(self.buttonDel, 2, 1)
         vbox.addWidget(self.buttonadd_work, 3, 0, 1, 0)
 
     def add_string(self):
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
         self.paker_layout_combo = self.current_widget.paker_layout_combo.currentText()
         self.plast_combo = self.current_widget.plast_combo.combo_box.currentText()
 
@@ -653,7 +653,7 @@ class AcidPakerWindow(WindowUnion):
         event.accept()  # Принимаем событие закрытия
 
     def add_work(self):
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
         try:
             self.need_privyazka_q_combo = self.current_widget.need_privyazka_q_combo.currentText()
             if self.need_privyazka_q_combo == 'Да':
@@ -1018,7 +1018,7 @@ class AcidPakerWindow(WindowUnion):
                                            f'{self.data_well.fluid_work}',
                                            None, None, None, None, None, None, None,
                                            'мастер КРС',
-                                           liftingNKT_norm(self.data_well.current_bottom, 1)])
+                                           lifting_nkt_norm(self.data_well.current_bottom, 1)])
         if self.data_well.region == 'ТГМ' and self.data_well.curator == 'ОР' and self.data_well.dict_pump_ecn == 0:
             work_template_list.extend(kot_work(self, self.data_well.current_bottom))
 

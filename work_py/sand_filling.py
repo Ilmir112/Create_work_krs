@@ -9,7 +9,7 @@ from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 from .rir import RirWindow
 
 from .opressovka import OpressovkaEK
-from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from .rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
 
 
 
@@ -196,7 +196,7 @@ class SandWindow(WindowUnion):
 
 
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -204,28 +204,28 @@ class SandWindow(WindowUnion):
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
 
-        privyazka_question_QCombo = str(self.tabWidget.currentWidget().privyazka_question_QCombo.currentText())
-        roof_sand_edit = int(float(self.tabWidget.currentWidget().roof_sand_edit.text()))
-        sole_sand_edit = int(float(self.tabWidget.currentWidget().sole_sand_edit.text()))
-        rir_question_qcombo = str(self.tabWidget.currentWidget().rir_question_qcombo.currentText())
+        privyazka_question_QCombo = str(self.tab_widget.currentWidget().privyazka_question_QCombo.currentText())
+        roof_sand_edit = int(float(self.tab_widget.currentWidget().roof_sand_edit.text()))
+        sole_sand_edit = int(float(self.tab_widget.currentWidget().sole_sand_edit.text()))
+        rir_question_qcombo = str(self.tab_widget.currentWidget().rir_question_qcombo.currentText())
 
-        need_change_zgs_combo = self.tabWidget.currentWidget().need_change_zgs_combo.currentText()
+        need_change_zgs_combo = self.tab_widget.currentWidget().need_change_zgs_combo.currentText()
         if len(self.data_well.plast_project) != 0:
-            plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.currentText()
+            plast_new_combo = self.tab_widget.currentWidget().plast_new_combo.currentText()
         else:
-            plast_new_combo = self.tabWidget.currentWidget().plast_new_combo.text()
-        fluid_new_edit = self.tabWidget.currentWidget().fluid_new_edit.text()
-        pressure_new_edit = self.tabWidget.currentWidget().pressure_new_edit.text()
+            plast_new_combo = self.tab_widget.currentWidget().plast_new_combo.text()
+        fluid_new_edit = self.tab_widget.currentWidget().fluid_new_edit.text()
+        pressure_new_edit = self.tab_widget.currentWidget().pressure_new_edit.text()
         if (plast_new_combo == '' or fluid_new_edit == '' or pressure_new_edit == '') and \
                 need_change_zgs_combo == 'Да':
             mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
             return
-        volume_cement = self.tabWidget.currentWidget().cement_volume_line.text().replace(',', '.')
+        volume_cement = self.tab_widget.currentWidget().cement_volume_line.text().replace(',', '.')
         if volume_cement != '':
             volume_cement = round(float(volume_cement), 1)
         elif volume_cement == '' and rir_question_qcombo == "Да":
@@ -235,8 +235,8 @@ class SandWindow(WindowUnion):
         work_list = self.sandFilling(roof_sand_edit, sole_sand_edit, privyazka_question_QCombo)
         if rir_question_qcombo == "Да":
             work_list = work_list[:-1]
-            roof_rir_edit = int(float(self.tabWidget.currentWidget().roof_rir_edit.text()))
-            sole_rir_edit = int(float(self.tabWidget.currentWidget().sole_rir_edit.text()))
+            roof_rir_edit = int(float(self.tab_widget.currentWidget().roof_rir_edit.text()))
+            sole_rir_edit = int(float(self.tab_widget.currentWidget().sole_rir_edit.text()))
             rir_list = RirWindow.rir_with_pero_gl(self, "Не нужно", '', roof_rir_edit, sole_rir_edit, volume_cement,
                                                 need_change_zgs_combo, plast_new_combo, fluid_new_edit,
                                                 pressure_new_edit)
@@ -353,7 +353,7 @@ class SandWindow(WindowUnion):
                              f'скважины в объеме {round(filling_depth * 1.12 / 1000, 1)}м3 тех. жидкостью '
                              f'уд.весом {self.data_well.fluid_work}',
                              None, None, None, None, None, None, None,
-                             'мастер КРС', liftingNKT_norm(filling_depth, 1)])
+                             'мастер КРС', lifting_nkt_norm(filling_depth, 1)])
         self.data_well.current_bottom = filling_depth
 
         self.calculate_chemistry('песок', sand_volume)
@@ -388,7 +388,7 @@ class SandWindow(WindowUnion):
              f'{round(washingDepth * 1.12 / 1000, 1)}м3 тех. '
              f'жидкостью  уд.весом {self.data_well.fluid_work}',
              None, None, None, None, None, None, None,
-             'мастер КРС', liftingNKT_norm(washingDepth, 1.2)]]
+             'мастер КРС', lifting_nkt_norm(washingDepth, 1.2)]]
         self.data_well.current_bottom = washingDepth
 
         return washingOut_list

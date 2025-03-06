@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, 
 
 
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm
 
 
 class TabPageSo(TabPageUnion):
@@ -28,7 +28,7 @@ class OpressovkaEK(WindowUnion):
         super().__init__(data_well)
 
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -49,7 +49,7 @@ class OpressovkaEK(WindowUnion):
         self.buttonadd_string = QPushButton('Поинтервальная опрессовка')
         self.buttonadd_string.clicked.connect(self.add_string)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
 
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
@@ -64,7 +64,7 @@ class OpressovkaEK(WindowUnion):
 
     def add_row_table(self):
 
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
 
         paker_khost = int(float(self.current_widget.paker_khost_edit.text()))
         paker_depth = int(float(self.current_widget.paker_depth_edit.text()))
@@ -99,14 +99,15 @@ class OpressovkaEK(WindowUnion):
             return
         if self.check_depth_in_skm_interval(paker_depth) is False:
             return
+        item_roof = self.find_item_in_table(int(paker_depth))
 
-        rows = self.tableWidget.rowCount()
-        self.tableWidget.insertRow(rows)
+        if item_roof is None:
+            rows = self.tableWidget.rowCount()
+            self.tableWidget.insertRow(rows)
+            # self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(paker_khost)))
+            self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(paker_depth)))
 
-        # self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(paker_khost)))
-        self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(paker_depth)))
-
-        self.tableWidget.setSortingEnabled(False)
+            self.tableWidget.setSortingEnabled(False)
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()
@@ -117,18 +118,18 @@ class OpressovkaEK(WindowUnion):
 
     def add_work(self):
         rows = self.tableWidget.rowCount()
-        paker_khost = int(float(self.tabWidget.currentWidget().paker_khost_edit.text()))
-        diameter_paker = int(float(self.tabWidget.currentWidget().diameter_paker_edit.text()))
-        pressure_zumpf_question_combo = self.tabWidget.currentWidget().pressure_zumpf_question_combo.currentText()
+        paker_khost = int(float(self.tab_widget.currentWidget().paker_khost_edit.text()))
+        diameter_paker = int(float(self.tab_widget.currentWidget().diameter_paker_edit.text()))
+        pressure_zumpf_question_combo = self.tab_widget.currentWidget().pressure_zumpf_question_combo.currentText()
         if pressure_zumpf_question_combo == 'Да':
-            paker_depth_zumpf = int(float(self.tabWidget.currentWidget().paker_depth_zumpf_edit.text()))
+            paker_depth_zumpf = int(float(self.tab_widget.currentWidget().paker_depth_zumpf_edit.text()))
             if paker_khost + paker_depth_zumpf >= self.data_well.current_bottom:
                 QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
                 return
 
         else:
             paker_depth_zumpf = 0
-        self.need_privyazka_q_combo = self.tabWidget.currentWidget().need_privyazka_q_combo.currentText()
+        self.need_privyazka_q_combo = self.tab_widget.currentWidget().need_privyazka_q_combo.currentText()
 
         if rows == 0:
             QMessageBox.warning(self, 'ОШИБКА', 'Нужно добавить интервалы')
@@ -248,7 +249,7 @@ class OpressovkaEK(WindowUnion):
                  f'Поднять {paker_select} на НКТ{self.data_well.nkt_diam}мм c глубины {paker_depth}м с доливом скважины в '
                  f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {self.data_well.fluid_work}',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
+                 'мастер КРС', lifting_nkt_norm(paker_depth, 1.2)]]
 
         else:
             paker_list = [
@@ -284,7 +285,7 @@ class OpressovkaEK(WindowUnion):
                  f'Поднять {paker_select} на НКТ{self.data_well.nkt_diam}мм c глубины {paker_depth}м с доливом скважины в '
                  f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом {self.data_well.fluid_work}',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]]
+                 'мастер КРС', lifting_nkt_norm(paker_depth, 1.2)]]
 
         if self.need_privyazka_q_combo == "Да":
             paker_list.insert(1, self.privyazka_nkt()[0])
@@ -292,7 +293,7 @@ class OpressovkaEK(WindowUnion):
         return paker_list
 
     def add_string(self):
-        paker_depth = int(float(self.tabWidget.currentWidget().paker_depth_edit.text()))
+        paker_depth = int(float(self.tab_widget.currentWidget().paker_depth_edit.text()))
         if len(self.data_well.dict_leakiness) != 0:
             dict_leakinest_keys = sorted(list(self.data_well.dict_leakiness['НЭК']['интервал'].keys()),
                                          key=lambda x: x[0],
@@ -450,7 +451,7 @@ class OpressovkaEK(WindowUnion):
                  f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом '
                  f'{self.data_well.fluid_work}',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]
+                 'мастер КРС', lifting_nkt_norm(paker_depth, 1.2)]
             ]
         else:
             zumpf_list = [[None, None,
@@ -459,7 +460,7 @@ class OpressovkaEK(WindowUnion):
                            f'объеме {round(paker_depth * 1.12 / 1000, 1)}м3 удельным весом '
                            f'{self.data_well.fluid_work}',
                            None, None, None, None, None, None, None,
-                           'мастер КРС', liftingNKT_norm(paker_depth, 1.2)]
+                           'мастер КРС', lifting_nkt_norm(paker_depth, 1.2)]
                           ]
         for row in zumpf_list:
             paker_list.append(row)

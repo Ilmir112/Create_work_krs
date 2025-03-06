@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import  QWidget, QLabel, QLineEdit, QComboBox, QGridLayout,
 import data_list
 
 from work_py.parent_work import TabPageUnion, WindowUnion,TabWidgetUnion
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm
 
 
 class TabPageSoLar(TabPageUnion):
@@ -102,7 +102,7 @@ class EmergencyPo(WindowUnion):
 
 
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -113,7 +113,7 @@ class EmergencyPo(WindowUnion):
 
         vbox = QGridLayout(self.centralWidget)
 
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonadd_work, 3, 0)
 
     def closeEvent(self, event):
@@ -122,13 +122,13 @@ class EmergencyPo(WindowUnion):
         event.accept()  # Принимаем событие закрытия
 
     def add_work(self):
-        po_str_combo = self.tabWidget.currentWidget().po_type_combo.currentText()
-        nkt_str_combo = self.tabWidget.currentWidget().nkt_str_combo.currentText()
-        # lar_diameter_line = self.tabWidget.currentWidget().lar_diameter_line.text()
-        nkt_key = self.tabWidget.currentWidget().nkt_select_combo.currentText()
-        # lar_type_combo = self.tabWidget.currentWidget().lar_type_combo.currentText()
-        emergency_bottom_line = self.tabWidget.currentWidget().emergency_bottom_line.text().replace(',', '')
-        bottom_line = self.tabWidget.currentWidget().bottom_line.text().replace(',', '')
+        po_str_combo = self.tab_widget.currentWidget().po_type_combo.currentText()
+        nkt_str_combo = self.tab_widget.currentWidget().nkt_str_combo.currentText()
+        # lar_diameter_line = self.tab_widget.currentWidget().lar_diameter_line.text()
+        nkt_key = self.tab_widget.currentWidget().nkt_select_combo.currentText()
+        # lar_type_combo = self.tab_widget.currentWidget().lar_type_combo.currentText()
+        emergency_bottom_line = self.tab_widget.currentWidget().emergency_bottom_line.text().replace(',', '')
+        bottom_line = self.tab_widget.currentWidget().bottom_line.text().replace(',', '')
         if bottom_line != '':
             bottom_line = int(float(bottom_line))
 
@@ -192,7 +192,7 @@ class EmergencyPo(WindowUnion):
              f'Поднять аварийные НКТ до устья. \nПри выявлении отложений солей и гипса, отобрать шлам. '
              f'Сдать в лабораторию для проведения хим. анализа.',
              None, None, None, None, None, None, None,
-             'Мастер КРС', liftingNKT_norm(self.data_well.current_bottom, 1.2)],
+             'Мастер КРС', lifting_nkt_norm(self.data_well.current_bottom, 1.2)],
             [f'Завоз на скважину СБТ', None,
              f'Завоз на скважину СБТ – Укладка труб на стеллажи.',
              None, None, None, None, None, None, None,
@@ -223,7 +223,7 @@ class EmergencyPo(WindowUnion):
               f'объеме {round(self.data_well.current_bottom * 1.25 / 1000, 1)}м3'
               f' удельным весом {self.data_well.fluid_work}.',
               None, None, None, None, None, None, None,
-              'Мастер КРС', liftingNKT_norm(self.data_well.current_bottom, 1.2)],
+              'Мастер КРС', lifting_nkt_norm(self.data_well.current_bottom, 1.2)],
              [None, None,
               f'По результату ревизии печати, согласовать с ПТО  и УСРСиСТ и '
               f'подобрать ловильный инструмент',

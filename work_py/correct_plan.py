@@ -89,7 +89,7 @@ class CorrectPlanWindow(WindowUnion):
 
         self.current_widget = None
         self.data_well.insert_index = 0
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -107,7 +107,7 @@ class CorrectPlanWindow(WindowUnion):
         self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
 
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
 
         vbox.addWidget(self.buttonadd_work, 3, 0, 1, 2)
 
@@ -116,7 +116,7 @@ class CorrectPlanWindow(WindowUnion):
         from work_py.dop_plan_py import DopPlanWindow
 
         from data_list import ProtectedIsNonNone
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
 
         well_number = self.current_widget.well_number_edit.text()
         well_area = self.current_widget.well_area_edit.text()

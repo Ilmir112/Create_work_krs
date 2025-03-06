@@ -117,7 +117,7 @@ class CorrectSignaturesCdng(QMainWindow):
         self.setWindowModality(QtCore.Qt.ApplicationModal)  # Устанавливаем модальность окна
 
         # self.selected_region = selected_region
-        self.tabWidget = TabWidget()
+        self.tab_widget = TabWidget()
         # self.tableWidget = QTableWidget(0, 4)
         # self.labels_nkt = labels_nkt
 
@@ -125,16 +125,16 @@ class CorrectSignaturesCdng(QMainWindow):
         self.buttonAdd.clicked.connect(self.add_row_table)
 
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         # vbox.addWidget(self.tableWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 3, 0)
 
     def add_row_table(self):
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
 
         selected_region = self.current_widget.region_combo_box.currentText()
         cdng_combo = self.current_widget.cdng_combo_box.currentText()
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
 
         nach_chng_edit_type = self.current_widget.nach_chng_edit_type.text()
         nach_chng_name_edit_type = self.current_widget.nach_chng_name_edit_type.text().title()

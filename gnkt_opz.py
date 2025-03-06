@@ -208,7 +208,7 @@ class GnktOpz(GnktModel):
         self.paker_select = None
 
         self.tableWidget = QTableWidget(0, 7)
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.tableWidget.setHorizontalHeaderLabels(
             ["Пласт", 'кровля', 'Подошва', 'СКВ', "вид кислоты", "процент", "объем"])
@@ -229,9 +229,9 @@ class GnktOpz(GnktModel):
         self.buttonadd_string = QPushButton('Добавить обработку')
         self.buttonadd_string.clicked.connect(self.add_string)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonadd_string, 2, 0)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
 
         vbox.addWidget(self.buttonDel, 2, 1)
@@ -246,7 +246,7 @@ class GnktOpz(GnktModel):
 
     def add_work(self):
 
-        self.current_widget = self.tabWidget.currentWidget()
+        self.current_widget = self.tab_widget.currentWidget()
 
         try:
             self.need_rast_combo = self.current_widget.need_rast_combo.currentText()
@@ -266,7 +266,7 @@ class GnktOpz(GnktModel):
             return
 
         if self.acid_edit == 'ВТ':
-            self.vt = self.tabWidget.currentWidget().sko_vt_edit.text()
+            self.vt = self.tab_widget.currentWidget().sko_vt_edit.text()
             if self.vt == '':
                 QMessageBox.critical(self, "Ошибка", "Нужно расписать объемы и вид кислоты")
                 return
@@ -276,20 +276,20 @@ class GnktOpz(GnktModel):
 
     def add_string(self):
 
-        roof_plast = float(self.tabWidget.currentWidget().roof_edit.text().replace(',', '.'))
-        sole_plast = float(self.tabWidget.currentWidget().sole_edit.text().replace(',', '.'))
+        roof_plast = float(self.tab_widget.currentWidget().roof_edit.text().replace(',', '.'))
+        sole_plast = float(self.tab_widget.currentWidget().sole_edit.text().replace(',', '.'))
 
-        plast_combo = str(self.tabWidget.currentWidget().plast_combo.combo_box.currentText())
+        plast_combo = str(self.tab_widget.currentWidget().plast_combo.combo_box.currentText())
 
         acid_edit_list = ['HCl', 'HF', 'ВТ', 'лимонная кислота']
-        acid_edit = self.tabWidget.currentWidget().acid_edit.currentText()
+        acid_edit = self.tab_widget.currentWidget().acid_edit.currentText()
         acid_edit_combo = QComboBox(self)
         acid_edit_combo.addItems(acid_edit_list)
         acid_edit_combo.setCurrentIndex(acid_edit_list.index(acid_edit))
-        self.tabWidget.currentWidget().acid_volume_edit.text().replace(',', '.')
-        acid_volume_edit = float(self.tabWidget.currentWidget().acid_volume_edit.text().replace(',', '.'))
-        acid_proc_edit = int(float(self.tabWidget.currentWidget().acid_proc_edit.text().replace(',', '.')))
-        svk_true_combo_str = self.tabWidget.currentWidget().svk_true_combo.currentText()
+        self.tab_widget.currentWidget().acid_volume_edit.text().replace(',', '.')
+        acid_volume_edit = float(self.tab_widget.currentWidget().acid_volume_edit.text().replace(',', '.'))
+        acid_proc_edit = int(float(self.tab_widget.currentWidget().acid_proc_edit.text().replace(',', '.')))
+        svk_true_combo_str = self.tab_widget.currentWidget().svk_true_combo.currentText()
 
         svk_true_combo = QComboBox(self)
         svk_true_list = ['Нужно СКВ', 'без СКВ']

@@ -52,10 +52,8 @@ class CreatePZ(MyMainWindow):
         col_width = [source_sheet.column_dimensions[get_column_letter(i + 1)].width for i in range(0, 15)]
         # Копируем данные, стили и размеры ячеек
         for row in range(start_row, end_row + 1):
-            asde = target_start_row + row - start_row + 1
             for col in range(start_col, end_col + 1):
                 cell = source_sheet.cell(row=row, column=col)
-                asdffr = cell.value
                 target_cell = target_sheet.cell(row=target_start_row + row - start_row + 1, column=col)
                 if cell.value not in ['Ведущий технолог Подрядной организации', 'ф.и.о.', '(Подпись)', '(чч.мм.гг)']:
                     target_cell.value = cell.value

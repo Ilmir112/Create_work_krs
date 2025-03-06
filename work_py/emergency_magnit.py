@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdi
 
 from main import MyMainWindow
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
-from work_py.rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
 
 
 class TabPageSoMagnit(TabPageUnion):
@@ -80,13 +80,13 @@ class TabPageSoMagnit(TabPageUnion):
     def update_raid_edit(self, index):
         if index == 'магнит в ЭК':
             self.print_diameter_line.setText(
-                str(self.raiding_Bit_diam_select(self.data_well.head_column_additional.get_value - 10)))
+                str(self.raiding_bit_diam_select(self.data_well.head_column_additional.get_value - 10)))
         elif index == 'магнит в ДП':
-            self.print_diameter_line.setText(str(self.raiding_Bit_diam_select(self.data_well.current_bottom)))
+            self.print_diameter_line.setText(str(self.raiding_bit_diam_select(self.data_well.current_bottom)))
 
-    def raiding_Bit_diam_select(self, depth):
+    def raiding_bit_diam_select(self, depth):
         try:
-            raiding_Bit_dict = {
+            raiding_bit_dict = {
                 82: (88, 92),
                 88: (92.1, 96.6),
                 90: (96.7, 102),
@@ -107,7 +107,7 @@ class TabPageSoMagnit(TabPageUnion):
             else:
                 diam_internal_ek = self.data_well.column_additional_diameter.get_value - 2 * self.data_well.column_additional_wall_thickness.get_value
 
-            for diam, diam_internal_bit in raiding_Bit_dict.items():
+            for diam, diam_internal_bit in raiding_bit_dict.items():
                 if diam_internal_bit[0] <= diam_internal_ek <= diam_internal_bit[1]:
                     bit_diameter = diam
             return bit_diameter
@@ -125,7 +125,7 @@ class EmergencyMagnit(WindowUnion):
     def __init__(self, data_well, table_widget, parent=None):
         super().__init__(data_well)
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
@@ -135,7 +135,7 @@ class EmergencyMagnit(WindowUnion):
 
         vbox = QGridLayout(self.centralWidget)
 
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonadd_work, 3, 0)
 
     def closeEvent(self, event):
@@ -144,9 +144,9 @@ class EmergencyMagnit(WindowUnion):
         event.accept()  # Принимаем событие закрытия
 
     def add_work(self):
-        nkt_str_combo = self.tabWidget.currentWidget().nkt_str_combo.currentText()
-        print_diameter_line = self.tabWidget.currentWidget().print_diameter_line.text()
-        nkt_key = self.tabWidget.currentWidget().nkt_select_combo.currentText()
+        nkt_str_combo = self.tab_widget.currentWidget().nkt_str_combo.currentText()
+        print_diameter_line = self.tab_widget.currentWidget().print_diameter_line.text()
+        nkt_key = self.tab_widget.currentWidget().nkt_select_combo.currentText()
         if nkt_key == 'Силами ККТ или ГИРС':
             mes = QMessageBox.question(self, 'ПРЕДУПРЕЖДЕНИЕ',
                                        'Использование магнита с ККТ или ГИС можно только при полётах '
@@ -155,9 +155,9 @@ class EmergencyMagnit(WindowUnion):
                                        ' гипсоотложения, которые могут привезти к заклиниванию оборудования ')
             if mes == QMessageBox.StandardButton.No:
                 return
-        print_type_combo = self.tabWidget.currentWidget().print_type_combo.currentText()
-        emergency_bottom_line = self.tabWidget.currentWidget().emergency_bottom_line.text().replace(',', '')
-        nkt_select_combo = self.tabWidget.currentWidget().nkt_select_combo.currentText()
+        print_type_combo = self.tab_widget.currentWidget().print_type_combo.currentText()
+        emergency_bottom_line = self.tab_widget.currentWidget().emergency_bottom_line.text().replace(',', '')
+        nkt_select_combo = self.tab_widget.currentWidget().nkt_select_combo.currentText()
 
         if emergency_bottom_line != '':
             emergency_bottom_line = int(float(emergency_bottom_line))
@@ -225,7 +225,7 @@ class EmergencyMagnit(WindowUnion):
                  f'с доливом скважины в объеме {round(emergency_bottom_line * 1.12 / 1000, 1)}м3 тех. жидкостью '
                  f'уд.весом {self.data_well.fluid_work}',
                  None, None, None, None, None, None, None,
-                 'мастер КРС', liftingNKT_norm(emergency_bottom_line, 1)],
+                 'мастер КРС', lifting_nkt_norm(emergency_bottom_line, 1)],
                 [None, None,
                  f'ПО результатам ревизии СПО магнита повторить',
                  None, None, None, None, None, None, None,

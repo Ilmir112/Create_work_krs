@@ -403,7 +403,7 @@ class DopPlanWindow(WindowUnion):
         self.old_index = 0
         self.tableWidget = QTableWidget(0, 12)
 
-        self.tabWidget = TabWidget(self.data_well, self.tableWidget, self.old_index)
+        self.tab_widget = TabWidget(self.data_well, self.tableWidget, self.old_index)
         self.tableWidget.setSortingEnabled(True)
         self.tableWidget.setAlternatingRowColors(True)
 
@@ -417,7 +417,7 @@ class DopPlanWindow(WindowUnion):
         self.buttonAddProject.clicked.connect(self.addPerfProject)
 
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
         vbox.addWidget(self.buttonDel, 2, 1)
@@ -428,7 +428,7 @@ class DopPlanWindow(WindowUnion):
 
     def add_row_table(self):
 
-        current_widget = self.tabWidget.currentWidget()
+        current_widget = self.tab_widget.currentWidget()
 
         self.plast_line = current_widget.plast_line.text()
         self.roof_edit = current_widget.roof_edit.text().replace(',', '.')
@@ -477,7 +477,7 @@ class DopPlanWindow(WindowUnion):
             self.tableWidget.setItem(rows, 9, QTableWidgetItem(str(self.date_pressure_edit)))
 
     def addPerfProject(self):
-        current_widget = self.tabWidget.currentWidget()
+        current_widget = self.tab_widget.currentWidget()
         table_in_base_combo = str(current_widget.well_data_in_base_combo.currentText())
 
         if ' от' in table_in_base_combo:
@@ -757,7 +757,7 @@ class DopPlanWindow(WindowUnion):
         from work_py.advanted_file import definition_plast_work
         self.data_well.data_list = []
 
-        current_widget = self.tabWidget.currentWidget()
+        current_widget = self.tab_widget.currentWidget()
         method_bottom_combo = current_widget.method_bottom_combo.currentText()
         if method_bottom_combo == '':
             QMessageBox.critical(self, 'Забой', 'Выберете метод определения забоя')

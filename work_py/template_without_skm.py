@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QTabWidget, QWidget, QLab
 
 from work_py.calculate_work_parametrs import volume_work
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
-from .rationingKRS import descentNKT_norm, liftingNKT_norm, well_volume_norm
+from .rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
 
 from PyQt5.QtGui import QDoubleValidator
 from work_py.template_work import TemplateKrs, TabPageSoWith
@@ -595,7 +595,7 @@ class TemplateWithoutSkm(WindowUnion):
 
 
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -607,24 +607,24 @@ class TemplateWithoutSkm(WindowUnion):
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
 
-        distance_second = int(self.tabWidget.currentWidget().dictance_template_second_edit.text())
-        distance_first = int(self.tabWidget.currentWidget().dictance_template_first_edit.text())
-        template_str = str(self.tabWidget.currentWidget().template_str_edit.text())
-        template = str(self.tabWidget.currentWidget().template_combo.currentText())
-        template_length = int(float(self.tabWidget.currentWidget().length_template_second_edit.text()))
+        distance_second = int(self.tab_widget.currentWidget().dictance_template_second_edit.text())
+        distance_first = int(self.tab_widget.currentWidget().dictance_template_first_edit.text())
+        template_str = str(self.tab_widget.currentWidget().template_str_edit.text())
+        template = str(self.tab_widget.currentWidget().template_combo.currentText())
+        template_length = int(float(self.tab_widget.currentWidget().length_template_second_edit.text()))
         if self.data_well.column_additional:
-            template_length_addition = int(float(self.tabWidget.currentWidget().length_template_first_edit.text()))
+            template_length_addition = int(float(self.tab_widget.currentWidget().length_template_first_edit.text()))
         if self.data_well.column_additional is False or (
                 self.data_well.column_additional is True and float(
             self.data_well.head_column_additional.get_value) >= self.data_well.current_bottom):
-            template_diameter = int(self.tabWidget.currentWidget().template_second_edit.text())
+            template_diameter = int(self.tab_widget.currentWidget().template_second_edit.text())
         else:
-            template_diameter = int(self.tabWidget.currentWidget().template_first_edit.text())
+            template_diameter = int(self.tab_widget.currentWidget().template_first_edit.text())
         # print(f'проблема ЭК {self.data_well.problem_with_ek_diameter}')
         if (template_diameter >= int(self.data_well.problem_with_ek_diameter) - 2
                 and self.data_well.template_depth > int(self.data_well.problem_with_ek_depth)):
@@ -653,12 +653,12 @@ class TemplateWithoutSkm(WindowUnion):
         self.data_well.template_length = template_length
         if self.data_well.column_additional:
             self.data_well.template_length_addition = template_length_addition
-        current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
+        current_bottom = self.tab_widget.currentWidget().current_bottom_edit.text()
         if current_bottom != '':
             self.data_well.current_bottom = round(float(current_bottom), 1)
 
         self.update_template(self.data_well.insert_index)
-        self.privyazka_question = self.tabWidget.currentWidget().privyazka_question_QCombo.currentText()
+        self.privyazka_question = self.tab_widget.currentWidget().privyazka_question_QCombo.currentText()
         if self.privyazka_question == 'Да':
             mes = QMessageBox.question(self, 'Привязка', 'ЗУМПФ меньше 10м. '
                                                          'Привязка нужна, корректно ли?')
@@ -698,15 +698,15 @@ class TemplateWithoutSkm(WindowUnion):
 
     def template_ek(self, template_str, template, temlate_ek):
 
-        solvent_question = self.tabWidget.currentWidget().solvent_question_combo.currentText()
-        solvent_volume_edit = self.tabWidget.currentWidget().solvent_volume_edit.text()
+        solvent_question = self.tab_widget.currentWidget().solvent_question_combo.currentText()
+        solvent_volume_edit = self.tab_widget.currentWidget().solvent_volume_edit.text()
         if solvent_volume_edit != '':
             solvent_volume_edit = round(float(solvent_volume_edit), 1)
 
-        self.note_question_qcombo = self.tabWidget.currentWidget().note_question_qcombo.currentText()
-        self.kot_question_qcombo = self.tabWidget.currentWidget().kot_question_qcombo.currentText()
+        self.note_question_qcombo = self.tab_widget.currentWidget().note_question_qcombo.currentText()
+        self.kot_question_qcombo = self.tab_widget.currentWidget().kot_question_qcombo.currentText()
 
-        current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
+        current_bottom = self.tab_widget.currentWidget().current_bottom_edit.text()
         if current_bottom != '':
             current_bottom = round(float(current_bottom), 1)
 
@@ -783,7 +783,7 @@ class TemplateWithoutSkm(WindowUnion):
                                  f'объеме {round(float(current_bottom) * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом '
                                  f'{self.data_well.fluid_work}',
                                  None, None, None, None, None, None, None,
-                                 'Мастер КРС', liftingNKT_norm(current_bottom, 1.2)])
+                                 'Мастер КРС', lifting_nkt_norm(current_bottom, 1.2)])
 
         notes_list = [
             [None, None,
@@ -871,7 +871,7 @@ class TemplateWithoutSkm(WindowUnion):
 
     def pero(self):
         from .rir import RirWindow
-        from .drilling import Drill_window
+        from .drilling import DrillWindow
 
         pero_list = RirWindow.pero_select(self, self.data_well.current_bottom)
         gips_pero_list = [
@@ -922,9 +922,9 @@ class TemplateWithoutSkm(WindowUnion):
             if self.data_well.dict_pump_shgn["before"] != 0:
 
                 gips_pero_list = [gips_pero_list[-1]]
-                from .drilling import Drill_window
+                from .drilling import DrillWindow
                 if self.raid_window is None:
-                    self.raid_window = Drill_window(self.table_widget, self.insert_index)
+                    self.raid_window = DrillWindow(self.table_widget, self.insert_index)
                     # self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
                     self.pause_app()
@@ -940,7 +940,7 @@ class TemplateWithoutSkm(WindowUnion):
                     gips_pero_list.append(row)
             else:
                 if self.raid_window is None:
-                    self.raid_window = Drill_window(self.table_widget, self.insert_index)
+                    self.raid_window = DrillWindow(self.table_widget, self.insert_index)
                     # self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
                     self.pause_app()

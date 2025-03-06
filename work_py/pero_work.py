@@ -132,7 +132,7 @@ class PeroWindow(WindowUnion):
 
 
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)        
         self.table_widget = table_widget
@@ -141,7 +141,7 @@ class PeroWindow(WindowUnion):
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def closeEvent(self, event):
@@ -151,16 +151,16 @@ class PeroWindow(WindowUnion):
 
     def add_work(self):
         try:
-            pero_combo_combo = self.tabWidget.currentWidget().pero_combo_combo.currentText()
-            current_edit = int(float(self.tabWidget.currentWidget().current_edit.text().replace(',', '.')))
+            pero_combo_combo = self.tab_widget.currentWidget().pero_combo_combo.currentText()
+            current_edit = int(float(self.tab_widget.currentWidget().current_edit.text().replace(',', '.')))
             if current_edit >= self.data_well.bottom_hole_artificial.get_value:
                 QMessageBox.warning(self, 'Ошибка',
                                     f'Необходимый забой-{current_edit}м ниже искусственного '
                                     f'{self.data_well.bottom_hole_artificial.get_value}м')
                 return
 
-            solvent_question_combo = str(self.tabWidget.currentWidget().solvent_question_combo.currentText())
-            solvent_volume_edit = self.tabWidget.currentWidget().solvent_volume_edit.text().replace(',', '.')
+            solvent_question_combo = str(self.tab_widget.currentWidget().solvent_question_combo.currentText())
+            solvent_volume_edit = self.tab_widget.currentWidget().solvent_volume_edit.text().replace(',', '.')
             if solvent_volume_edit != '':
                 solvent_volume_edit = round(float(solvent_volume_edit), 1)
         except Exception as e:

@@ -10,7 +10,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QDoubleValidator
 from main import MyMainWindow
 from work_py.parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
-from work_py.rationingKRS import descentNKT_norm, well_volume_norm, liftingNKT_norm
+from work_py.rationingKRS import descentNKT_norm, well_volume_norm, lifting_nkt_norm
 
 
 class TabPageSoWith(TabPageUnion):
@@ -209,7 +209,7 @@ class TemplateKrs(WindowUnion):
 
 
         self.insert_index = data_well.insert_index
-        self.tabWidget = TabWidget(self.data_well)
+        self.tab_widget = TabWidget(self.data_well)
         # print(f'дочерний класс TemplateKRS')
 
         self.centralWidget = QWidget()
@@ -235,9 +235,9 @@ class TemplateKrs(WindowUnion):
         self.buttonadd_string.clicked.connect(self.add_string)
 
         vbox = QGridLayout(self.centralWidget)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
-        vbox.addWidget(self.tabWidget, 0, 0, 1, 2)
+        vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.tableWidget, 1, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
         vbox.addWidget(self.buttonDel, 2, 1)
@@ -245,8 +245,8 @@ class TemplateKrs(WindowUnion):
         vbox.addWidget(self.buttonadd_string, 3, 1)
 
     def add_row_table(self):
-        roof_skm = self.tabWidget.currentWidget().roof_skm_line.text()
-        sole_skm = self.tabWidget.currentWidget().sole_skm_line.text()
+        roof_skm = self.tab_widget.currentWidget().roof_skm_line.text()
+        sole_skm = self.tab_widget.currentWidget().sole_skm_line.text()
         if roof_skm != '':
             roof_skm = int(float(roof_skm))
         if sole_skm != '':
@@ -256,7 +256,7 @@ class TemplateKrs(WindowUnion):
                                               f'Глубина СКМ на {self.data_well.skm_depth}м не позволяет скреперовать в '
                                               f'{roof_skm}-{sole_skm}м')
                 return
-        template_key = self.tabWidget.currentWidget().template_combo.currentText()
+        template_key = self.tab_widget.currentWidget().template_combo.currentText()
 
         if not roof_skm or not sole_skm:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
@@ -295,7 +295,7 @@ class TemplateKrs(WindowUnion):
     def add_string(self):
         from .advanted_file import skm_interval
 
-        template_key = str(self.tabWidget.currentWidget().template_combo.currentText())
+        template_key = str(self.tab_widget.currentWidget().template_combo.currentText())
         skm_interval = skm_interval(self, template_key)
 
 
@@ -309,8 +309,8 @@ class TemplateKrs(WindowUnion):
 
     def add_work(self):
 
-        template_str = str(self.tabWidget.currentWidget().template_str_edit.text())
-        template_key = str(self.tabWidget.currentWidget().template_combo.currentText())
+        template_str = str(self.tab_widget.currentWidget().template_str_edit.text())
+        template_key = str(self.tab_widget.currentWidget().template_combo.currentText())
 
 
 
@@ -389,10 +389,10 @@ class TemplateKrs(WindowUnion):
 
 
 
-        privyazka_question = self.tabWidget.currentWidget().privyazka_question_QCombo.currentText()
+        privyazka_question = self.tab_widget.currentWidget().privyazka_question_QCombo.currentText()
 
 
-        current_bottom = self.tabWidget.currentWidget().current_bottom_edit.text()
+        current_bottom = self.tab_widget.currentWidget().current_bottom_edit.text()
         if current_bottom != '':
             current_bottom = round(float(current_bottom), 1)
 
@@ -416,7 +416,7 @@ class TemplateKrs(WindowUnion):
              f'Поднять {template_str} на НКТ{self.data_well.nkt_diam}мм с глубины {current_bottom}м с доливом скважины в '
              f'объеме {round(current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.data_well.fluid_work}',
              None, None, None, None, None, None, None,
-             'Мастер КРС', liftingNKT_norm(float(current_bottom), 1.2)]
+             'Мастер КРС', lifting_nkt_norm(float(current_bottom), 1.2)]
         ]
 
 
