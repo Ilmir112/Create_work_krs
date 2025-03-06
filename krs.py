@@ -18,6 +18,7 @@ class TabPageGno(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+
         self.work_plan = self.data_well.work_plan
 
         self.current_bottom_label = QLabel('Забой текущий')

@@ -1,16 +1,9 @@
-from PyQt5.QtGui import QDoubleValidator, QIntValidator
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, \
-    QMainWindow, QPushButton
+
+from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QLineEdit, QGridLayout, \
+    QPushButton
 
 import data_list
-from main import MyMainWindow
-from .alone_oreration import volume_vn_ek
-from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
-from .rir import RirWindow
-
-from .opressovka import OpressovkaEK
-from .rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
-
+from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
 class TabPageSoTorpedo(TabPageUnion):
     def __init__(self, parent=None):

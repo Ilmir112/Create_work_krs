@@ -940,8 +940,8 @@ class DataWindow(WindowUnion):
                     if key.text() != '' and value.text() != '':
                         self.data_well.dict_nkt_before[key.text()] = self.check_if_none(float(value.text()))
 
-            if all([pump for pump in [self.ifNum(dict_pump_ecn_posle), self.ifNum(paker2_posle),
-                                      self.ifNum(dict_pump_shgn_posle), self.ifNum(paker_posle)]]):
+            if all([pump for pump in [self.if_none(dict_pump_ecn_posle), self.if_none(paker2_posle),
+                                      self.if_none(dict_pump_shgn_posle), self.if_none(paker_posle)]]):
 
                 voronka_question = QMessageBox.question(self, 'Внимание',
                                                         'Программа определила что в скважине '
@@ -970,7 +970,7 @@ class DataWindow(WindowUnion):
 
             close_file = True
 
-            if any([self.ifNum(data_well) is False or data_well in ['не корректно', 0, 'отсут'] for data_well in
+            if any([self.if_none(data_well) is False or data_well in ['не корректно', 0, 'отсут'] for data_well in
                     [column_type, column_wall_thickness, shoe_column]]):
                 QMessageBox.information(self, 'Внимание', 'Не все поля в данных колонне соответствуют значениям')
                 close_file = False
@@ -979,49 +979,49 @@ class DataWindow(WindowUnion):
                 QMessageBox.information(self, 'Внимание', 'Забой не корректный')
                 close_file = False
 
-            if any([self.ifNum(data_well) is False for data_well in
+            if any([self.if_none(data_well) is False for data_well in
                     [column_additional_diameter, column_additional_wall_thickness,
                      shoe_column_additional, head_column_additional]]) and self.data_well.column_additional:
                 QMessageBox.information(self, 'Внимание', 'Не все поля в доп колонне соответствуют значениям')
                 close_file = False
 
-            if self.ifNum(bottomhole_artificial) is False \
-                    or self.ifNum(bottomhole_drill) is False \
-                    or self.ifNum(current_bottom) is False \
-                    or self.ifNum(max_angle_depth) is False \
-                    or self.ifNum(max_angle) is False \
-                    or self.ifNum(max_admissible_pressure) is False \
-                    or self.ifNum(max_expected_pressure) is False:
+            if self.if_none(bottomhole_artificial) is False \
+                    or self.if_none(bottomhole_drill) is False \
+                    or self.if_none(current_bottom) is False \
+                    or self.if_none(max_angle_depth) is False \
+                    or self.if_none(max_angle) is False \
+                    or self.if_none(max_admissible_pressure) is False \
+                    or self.if_none(max_expected_pressure) is False:
                 QMessageBox.information(self, 'Внимание', 'Не все поля в забое соответствуют значениям')
                 close_file = False
-            if self.ifNum(static_level) is False \
-                    or self.ifNum(dinamic_level) is False:
+            if self.if_none(static_level) is False \
+                    or self.if_none(dinamic_level) is False:
                 QMessageBox.information(self, 'Внимание', 'Не все поля в уровнях соответствуют значениям')
                 close_file = False
-            if self.ifNum(dict_pump_ecn_h_do) is False \
-                    or self.ifNum(dict_pump_ecn_h_posle) is False \
-                    or self.ifNum(dict_pump_shgn_h_do) is False \
-                    or self.ifNum(dict_pump_shgn_h_posle) is False \
-                    or self.ifNum(depth_fond_paker_do) is False \
-                    or self.ifNum(depth_fond_paker_posle) is False \
-                    or self.ifNum(depth_fond_paker2_do) is False \
-                    or self.ifNum(depth_fond_paker2_posle) is False:
+            if self.if_none(dict_pump_ecn_h_do) is False \
+                    or self.if_none(dict_pump_ecn_h_posle) is False \
+                    or self.if_none(dict_pump_shgn_h_do) is False \
+                    or self.if_none(dict_pump_shgn_h_posle) is False \
+                    or self.if_none(depth_fond_paker_do) is False \
+                    or self.if_none(depth_fond_paker_posle) is False \
+                    or self.if_none(depth_fond_paker2_do) is False \
+                    or self.if_none(depth_fond_paker2_posle) is False:
                 QMessageBox.information(self, 'Внимание', 'Не все поля в спущенном оборудовании соответствуют значениям')
                 close_file = False
-            if self.ifNum(level_cement) is False:
+            if self.if_none(level_cement) is False:
                 QMessageBox.information(self, 'Внимание', 'Уровень цемента за ЭК не соответствуют значениям')
                 close_file = False
-            if self.ifNum(column_direction_diameter) is False \
-                    or self.ifNum(column_direction_wall_thickness) is False \
-                    or self.ifNum(column_direction_length) is False \
-                    or self.ifNum(level_cement_direction) is False:
+            if self.if_none(column_direction_diameter) is False \
+                    or self.if_none(column_direction_wall_thickness) is False \
+                    or self.if_none(column_direction_length) is False \
+                    or self.if_none(level_cement_direction) is False:
                 QMessageBox.information(self, 'Внимание', 'Не все поля в Направлении соответствуют значениям')
                 close_file = False
-            if self.ifNum(column_conductor_diameter) is False \
-                    or self.ifNum(column_conductor_wall_thickness) is False \
-                    or self.ifNum(column_conductor_length) is False \
-                    or self.ifNum(column_direction_length) is False \
-                    or self.ifNum(level_cement_conductor) is False:
+            if self.if_none(column_conductor_diameter) is False \
+                    or self.if_none(column_conductor_wall_thickness) is False \
+                    or self.if_none(column_conductor_length) is False \
+                    or self.if_none(column_direction_length) is False \
+                    or self.if_none(level_cement_conductor) is False:
                 QMessageBox.information(self, 'Внимание', 'Не все поля в кондукторе соответствуют значениям')
                 close_file = False
 
@@ -1045,9 +1045,9 @@ class DataWindow(WindowUnion):
                             dict_pump_ecn_do == 'отсут']) is False:
                 QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
                 close_file = False
-            if isinstance(self.ifNum(head_column_additional), str):
-                # print(self.check_if_none(head_column_additional), isinstance(self.ifNum(head_column_additional), str))
-                if self.check_if_none(20 if self.ifNum(head_column_additional) else head_column_additional) < 5:
+            if isinstance(self.if_none(head_column_additional), str):
+                # print(self.check_if_none(head_column_additional), isinstance(self.if_none(head_column_additional), str))
+                if self.check_if_none(20 if self.if_none(head_column_additional) else head_column_additional) < 5:
                     # print(self.check_if_none(head_column_additional))
                     QMessageBox.information(self, 'Внимание', 'В скважине отсутствует доп колонна')
                     close_file = False
@@ -1116,13 +1116,13 @@ class DataWindow(WindowUnion):
                 self.data_well.grp_plan = True
 
             if curator == 'ОР':
-                if self.ifNum(expected_pickup_edit) is False or self.ifNum(expected_pressure_edit) is False:
+                if self.if_none(expected_pickup_edit) is False or self.if_none(expected_pressure_edit) is False:
                     QMessageBox.information(self, 'Внимание',
                                             'Не все поля в Ожидаемых показателях соответствуют значениям')
                     close_file = False
             else:
-                if self.ifNum(water_cut_edit) is False or self.ifNum(expected_oil_edit) is False or \
-                        self.ifNum(proc_water_edit) is False:
+                if self.if_none(water_cut_edit) is False or self.if_none(expected_oil_edit) is False or \
+                        self.if_none(proc_water_edit) is False:
                     QMessageBox.information(self, 'Внимание',
                                             'Не все поля в Ожидаемых показателях соответствуют значениям')
                     close_file = False
@@ -1393,7 +1393,7 @@ class DataWindow(WindowUnion):
             else:
                 return False
 
-    def ifNum(self, string):
+    def if_none(self, string):
         if str(string) == "['0']":
             return False
         elif str(string) == 'отсут':

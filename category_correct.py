@@ -1,10 +1,7 @@
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.Qt import QWidget, QLabel, QComboBox
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QGridLayout, QMessageBox, QInputDialog, QLineEdit, QTabWidget, QPushButton
-
-from main import MyMainWindow
-from work_py.calculate_work_parametrs import volume_work, volume_well_pod_nkt_calculate
+from PyQt5.QtWidgets import QGridLayout, QMessageBox, QInputDialog, QLineEdit, QPushButton
 
 from collections import namedtuple
 
@@ -208,8 +205,9 @@ class TabPageSo(TabPageUnion):
             setattr(self, f"{isolated_plast}_{n}_line", isolated_plast)
 
             try:
-                calc_plast_h2s.setText(str(self.calculate_h2s(self.type_absorbent.currentText(), category_h2s_edit.text(),
-                                                         float(h2s_mg_edit.text()), float(h2s_pr_edit.text()))))
+                calc_plast_h2s.setText(
+                    str(self.calculate_h2s(self.type_absorbent.currentText(), category_h2s_edit.text(),
+                                           float(h2s_mg_edit.text()), float(h2s_pr_edit.text()))))
             except Exception as e:
                 QMessageBox.warning(self, 'Ошибка', f'Приложение не смогла произвести расчет поглотителя H2S, '
                                                     f'Нужно проверить таблицу по категорийности, {e}')
@@ -271,11 +269,10 @@ class CategoryWindow(WindowUnion):
         pressure = namedtuple("pressure", "category data_pressure")
         Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
         Data_gaz = namedtuple("Data_gaz", "category data")
-        aaasse = self.tab_widget.currentWidget().labels_category
         if cat_P_1:
             for index in data_list.number_indez:
                 for ind in range(1, 6):
-                    if self.ifNum(self.tab_widget.currentWidget().labels_category[index][ind].text()) is False:
+                    if self.if_none(self.tab_widget.currentWidget().labels_category[index][ind].text()) is False:
                         QMessageBox.warning(self, 'Ошибка', 'ошибка в сохранении данных, не корректные данные ')
                         return
 
@@ -307,7 +304,8 @@ class CategoryWindow(WindowUnion):
                                 float(self.tab_widget.currentWidget().labels_category[index][4].text()),
                                 float(self.tab_widget.currentWidget().labels_category[index][5].text()),
                                 float(
-                                    self.tab_widget.currentWidget().labels_category[index][9].text().replace(',', '.'))))
+                                    self.tab_widget.currentWidget().labels_category[index][9].text().replace(',',
+                                                                                                             '.'))))
 
                         self.dict_category.setdefault(plast, {}).setdefault(
                             'по газовому фактору', Data_gaz(
@@ -332,7 +330,7 @@ class CategoryWindow(WindowUnion):
             self.data_well.bvo = True
         self.close()
 
-    def ifNum(self, string):
+    def if_none(self, string):
         # метод для проверки и преобразования введенных значений
         if str(string) == "['0']":
             return False

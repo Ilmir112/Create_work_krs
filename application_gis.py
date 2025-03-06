@@ -1,11 +1,11 @@
 import openpyxl
 import re
 import data_list
-import sys
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
-from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, QMainWindow, QPushButton, \
-    QMessageBox, QApplication, QTableWidget, QTableWidgetItem, QVBoxLayout, QHeaderView
+from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QPushButton, \
+    QMessageBox,  QTableWidget, QTableWidgetItem, QHeaderView
 
 from main import  MyMainWindow
 from work_py.parent_work import TabPageUnion, TabWidgetUnion
@@ -276,17 +276,6 @@ class GisApplication(MyMainWindow):
             result_string = re.sub(r"[^\d-.]", "", row[-15:]).split('-')
             roof = result_string[0]
             sole = result_string[1]
-
-        # elif 'ГК и ЛМ' in row:
-        #     try:
-        #         type = 'ГК и ЛМ'
-        #         # Удаление всех символов, кроме цифр и тире
-        #         result_string = re.sub(r"[^\d-]", "", row[-15:]).split('-')
-        #         roof = result_string[0]
-        #         sole = result_string[1]
-        #     except IndexError:
-        #         pass
-
         elif 'ВП' in row or '№ 2.1.13' in row or 'ГПШ' in row or 'желонк' in row or '2.1.16' in row or '2.1.17' in row \
                 or 'РГД по колонне' in row or 'РГД по НКТ' in row or '2.3.2' in row or '2.3.3' in row or '2.3.1' in row \
                 or '2.8.1' in row or '2.8.2' in row:

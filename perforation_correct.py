@@ -1,25 +1,24 @@
 import data_list
-import re
-from PyQt5 import QtCore, QtGui, QtWidgets
+
+from PyQt5 import QtCore,  QtWidgets
 from PyQt5.Qt import *
 from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
 
 from find import FindIndexPZ
-from main import MyMainWindow
 from work_py.advanted_file import definition_plast_work
 from work_py.parent_work import TabWidgetUnion, WindowUnion
 
 
 class FloatLineEdit(QLineEdit):
-    def __init__(self, parent=None):
+    def __init__(self):
         super(FloatLineEdit, self).__init__()
 
         # Устанавливаем валидатор для проверки на float
 
         reg = QRegExp("[0-9.]*")
-        pValidator = QRegExpValidator(self)
-        pValidator.setRegExp(reg)
-        self.setValidator(pValidator)
+        p_validator = QRegExpValidator(self)
+        p_validator.setRegExp(reg)
+        self.setValidator(p_validator)
 
     def focusOutEvent(self, event):
         # При потере фокуса проверяем, является ли текст float
@@ -72,37 +71,37 @@ class TabPageSo(QWidget):
                 sole_edit = QLineEdit(self)
                 sole_edit.setText(str(sole))
 
-                plast_status_ComboBox = QComboBox(self)
-                plast_status_ComboBox.addItems(['отключен', 'вскрыт', 'проект', 'отсутствует'])
-                plast_status_ComboBox.setCurrentIndex(self.check_plast_status(plast))
+                plast_status_combo = QComboBox(self)
+                plast_status_combo.addItems(['отключен', 'вскрыт', 'проект', 'отсутствует'])
+                plast_status_combo.setCurrentIndex(self.check_plast_status(plast))
 
-                template_status_ComboBox = QComboBox(self)
-                template_status_ComboBox.addItems(['Прошаблонировано', 'Не прошаблонировано'])
-                # template_status_ComboBox.setText('Прошаблонировано')
-                template_status_ComboBox.setCurrentIndex(self.check_template_status(plast))
+                template_status_combo = QComboBox(self)
+                template_status_combo.addItems(['Прошаблонировано', 'Не прошаблонировано'])
+                # template_status_combo.setText('Прошаблонировано')
+                template_status_combo.setCurrentIndex(self.check_template_status(plast))
 
-                raiding_status_ComboBox = QComboBox(self)
-                raiding_status_ComboBox.addItems(['отрайбировано', 'Не отрайбировано'])
-                # raiding_status_ComboBox.setText('отрайбировано')
-                raiding_status_ComboBox.setCurrentIndex(self.check_raiding_status(plast))
+                raiding_status_combo = QComboBox(self)
+                raiding_status_combo.addItems(['отрайбировано', 'Не отрайбировано'])
+                # raiding_status_combo.setText('отрайбировано')
+                raiding_status_combo.setCurrentIndex(self.check_raiding_status(plast))
 
                 grid.addWidget(plast_edit, index_interval, 0)
                 grid.addWidget(roof_edit, index_interval, 1)
                 grid.addWidget(sole_edit, index_interval, 2)
-                grid.addWidget(plast_status_ComboBox, index_interval, 3)
-                grid.addWidget(template_status_ComboBox, index_interval, 4)
-                grid.addWidget(raiding_status_ComboBox, index_interval, 5)
+                grid.addWidget(plast_status_combo, index_interval, 3)
+                grid.addWidget(template_status_combo, index_interval, 4)
+                grid.addWidget(raiding_status_combo, index_interval, 5)
 
                 # Переименование атрибута
                 setattr(self, f"plast_{index_interval}_edit", plast_edit)
                 setattr(self, f"roof_{index_interval}_edit", roof_edit)
                 setattr(self, f"sole_{index_interval}_edit", sole_edit)
-                setattr(self, f"plast_status_{index_interval}_edit", plast_status_ComboBox)
-                setattr(self, f"template_status_{index_interval}_edit", template_status_ComboBox)
-                setattr(self, f"raiding_status_{index_interval}_edit", raiding_status_ComboBox)
+                setattr(self, f"plast_status_{index_interval}_edit", plast_status_combo)
+                setattr(self, f"template_status_{index_interval}_edit", template_status_combo)
+                setattr(self, f"raiding_status_{index_interval}_edit", raiding_status_combo)
 
-                self.labels_plast[index_interval] = (plast_edit, roof_edit, sole_edit, plast_status_ComboBox,
-                                                     template_status_ComboBox, raiding_status_ComboBox)
+                self.labels_plast[index_interval] = (plast_edit, roof_edit, sole_edit, plast_status_combo,
+                                                     template_status_combo, raiding_status_combo)
                 index_interval += 1
         if len(self.data_well.dict_perforation) != 0:
             for plast in plast_projects:
@@ -117,37 +116,37 @@ class TabPageSo(QWidget):
                     sole_edit = QLineEdit(self)
                     sole_edit.setText(str(sole))
 
-                    plast_status_ComboBox = QComboBox(self)
-                    plast_status_ComboBox.addItems(['отключен', 'вскрыт', 'проект', 'отсутствует'])
-                    plast_status_ComboBox.setCurrentIndex(2)
+                    plast_status_combo = QComboBox(self)
+                    plast_status_combo.addItems(['отключен', 'вскрыт', 'проект', 'отсутствует'])
+                    plast_status_combo.setCurrentIndex(2)
 
-                    template_status_ComboBox = QComboBox(self)
-                    template_status_ComboBox.addItems(['Прошаблонировано', 'Не прошаблонировано'])
-                    # template_status_ComboBox.setText('Прошаблонировано')
-                    template_status_ComboBox.setCurrentIndex(1)
+                    template_status_combo = QComboBox(self)
+                    template_status_combo.addItems(['Прошаблонировано', 'Не прошаблонировано'])
+                    # template_status_combo.setText('Прошаблонировано')
+                    template_status_combo.setCurrentIndex(1)
 
-                    raiding_status_ComboBox = QComboBox(self)
-                    raiding_status_ComboBox.addItems(['отрайбировано', 'Не отрайбировано'])
-                    # raiding_status_ComboBox.setText('отрайбировано')
-                    raiding_status_ComboBox.setCurrentIndex(1)
+                    raiding_status_combo = QComboBox(self)
+                    raiding_status_combo.addItems(['отрайбировано', 'Не отрайбировано'])
+                    # raiding_status_combo.setText('отрайбировано')
+                    raiding_status_combo.setCurrentIndex(1)
 
                     grid.addWidget(plast_edit, index_interval, 0)
                     grid.addWidget(roof_edit, index_interval, 1)
                     grid.addWidget(sole_edit, index_interval, 2)
-                    grid.addWidget(plast_status_ComboBox, index_interval, 3)
-                    grid.addWidget(template_status_ComboBox, index_interval, 4)
-                    grid.addWidget(raiding_status_ComboBox, index_interval, 5)
+                    grid.addWidget(plast_status_combo, index_interval, 3)
+                    grid.addWidget(template_status_combo, index_interval, 4)
+                    grid.addWidget(raiding_status_combo, index_interval, 5)
 
                     # Переименование атрибута
                     setattr(self, f"plast_{index_interval}_edit", plast_edit)
                     setattr(self, f"roof_{index_interval}_edit", roof_edit)
                     setattr(self, f"sole_{index_interval}_edit", sole_edit)
-                    setattr(self, f"plast_status_{index_interval}_edit", plast_status_ComboBox)
-                    setattr(self, f"template_status_{index_interval}_edit", template_status_ComboBox)
-                    setattr(self, f"raiding_status_{index_interval}_edit", raiding_status_ComboBox)
+                    setattr(self, f"plast_status_{index_interval}_edit", plast_status_combo)
+                    setattr(self, f"template_status_{index_interval}_edit", template_status_combo)
+                    setattr(self, f"raiding_status_{index_interval}_edit", raiding_status_combo)
 
-                    self.labels_plast[index_interval] = (plast_edit, roof_edit, sole_edit, plast_status_ComboBox,
-                                                         template_status_ComboBox, raiding_status_ComboBox)
+                    self.labels_plast[index_interval] = (plast_edit, roof_edit, sole_edit, plast_status_combo,
+                                                         template_status_combo, raiding_status_combo)
                     index_interval += 1
 
     def check_plast_status(self, plast):
@@ -162,7 +161,8 @@ class TabPageSo(QWidget):
             return 0 if self.dict_perforation[plast]['отрайбировано'] else 1
         else:
             max_sole = max(list(map(lambda x: x[1], self.dict_perforation[plast]['интервал'])))
-            if self.data_well.depth_fond_paker_before["before"] > max_sole and \
+            if (self.data_well.depth_fond_paker_before["before"] > max_sole or\
+                self.data_well.depth_fond_paker_second_before["before"] > max_sole) and \
                     self.data_well.current_bottom > max_sole:
                 return 0
             else:
@@ -183,6 +183,8 @@ class PerforationCorrect(WindowUnion):
         self.setWindowModality(QtCore.Qt.ApplicationModal)  # Устанавливаем модальность окна
 
         self.tab_widget = TabWidget(self.data_well)
+        self.dict_perforation_project = {}
+        self.dict_perforation = self.data_well.dict_perforation
 
         self.buttonAdd = QPushButton('сохранить данные')
         self.buttonAdd.clicked.connect(self.add_row_table)
@@ -194,9 +196,9 @@ class PerforationCorrect(WindowUnion):
 
     def add_row_table(self):
 
-        self.dict_perforation = self.data_well.dict_perforation
+
         plast_all = self.tab_widget.currentWidget().labels_plast
-        self.dict_perforation_project = {}
+        
 
         plast_list = []
         plast_oktl = []
@@ -263,7 +265,7 @@ class PerforationCorrect(WindowUnion):
                         self.data_well.dict_perforation[plast]['отрайбировано'] = False
 
             if len(plast_del) > 0:
-                aaa = self.data_well.dict_perforation
+                
                 for plast in list(self.data_well.dict_perforation.keys()):
                     if plast in plast_del:
                         self.data_well.dict_perforation.pop(plast)
