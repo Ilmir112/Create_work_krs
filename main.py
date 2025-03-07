@@ -642,13 +642,6 @@ class MyMainWindow(QMainWindow):
             if float(interval[0]) <= float(depth) <= float(interval[1]):
                 check_ribbing = True
 
-        if check_true is False and check_ribbing is False:
-            QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
-                                f'Проверка посадки показала, что пакер сажается не '
-                                f'в интервал скреперования {self.data_well.skm_interval}, и '
-                                f'райбирования {self.data_well.ribbing_interval} \n'
-                                f'Нужно скорректировать интервалы скреперования или глубину посадки пакера')
-            return False
         if check_true is False or check_ribbing is True:
             false_question = QMessageBox.question(None, 'Проверка посадки пакера в интервал скреперования',
                                                   f'Проверка посадки показала, что пакер сажается не '
@@ -658,6 +651,15 @@ class MyMainWindow(QMainWindow):
                                                   f'Продолжить?')
             if false_question == QMessageBox.StandardButton.No:
                 return False
+
+        if check_true is False and check_ribbing is False:
+            QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
+                                f'Проверка посадки показала, что пакер сажается не '
+                                f'в интервал скреперования {self.data_well.skm_interval}, и '
+                                f'райбирования {self.data_well.ribbing_interval} \n'
+                                f'Нужно скорректировать интервалы скреперования или глубину посадки пакера')
+            return False
+
 
     def true_set_paker(self, depth):
 
@@ -1763,6 +1765,7 @@ class MyWindow(MyMainWindow):
         self.data_well = None
         if not self.table_widget is None:
             self.table_widget.clear()
+            self.work_window = None
             self.table_widget.resizeColumnsToContents()
             self.table_widget = None
             self.tab_widget = None
