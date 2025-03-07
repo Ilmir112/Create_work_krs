@@ -1111,9 +1111,9 @@ class WellHistoryData(FindIndexPZ):
                             self.definition_is_none(self.date_drilling_cancel,
                                                     row_index + begin_index, col + 1, 1)
                     elif 'Дата ввода в экспл' in str(value):
-                        self.date_commissioning = row[col + 2]
-                        if type(self.date_commissioning) is datetime:
-                            self.date_commissioning = ProtectedIsNonNone(self.date_commissioning.strftime(
+                        self.date_commissioning = ProtectedIsNonNone(row[col + 2])
+                        if type(self.date_commissioning.get_value) is datetime:
+                            self.date_commissioning = ProtectedIsNonNone(self.date_commissioning.get_value.strftime(
                                 '%d.%m.%Y'))
                     elif 'ствол скважины' in str(row[col]).lower() and 'буров' in str(row[col]).lower():
                         self.bur_rastvor = row[col]

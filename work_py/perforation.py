@@ -488,6 +488,7 @@ class PerforationWindow(WindowUnion):
                 else:
                     self.paker_depth = int(self.paker_depth)
                     self.diameter_paker = int(float(self.diameter_paker))
+                    self.paker_khost = int(self.tableWidget.min_roof - self.paker_depth)
 
                 if self.check_true_depth_template(self.paker_depth) is False:
                     return
@@ -510,7 +511,6 @@ class PerforationWindow(WindowUnion):
             else:
                 self.paker_layout_combo = 'воронка'
 
-            self.paker_khost = int(self.tableWidget.min_roof - self.paker_depth)
 
             perforation[2] = [f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)", None,
                               f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2). \n{angle_text}", None, None, None, None,

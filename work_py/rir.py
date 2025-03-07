@@ -1220,6 +1220,7 @@ class RirWindow(WindowUnion):
             if paker_need_combo == 'без СПО':
                 difference_date_well = self.difference_date_days(self.data_well.date_commissioning.get_value)
                 difference_date_pressuar = self.difference_date_days(self.data_well.result_pressure_date.get_value)
+                mes = ''
                 if difference_date_well > 365.25 * 20:
                     mes = QMessageBox.question(self, 'Критерии',
                                                f'Скважина в эксплуатации более {difference_date_well / 365:.0f}лет '

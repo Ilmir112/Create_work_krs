@@ -645,8 +645,8 @@ class MyMainWindow(QMainWindow):
         if check_true is False and check_ribbing is False:
             QMessageBox.warning(None, 'Проверка посадки пакера в интервал скреперования',
                                 f'Проверка посадки показала, что пакер сажается не '
-                                f'в интервал скреперования {"".join(self.data_well.skm_interval)}, и '
-                                f'райбирования {"".join(self.data_well.ribbing_interval)} \n'
+                                f'в интервал скреперования {self.data_well.skm_interval}, и '
+                                f'райбирования {self.data_well.ribbing_interval} \n'
                                 f'Нужно скорректировать интервалы скреперования или глубину посадки пакера')
             return False
         if check_true is False or check_ribbing is True:

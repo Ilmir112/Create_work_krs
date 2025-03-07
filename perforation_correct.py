@@ -161,8 +161,8 @@ class TabPageSo(QWidget):
             return 0 if self.dict_perforation[plast]['отрайбировано'] else 1
         else:
             max_sole = max(list(map(lambda x: x[1], self.dict_perforation[plast]['интервал'])))
-            if (self.data_well.depth_fond_paker_before["before"] > max_sole or\
-                self.data_well.depth_fond_paker_second_before["before"] > max_sole) and \
+            if (self.data_well.depth_fond_paker_before["before"] >= max_sole or\
+                self.data_well.depth_fond_paker_second_before["before"] >= max_sole) and \
                     self.data_well.current_bottom > max_sole:
                 return 0
             else:
