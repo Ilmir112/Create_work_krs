@@ -979,8 +979,8 @@ class MyWindow(MyMainWindow):
                      self.data_well.fluid
                      )
 
-        query = f"INSERT INTO chemistry " \
-                f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " \
+        query = f"INSERT INTO chemistry "\
+                f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, "\
                 f"%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
         from data_base.work_with_base import ClassifierWell

@@ -1275,7 +1275,7 @@ class LiftPumpNnWithPaker(GnoParent):
     def lifting_nn_with_paker(self):
         sucker_jamming = ""
         if self.without_damping_true is False:
-            sucker_jamming = f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу." \
+            sucker_jamming = f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу."\
                              f" Произвести глушение в НКТ в объеме {volume_pod_nkt(self)}м3"
         lift_pump_nn_with_paker = [
             [f'Опрессовать ГНО на Р={40}атм', None,

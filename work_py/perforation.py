@@ -651,7 +651,7 @@ class PerforationWindow(WindowUnion):
                     swab_work_list = SwabWindow.swabbing_with_voronka(self)
 
                 perforation.extend(swab_work_list[1:])
-        end_list = "Произвести контрольную запись ЛМ;ТМ. Составить АКТ на перфорацию." \
+        end_list = "Произвести контрольную запись ЛМ;ТМ. Составить АКТ на перфорацию."\
             if self.type_perforation not in ['Трубная перфорация','Трубная перфорация на депрессии'] \
             else f'Подъем последних 5-ти НКТ{self.data_well.nkt_diam}мм и демонтаж перфоратора ' \
                  f'производить в присутствии ответственного ' \

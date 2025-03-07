@@ -297,11 +297,11 @@ class WorkDatabaseWell:
                         return
 
                 # Подготовленный запрос для вставки данных с параметрами
-                query = f"INSERT INTO wells " \
-                        f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, " \
-                        f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                        f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                        f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
+                query = f"INSERT INTO wells "\
+                        f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, "\
+                        f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, "\
+                        f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, "\
+                        f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, "\
                         f"{self.path_index}, {self.path_index}, {self.path_index})"
 
                 data_values = (str(well_number), well_area,
@@ -403,12 +403,12 @@ class WorkDatabaseWell:
             cursor.execute(query2, data_work2)
 
         else:
-            query = f"INSERT INTO chemistry " \
-                    f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                    f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                    f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                    f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}," \
-                    f" {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
+            query = f"INSERT INTO chemistry "\
+                    f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, "\
+                    f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, "\
+                    f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, "\
+                    f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index},"\
+                    f" {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, "\
                     f"{self.path_index}, {self.path_index})"
             cursor.execute(query, data_work)
         self.db_connection.commit()
@@ -538,8 +538,8 @@ class CheckWellExistence:
         if not self.db_connection:
             return None
         with CursorContext(self.db_connection.cursor()) as cursor:
-            query = f"INSERT INTO {region_name} (well_number, deposit_area, today, region, costumer) " \
-                    f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
+            query = f"INSERT INTO {region_name} (well_number, deposit_area, today, region, costumer) "\
+                    f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, "\
                     f"{self.path_index})"
 
             cursor.execute(query,
@@ -723,7 +723,7 @@ class CheckWellExistence:
             return None
         with CursorContext(self.db_connection.cursor()) as cursor:
             # Проверка наличия записи в базе данных
-            query = f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор " \
+            query = f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор "\
                     f"WHERE well_number =({self.path_index}) and deposit_area =({self.path_index})"
             data = (str(well_number.get_value), str(deposit_area.get_value).replace("_", " "))
             cursor.execute(query, data)
@@ -796,11 +796,11 @@ class GnktDatabaseWell:
                            pipe_mileage, pipe_fatigue, previous_well, current_datetime, pvo)
 
             # Подготовленный запрос для вставки данных с параметрами
-            query = f"INSERT INTO gnkt_{contractor} " \
-                    f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, " \
-                    f"tubing_fatigue, previous_well, today, pvo_number) " \
-                    f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
-                    f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
+            query = f"INSERT INTO gnkt_{contractor} "\
+                    f"(gnkt_number, well_number, length_gnkt, diameter_gnkt, wear_gnkt, mileage_gnkt, "\
+                    f"tubing_fatigue, previous_well, today, pvo_number) "\
+                    f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, "\
+                    f"{self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, "\
                     f"{self.path_index}, {self.path_index})"
 
             # Выполнение запроса с использованием параметров

@@ -22,7 +22,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.labels_sucker_po = {}
 
         self.column_direction_diameter_Label = QLabel("диаметр направление ", self)
-        self.column_direction_diameter_edit = FloatLineEdit(self)
+        self.column_direction_diameter_edit = FloatLineEdit()
         if self.data_well.column_direction_true:
             self.column_direction_diameter_edit.setText(
                 f'{str(self.data_well.column_direction_diameter.get_value).strip()}')
@@ -30,14 +30,14 @@ class TabPageSoCorrect(TabPageUnion):
             self.column_direction_diameter_edit.setText(f'отсут')
 
         self.column_direction_wall_thickness_Label = QLabel("Толщина \nстенки", self)
-        self.column_direction_wall_thickness_edit = FloatLineEdit(self)
+        self.column_direction_wall_thickness_edit = FloatLineEdit()
         if self.data_well.column_direction_true:
             self.column_direction_wall_thickness_edit.setText(
                 f'{str(self.data_well.column_direction_wall_thickness.get_value).strip()}')
         else:
             self.column_direction_wall_thickness_edit.setText(f'отсут')
         self.column_direction_length_Label = QLabel("башмак направления", self)
-        self.column_direction_length_edit = FloatLineEdit(self)
+        self.column_direction_length_edit = FloatLineEdit()
         if self.data_well.column_direction_true:
             self.column_direction_length_edit.setText(
                 f'{str(self.data_well.column_direction_length.get_value).strip()}')
@@ -45,7 +45,7 @@ class TabPageSoCorrect(TabPageUnion):
             self.column_direction_length_edit.setText(f'отсут')
 
         self.level_cement_direction_Label = QLabel("Уровень \nцемента", self)
-        self.level_cement_direction_edit = FloatLineEdit(self)
+        self.level_cement_direction_edit = FloatLineEdit()
         if self.data_well.column_direction_true:
             self.level_cement_direction_edit.setText(
                 f'{str(self.data_well.level_cement_direction.get_value).strip()}')
@@ -53,12 +53,12 @@ class TabPageSoCorrect(TabPageUnion):
             self.level_cement_direction_edit.setText(f'отсут')
 
         self.column_conductor_diameter_Label = QLabel("диаметр \nкондуктора", self)
-        self.column_conductor_diameter_edit = FloatLineEdit(self)
+        self.column_conductor_diameter_edit = FloatLineEdit()
         self.column_conductor_diameter_edit.setText(
             f'{str(self.data_well.column_conductor_diameter.get_value).strip()}')
 
         self.column_conductor_wall_thickness_Label = QLabel("Толщина \nстенки ", self)
-        self.column_conductor_wall_thickness_edit = FloatLineEdit(self)
+        self.column_conductor_wall_thickness_edit = FloatLineEdit()
         self.column_conductor_wall_thickness_edit.setText(
             f'{str(self.data_well.column_conductor_wall_thickness.get_value).strip()}')
 
@@ -79,36 +79,36 @@ class TabPageSoCorrect(TabPageUnion):
         self.appointment_well_line.setText(self.data_well.appointment_well.get_value)
 
         self.column_conductor_length_Label = QLabel("башмак кондуктора", self)
-        self.column_conductor_length_edit = FloatLineEdit(self)
+        self.column_conductor_length_edit = FloatLineEdit()
         self.column_conductor_length_edit.setText(
             f'{str(self.data_well.column_conductor_length.get_value).strip()}')
 
         self.level_cement_conductor_Label = QLabel("Уровень \nцемента", self)
-        self.level_cement_conductor_edit = FloatLineEdit(self)
+        self.level_cement_conductor_edit = FloatLineEdit()
         self.level_cement_conductor_edit.setText(f'{str(self.data_well.level_cement_conductor.get_value).strip()}')
 
         self.column_label = QLabel("диаметр ЭК", self)
-        self.column_type = FloatLineEdit(self)
+        self.column_type = FloatLineEdit()
         self.column_type.setText(f'{self.ifNone(self.data_well.column_diameter.get_value)}')
 
         # self.column_type.setClearButtonEnabled(True)
 
         self.column_wall_thickness_label = QLabel("Толщина \nстенки ЭК", self)
-        self.column_wall_thickness_edit_type2 = FloatLineEdit(self)
+        self.column_wall_thickness_edit_type2 = FloatLineEdit()
         self.column_wall_thickness_edit_type2.setText(
             f'{self.ifNone(self.data_well.column_wall_thickness.get_value)}')
         # self.column_wall_thickness_edit_type2.setClearButtonEnabled(True)
 
         self.head_column_label = QLabel("Голова ЭК", self)
-        self.head_column_edit_type2 = FloatLineEdit(self)
+        self.head_column_edit_type2 = FloatLineEdit()
         self.head_column_edit_type2.setText(f'{0}')
 
         self.shoe_column_label = QLabel("башмак ЭК", self)
-        self.shoe_column_edit_type2 = FloatLineEdit(self)
+        self.shoe_column_edit_type2 = FloatLineEdit()
         self.shoe_column_edit_type2.setText(f'{self.ifNone(self.data_well.shoe_column.get_value)}')
 
         self.level_cement_label = QLabel("Высота цемента \nза колонной", self)
-        self.level_cement_edit = FloatLineEdit(self)
+        self.level_cement_edit = FloatLineEdit()
         if '-' in str(self.data_well.level_cement_column.get_value):
             self.level_cement_edit.setText(self.ifNone(self.data_well.level_cement_column.get_value).split("-")[0].strip())
         else:
@@ -125,27 +125,27 @@ class TabPageSoCorrect(TabPageUnion):
         self.column_add_true_comboBox.setCurrentIndex(column_add)
 
         self.column_add_label = QLabel("диаметр \nдоп. колонны", self)
-        self.column_add_edit_type = FloatLineEdit(self)
+        self.column_add_edit_type = FloatLineEdit()
         self.column_add_edit_type.setText(f'{self.ifNone(self.data_well.column_additional_diameter.get_value)}')
         # self.column_add_edit_type.setClearButtonEnabled(True)
 
         self.column_add_wall_thicknessLabel = QLabel("Толщина стенки ", self)
-        self.column_add_wall_thicknessedit_type2 = FloatLineEdit(self)
+        self.column_add_wall_thicknessedit_type2 = FloatLineEdit()
         self.column_add_wall_thicknessedit_type2.setText(
             f'{self.ifNone(self.data_well.column_additional_wall_thickness.get_value)}')
         # self.column_add_wall_thicknessedit_type2.setClearButtonEnabled(True)
 
         self.head_column_add_label = QLabel("Голова \nдоп колонны", self)
-        self.head_column_add_edit_type2 = FloatLineEdit(self)
+        self.head_column_add_edit_type2 = FloatLineEdit()
         self.head_column_add_edit_type2.setText(f'{self.ifNone(self.data_well.head_column_additional.get_value)}')
 
         self.shoe_column_add_label = QLabel("башмак \nдоп колонны", self)
-        self.shoe_column_add_edit_type2 = FloatLineEdit(self)
+        self.shoe_column_add_edit_type2 = FloatLineEdit()
         self.shoe_column_add_edit_type2.setText(f'{self.ifNone(self.data_well.shoe_column_additional.get_value)}')
         # self.shoe_column_add_edit_type2.setClearButtonEnabled(True)
 
         self.bottomhole_drill_Label = QLabel('Пробуренный забой')
-        self.bottomhole_drill_edit_type = FloatLineEdit(self)
+        self.bottomhole_drill_edit_type = FloatLineEdit()
 
 
         self.bottomhole_drill_edit_type.setText(
@@ -154,7 +154,7 @@ class TabPageSoCorrect(TabPageUnion):
             self.data_well.check_data_in_pz.append('Не корректно указан пробуренный забой\n')
 
         self.bottomhole_artificial_Label = QLabel('Искусственный забой')
-        self.bottomhole_artificial_edit_type = FloatLineEdit(self)
+        self.bottomhole_artificial_edit_type = FloatLineEdit()
         self.bottomhole_artificial_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.bottom_hole_artificial.get_value))}')
 
@@ -162,32 +162,32 @@ class TabPageSoCorrect(TabPageUnion):
             self.data_well.check_data_in_pz.append('Не корректно указан искусственный забой\n')
 
         self.current_bottom_Label = QLabel('Текущий забой')
-        self.current_bottom_edit_type = FloatLineEdit(self)
+        self.current_bottom_edit_type = FloatLineEdit()
         self.current_bottom_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.current_bottom))}')
 
         self.max_angle_Label = QLabel('Максимальный угол')
-        self.max_angle_edit_type = FloatLineEdit(self)
+        self.max_angle_edit_type = FloatLineEdit()
         self.max_angle_edit_type.setText(f'{self.ifNone(self.data_well.max_angle.get_value)}')
 
         if self.max_angle_edit_type.text() == 'отсут':
             self.data_well.check_data_in_pz.append('Не корректно указан максимальный угол\n')
 
         self.max_angle_depth_Label = QLabel('Глубина \nмаксимального угла')
-        self.max_angle_depth_edit_type = FloatLineEdit(self)
+        self.max_angle_depth_edit_type = FloatLineEdit()
         self.max_angle_depth_edit_type.setText(f'{self.ifNone(self.data_well.max_angle_depth.get_value)}')
         if  self.max_angle_depth_edit_type.text() == 'отсут':
             self.data_well.check_data_in_pz.append('Не корректно указана глубина максимального угола\n')
 
         self.max_expected_pressure_Label = QLabel('Максимальный \nожидаемое давление')
-        self.max_expected_pressure_edit_type = FloatLineEdit(self)
+        self.max_expected_pressure_edit_type = FloatLineEdit()
         self.max_expected_pressure_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.max_expected_pressure.get_value))}')
         if self.max_expected_pressure_edit_type.text() == 'отсут':
             self.data_well.check_data_in_pz.append('Не корректно указана глубина максимального ожидаемое давление\n')
 
         self.max_admissible_pressure_Label = QLabel('Максимальный \nдопустимое давление')
-        self.max_admissible_pressure_edit_type = FloatLineEdit(self)
+        self.max_admissible_pressure_edit_type = FloatLineEdit()
         self.max_admissible_pressure_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.max_admissible_pressure.get_value))}')
 
@@ -199,7 +199,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.pump_SHGN_do_edit_type.setText(f'{self.ifNone(self.data_well.dict_pump_shgn["before"])}')
 
         self.pump_SHGN_depth_do_Label = QLabel('Глубина \nштангового насоса')
-        self.pump_SHGN_depth_do_edit_type = FloatLineEdit(self)
+        self.pump_SHGN_depth_do_edit_type = FloatLineEdit()
         if self.pump_SHGN_do_edit_type.text() != 'отсут':
             self.pump_SHGN_depth_do_edit_type.setText(
                 f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.dict_pump_shgn_depth["before"]))}')
@@ -211,7 +211,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.pump_SHGN_posle_edit_type.setText(f'{self.ifNone(self.data_well.dict_pump_shgn["after"])}')
 
         self.pump_SHGN_depth_posle_Label = QLabel('Плановая глубина \nспуска насоса')
-        self.pump_SHGN_depth_posle_edit_type = FloatLineEdit(self)
+        self.pump_SHGN_depth_posle_edit_type = FloatLineEdit()
         if self.pump_SHGN_posle_edit_type.text() != 'отсут':
             self.pump_SHGN_depth_posle_edit_type.setText(
                 f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.dict_pump_shgn_depth["after"]))}')
@@ -223,7 +223,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.pump_ECN_do_edit_type.setText(f'{self.ifNone(self.data_well.dict_pump_ecn["before"])}')
 
         self.pump_ECN_depth_do_Label = QLabel('Глубина \nспуска ЭЦН')
-        self.pump_ECN_depth_do_edit_type = FloatLineEdit(self)
+        self.pump_ECN_depth_do_edit_type = FloatLineEdit()
         if self.pump_ECN_do_edit_type.text() != 'отсут':
             self.pump_ECN_depth_do_edit_type.setText(
                 f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.dict_pump_ecn_depth["before"]))}')
@@ -235,7 +235,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.pump_ECN_posle_edit_type.setText(f'{self.ifNone(self.data_well.dict_pump_ecn["after"])}')
 
         self.pump_ECN_depth_posle_Label = QLabel('Плановая глубина \nспуска ЭЦН')
-        self.pump_ECN_depth_posle_edit_type = FloatLineEdit(self)
+        self.pump_ECN_depth_posle_edit_type = FloatLineEdit()
         if self.pump_ECN_posle_edit_type.text() != 'отсут':
             self.pump_ECN_depth_posle_edit_type.setText(
                 f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.dict_pump_ecn_depth["after"]))}')
@@ -247,7 +247,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.paker_do_edit_type.setText(f'{self.ifNone(self.data_well.paker_before["before"])}')
 
         self.paker_depth_do_Label = QLabel('Глубина спуска \nпакера')
-        self.paker_depth_do_edit_type = FloatLineEdit(self)
+        self.paker_depth_do_edit_type = FloatLineEdit()
         self.paker_depth_do_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.depth_fond_paker_before["before"]))}')
 
@@ -256,7 +256,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.paker_posle_edit_type.setText(f'{self.ifNone(self.data_well.paker_before["after"])}')
 
         self.paker_depth_posle_Label = QLabel('Глубина спуска \nпакера')
-        self.paker_depth_posle_edit_type = FloatLineEdit(self)
+        self.paker_depth_posle_edit_type = FloatLineEdit()
         self.paker_depth_posle_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.depth_fond_paker_before["after"]))}')
 
@@ -265,7 +265,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.paker2_do_edit_type.setText(f'{self.ifNone(self.data_well.paker_second_before["before"])}')
 
         self.paker2_depth_do_Label = QLabel('Глубина спуска \nпакера')
-        self.paker2_depth_do_edit_type = FloatLineEdit(self)
+        self.paker2_depth_do_edit_type = FloatLineEdit()
         self.paker2_depth_do_edit_type.setText(self.remove_non_numeric_chars(
             self.ifNone(str(self.data_well.depth_fond_paker_second_before["before"]))))
 
@@ -275,18 +275,18 @@ class TabPageSoCorrect(TabPageUnion):
         self.paker2_posle_edit_type.setText(str(self.ifNone(self.data_well.paker_second_before["after"])))
 
         self.paker2_depth_posle_Label = QLabel('Глубина спуска пакера')
-        self.paker2_depth_posle_edit_type = FloatLineEdit(self)
+        self.paker2_depth_posle_edit_type = FloatLineEdit()
         self.paker2_depth_posle_edit_type.setText(
             self.remove_non_numeric_chars(self.ifNone(str(self.data_well.depth_fond_paker_second_before["after"]))))
         # print(f' насос спуск {data_list.pdict_pump["after"]}')
 
         self.static_level_Label = QLabel('Статический уровень \nв скважине')
-        self.static_level_edit_type = FloatLineEdit(self)
+        self.static_level_edit_type = FloatLineEdit()
         self.static_level_edit_type.setText(self.remove_non_numeric_chars(
             self.ifNone(self.data_well.static_level.get_value)))
 
         self.dinamic_level_Label = QLabel('Динамический уровень \nв скважине')
-        self.dinamic_level_edit_type = FloatLineEdit(self)
+        self.dinamic_level_edit_type = FloatLineEdit()
         self.dinamic_level_edit_type.setText(self.remove_non_numeric_chars(
             self.ifNone(self.data_well.dinamic_level.get_value)))
 
@@ -585,7 +585,7 @@ class TabPageSoCorrect(TabPageUnion):
         if self.curator_Combo.currentText() == 'ОР':
 
             self.expected_pickup_label = QLabel('Ожидаемая приемистость')
-            self.expected_pickup_edit = FloatLineEdit(self)
+            self.expected_pickup_edit = FloatLineEdit()
             try:
                 self.expected_pickup_edit.setText(f'{self.data_well.expected_pickup}')
                 # print(f'ожидаемая приемистисть{self.data_well.expected_pickup}')
@@ -595,7 +595,7 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(self.expected_pickup_edit, 26, 2)
 
             self.expected_pressure_label = QLabel('Ожидаемое давление закачки')
-            self.expected_pressure_edit = FloatLineEdit(self)
+            self.expected_pressure_edit = FloatLineEdit()
             try:
                 self.expected_pressure_edit.setText(f'{self.data_well.expected_pressure}')
             except:
@@ -604,7 +604,7 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(self.expected_pressure_edit, 26, 3)
         else:
             self.water_cut_Label = QLabel('Дебит по жидкости')
-            self.water_cut_edit = FloatLineEdit(self)
+            self.water_cut_edit = FloatLineEdit()
             try:
                 self.water_cut_edit.setText(f'{self.data_well.water_cut}')
             except:
@@ -612,7 +612,7 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(self.water_cut_Label, 25, 1)
             self.grid.addWidget(self.water_cut_edit, 26, 1)
             self.expected_oil_Label = QLabel('Дебит по нефти')
-            self.expected_oil_edit = FloatLineEdit(self)
+            self.expected_oil_edit = FloatLineEdit()
             try:
                 self.expected_oil_edit.setText(f'{self.data_well.expected_oil}')
             except:
@@ -621,7 +621,7 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(self.expected_oil_edit, 26, 2)
             self.proc_water_Label = QLabel('Обводненность')
 
-            self.proc_water_edit = FloatLineEdit(self)
+            self.proc_water_edit = FloatLineEdit()
             try:
                 self.proc_water_edit.setText(f'{self.data_well.percent_water}')
             except:
@@ -714,7 +714,7 @@ class TabPageSoCorrect(TabPageUnion):
 
         if self.curator_Combo.currentText() == 'ОР':
             self.expected_pickup_label = QLabel('Ожидаемая приемистость')
-            self.expected_pickup_edit = FloatLineEdit(self)
+            self.expected_pickup_edit = FloatLineEdit()
             try:
                 self.expected_pickup_edit.setText(f'{self.data_well.expected_pickup}')
             except:
@@ -723,13 +723,13 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(self.expected_pickup_edit, 26, 4)
 
             self.expected_pressure_label = QLabel('Ожидаемое давление закачки')
-            self.expected_pressure_edit = FloatLineEdit(self)
+            self.expected_pressure_edit = FloatLineEdit()
             self.expected_pressure_edit.setText(f'{self.data_well.expected_pressure}')
             self.grid.addWidget(self.expected_pressure_label, 25, 5)
             self.grid.addWidget(self.expected_pressure_edit, 26, 5)
         else:
             self.water_cut_Label = QLabel('Дебит по жидкости')
-            self.water_cut_edit = FloatLineEdit(self)
+            self.water_cut_edit = FloatLineEdit()
             try:
                 self.water_cut_edit.setText(f'{self.data_well.water_cut}')
             except:
@@ -737,7 +737,7 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(self.water_cut_Label, 25, 1)
             self.grid.addWidget(self.water_cut_edit, 26, 1)
             self.expected_oil_Label = QLabel('Дебит по нефти')
-            self.expected_oil_edit = FloatLineEdit(self)
+            self.expected_oil_edit = FloatLineEdit()
             try:
                 self.expected_oil_edit.setText(f'{self.data_well.expected_oil}')
             except:
@@ -746,7 +746,7 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(self.expected_oil_edit, 26, 2)
             self.proc_water_Label = QLabel('Обводненность')
 
-            self.proc_water_edit = FloatLineEdit(self)
+            self.proc_water_edit = FloatLineEdit()
             try:
                 self.proc_water_edit.setText(f'{self.data_well.percent_water}')
             except:
