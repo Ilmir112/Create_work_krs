@@ -649,6 +649,11 @@ def insert_data_well_dop_plan(self, data_well):
     else:
         self.data_well.result_pressure_date = data_list.ProtectedIsNonNone('01.01.2000')
 
+    if 'ПВР план' in list(well_data_dict.keys()):
+        self.data_well.dict_perforation_project = well_data_dict['ПВР план']
+    else:
+        self.data_well.dict_perforation_project = ''
+
     self.data_well.data_well_dict = well_data_dict
 
     self.data_well.well_volume_in_pz = [well_volume(self, self.data_well.head_column_additional.get_value)]

@@ -234,8 +234,7 @@ class TabPageSoAcid(TabPageUnion):
         self.pressure_Label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
         self.pressure_edit.setClearButtonEnabled(True)
-        if self.data_well:
-            self.pressure_edit.setText(str(self.data_well.max_admissible_pressure.get_value))
+
 
         self.grid.addWidget(self.pressure_Label, 6, 6)
         self.grid.addWidget(self.pressure_edit, 7, 6)
@@ -316,6 +315,8 @@ class TabPageSoAcid(TabPageUnion):
         if paker_depth:
             paker_diameter = int(float(self.paker_diameter_select(paker_depth)))
             self.diameter_paker_edit.setText(str(paker_diameter))
+        if self.data_well:
+            self.pressure_edit.setText(str(self.data_well.max_admissible_pressure.get_value))
 
     def update_paker_layout(self, index):
         self.paker_layout_index = index
@@ -669,7 +670,7 @@ class AcidPakerWindow(WindowUnion):
                 if read_swab is False:
                     return
             if self.paker_layout_combo not in ['воронка', 'без монтажа компоновки на спуск']:
-                self.diameter_paker = int(float(self.current_widget.diameter_paker_edit.text()))
+                self.diameter_paker = int(float(self.current_widget.diameter_paker_edit.text().replace(',', '.')))
             self.depth_gauge_combo = str(self.current_widget.depth_gauge_combo.currentText())
 
             self.svk_true_combo = self.current_widget.svk_true_combo.currentText()
@@ -687,7 +688,7 @@ class AcidPakerWindow(WindowUnion):
                 self.expected_pickup = self.current_widget.expected_pickup_edit.text()
                 self.expected_pressure = self.current_widget.expected_pressure_edit.text()
                 if self.expected_pressure not in [None, 'None', '', '-', 'атм']:
-                    self.expected_pressure = int(float(self.expected_pressure))
+                    self.expected_pressure = int(float(self.expected_pressure.replace(',', '.')))
                 self.pressure_three = self.current_widget.pressure_three_edit.text()
 
             self.pressure_zumph_combo = self.current_widget.pressure_zumpf_question_combo.currentText()
@@ -700,7 +701,7 @@ class AcidPakerWindow(WindowUnion):
                     QMessageBox.warning(self, 'Ошибка', f'не введены глубина опрессовки ЗУМПФа')
                     return
                 else:
-                    self.paker_depth_zumpf = int(float(self.paker_depth_zumpf))
+                    self.paker_depth_zumpf = int(float(self.paker_depth_zumpf.replace(',', '.')))
 
                 if self.paker_khost + self.paker_depth_zumpf >= self.data_well.current_bottom:
                     QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
@@ -738,7 +739,7 @@ class AcidPakerWindow(WindowUnion):
         if rows == 0:
             self.paker_khost = self.current_widget.paker_khost.text()
             if self.paker_khost not in ['', 0, '0']:
-                self.paker_khost = float(self.paker_khost)
+                self.paker_khost = float(self.paker_khost.replace(',', '.'))
             else:
                 QMessageBox.warning(self, 'Ошибка', 'Не указано глубина НКТ')
                 return
@@ -833,11 +834,11 @@ class AcidPakerWindow(WindowUnion):
                         data_list.paker_khost = self.paker_khost
                     else:
                         self.paker_khost = data_list.paker_khost
-                    self.paker_depth = int(float(self.tableWidget.item(row, 2).text()))
+                    self.paker_depth = int(float(self.tableWidget.item(row, 2).text().replace(',', '.')))
                     self.svk_true_combo = self.tableWidget.cellWidget(row, 3).currentText()
                     self.acid_edit = self.tableWidget.cellWidget(row, 4).currentText()
-                    self.acid_proc_edit = int(float(self.tableWidget.item(row, 5).text()))
-                    self.acid_volume_edit = round(float(self.tableWidget.item(row, 6).text()), 1)
+                    self.acid_proc_edit = int(float(self.tableWidget.item(row, 5).text().replace(',', '.')))
+                    self.acid_volume_edit = round(float(self.tableWidget.item(row, 6).text().replace(',', '.')), 1)
                     if self.acid_edit == 'HCl':
                         self.sko_volume_all += self.acid_volume_edit
 
@@ -852,20 +853,20 @@ class AcidPakerWindow(WindowUnion):
 
                     self.plast_combo = self.tableWidget.item(row, 0).text()
                     if row == 0:
-                        self.paker_khost = int(float(self.tableWidget.item(row, 1).text()))
+                        self.paker_khost = int(float(self.tableWidget.item(row, 1).text().replace(',', '.')))
                         data_list.paker_khost = self.paker_khost
                     else:
                         self.paker_khost = data_list.paker_khost
 
                     self.svk_true_combo = self.tableWidget.cellWidget(row, 2).currentText()
                     self.acid_edit = self.tableWidget.cellWidget(row, 3).currentText()
-                    self.acid_volume_edit = round(float(self.tableWidget.item(row, 5).text()), 1)
-                    self.acid_proc_edit = int(float(self.tableWidget.item(row, 4).text()))
+                    self.acid_volume_edit = round(float(self.tableWidget.item(row, 5).text().replace(',', '.')), 1)
+                    self.acid_proc_edit = int(float(self.tableWidget.item(row, 4).text().replace(',', '.')))
                     if self.acid_edit == 'HCl':
                         self.sko_volume_all += self.acid_volume_edit
 
                     try:
-                        self.acidOilProc = round(float(self.tableWidget.item(row, 6).text()))
+                        self.acidOilProc = round(float(self.tableWidget.item(row, 6).text().replace(',', '.')))
                     except Exception:
                         self.acidOilProc = 0
                     if self.paker_layout_combo == 'воронка':

@@ -622,14 +622,14 @@ class GnoParent(ABC):
             well_jamming_str = f'Произвести закачку в трубное пространство тех жидкости уд.весом ' \
                                f'{self.data_well.fluid_work} в ' \
                                f'объеме {round(self.volume_well_jamming - volume_pod_nkt_str, 1)}м3 на циркуляцию. ' \
-                               f'Закрыть затрубное пространство. Закрыть скважину на стабилизацию не менее 2 часов. ' \
+                               f'Закрыть трубное пространство. Закрыть скважину на стабилизацию не менее 2 часов. ' \
                                f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)'
 
             well_jamming_short = f'Глушение в НКТ уд.весом {self.data_well.fluid_work_short} ' \
                                  f'объеме {volume_nkt_str}м3 ' \
                                  f'на циркуляцию.  '
 
-        elif self.without_damping_true is False and self.lift_key in ['ОРД']:
+        elif self.without_damping_true is False and self.lift_key in ['ОРД', 'ЭЦН']:
             well_jamming_str = f'Произвести закачку в затрубное пространство тех жидкости уд.весом ' \
                                f'{self.data_well.fluid_work_short} в ' \
                                f'объеме {round(volume_nkt_ustie, 1)}м3 ' \
@@ -637,10 +637,10 @@ class GnoParent(ABC):
                                f'{self.data_well.max_admissible_pressure.get_value}атм. Закрыть ' \
                                f'затрубное пространство. Закрыть скважину на стабилизацию не менее 2 часов. ' \
                                f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)'
-            well_jamming_short = f'Глушение в затруб уд.весом {self.data_well.fluid_work_short} в ' \
+            well_jamming_short = f'Глушение в НКТ уд.весом {self.data_well.fluid_work_short} в ' \
                                  f'объеме ' \
                                  f'{round(volume_nkt_ustie, 1)}м3 '
-        elif self.without_damping_true is False and self.lift_key in ['НН', 'НВ', 'ЭЦН']:
+        elif self.without_damping_true is False and self.lift_key in ['НН', 'НВ']:
             well_jamming_str = f'Произвести глушение скважины в объеме {self.volume_well_jamming}м3 тех ' \
                                f'жидкостью уд.весом {self.data_well.fluid_work}' \
                                f' на циркуляцию в следующим алгоритме: \n Произвести закачку в' \
@@ -659,7 +659,7 @@ class GnoParent(ABC):
             well_jamming_str = f'Произвести глушение скважины объеме {self.volume_well_jamming}м3 тех ' \
                                f'жидкостью уд.весом {self.data_well.fluid_work}' \
                                f' на циркуляцию в следующим алгоритме: \n Произвести закачку ' \
-                               f'в затрубное пространство ' \
+                               f'в трубное пространство ' \
                                f'тех жидкости в ' \
                                f'объеме {volume_nkt_ustie}м3 на ' \
                                f'циркуляцию. Закрыть трубное пространство. ' \
@@ -670,16 +670,16 @@ class GnoParent(ABC):
                                f'Закрыть скважину на ' \
                                f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае ' \
                                f'отсутствия на желобную емкость'
-            well_jamming_short = f'Глушение в затруб в объеме {self.volume_well_jamming}м3 тех ' \
+            well_jamming_short = f'Глушение в НКТ в объеме {self.volume_well_jamming}м3 тех ' \
                                  f'жидкостью уд.весом {self.data_well.fluid_work_short}'
         elif abs(self.length_nkt - self.data_well.perforation_roof) <= 150:
-            well_jamming_str = f'Произвести глушение скважины  в объеме {self.volume_well_jamming}м3 тех ' \
+            well_jamming_str = f'Произвести глушение скважины в объеме {self.volume_well_jamming}м3 тех ' \
                                f'жидкостью уд.весом {self.data_well.fluid_work}' \
                                f' на циркуляцию. Закрыть скважину на ' \
                                f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, ' \
                                f'в случае отсутствия ' \
                                f'на желобную емкость)'
-            well_jamming_short = (f'Глушение в затруб в объеме {self.volume_well_jamming}м3 уд.весом '
+            well_jamming_short = (f'Глушение в НКТ в объеме {self.volume_well_jamming}м3 уд.весом '
                                   f'{self.data_well.fluid_work_short}')
 
         if len(self.data_well.plast_work) == 0 and self.data_well.dict_leakiness:

@@ -1332,7 +1332,8 @@ class DataWindow(WindowUnion):
                         'максимальное ожидаемое давление': self.data_well.max_expected_pressure.get_value,
                         'максимальное допустимое давление': self.data_well.max_admissible_pressure.get_value,
                         'диаметр долото при бурении': self.data_well.diameter_doloto_ek.get_value
-                    }
+                    },
+                    'ПВР план': self.data_well.dict_perforation_project
                 }
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Ошибка в обработке {e}')

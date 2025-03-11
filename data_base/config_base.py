@@ -239,7 +239,7 @@ class WorkDatabaseWell:
         date_today = datetime.now().strftime('%Y-%m-%d')
 
         type_kr = data_well.type_kr.split(' ')[0]
-        adedaas = data_well.data_list
+
         data_paragraph = json.dumps(data_well.data_list, ensure_ascii=False)
         cdng = data_well.cdng.get_value
 
@@ -282,10 +282,10 @@ class WorkDatabaseWell:
                                         WHERE well_number ={self.path_index} AND area_well ={self.path_index} 
                                         AND contractor ={self.path_index}
                                          AND costumer ={self.path_index} AND work_plan ={self.path_index} 
-                                         AND type_kr={self.path_index}
+                                         AND type_kr={self.path_index} AND today={self.path_index}
                                                     """, (
                             str(well_number), well_area, contractor, costumer, work_plan_str,
-                            type_kr))
+                            type_kr, date_in_base))
 
                         QMessageBox.information(None, 'Успешно', 'Данные удалены')
                     else:
@@ -305,9 +305,9 @@ class WorkDatabaseWell:
                         f"{self.path_index}, {self.path_index}, {self.path_index})"
 
                 data_values = (str(well_number), well_area,
-                               data_well_dict, date_today, excel_json, contractor, data_list.costumer,
+                               data_well_dict,  excel_json, contractor, data_list.costumer,
                                work_plan_str, data_list.user[1], type_kr, data_paragraph, cdng, category_dict,
-                               well_oilfield, appointment_well, str(inv_number), wellhead_fittings, angle_data)
+                               well_oilfield, appointment_well, str(inv_number), wellhead_fittings, angle_data, date_today)
 
                 # Выполнение запроса с использованием параметров
                 cursor.execute(query, data_values)
