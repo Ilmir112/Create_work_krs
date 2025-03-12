@@ -837,7 +837,7 @@ class DataWindow(WindowUnion):
             level_cement = self.current_widget.level_cement_edit.text()
             if '-' in level_cement:
                 level_cement = level_cement.split("-")[0]
-            head_column = float(self.current_widget.head_column_edit_type2.text()).replace(',', '.')
+            head_column = float(self.current_widget.head_column_edit_type2.text().replace(',', '.'))
             column_add_True = str(self.current_widget.column_add_true_comboBox.currentText())
             if column_add_True == 'в наличии':
                 self.data_well.column_additional = True
@@ -1341,9 +1341,7 @@ class DataWindow(WindowUnion):
             return
 
         if str(self.data_well.paker_before["before"]).lower() not in ['0', 0, '-', 'отсут', '', None]:
-
             try:
-
                 paker_diameter = TabPageSo.paker_diameter_select(self, float(
                     self.data_well.depth_fond_paker_before["before"]))
                 if str(paker_diameter) not in str(self.data_well.paker_before["before"]):
@@ -1355,6 +1353,7 @@ class DataWindow(WindowUnion):
             except Exception as e:
                 QMessageBox.information(self, 'Ошибка обработки', f'ошибка проверки ПЗ в части соответствия '
                                                                   f'диаметра пакера \n {type(e).__name__}\n\n{str(e)}')
+                return
         self.definition_open_trunk_well()
 
         data_list.pause = False
