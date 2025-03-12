@@ -213,7 +213,7 @@ class GrpWindow(WindowUnion):
             [f'по согласованию с заказчиком: Отбивка забоя',
              None, f'по согласованию с заказчиком: \n'
                    f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
-                   f'Произвести монтаж ПАРТИИ ГИС согласно схемы №8а утвержденной главным инженером '
+                   f'Произвести монтаж ПАРТИИ ГИС согласно схемысхема №11 утвержденной главным инженером '
                    f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                    f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
              None, None, None, None, None, None, None,
@@ -261,7 +261,7 @@ class GrpWindow(WindowUnion):
     def grpPaker(self, diameter_paker, paker_depth, paker_khost, gis_otz_true_quest, gis_otz_after_true_quest,
                  normalization_true_quest, current_depth):
         if 'Ойл' in data_list.contractor:
-            schema_grp = '7а'
+            schema_grp = '6'
         elif 'РН' in data_list.contractor:
             schema_grp = '6'
 
@@ -298,7 +298,7 @@ class GrpWindow(WindowUnion):
              'мастер КРС', ''],
             [f'Привязка по ГК и ЛМ', None,
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
-             f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  '
+             f'Произвести  монтаж ПАРТИИ ГИС согласно схемы схема №11 утвержденной главным инженером  '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины Отбить забой по ГК и ЛМ',
              None, None, None, None, None, None, None,
@@ -434,7 +434,7 @@ class GrpWindow(WindowUnion):
             paker_list.append(
                 [f'Отбить забой по ГК и ЛМ', None,
                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
-                 f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
+                 f'Произвести  монтаж ПАРТИИ ГИС согласно схемы схема №11 утвержденной главным инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                  f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', 4])

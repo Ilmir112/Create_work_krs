@@ -986,7 +986,7 @@ class SwabWindow(WindowUnion):
 
     def swabbing_opy_with_paker(self):
         if 'Ойл' in data_list.contractor:
-            schema_swab = '8'
+            schema_swab = '7'
         elif 'РН' in data_list.contractor:
             schema_swab = '7'
         if self.check_true_depth_template(self.paker_depth) is False:
@@ -1171,7 +1171,7 @@ class SwabWindow(WindowUnion):
             dict_nkt = {60: self.depth_opy}
 
         if 'Ойл' in data_list.contractor:
-            schema_swab = '8'
+            schema_swab = '7'
         elif 'РН' in data_list.contractor:
             schema_swab = '7'
 
@@ -1319,7 +1319,7 @@ class SwabWindow(WindowUnion):
         elif nkt_diam == 60:
             dict_nkt = {60: self.paker_depth + self.paker_khost}
         if 'Ойл' in data_list.contractor:
-            schema_swab = '8'
+            schema_swab = '7'
         elif 'РН' in data_list.contractor:
             schema_swab = '7'
         paker_list = [
@@ -1471,7 +1471,7 @@ class SwabWindow(WindowUnion):
         elif nkt_diam == 60:
             dict_nkt = {60: self.paker_depth + self.paker_khost}
         if 'Ойл' in data_list.contractor:
-            schema_swab = '8'
+            schema_swab = '7'
         elif 'РН' in data_list.contractor:
             schema_swab = '7'
         if self.pressure_zumph_combo == "Да":
@@ -1681,7 +1681,7 @@ class SwabWindow(WindowUnion):
         elif nkt_diam == 60:
             dict_nkt = {60: self.paker_depth + self.paker_khost}
         if 'Ойл' in data_list.contractor:
-            schema_swab = '8'
+            schema_swab = '7'
         elif 'РН' in data_list.contractor:
             schema_swab = '7'
         paker_list = [
@@ -1801,7 +1801,7 @@ class SwabWindow(WindowUnion):
                           f'{self.depth_gauge}'
             dict_nkt = {60: self.paker_depth}
         if 'Ойл' in data_list.contractor:
-            schema_swab = '8'
+            schema_swab = '7'
         elif 'РН' in data_list.contractor:
             schema_swab = '7'
         paker_list = [

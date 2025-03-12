@@ -370,7 +370,7 @@ class MyMainWindow(QMainWindow):
         priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
                       f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС '
                       f'{data_list.contractor}". '
-                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
+                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы схема №11 утвержденной главным инженером '
                       f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                       f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
                       None, None, None, None, None, None, None,
@@ -1931,7 +1931,7 @@ class MyWindow(MyMainWindow):
 
         priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
                       f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
-                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
+                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы схема №11 утвержденной главным инженером '
                       f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                       f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
                       None, None, None, None, None, None, None,
@@ -2487,7 +2487,8 @@ class SaveInExcel(MyWindow):
 
             # try:
             for row_ind, row in enumerate(self.ws2.iter_rows(values_only=True)):
-                if 15 < row_ind < 100:
+                if 15 < row_ind < 100 and \
+                        self.data_well.data_pvr_max.get_value < row_ind < self.data_well.data_fond_min.get_value:
                     if all(cell in [None, ''] for cell in row) \
                             and ('Интервалы темпа' not in str(self.ws2.cell(row=row_ind, column=2).value) \
                                  and 'Замечания к эксплуатационному периоду' not in str(

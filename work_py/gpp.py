@@ -111,7 +111,7 @@ class GppWindow(WindowUnion):
     def grp_gpp_work(self, gpp_depth, current_depth, diameter_paker, gis_otz_after_true_quest):
         schema_grp = ''
         if 'Ойл' in data_list.contractor:
-            schema_grp = '7'
+            schema_grp = '6'
         elif 'РН' in data_list.contractor:
             schema_grp = '6'
 
@@ -175,7 +175,7 @@ class GppWindow(WindowUnion):
             [f'Привязка по ГК и ЛМ',
              None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС '
                    f'{data_list.contractor}". '
-                   f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №8а утвержденной главным инженером '
+                   f'Произвести  монтаж ПАРТИИ ГИС согласно схемы схема №11 утвержденной главным инженером '
                    f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                    f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
              None, None, None, None, None, None, None,

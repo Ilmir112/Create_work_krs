@@ -831,42 +831,42 @@ class DataWindow(WindowUnion):
             else:
                 self.data_well.type_kr = type_kr_combo
 
-            column_type = self.current_widget.column_type.text()
+            column_type = self.current_widget.column_type.text().replace(',', '.')
             column_wall_thickness = self.current_widget.column_wall_thickness_edit_type2.text()
-            shoe_column = self.current_widget.shoe_column_edit_type2.text().strip()
+            shoe_column = self.current_widget.shoe_column_edit_type2.text().strip().replace(',', '.')
             level_cement = self.current_widget.level_cement_edit.text()
             if '-' in level_cement:
                 level_cement = level_cement.split("-")[0]
-            head_column = float(self.current_widget.head_column_edit_type2.text())
+            head_column = float(self.current_widget.head_column_edit_type2.text()).replace(',', '.')
             column_add_True = str(self.current_widget.column_add_true_comboBox.currentText())
             if column_add_True == 'в наличии':
                 self.data_well.column_additional = True
             else:
                 self.data_well.column_additional = False
 
-            column_additional_diameter = self.current_widget.column_add_edit_type.text()
-            column_additional_wall_thickness = self.current_widget.column_add_wall_thicknessedit_type2.text()
-            shoe_column_additional = self.current_widget.shoe_column_add_edit_type2.text()
-            head_column_additional = self.current_widget.head_column_add_edit_type2.text()
-            bottomhole_drill = self.current_widget.bottomhole_drill_edit_type.text()
+            column_additional_diameter = self.current_widget.column_add_edit_type.text().replace(',', '.')
+            column_additional_wall_thickness = self.current_widget.column_add_wall_thicknessedit_type2.text().replace(',', '.')
+            shoe_column_additional = self.current_widget.shoe_column_add_edit_type2.text().replace(',', '.')
+            head_column_additional = self.current_widget.head_column_add_edit_type2.text().replace(',', '.')
+            bottomhole_drill = self.current_widget.bottomhole_drill_edit_type.text().replace(',', '.')
             if bottomhole_drill == 'отсут':
                 QMessageBox.warning(self, 'Ошибка', 'Ошибка в пробуренном забое')
                 return
             bottomhole_artificial = self.current_widget.bottomhole_artificial_edit_type.text().replace(',', '.')
             current_bottom = self.current_widget.current_bottom_edit_type.text().replace(',', '.')
-            max_angle_depth = self.current_widget.max_angle_depth_edit_type.text()
-            max_angle = self.current_widget.max_angle_edit_type.text()
-            max_expected_pressure = self.current_widget.max_expected_pressure_edit_type.text()
-            max_admissible_pressure = self.current_widget.max_admissible_pressure_edit_type.text()
+            max_angle_depth = self.current_widget.max_angle_depth_edit_type.text().replace(',', '.')
+            max_angle = self.current_widget.max_angle_edit_type.text().replace(',', '.')
+            max_expected_pressure = self.current_widget.max_expected_pressure_edit_type.text().replace(',', '.')
+            max_admissible_pressure = self.current_widget.max_admissible_pressure_edit_type.text().replace(',', '.')
 
-            column_direction_diameter = self.current_widget.column_direction_diameter_edit.text()
-            column_direction_wall_thickness = self.current_widget.column_direction_wall_thickness_edit.text()
-            column_direction_length = self.current_widget.column_direction_length_edit.text()
+            column_direction_diameter = self.current_widget.column_direction_diameter_edit.text().replace(',', '.')
+            column_direction_wall_thickness = self.current_widget.column_direction_wall_thickness_edit.text().replace(',', '.')
+            column_direction_length = self.current_widget.column_direction_length_edit.text().replace(',', '.')
             level_cement_direction = self.current_widget.level_cement_direction_edit.text()
-            column_conductor_diameter = self.current_widget.column_conductor_diameter_edit.text()
-            column_conductor_wall_thickness = self.current_widget.column_conductor_wall_thickness_edit.text()
-            column_conductor_length = self.current_widget.column_conductor_length_edit.text()
-            level_cement_conductor = self.current_widget.level_cement_conductor_edit.text()
+            column_conductor_diameter = self.current_widget.column_conductor_diameter_edit.text().replace(',', '.')
+            column_conductor_wall_thickness = self.current_widget.column_conductor_wall_thickness_edit.text().replace(',', '.')
+            column_conductor_length = self.current_widget.column_conductor_length_edit.text().replace(',', '.')
+            level_cement_conductor = self.current_widget.level_cement_conductor_edit.text().replace(',', '.')
 
             dict_pump_shgn_do = str(self.current_widget.pump_SHGN_do_edit_type.text())
             dict_pump_shgn_h_do = self.current_widget.pump_SHGN_depth_do_edit_type.text()

@@ -344,7 +344,7 @@ class FindIndexPZ(MyMainWindow):
             elif 'III. Состояние скважины к началу ремонта ' in row:
                 self.condition_of_wells = ProtectedIsDigit(row_ind)
             elif any([('безопасный' in str(col).lower() and ('урове' in str(col).lower() or 'Нст' in str(col).lower()))
-                      or 'бсу ' in str(col).lower() for col in row]):
+                      or 'бсу' in str(col).lower() for col in row]):
                 self.bcu_level = True
             for col, value in enumerate(row):
                 if value is not None and col <= 12:

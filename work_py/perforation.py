@@ -615,7 +615,7 @@ class PerforationWindow(WindowUnion):
 
             if self.type_perforation in ['Трубная перфорация на депрессии']:
                 if 'Ойл' in data_list.contractor:
-                    schema_swab = '8'
+                    schema_swab = '9'
                 elif 'РН' in data_list.contractor:
                     schema_swab = '7'
                 pipe_perforation.extend([[None, None,
