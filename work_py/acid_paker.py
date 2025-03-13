@@ -604,7 +604,7 @@ class AcidPakerWindow(WindowUnion):
             self.tableWidget.setSortingEnabled(False)
         elif self.paker_layout_combo in ['двухпакерная', 'двухпакерная, упорные']:
             self.paker_khost = self.check_if_none((self.current_widget.paker_khost.text()))
-            self.paker_depth_edit = int(self.check_if_none(self.current_widget.paker_depth_edit.text()))
+            self.paker_depth = int(self.check_if_none(self.current_widget.paker_depth_edit.text()))
             self.paker2_depth = int(self.check_if_none(self.current_widget.paker2_depth.text()))
 
             if self.data_well:
@@ -635,7 +635,7 @@ class AcidPakerWindow(WindowUnion):
             self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(self.acid_proc_edit)))
             self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(self.acid_volume_edit)))
         elif self.paker_layout_combo in ['воронка', 'без монтажа компоновки на спуск']:
-            self.paker_depth_edit = int(self.check_if_none(self.current_widget.paker_depth_edit.text()))
+            self.paker_depth = int(self.check_if_none(self.current_widget.paker_depth_edit.text()))
             self.paker_khost = self.check_if_none((self.current_widget.paker_khost.text()))
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(self.plast_combo))

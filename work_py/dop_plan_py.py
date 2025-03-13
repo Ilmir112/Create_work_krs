@@ -568,7 +568,7 @@ class DopPlanWindow(WindowUnion):
                                 self.perforation_list.append(list_row)
                     else:
                         self.count_diam = 1
-        self.data_well.insert_index2 = self.data_well.data_x_max.get_value -1
+        self.data_well.insert_index = self.data_well.data_x_max.get_value -1
         self.data_well.count_template = 1
 
         if self.data_well.work_plan != 'plan_change':
@@ -1059,7 +1059,7 @@ class DopPlanWindow(WindowUnion):
                 self.data_well.template_length = float(template_length_addition_edit)
 
             work_list = self.work_list(work_earlier)
-            self.data_well.insert_index2 = self.insert_index
+            self.data_well.insert_index = self.insert_index
             self.populate_row(self.insert_index, work_list, self.table_widget, self.work_plan)
             definition_plast_work(self)
 
@@ -1094,7 +1094,7 @@ class DopPlanWindow(WindowUnion):
 
                         if 'порядок работы' in str(cell.value).lower() or \
                                 'наименование работ' in str(cell.value).lower():
-                            self.data_well.insert_index2 = i + 1
+                            self.data_well.insert_index = i + 1
                             ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
                             ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                             vertical='center')
