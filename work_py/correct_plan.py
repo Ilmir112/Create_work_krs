@@ -88,7 +88,7 @@ class CorrectPlanWindow(WindowUnion):
         super().__init__(data_well)
 
         self.current_widget = None
-        self.data_well.insert_index = 0
+        self.data_well.insert_index2 = 0
         self.tab_widget = TabWidget(self.data_well)
 
         self.centralWidget = QWidget()

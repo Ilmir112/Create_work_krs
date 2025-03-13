@@ -735,10 +735,10 @@ class MyMainWindow(QMainWindow):
                                 table_widget.setRowHeight(row, int(text_width))
         if 'gnkt' not in work_plan:
             for row in range(table_widget.rowCount()):
-                if row >= self.data_well.insert_index + 2:
+                if row >= self.data_well.insert_index2 + 2:
                     # Добавляем нумерацию в первую колонку
                     item_number = QtWidgets.QTableWidgetItem(
-                        str(row - self.data_well.insert_index - 1))  # Номер строки + 1
+                        str(row - self.data_well.insert_index2 - 1))  # Номер строки + 1
                     table_widget.setItem(row, 1, item_number)
 
     def check_true_depth_template(self, depth):
@@ -832,12 +832,12 @@ class MyMainWindow(QMainWindow):
             if data_list.dop_work_list:
                 self.populate_row(table_widget.rowCount(), data_list.dop_work_list, self.table_widget, self.work_plan)
             for row in range(table_widget.rowCount()):
-                if row >= self.data_well.insert_index + 3:
+                if row >= self.data_well.insert_index2 + 3 and 'gnkt' not in work_plan:
                     # Добавляем нумерацию в первую колонку
-                    ase = row - self.data_well.insert_index - 2
+                    ase = row - self.data_well.insert_index2 - 2
                     asdawdaw = cell_value
                     item_number = QtWidgets.QTableWidgetItem(
-                        str(row - self.data_well.insert_index - 2))  # Номер строки + 1
+                        str(row - self.data_well.insert_index2 - 2))  # Номер строки + 1
                     table_widget.setItem(row, 1, item_number)
 
                 row_value_empty = True  # Флаг, указывающий, что все ячейки в строке пустые
