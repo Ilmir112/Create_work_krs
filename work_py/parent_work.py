@@ -716,15 +716,15 @@ class WindowUnion(MyMainWindow):
                              f'{self.acid_volume_edit}м3 - {20}% не ' \
                              f'более Р={self.pressure_edit}атм.\n'
             # print(f'Ожидаемое показатели {self.data_well.expected_pick_up.values()}')
-        layout_select = f'посадить пакер на глубине {self.paker_depth}м'
+        layout_select = f'посадить пакер на глубине {self.paker_depth_edit}м'
 
         if self.__class__.__name__ == 'AcidPakerWindow':
             if self.paker_layout_combo in ['воронка', 'пакер с заглушкой', 'без монтажа компоновки на спуск']:
                 layout_select = 'Закрыть затрубное пространство'
             if 'одно' in self.paker_layout_combo:
-                layout_select = f'посадить пакер на глубине {self.paker_depth}м'
+                layout_select = f'посадить пакер на глубине {self.paker_depth_edit}м'
             elif 'дву' in self.paker_layout_combo:
-                layout_select = f'посадить пакера на глубине {self.paker_depth}/{self.paker2_depth}м'
+                layout_select = f'посадить пакера на глубине {self.paker_depth_edit}/{self.paker2_depth}м'
 
         acid_list_1 = [
             [acid_sel_short, None,
@@ -970,13 +970,13 @@ class WindowUnion(MyMainWindow):
                                          f'по круговой циркуляции  жидкостью уд.весом {self.data_well.fluid_work} п' \
                                          f'ри расходе жидкости не ' \
                                          f'менее 6-8 л/сек в объеме не менее ' \
-                                         f'{round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 ' \
+                                         f'{round(well_volume(self, self.paker_depth_edit + self.paker_khost) * 1.5, 1)}м3 ' \
                                          f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ. '
                 flushing_downhole_short = f'При наличии ЦИРКУЛЯЦИИ: Допустить ' \
                                           f'до Н- {self.data_well.current_bottom}м. ' \
                                           f'Промыть уд.весом ' \
                                           f'{self.data_well.fluid_work[:4]}' \
-                                          f'не менее {round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 '
+                                          f'не менее {round(well_volume(self, self.paker_depth_edit + self.paker_khost) * 1.5, 1)}м3 '
 
             elif self.data_well.perforation_roof - 5 + self.paker_khost < self.data_well.current_bottom:
                 flushing_downhole_list = f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
@@ -989,7 +989,7 @@ class WindowUnion(MyMainWindow):
                                          f'Промыть скважину обратной промывкой по круговой циркуляции ' \
                                          f'жидкостью уд.весом {self.data_well.fluid_work} при расходе жидкости не ' \
                                          f'менее 6-8 л/сек в объеме не менее ' \
-                                         f'{round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 ' \
+                                         f'{round(well_volume(self, self.paker_depth_edit + self.paker_khost) * 1.5, 1)}м3 ' \
                                          f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ. \n' \
                                          f'в случае ГНО с НВ промывку от забоя делаем с допуском замковой опоры, ' \
                                          f'в случае НН и ЭЦН и наличия пакера в компоновке выполняем отдельное ' \
@@ -1000,7 +1000,7 @@ class WindowUnion(MyMainWindow):
                                           f' низ НКТ до H' \
                                           f' {self.data_well.perforation_roof - 5 + self.paker_khost}м) ' \
                                           f'Промыть уд.весом {self.data_well.fluid_work} не менее ' \
-                                          f'{round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 ' \
+                                          f'{round(well_volume(self, self.paker_depth_edit + self.paker_khost) * 1.5, 1)}м3 ' \
                                           f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
                                           f'При отсутствии циркуляции на скважине промывку исключить, ' \
                                           f'увеличить объем продавки кислотного состава в 1,5 кратном объеме НКТ'
@@ -1011,7 +1011,7 @@ class WindowUnion(MyMainWindow):
                                      f'по круговой циркуляции  жидкостью уд.весом {self.data_well.fluid_work} п' \
                                      f'ри расходе жидкости не ' \
                                      f'менее 6-8 л/сек в объеме не менее ' \
-                                     f'{round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 ' \
+                                     f'{round(well_volume(self, self.paker_depth_edit + self.paker_khost) * 1.5, 1)}м3 ' \
                                      f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.' \
                                      f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
                                      f'При отсутствии циркуляции произвести замещения продуктов реакции тех ' \
@@ -1019,21 +1019,21 @@ class WindowUnion(MyMainWindow):
 
             flushing_downhole_short = f'При наличии ЦИРКУЛЯЦИИ: Допустить до Н- {self.data_well.current_bottom}м. Промыть уд.весом ' \
                                       f'{self.data_well.fluid_work}' \
-                                      f'не менее {round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 '
+                                      f'не менее {round(well_volume(self, self.paker_depth_edit + self.paker_khost) * 1.5, 1)}м3 '
         else:
             flushing_downhole_list = f'При наличии ЦИРКУЛЯЦИИ: При наличии избыточного давления:' \
                                      f'Промыть скважину обратной промывкой ' \
                                      f'по круговой циркуляции  жидкостью уд.весом {self.data_well.fluid_work} п' \
                                      f'ри расходе жидкости не ' \
                                      f'менее 6-8 л/сек в объеме не менее ' \
-                                     f'{round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 ' \
+                                     f'{round(well_volume(self, self.paker_depth_edit + self.paker_khost) * 1.5, 1)}м3 ' \
                                      f'в присутствии представителя заказчика ДО ЧИСТОЙ ВОДЫ.' \
                                      f'МЕРОПРИЯТИЯ ПОСЛЕ ОПЗ: \n' \
                                      f'При отсутствии циркуляции произвести замещения продуктов реакции тех ' \
                                      f'жидкостью большей плотностью с последующей промывкой'
             flushing_downhole_short = f'При наличии избыточного давления: Промыть уд.весом ' \
                                       f'{self.data_well.fluid_work_short} ' \
-                                      f'не менее {round(well_volume(self, self.paker_depth + self.paker_khost) * 1.5, 1)}м3 '
+                                      f'не менее {round(well_volume(self, self.paker_depth_edit + self.paker_khost) * 1.5, 1)}м3 '
 
         return flushing_downhole_list, flushing_downhole_short
 
@@ -1056,7 +1056,7 @@ class WindowUnion(MyMainWindow):
         try:
             self.QplastEdit = current_widget.QplastEdit.currentText()
             self.acid_edit = current_widget.acid_edit.currentText()
-            self.acid_volume_edit = current_widget.acid_volume_edit.text()
+            self.acid_volume_edit = current_widget.acid_volume_edit.text().replace(",", ".")
             if self.acid_volume_edit != '':
                 self.acid_volume_edit = float(self.acid_volume_edit)
             self.acid_proc_edit = current_widget.acid_proc_edit.text()

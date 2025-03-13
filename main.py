@@ -559,6 +559,7 @@ class MyMainWindow(QMainWindow):
                         value = value.text()
                         if 'схеме №' in value or 'схемы №' in value or \
                                 'Схемы обвязки №' in value or 'схемы ПВО №' in value:
+
                             number_schema = value[value.index(' №') + 1:value.index(' №') + 4].replace(' ', '')
 
                             schema_pvo_set.add(number_schema)
@@ -569,7 +570,7 @@ class MyMainWindow(QMainWindow):
             for schema in list(schema_pvo_set):
                 coordinate = f'{get_column_letter(2)}{1 + n}'
                 if 'Ойл' in data_list.contractor:
-                    schema_path = f'{data_list.path_image}imageFiles/pvo/oil/схема {schema}.jpg'
+                    schema_path = f'{data_list.path_image}imageFiles/pvo/oil/схема {schema}.png'
                 elif 'РН' in data_list.contractor:
                     schema_path = f'{data_list.path_image}imageFiles/pvo/rn/схема {schema}.png'
                 try:
@@ -580,7 +581,7 @@ class MyMainWindow(QMainWindow):
                     ws5.add_image(img, coordinate)
                     n += 29
                 except FileNotFoundError as f:
-                    QMessageBox.warning(self, 'Ошибка', f'Схему {schema} не удалось вставилось:\n {f}')
+                    QMessageBox.warning(None, 'Ошибка', f'Схему {schema} не удалось вставилось:\n {f}')
             ws5.print_area = f'B1:M{n}'
             ws5.page_setup.fitToPage = True
             ws5.page_setup.fitToHeight = False
@@ -733,14 +734,12 @@ class MyMainWindow(QMainWindow):
                                 text_width = key
                                 table_widget.setRowHeight(row, int(text_width))
         if 'gnkt' not in work_plan:
-
             for row in range(table_widget.rowCount()):
-                if row >= self.data_well.insert_index2 + 3:
+                if row >= self.data_well.insert_index2 + 2:
                     # Добавляем нумерацию в первую колонку
                     item_number = QtWidgets.QTableWidgetItem(
-                        str(row - self.data_well.insert_index2 - 2))  # Номер строки + 1
+                        str(row - self.data_well.insert_index2 - 1))  # Номер строки + 1
                     table_widget.setItem(row, 1, item_number)
-        asdw = 25
 
     def check_true_depth_template(self, depth):
         check = True
@@ -814,6 +813,8 @@ class MyMainWindow(QMainWindow):
                         item = QtWidgets.QTableWidgetItem(str(cell_value))
                         table_widget.setItem(row - 1, col - 1, item)
 
+
+
                         # Проверяем, является ли текущая ячейка объединенной
                         for merged_cell in merged_cells:
                             range_row = range(merged_cell.min_row, merged_cell.max_row + 1)
@@ -827,9 +828,17 @@ class MyMainWindow(QMainWindow):
                     else:
                         item = QTableWidgetItem("")
 
+
             if data_list.dop_work_list:
                 self.populate_row(table_widget.rowCount(), data_list.dop_work_list, self.table_widget, self.work_plan)
             for row in range(table_widget.rowCount()):
+                if row >= self.data_well.insert_index2 + 3:
+                    # Добавляем нумерацию в первую колонку
+                    ase = row - self.data_well.insert_index2 - 2
+                    asdawdaw = cell_value
+                    item_number = QtWidgets.QTableWidgetItem(
+                        str(row - self.data_well.insert_index2 - 2))  # Номер строки + 1
+                    table_widget.setItem(row, 1, item_number)
 
                 row_value_empty = True  # Флаг, указывающий, что все ячейки в строке пустые
                 # Проход по всем колонкам в текущей строке
@@ -863,6 +872,7 @@ class MyMainWindow(QMainWindow):
                          13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
             for column in range(table_widget.columnCount()):
                 table_widget.setColumnWidth(column, int(col_width[column]))  # Здесь задайте требуемую ширину столбца
+
         elif work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz'] and list_page == 2:
 
             col_width = property_excel.property_excel_pvr.col_width_gnkt_osv
@@ -2488,7 +2498,7 @@ class SaveInExcel(MyWindow):
             # try:
             for row_ind, row in enumerate(self.ws2.iter_rows(values_only=True)):
                 if 15 < row_ind < 100 and \
-                        self.data_well.data_pvr_max.get_value < row_ind < self.data_well.data_fond_min.get_value:
+                        (self.data_well.data_pvr_max.get_value + 13 > row_ind or row_ind > self.data_well.data_fond_min.get_value + 13):
                     if all(cell in [None, ''] for cell in row) \
                             and ('Интервалы темпа' not in str(self.ws2.cell(row=row_ind, column=2).value) \
                                  and 'Замечания к эксплуатационному периоду' not in str(

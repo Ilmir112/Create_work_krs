@@ -521,6 +521,14 @@ class DopPlanWindow(WindowUnion):
                             self.data_well.work_plan not in ['plan_change']:
                         self.target_row_index_cancel = int(i)
                         break
+                    elif 'II. История эксплуатации скважины' in str(
+                            row[col]['value']):
+                        self.data_well.data_pvr_max = data_list.ProtectedIsDigit(int(i) - 1)
+                        break
+                    elif 'Оборудование скважины' in str(
+                            row[col]['value']):
+                        self.data_well.data_fond_min = data_list.ProtectedIsDigit(int(i) - 1)
+                        break
                     elif 'Порядок работы' in str(row[2]['value']) or 'Порядок работы' in str(row[1]['value']) or\
                             'Ранее проведенные работ' in str(row[1]['value']) or 'Ранее проведенные работ' in str(row[2]['value']):
                         self.data_well.data_x_max = data_list.ProtectedIsDigit(int(i) - 1)
