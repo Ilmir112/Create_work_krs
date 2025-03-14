@@ -708,13 +708,13 @@ class SwabWindow(WindowUnion):
                                             'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно, продолжить')
                 if ques == QMessageBox.StandardButton.No:
                     return
-            paker_opy = self.tab_widget.currentWidget().paker2Edit.text()
-            if paker_opy != '':
-                paker_opy = int(float(str(paker_opy).replace(',', '.')))
+            self.depth_opy = self.tab_widget.currentWidget().paker2Edit.text()
+            if self.depth_opy != '':
+                self.depth_opy = int(float(str(self.depth_opy).replace(',', '.')))
 
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(self.data_well.current_bottom)))
-            self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_opy)))
+            self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(self.depth_opy)))
 
         elif swab_true_edit_type in ['Опрессовка снижением уровня на пакере с заглушкой']:
             paker_depth = self.check_if_none(self.tab_widget.currentWidget().pakerEdit.text())
@@ -722,15 +722,15 @@ class SwabWindow(WindowUnion):
 
             if rows != 0:
                 QMessageBox.warning(self, 'ОШИБКА', 'НЕЛЬЗЯ на одной и тоже компоновки освоивать повторно')
-            paker_opy = self.tab_widget.currentWidget().paker2Edit.text()
-            if paker_opy != '':
-                paker_opy = int(float(str(paker_opy).replace(',', '.')))
+            self.depth_opy = self.tab_widget.currentWidget().paker2Edit.text()
+            if self.depth_opy != '':
+                self.depth_opy = int(float(str(self.depth_opy).replace(',', '.')))
 
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(self.data_well.current_bottom)))
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_khost)))
             self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(paker_depth)))
-            self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(paker_opy)))
+            self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(self.depth_opy)))
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()
@@ -957,9 +957,10 @@ class SwabWindow(WindowUnion):
                             return
 
                 self.template_second = self.current_widget.template_second_edit.text()
-                self.length_template_second_edit = self.current_widget.length_template_second_edit.text()
+                self.length_template_second = self.current_widget.length_template_second_edit.text()
 
                 self.paker2_depth = int(float(self.tableWidget.item(row, 1).text()))
+
                 work_list = self.swabbing_opy()
             elif self.swab_true_edit_type == 'Опрессовка снижением уровня на пакере с заглушкой':
                 self.paker2_depth = int(float(self.tableWidget.item(row, 3).text()))

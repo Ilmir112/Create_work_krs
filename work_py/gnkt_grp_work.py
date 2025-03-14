@@ -56,8 +56,8 @@ class TabPageGnkt(TabPageUnion):
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
         self.fluid_edit = QLineEdit(self)
         self.fluid_edit.setValidator(self.validator_float)
-        if len(self.data_well.well_volume_in_pz) != 0:
-            self.fluid_edit.setText(str(self.data_well.well_volume_in_pz[0]))
+        if self.data_well.fluid:
+            self.fluid_edit.setText(str(self.data_well.fluid))
 
         self.fluid_work_label = QLabel("уд.вес рабочей жидкости", self)
         self.fluid_work_edit = QLineEdit(self)

@@ -838,6 +838,7 @@ class RirWindow(WindowUnion):
                 None, None, None, None, None, None, None,
                 'мастер КРС', lifting_nkt_norm(roof_rir_edit, 1)])
         self.data_well.for_paker_list = None
+        self.data_well.current_bottom = roof_rir_edit
         return uzm_pero_list
 
     def rir_with_pero(self, paker_need_combo, plast_combo,
@@ -1308,6 +1309,7 @@ class RirWindow(WindowUnion):
                 paker_need_combo, plast_combo, roof_rir_edit, sole_rir_edit, volume_cement, info_rir_edit,
                 need_change_zgs_combo, plast_new_combo, fluid_new_edit, pressure_new_edit, pressure_zumpf_question,
                 diameter_paker, paker_khost, paker_depth)
+
 
 
 

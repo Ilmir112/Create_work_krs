@@ -781,6 +781,9 @@ class MyMainWindow(QMainWindow):
         from krs import GnoWindow
         if sheet:
             rows = sheet.max_row
+            if work_plan == 'krs':
+                self.data_well.insert_index2 = rows
+
             merged_cells = sheet.merged_cells
             table_widget.setRowCount(rows)
             self.data_well.count_row_well = table_widget.rowCount()
@@ -831,14 +834,15 @@ class MyMainWindow(QMainWindow):
 
             if data_list.dop_work_list:
                 self.populate_row(table_widget.rowCount(), data_list.dop_work_list, self.table_widget, self.work_plan)
-            for row in range(table_widget.rowCount()):
-                if row >= self.data_well.insert_index2 + 3 and 'gnkt' not in work_plan:
-                    # Добавляем нумерацию в первую колонку
-                    ase = row - self.data_well.insert_index2 - 2
-                    asdawdaw = cell_value
-                    item_number = QtWidgets.QTableWidgetItem(
-                        str(row - self.data_well.insert_index2 - 2))  # Номер строки + 1
-                    table_widget.setItem(row, 1, item_number)
+            if 'gnkt' not in work_plan:
+                for row in range(table_widget.rowCount()):
+                    if row >= self.data_well.insert_index2 + 2:
+                        # Добавляем нумерацию в первую колонку
+                        ase = row - self.data_well.insert_index2 - 1
+                        asdawdaw = cell_value
+                        item_number = QtWidgets.QTableWidgetItem(
+                            str(row - self.data_well.insert_index2 -1))  # Номер строки + 1
+                        table_widget.setItem(row, 1, item_number)
 
                 row_value_empty = True  # Флаг, указывающий, что все ячейки в строке пустые
                 # Проход по всем колонкам в текущей строке
@@ -2445,7 +2449,7 @@ class SaveInExcel(MyWindow):
             self.ws2 = self.wb2.get_sheet_by_name('Sheet')
             self.ws2.title = "План работ"
 
-            insert_index = self.data_well.insert_index + 2
+            insert_index = self.data_well.insert_index2 + 2
 
             merged_cells = []  # Список индексов объединения ячеек
 
@@ -2709,6 +2713,8 @@ class SaveInExcel(MyWindow):
 
             for j in range(1, len(work_list[i - 1]) + 1):
                 cell = ws2.cell(row=i, column=j)
+                if 'Наименование работ' in work_list[i - 1][2]:
+                    work_list[i - 1][1] = 'п/п'
                 if cell and str(cell) != str(work_list[i - 1][j - 1]):
                     # print(work_list[i - 1][j - 1])
                     cell.value = self.reformated_string_data(work_list[i - 1][j - 1])
@@ -2721,8 +2727,6 @@ class SaveInExcel(MyWindow):
                                 if 'Ранее проведенные работ' not in str(ws2[f"B{i}"].value) and \
                                         'Порядок работы' not in str(ws2[f"B{i}"].value):
                                     ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins + 2}:C{i})'
-
-
                             else:
                                 if i != ind_ins:
                                     ws2[F"B{i}"].value = f'=COUNTA($C${ind_ins + 2}:C{i})'

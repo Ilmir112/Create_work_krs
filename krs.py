@@ -338,6 +338,7 @@ class GnoParent(ABC):
             #                                                  f'глубине м, корректен?')
             if question == QMessageBox.StandardButton.Yes:
                 self.without_damping_true = False
+
         self.well_jamming_str = self.well_jamming()
 
         self.well_jamming_ord = volume_jamming_well(self, float(self.data_well.depth_fond_paker_before["before"]))
@@ -682,7 +683,7 @@ class GnoParent(ABC):
             well_jamming_short = (f'Глушение в НКТ в объеме {self.volume_well_jamming}м3 уд.весом '
                                   f'{self.data_well.fluid_work_short}')
 
-        if len(self.data_well.plast_work) == 0 and self.data_well.dict_leakiness:
+        if len(self.data_well.plast_work) == 0 and len(self.data_well.dict_leakiness) == 0:
             well_jamming_str = f'Опрессовать эксплуатационную колонну в интервале 0-' \
                                f'{self.data_well.current_bottom}м на ' \
                                f'Р={self.data_well.max_admissible_pressure.get_value}атм' \
@@ -690,6 +691,9 @@ class GnoParent(ABC):
                                f'(Вызов представителя осуществлять телефонограммой за 12 часов, ' \
                                f'с подтверждением за 2 часа ' \
                                f'до начала работ)'
+
+            well_jamming_list2 = 'При негерметичности согласовать ' \
+                                 'глушение скважины по дополнительному плану работ'
 
             well_jamming_short = 'Рабочие интервалы отсутствуют, При необходимости необходимо согласовать ' \
                                  'глушение скважины по дополнительному плану работ'

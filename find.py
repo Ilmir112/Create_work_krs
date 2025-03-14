@@ -1658,7 +1658,7 @@ class WellData(FindIndexPZ):
                         f'до ремонта меньше глубины '
                         f'{self.dict_pump_shgn_depth["after"]}м')
         except Exception as e:
-            QMessageBox.warning(self, 'Ошибка', 'Ошибка в расчетах')
+            QMessageBox.warning(self, 'Ошибка', f'Ошибка в расчетах {e}')
 
         if self.data_window is None:
             from data_correct import DataWindow
@@ -2216,7 +2216,7 @@ class WellCategory(FindIndexPZ):
             self.delete_rows_pz(self.ws, self.cat_well_min, self.data_well_max, self.data_x_max)
 
             self.insert_index = self.data_well_max.get_value - self.cat_well_min.get_value + 19
-            self.insert_index2 = self.data_well_max.get_value - self.cat_well_min.get_value + 19 - 2
+
 
         return self
 

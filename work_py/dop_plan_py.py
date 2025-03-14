@@ -508,7 +508,7 @@ class DopPlanWindow(WindowUnion):
             if i != 'image':
                 list_row = []
                 for col in range(len(row)):
-                    if 'оризонт' in str(row[1]['value']) or 'пласт/' in str(row[1]['value']).lower():
+                    if 'оризонт' in str(row[1]['value']) or 'пласт/' in str(row[col]['value']).lower():
                         self.target_row_index = int(i) + 1
                     elif 'вскрытия/отключения' in str(row[col]['value']):
                         self.old_index = 1
@@ -529,18 +529,13 @@ class DopPlanWindow(WindowUnion):
                     elif 'Оборудование скважины' in str(row[1]['value']):
                         self.data_well.data_fond_min = data_list.ProtectedIsDigit(int(i) - 1)
                         break
-                    elif 'Порядок работы' in str(row[2]['value']) or 'Порядок работы' in str(row[1]['value']) or\
-                            'Ранее проведенные работ' in str(row[1]['value']) or 'Ранее проведенные работ' in str(row[2]['value']):
+                    elif ('Ранее проведенные' in str(row[1]['value']) or 'Ранее проведенные' in str(row[2]['value']) ) \
+                            and self.data_well.work_plan != "plan_change":
+                        row[1]['value'] = None
+                        row[2]['value'] = None
+                    elif 'Наименование работ' in str(row[2]['value']):
                         self.data_well.data_x_max = data_list.ProtectedIsDigit(int(i) - 1)
-
-                        if self.data_well.work_plan != 'plan_change':
-                            self.data_well.data_x_max = data_list.ProtectedIsDigit(self.data_well.data_x_max.get_value + 1)
-                            if 'Ранее проведенные работ' in str(row[1]['value']) or 'Ранее проведенные работ' in str(
-                                    row[2]['value']):
-                                self.data_well.data_x_max = data_list.ProtectedIsDigit(
-                                    self.data_well.data_x_max.get_value-2)
-                        asdded = self.data_well.data_x_max.get_value
-
+                        self.data_well.insert_index2 = int(i)
                         break
 
                     elif 'ИТОГО:' in str(row[col]['value']) and self.data_well.work_plan in ['plan_change']:
@@ -548,6 +543,7 @@ class DopPlanWindow(WindowUnion):
                         break
                     elif 'Текущий забой ' == str(row[col]['value']):
                         self.bottom_row_index = int(i)
+
 
                     if int(i) > self.target_row_index:
                         list_row.append(row[col]['value'])
@@ -1059,7 +1055,7 @@ class DopPlanWindow(WindowUnion):
                 self.data_well.template_length = float(template_length_addition_edit)
 
             work_list = self.work_list(work_earlier)
-            self.data_well.insert_index2 = self.insert_index
+            # self.data_well.insert_index2 = self.insert_index
             self.populate_row(self.insert_index, work_list, self.table_widget, self.work_plan)
             definition_plast_work(self)
 
