@@ -779,7 +779,8 @@ class WellNkt(FindIndexPZ):
 
         a_plan = 0
         data_list.nkt_mistake = False
-
+        self.column_index_lenght_nkt = None
+        self.column_index_column_nkt = None
         for row_ind, row in enumerate(self.ws.iter_rows(values_only=True, min_row=begin_index - 1,
                                                         max_row=cancel_index)):  # словарь количества НКТ и метраж
             if self.check_text_in_row('план', row) or self.check_text_in_row('карта спуска (планируемое)', row):
@@ -792,6 +793,10 @@ class WellNkt(FindIndexPZ):
                         self.column_index_column_nkt = col_index
                     if 'длина' in str(col).lower() and 'м' in str(col):
                         self.column_index_lenght_nkt = col_index
+        if self.column_index_lenght_nkt is None:
+            QMessageBox.warning(self, 'Ошибка', 'Ошибка в поиске индекса длины НКТ')
+            self.pause_app()
+            return
 
         if a_plan == 0:
             QMessageBox.warning(self, 'Индекс планового НКТ',
