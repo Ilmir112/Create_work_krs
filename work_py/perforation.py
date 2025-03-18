@@ -272,9 +272,7 @@ class PerforationWindow(WindowUnion):
 
                         self.tableWidget.setItem(rows, 5, QTableWidgetItem(plast))
                         self.tableWidget.setItem(rows, 6, QTableWidgetItem(' '))
-
                     else:
-                        # Вставка интервалов зарядов ГП без ГРП
                         count_charge = int((max(i) - min(i)) * chargePM)
                         if count_charge < 0 or count_charge > 500:
                             QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')

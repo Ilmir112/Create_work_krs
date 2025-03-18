@@ -915,6 +915,7 @@ class MyWindow(MyMainWindow):
         self.table_class = None
         self.table_juming = None
         self.resize(1400, 800)
+        self.showMaximized()
 
         # self.check_for_updates()
 

@@ -609,6 +609,16 @@ class GnoParent(ABC):
         volume_nkt_ustie = round(self.volume_well_jamming - volume_pod_nkt_str, 1)
         well_volume_str_after = f'{round(self.volume_well_jamming - well_volume, 1)}м3.' if round(
             self.volume_well_jamming - well_volume, 1) > 0.1 else ''
+        h2s_string_volume = ''
+        if self.data_well.plast_work:
+            poglot_h2s = [self.data_well.dict_category[plast]['по сероводороду'].poglot
+                          for plast in self.data_well.dict_category
+                          if self.data_well.dict_category[plast]['отключение'] == 'рабочий' and
+                          self.data_well.dict_category[plast]['по сероводороду'].category != 3]
+            if poglot_h2s:
+                poglot_h2s = max(poglot_h2s)
+                volume_h2s = round(well_volume * poglot_h2s, 1)
+                h2s_string_volume = f'Необходимое кол-во поглотителя сероводорода на объем глушение - {volume_h2s}л'
 
         if self.without_damping_true:
             well_jamming_str = f'Скважина состоит в перечне скважин ООО Башнефть-Добыча, на которых допускается ' \
@@ -623,8 +633,8 @@ class GnoParent(ABC):
             well_jamming_str = f'Произвести закачку в трубное пространство тех жидкости уд.весом ' \
                                f'{self.data_well.fluid_work} в ' \
                                f'объеме {round(self.volume_well_jamming - volume_pod_nkt_str, 1)}м3 на циркуляцию. ' \
-                               f'Закрыть трубное пространство. Закрыть скважину на стабилизацию не менее 2 часов. ' \
-                               f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)'
+                               f'Закрыть трубное пространство.  Закрыть скважину на стабилизацию не менее 2 часов. ' \
+                               f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость). '
 
             well_jamming_short = f'Глушение в НКТ уд.весом {self.data_well.fluid_work_short} ' \
                                  f'объеме {volume_nkt_str}м3 ' \
@@ -637,7 +647,7 @@ class GnoParent(ABC):
                                f'на поглощение при давлении не более ' \
                                f'{self.data_well.max_admissible_pressure.get_value}атм. Закрыть ' \
                                f'затрубное пространство. Закрыть скважину на стабилизацию не менее 2 часов. ' \
-                               f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость)'
+                               f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость). '
             well_jamming_short = f'Глушение в НКТ уд.весом {self.data_well.fluid_work_short} в ' \
                                  f'объеме ' \
                                  f'{round(volume_nkt_ustie, 1)}м3 '
@@ -653,7 +663,7 @@ class GnoParent(ABC):
                                f'объеме {volume_pod_nkt_str:.1f}м3. ' \
                                f'Закрыть скважину на ' \
                                f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае ' \
-                               f'отсутствия на желобную емкость'
+                               f'отсутствия на желобную емкость. '
             well_jamming_short = f'Глушение в затруб в объеме {self.volume_well_jamming}м3 тех ' \
                                  f'жидкостью уд.весом {self.data_well.fluid_work_short}'
         elif abs(self.length_nkt - self.data_well.perforation_roof) > 150:
@@ -670,7 +680,7 @@ class GnoParent(ABC):
                                f'объеме {round((volume_pod_nkt_str + volume_nkt_str) * 1.1, 1)}м3. ' \
                                f'Закрыть скважину на ' \
                                f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае ' \
-                               f'отсутствия на желобную емкость'
+                               f'отсутствия на желобную емкость. '
             well_jamming_short = f'Глушение в НКТ в объеме {self.volume_well_jamming}м3 тех ' \
                                  f'жидкостью уд.весом {self.data_well.fluid_work_short}'
         elif abs(self.length_nkt - self.data_well.perforation_roof) <= 150:
@@ -679,7 +689,7 @@ class GnoParent(ABC):
                                f' на циркуляцию. Закрыть скважину на ' \
                                f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, ' \
                                f'в случае отсутствия ' \
-                               f'на желобную емкость)'
+                               f'на желобную емкость). '
             well_jamming_short = (f'Глушение в НКТ в объеме {self.volume_well_jamming}м3 уд.весом '
                                   f'{self.data_well.fluid_work_short}')
 
@@ -690,15 +700,16 @@ class GnoParent(ABC):
                                f' в течение 30 минут в присутствии представителя заказчика, составить акт. ' \
                                f'(Вызов представителя осуществлять телефонограммой за 12 часов, ' \
                                f'с подтверждением за 2 часа ' \
-                               f'до начала работ)'
+                               f'до начала работ). '
 
             well_jamming_list2 = 'При негерметичности согласовать ' \
                                  'глушение скважины по дополнительному плану работ'
 
             well_jamming_short = 'Рабочие интервалы отсутствуют, При необходимости необходимо согласовать ' \
                                  'глушение скважины по дополнительному плану работ'
+        if 'в перечне скважин' not in well_jamming_str:
+            well_jamming_str += h2s_string_volume
 
-            # print([well_jamming_str, well_jamming_list2, well_jamming_short])
         return [well_jamming_str + '\nОпределить приемистость пласта при Р=80-120атм', well_jamming_list2,
                 well_jamming_short + '\nОпределить приемистость пласта при Р=80-120атм']
 

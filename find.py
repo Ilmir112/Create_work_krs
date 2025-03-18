@@ -1315,13 +1315,13 @@ class WellName(FindIndexPZ):
 
                     if 'площадь' in str(value):
                         if self.work_plan not in ['prs']:
-                            self.well_number = ProtectedIsNonNone(str(row[col - 1]))
-                        self.well_area = ProtectedIsNonNone(str(row[col + 1]).replace(" ", "_"))
+                            self.well_number = ProtectedIsNonNone(str(row[col - 1]).lstrip().rstrip())
+                        self.well_area = ProtectedIsNonNone(str(row[col + 1]).lstrip().rstrip().replace(" ", "_"))
                         # self.well_number = ProtectedIsNonNone(row[col - 1])
                         # self.well_area = ProtectedIsNonNone(row[col + 1])
 
-                    elif 'месторождение ' in str(value):  # определение номера скважины
-                        self.well_oilfield = ProtectedIsNonNone(row[col + 2])
+                    elif 'месторождение' in str(value):  # определение номера скважины
+                        self.well_oilfield = ProtectedIsNonNone(str(row[col + 2]).lstrip().rstrip())
                         # self.well_oilfield = ProtectedIsNonNone(row[col + 2])
                     elif 'инв. №' in str(value).lower():
                         self.inventory_number = ProtectedIsNonNone(row[col + 1])
