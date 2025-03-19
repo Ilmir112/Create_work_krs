@@ -24,24 +24,6 @@ from main import MyMainWindow, ExcelWorker
 from work_py.alone_oreration import well_volume
 
 
-def get_data_from_db(region):
-    db = connection_to_database(decrypt("DB_CLASSIFICATION"))
-
-    well_classification = CheckWellExistence(db)
-    data = well_classification.get_data_from_db(region)
-
-    return data
-
-
-def get_data_from_class_well_db(region):
-    db = connection_to_database(decrypt("DB_CLASSIFICATION"))
-
-    well_classification = CheckWellExistence(db)
-    data = well_classification.get_data_from_class_well_db(region)
-
-    return data
-
-
 class ClassifierWell(MyMainWindow):
     number_well = None
 
@@ -53,6 +35,7 @@ class ClassifierWell(MyMainWindow):
         self.region = region
         self.costumer = costumer
         self.number_well = None
+        self.db = connection_to_database(decrypt("DB_CLASSIFICATION"))
         # if self.well_number:
         #     self.number_well = self.data_well.well_number.get_value
 
@@ -62,6 +45,13 @@ class ClassifierWell(MyMainWindow):
             self.open_to_sqlite_class_well(costumer, region)
         elif ClassifierWell == 'damping':
             self.open_to_sqlite_without_juming(costumer, region)
+
+    def get_data_from_db(self, region):
+
+        well_classification = CheckWellExistence(self.db)
+        data = well_classification.get_data_from_db(region)
+
+        return data
 
     def open_to_sqlite_without_juming(self, costumer, region):
         layout = QVBoxLayout()
@@ -73,7 +63,7 @@ class ClassifierWell(MyMainWindow):
         self.edit_well_number.setText(self.number_well)
         layout.addWidget(self.edit_well_number)
 
-        data = get_data_from_db(region)
+        data = self.get_data_from_db(region)
         if data:
 
             self.table_class.setColumnCount(len(data[0]))
@@ -96,6 +86,14 @@ class ClassifierWell(MyMainWindow):
             self.new_window = None
             event.accept()  # Принимаем событие закрытия
 
+    def get_data_from_class_well_db(self, region):
+        db = connection_to_database(decrypt("DB_CLASSIFICATION"))
+
+        well_classification = CheckWellExistence(db)
+        data = well_classification.get_data_from_class_well_db(region)
+
+        return data
+
     def open_to_sqlite_class_well(self, costumer, region):
         layout = QVBoxLayout()
         self.edit_well_number = QLineEdit()
@@ -111,7 +109,7 @@ class ClassifierWell(MyMainWindow):
         layout.addWidget(self.edit_well_area)
         region = f'{region}_классификатор'
         # print(region)
-        data = get_data_from_class_well_db(region)
+        data = self.get_data_from_class_well_db(region)
         if data:
             # print(data)
 
@@ -161,7 +159,7 @@ class ClassifierWell(MyMainWindow):
 
         else:
             try:
-                db_path = connect_to_db('data_list.db', 'data_base_well')
+                db_path = self.connect_to_db('data_list.db', 'data_base_well')
                 # Создание подключения к базе данных SQLite
                 conn = sqlite3.connect(db_path)
                 query.replace('%s', '?')
@@ -235,11 +233,10 @@ class ClassifierWell(MyMainWindow):
             if index_row > 18:
                 break
 
-
         try:
             # Подключение к базе данных
-            db = connection_to_database(decrypt("DB_CLASSIFICATION"))
-            self.classification_well = CheckWellExistence(db)
+
+            self.classification_well = CheckWellExistence(self.db)
 
             REGION_LIST = ['ЧГМ', 'АГМ', 'ТГМ', 'ИГМ', 'КГМ', ]
 
@@ -268,7 +265,7 @@ class ClassifierWell(MyMainWindow):
                                     well_number = row[well_column]
                                     area_well = row[area_column]
 
-                                    if well_number and len(str(well_number)) <=5:
+                                    if well_number and len(str(well_number)) <= 5:
                                         print(well_number)
                                         self.classification_well.insert_data_in_table_without_juming(
                                             str(well_number), area_well, version_year, region_name, costumer)
@@ -396,18 +393,18 @@ class ClassifierWell(MyMainWindow):
             # Выведите сообщение об ошибке
             QMessageBox.warning(self, 'Ошибка', 'Ошибка подключения к базе данных')
 
+    @staticmethod
+    def connect_to_db(name_base, folder_base):
+        # Получаем текущий каталог приложения
+        current_dir = os.path.dirname(__file__)
 
-def connect_to_db(name_base, folder_base):
-    # Получаем текущий каталог приложения
-    current_dir = os.path.dirname(__file__)
+        # Определяем путь к папке с базой данных
+        db_folder = os.path.join(current_dir, folder_base)
 
-    # Определяем путь к папке с базой данных
-    db_folder = os.path.join(current_dir, folder_base)
+        # Формируем полный путь к файлу базы данных
+        db_path = os.path.join(db_folder, name_base)
 
-    # Формируем полный путь к файлу базы данных
-    db_path = os.path.join(db_folder, name_base)
-
-    return db_path
+        return db_path
 
 
 def excel_in_json(self, sheet):
@@ -556,7 +553,8 @@ def insert_data_well_dop_plan(self, data_well):
 
     self.data_well.level_cement_column = ProtectedIsDigit(well_data_dict["ЭК"]["цемент"])
     if '-' in str(self.data_well.level_cement_column.get_value):
-        self.data_well.level_cement_column = ProtectedIsDigit(self.data_well.level_cement_column.get_value.split('-')[1])
+        self.data_well.level_cement_column = ProtectedIsDigit(
+            self.data_well.level_cement_column.get_value.split('-')[1])
 
     self.data_well.column_conductor_length = ProtectedIsDigit(well_data_dict["кондуктор"]["башмак"])
     self.data_well.level_cement_conductor = ProtectedIsDigit(well_data_dict["кондуктор"]["цемент"])
@@ -660,8 +658,6 @@ def insert_data_well_dop_plan(self, data_well):
     self.data_well.check_data_in_pz = []
     self.data_well.without_damping = False
     self.thread_excel = ExcelWorker(self)
-
-
 
     # QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
 

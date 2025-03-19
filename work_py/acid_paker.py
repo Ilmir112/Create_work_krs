@@ -1,7 +1,6 @@
 from PyQt5 import QtWidgets
 
-from PyQt5.Qt import QWidget, QLabel, QComboBox, QGridLayout, \
-    QInputDialog, QPushButton
+from PyQt5.Qt import QWidget, QLabel, QComboBox, QGridLayout, QPushButton
 from PyQt5.QtCore import QEvent, Qt
 from PyQt5.QtGui import QPalette, QStandardItem, QIntValidator
 from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox, QCompleter, QTableWidget, \
@@ -171,8 +170,7 @@ class TabPageSoAcid(TabPageUnion):
         self.data_well = parent
         self.distance_between_packers_voronka = None
         self.distance_between_packers = None
-        # self.le = QLineEdit()
-        # self.grid = QGridLayout(self)
+
         self.tableWidget = tableWidget
 
         self.validator_int = QIntValidator(0, 8000)
@@ -234,7 +232,6 @@ class TabPageSoAcid(TabPageUnion):
         self.pressure_Label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
         self.pressure_edit.setClearButtonEnabled(True)
-
 
         self.grid.addWidget(self.pressure_Label, 6, 6)
         self.grid.addWidget(self.pressure_edit, 7, 6)
@@ -478,7 +475,8 @@ class TabPageSoAcid(TabPageUnion):
                         # print(f' расстояние между пакерами {self.distance_between_packers}')
                 else:
                     if self.paker_depth_edit.text() != '':
-                        self.paker2_depth.setText(f'{int(self.paker_depth_edit.text()) - self.distance_between_packers}')
+                        self.paker2_depth.setText(
+                            f'{int(self.paker_depth_edit.text()) - self.distance_between_packers}')
                         self.paker2_depth.setEnabled(False)
 
             elif self.paker_layout_combo.currentText() in ['воронка', 'без монтажа компоновки на спуск']:
@@ -608,11 +606,11 @@ class AcidPakerWindow(WindowUnion):
             self.paker2_depth = int(self.check_if_none(self.current_widget.paker2_depth.text()))
 
             if self.data_well:
-                if self.check_true_depth_template(self.paker_depth_edit) is False:
+                if self.check_true_depth_template(self.paker_depth) is False:
                     return
-                if self.true_set_paker(self.paker_depth_edit) is False:
+                if self.true_set_paker(self.paker_depth) is False:
                     return
-                if self.check_depth_in_skm_interval(self.paker_depth_edit) is False:
+                if self.check_depth_in_skm_interval(self.paker_depth) is False:
                     return
                 if self.check_true_depth_template(self.paker2_depth) is False:
                     return
@@ -622,13 +620,13 @@ class AcidPakerWindow(WindowUnion):
                     return
                 if self.data_well.current_bottom < float(self.paker_khost + self.paker2_depth):
                     QMessageBox.information(self, 'Внимание',
-                                            f'Компоновка ниже {self.paker_khost + self.paker_depth_edit}м текущего забоя '
+                                            f'Компоновка ниже {self.paker_khost + self.paker_depth}м текущего забоя '
                                             f'{self.data_well.current_bottom}м')
                     return
             self.tableWidget.insertRow(rows)
             self.tableWidget.setItem(rows, 0, QTableWidgetItem(self.plast_combo))
             self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(self.paker_khost)))
-            self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(self.paker_depth_edit)))
+            self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(self.paker_depth)))
             self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(self.paker2_depth)))
             self.tableWidget.setCellWidget(rows, 4, self.svk_true_combo)
             self.tableWidget.setCellWidget(rows, 5, self.acid_combo)
@@ -722,10 +720,10 @@ class AcidPakerWindow(WindowUnion):
             return
         work_template_list = []
         if self.depth_gauge_combo == 'Да':
-            work_template_list = [[f'Заявить глубинные манометры', None,
-                          f'Подать заявку на завоз глубиныx манометров с контейнером',
-                          None, None, None, None, None, None, None,
-                          'мастер КРС', None]]
+            work_template_list = [
+                [f'Заявить глубинные манометры', None,
+                 f'Подать заявку на завоз глубиныx манометров с контейнером',
+                 None, None, None, None, None, None, None, 'мастер КРС', None]]
 
         rows = self.tableWidget.rowCount()
         if rows == 0 and self.svk_true_combo == 'Нужно СКВ' and self.sko_true_combo == 'Нет':
@@ -875,22 +873,23 @@ class AcidPakerWindow(WindowUnion):
                         nkt_diam, nkt_pod, nkt_template = self.select_diameter_nkt(self.paker_khost,
                                                                                    self.swab_true_edit_type)
                         if self.data_well.column_additional is False or \
-                            (self.data_well.column_additional and
-                             self.data_well.head_column_additional.get_value >= self.data_well.current_bottom):
+                                (self.data_well.column_additional and
+                                 self.data_well.head_column_additional.get_value >= self.data_well.current_bottom):
                             self.dict_nkt = {nkt_diam: float(self.paker_khost) + float(self.paker_depth)}
                         else:
                             self.dict_nkt = {
                                 nkt_diam: round(self.data_well.head_column_additional.get_value, 0),
-                                nkt_pod: int(float(self.data_well.head_column_additional.get_value - self.paker_khost, 0))}
+                                nkt_pod: int(
+                                    float(self.data_well.head_column_additional.get_value - self.paker_khost, 0))}
                         work_template_list = []
                 if self.svk_true_combo == 'Нужно СКВ':
                     work_template_list.insert(-2, [f'Определить приемистость при Р-{self.pressure_edit}атм', None,
-                                                     f'Определить приемистость при Р-{self.pressure_edit}атм '
-                                                     f'в присутствии представителя заказчика.'
-                                                     f'при отсутствии приемистости произвести установку '
-                                                     f'СКВ по согласованию с заказчиком',
-                                                     None, None, None, None, None, None, None,
-                                                     'мастер КРС, УСРСиСТ', 1.2])
+                                                   f'Определить приемистость при Р-{self.pressure_edit}атм '
+                                                   f'в присутствии представителя заказчика.'
+                                                   f'при отсутствии приемистости произвести установку '
+                                                   f'СКВ по согласованию с заказчиком',
+                                                   None, None, None, None, None, None, None,
+                                                   'мастер КРС, УСРСиСТ', 1.2])
                     work_template_list.extend(self.skv_acid_work())
                 if self.QplastEdit == 'ДА':
                     work_template_list.insert(-2,
@@ -962,9 +961,6 @@ class AcidPakerWindow(WindowUnion):
                                                                 self.depth_gauge_combo)
 
                 work_template_list.extend(swab_work_list[1:])
-
-
-
             elif self.paker_layout_combo in ['двухпакерная', 'двухпакерная, упорные']:
                 self.swab_paker_depth = int(self.current_widget.swab_paker_depth.text())
                 if self.check_true_depth_template(self.swab_paker_depth) is False:
@@ -997,13 +993,13 @@ class AcidPakerWindow(WindowUnion):
                                                                   need_change_zgs_combo='Нет', plast_new='',
                                                                   fluid_new='', pressure_new=''
                                                                   )
-                work_template_list.append([f'Поднять до глубины {self.swab_paker_depth}', None,
-                                           f'Поднять воронку до глубины {self.swab_paker_depth}м',
-                                           None, None, None, None, None, None, None,
-                                           'мастер КРС', round(
-                        self.data_well.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04 + 0.18 + 0.008
-                        * 30 / 9.52 + 0.003 * 30 / 9.52,
-                        2)], )
+                work_template_list.append(
+                    [f'Поднять до глубины {self.swab_paker_depth}', None,
+                     f'Поднять воронку до глубины {self.swab_paker_depth}м',
+                     None, None, None, None, None, None, None,
+                     'мастер КРС',
+                     round(self.data_well.current_bottom / 9.52 * 1.51 / 60 * 1.2 * 1.2 * 1.04 + 0.18 + 0.008
+                           * 30 / 9.52 + 0.003 * 30 / 9.52, 2)], )
                 work_template_list.extend(swab_work_list[1:])
 
 
@@ -1025,10 +1021,9 @@ class AcidPakerWindow(WindowUnion):
 
         self.calculate_chemistry(self.acid_edit, self.acid_volume_edit)
         if self.depth_gauge_combo == 'Да':
-            work_template_list.extend([[f'вывести глубинные манометры', None,
-                               f'Подать заявку на вывоз глубиныx манометров',
-                               None, None, None, None, None, None, None,
-                               'мастер КРС', None]])
+            work_template_list.extend([
+                [f'вывести глубинные манометры', None, 'Подать заявку на вывоз глубинныx манометров',
+                 None, None, None, None, None, None, None, 'мастер КРС', None]])
         if work_template_list:
             self.populate_row(self.insert_index, work_template_list, self.table_widget)
             data_list.pause = False
@@ -1139,8 +1134,6 @@ class AcidPakerWindow(WindowUnion):
                                   None, None, None, None, None, None, None,
                                   'мастер КРС', None])
         return paker_list
-
-
 
     def paker_layout_one(self):
 

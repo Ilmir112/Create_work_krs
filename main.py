@@ -111,6 +111,12 @@ class MyMainWindow(QMainWindow):
         self.gnkt_data = None
 
     @staticmethod
+    def close_process():
+        for proc in psutil.process_iter():
+            if proc.name() == 'ZIMA.exe':
+                proc.terminate()  # Принудительное завершение
+
+    @staticmethod
     def show_info_message(data_well, message):
         from work_py.check_in_pz import CustomMessageBox
 
@@ -559,7 +565,6 @@ class MyMainWindow(QMainWindow):
                         value = value.text()
                         if 'схеме №' in value or 'схемы №' in value or \
                                 'Схемы обвязки №' in value or 'схемы ПВО №' in value:
-
                             number_schema = value[value.index(' №') + 1:value.index(' №') + 4].replace(' ', '')
 
                             schema_pvo_set.add(number_schema)
@@ -660,7 +665,6 @@ class MyMainWindow(QMainWindow):
                                 f'райбирования {self.data_well.ribbing_interval} \n'
                                 f'Нужно скорректировать интервалы скреперования или глубину посадки пакера')
             return False
-
 
     def true_set_paker(self, depth):
 
@@ -816,8 +820,6 @@ class MyMainWindow(QMainWindow):
                         item = QtWidgets.QTableWidgetItem(str(cell_value))
                         table_widget.setItem(row - 1, col - 1, item)
 
-
-
                         # Проверяем, является ли текущая ячейка объединенной
                         for merged_cell in merged_cells:
                             range_row = range(merged_cell.min_row, merged_cell.max_row + 1)
@@ -831,7 +833,6 @@ class MyMainWindow(QMainWindow):
                     else:
                         item = QTableWidgetItem("")
 
-
             if data_list.dop_work_list:
                 self.populate_row(table_widget.rowCount(), data_list.dop_work_list, self.table_widget, self.work_plan)
             if 'gnkt' not in work_plan:
@@ -841,7 +842,7 @@ class MyMainWindow(QMainWindow):
                         ase = row - self.data_well.insert_index2 - 1
                         asdawdaw = cell_value
                         item_number = QtWidgets.QTableWidgetItem(
-                            str(row - self.data_well.insert_index2 -1))  # Номер строки + 1
+                            str(row - self.data_well.insert_index2 - 1))  # Номер строки + 1
                         table_widget.setItem(row, 1, item_number)
 
                 row_value_empty = True  # Флаг, указывающий, что все ячейки в строке пустые
@@ -947,6 +948,28 @@ class MyWindow(MyMainWindow):
         # self.thread.started.connect(self.excepthook.handleException)
         self.thread.start()
 
+        try:
+            if getattr(sys, 'frozen', False):
+                # Скомпилированное приложение
+                data_list.path_image = '_internal/'
+            else:
+                # Режим разработки
+                data_list.path_image = ''
+
+            print(f"Путь к изображению: {data_list.path_image}")
+
+            data_list.connect_in_base, self.db = connect_to_database(decrypt("DB_NAME_USER"))
+
+            self.login_window = LoginWindow()
+            self.login_window.setWindowModality(Qt.ApplicationModal)
+
+            self.login_window.show()
+            self.pause_app()
+            data_list.pause = False
+        except Exception as e:
+            QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА',
+                                f'Критическая ошибка, смотри в лог {type(e).__name__}\n\n{str(e)}')
+
     def insert_data_in_chemistry(self):
 
         if self.data_well.work_plan in ['dop_plan', 'dop_plan_in_base']:
@@ -996,8 +1019,8 @@ class MyWindow(MyMainWindow):
                      self.data_well.fluid
                      )
 
-        query = f"INSERT INTO chemistry "\
-                f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, "\
+        query = f"INSERT INTO chemistry " \
+                f"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, " \
                 f"%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
         from data_base.work_with_base import ClassifierWell
@@ -1013,12 +1036,6 @@ class MyWindow(MyMainWindow):
             return True  # Процесс найден
 
         return False  # Процесс не найден
-
-    @staticmethod
-    def close_process():
-        for proc in psutil.process_iter():
-            if proc.name() == 'ZIMA.exe':
-                proc.terminate()  # Принудительное завершение
 
     @staticmethod
     def show_confirmation():
@@ -1727,8 +1744,8 @@ class MyWindow(MyMainWindow):
                            120: (501, 600), 140: (601, 700), 160: (701, 800), 180: (801, 900), 200: (901, 1500)}
         if self.insert_index > self.data_well.count_row_well:
             if self.copied_rows:
-
-                currentRow = self.table_widget.currentRow() + 1 if self.table_widget.currentRow() >= 0 else self.table_widget.rowCount()
+                currentRow = self.table_widget.currentRow() + 1 if self.table_widget.currentRow() >= 0 \
+                    else self.table_widget.rowCount()
                 for original_row, row_data in self.copied_rows[::-1]:
                     self.table_widget.insertRow(currentRow)
                     for column in range(len(row_data)):
@@ -1858,7 +1875,7 @@ class MyWindow(MyMainWindow):
 
         self.data_well.fluid_work = data[row][7]
         self.data_well.template_depth, self.data_well.template_length, \
-            self.data_well.template_depth_addition, self.data_well.template_length_addition = json.loads(
+        self.data_well.template_depth_addition, self.data_well.template_length_addition = json.loads(
             data[row][11])
         self.data_well.skm_interval = json.loads(data[row][12])
 
@@ -2503,7 +2520,8 @@ class SaveInExcel(MyWindow):
             # try:
             for row_ind, row in enumerate(self.ws2.iter_rows(values_only=True)):
                 if 15 < row_ind < 100 and \
-                        (self.data_well.data_pvr_max.get_value + 13 > row_ind or row_ind > self.data_well.data_fond_min.get_value + 13):
+                        (
+                                self.data_well.data_pvr_max.get_value + 13 > row_ind or row_ind > self.data_well.data_fond_min.get_value + 13):
                     if all(cell in [None, ''] for cell in row) \
                             and ('Интервалы темпа' not in str(self.ws2.cell(row=row_ind, column=2).value) \
                                  and 'Замечания к эксплуатационному периоду' not in str(
@@ -3077,28 +3095,6 @@ if __name__ == "__main__":
 
     if MyWindow.check_process():
         MyWindow.show_confirmation()
-
-    try:
-        if getattr(sys, 'frozen', False):
-            # Скомпилированное приложение
-            data_list.path_image = '_internal/'
-        else:
-            # Режим разработки
-            data_list.path_image = ''
-
-        print(f"Путь к изображению: {data_list.path_image}")
-
-        data_list.connect_in_base = connect_to_database(decrypt("DB_NAME_USER"))
-
-        login_window = LoginWindow()
-        login_window.setWindowModality(Qt.ApplicationModal)
-
-        login_window.show()
-        MyMainWindow.pause_app()
-        data_list.pause = False
-    except Exception as e:
-        QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА',
-                            f'Критическая ошибка, смотри в лог {type(e).__name__}\n\n{str(e)}')
 
     window = MyWindow()
     window.show()

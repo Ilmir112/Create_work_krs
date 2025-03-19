@@ -1,3 +1,5 @@
+import psutil
+
 import data_list
 
 from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox, QGridLayout
@@ -9,9 +11,8 @@ from decrypt import decrypt
 
 
 class LoginWindow(QWidget):
-    def __init__(self):
+    def __init__(self, ):
         super().__init__()
-
         self.register_window = None
         self.setWindowTitle('окно входа')
 
@@ -56,7 +57,9 @@ class LoginWindow(QWidget):
     def closeEvent(self, event):
         if self.sender() is None:  # Проверяем вызывающий объект
             # Закрываем основное окно при закрытии окна входа
-            # self.main_window.close()
+            for proc in psutil.process_iter():
+                if proc.name() == 'ZIMA.exe':
+                    proc.terminate()  # Принудительное завершение
             event.accept()  # Принимаем событие закрытия
 
     def login(self):

@@ -855,7 +855,7 @@ def connect_to_database(DB_NAME):
                                 'Проверка показало что с облаком соединения нет, '
                                 'будет использована локальная база данных')
 
-        return False
-    return True
+        return False, False
+    return True, conn
 
 # print(connect_to_database(DB_NAME))
