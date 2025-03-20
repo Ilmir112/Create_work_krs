@@ -3084,6 +3084,7 @@ class SaveInExcel(MyWindow):
                     podpis_dict[data_list.costumer][region]["grr"]['surname'])
         return False
 
+
 class LoadThread(QThread):
     finished = pyqtSignal()
 
@@ -3095,39 +3096,34 @@ class LoadThread(QThread):
 
 
 def show_splash_screen():
+    # Создаем приложение
     app = QApplication(sys.argv)
 
     # Загружаем изображение для заставки
     # splash_pix = QPixmap("imageFiles/icon/zima.png")  # Укажите путь к вашему изображению
-    splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima_fon.png")  # Укажите путь к вашему изображению
+
+    splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima.png")  # Укажите путь к вашему изображению
     splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
     splash.setMask(splash_pix.mask())
-    # splash.setGeometry(400, 400, 500, 600)
     splash.show()
 
-    # Создаем и запускаем поток загрузки
-    load_thread = LoadThread()
-    load_thread.finished.connect(splash.close)  # Закрываем заставку по завершении загрузки
-    load_thread.finished.connect(show_main_window)  # Показываем главное окно
-    load_thread.start()  # Запускаем поток
+    # Задержка на 5 секунд
+    QTimer.singleShot(5000, splash.close)
 
-    sys.exit(app.exec_())
-
-def show_main_window():
     # Создаем главное окно
     window = MyWindow()
     window.show()
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     from data_base.config_base import connect_to_database
     from users.login_users import LoginWindow
 
-    show_splash_screen()
-
     if MyWindow.check_process():
         MyWindow.show_confirmation()
 
-    window = MyWindow()
-    window.show()
+    show_splash_screen()
 
-    sys.exit(app.exec_())
+    # window = MyWindow()
+    # window.show()
+
