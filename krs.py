@@ -349,10 +349,12 @@ class GnoParent(ABC):
                                                           f" {self.data_well.fluid_work}. Техостой 2ч."])
 
         if self.data_well.work_plan == 'krs':
-            if any([str(cater) == '1' for cater in self.data_well.category_pressure_well]):
+            if any([str(cater) == '1' for cater in self.data_well.category_pressure_list]):
+                self.data_well.category_pvo = 1
                 self.data_well.category_pvo, _ = QInputDialog.getInt(
                     None, 'Категория скважины', f'Категория скважины № {self.data_well.category_pvo}, корректно?',
                     self.data_well.category_pvo, 1, 2)
+
 
     def lifting_unit(self):
         aprs_40 = 'Установить подъёмный агрегат на устье не менее 40т.\n' \
@@ -452,7 +454,7 @@ class GnoParent(ABC):
             type_of_chemistry = 'CaCl'
             water_fresh = data_list.DICT_CALC_CACL[float(self.fluid)][0]
             volume_chemistry = data_list.DICT_CALC_CACL[float(self.fluid)][1]
-        elif 1.34 < float(self.fluid) < 1.6:
+        elif 1.34 <= float(self.fluid) < 1.6:
             type_of_chemistry = 'CaЖГ'
             water_fresh = data_list.DICT_CALC_CAZHG[float(self.fluid)][0]
             volume_chemistry = data_list.DICT_CALC_CAZHG[float(self.fluid)][1]
@@ -539,7 +541,7 @@ class GnoParent(ABC):
                                   f'{type_of_chemistry} весом {10 * volume_chemistry / 1000:.1f}т (из расчета '
                                   f'{10 * volume_chemistry:.1f}кг/м3 на {water_fresh:.1f}л  пресной воды) на основе '
                                   f'тех жидкости '
-                                  f'уд. весом 1,01г/см3 в объеме {water_fresh * 10 / 1000:.1f}м3 доставленной автоцистернами '
+                                  f'уд. весом 1,01г/см3 в объеме {water_fresh * 10:.1f}м3 доставленной автоцистернами '
                                   f'из ПНТЖ заказчика уд. весом 1,01г/см3 '
                                   f'Заявку на завоз тех жидкости подать за 24 часа до начала работ через '
                                   f'ведущего инженера ЦИТС {data_list.contractor}',

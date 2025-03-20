@@ -1162,6 +1162,10 @@ class TemplateKrs(WindowUnion):
                                            f'\n Продолжить?')
                 if mes == QMessageBox.StandardButton.No:
                     return
+            mes = QMessageBox.question(self, 'ПСШ + пакер',
+                                       f'в скважину спускается ПСШ + пакер\n Продолжить?')
+            if mes == QMessageBox.StandardButton.No:
+                return
 
 
         distance_second = int(float(self.current_widget.dictance_template_second_edit.text()))

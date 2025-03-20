@@ -228,7 +228,7 @@ class FindIndexPZ(MyMainWindow):
         self.data_x_min = ProtectedIsDigit(0)
         self.data_fond_min = ProtectedIsDigit(0)
         self.data_pvr_min = ProtectedIsDigit(0)
-        self.well_volume_in_pz = []
+
         if self.work_plan not in ['prs']:
             self.read_pz()
         else:
@@ -1206,7 +1206,7 @@ class WellCondition(FindIndexPZ):
                         elif 'расстояние от скважин' in str(value).lower():
                             self.distance_from_well_to_sampling_point = str(row[col + 2]).replace(',', '.')
 
-                        elif 'плотность жидкости глушения' in str(value).lower():
+                        elif 'плотность жидкости ' in str(value).lower():
                             try:
                                 if 'prs' in self.work_plan:
                                     well_volume_in_pz = str(row[col + 4]).replace(',', '.')

@@ -4,10 +4,7 @@ import data_list
 from work_py.descent_gno import GnoDescentWindow
 
 def select_ovtr(self):
-    ovtr = 'ОВТР 4ч'
-    if self.data_well.region == 'ТГМ' or \
-            (self.data_well.region == 'КГМ' and self.data_well.curator == 'ОР'):
-        ovtr = 'ОВТР 6ч'
+    ovtr = 'ОВТР 4ч' if self.data_well.region == 'ЧГМ' else 'ОВТР 6ч'
     return ovtr
 
 
