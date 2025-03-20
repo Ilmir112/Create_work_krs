@@ -3099,9 +3099,10 @@ def show_splash_screen():
 
     # Загружаем изображение для заставки
     # splash_pix = QPixmap("imageFiles/icon/zima.png")  # Укажите путь к вашему изображению
-    splash_pix = QPixmap("imageFiles/icon/zima_fon.png")  # Укажите путь к вашему изображению
+    splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima_fon.png")  # Укажите путь к вашему изображению
     splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
     splash.setMask(splash_pix.mask())
+    # splash.setGeometry(400, 400, 500, 600)
     splash.show()
 
     # Создаем и запускаем поток загрузки
