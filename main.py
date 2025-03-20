@@ -959,6 +959,17 @@ class MyWindow(MyMainWindow):
 
             print(f"Путь к изображению: {data_list.path_image}")
 
+            # Загружаем изображение для заставки
+            splash_pix = QPixmap("imageFiles/icon/zima.png")  # Укажите путь к вашему изображению
+
+            # splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima.png")  # Укажите путь к вашему изображению
+            splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+            splash.setMask(splash_pix.mask())
+            splash.show()
+
+            # Задержка на 5 секунд
+            QTimer.singleShot(5000, splash.close)
+
             data_list.connect_in_base, self.db = connect_to_database(decrypt("DB_NAME_USER"))
 
             self.login_window = LoginWindow()
@@ -3099,16 +3110,7 @@ def show_splash_screen():
     # Создаем приложение
     app = QApplication(sys.argv)
 
-    # Загружаем изображение для заставки
-    # splash_pix = QPixmap("imageFiles/icon/zima.png")  # Укажите путь к вашему изображению
 
-    splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima.png")  # Укажите путь к вашему изображению
-    splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
-    splash.setMask(splash_pix.mask())
-    splash.show()
-
-    # Задержка на 5 секунд
-    QTimer.singleShot(5000, splash.close)
 
     # Создаем главное окно
     window = MyWindow()
