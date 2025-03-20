@@ -1427,11 +1427,9 @@ class WindowUnion(MyMainWindow):
             return False
 
     def pvo_gno(self, kat_pvo):
-        date_str = ''
-        if 'Ойл' in contractor:
-            date_str = 'от 07.03.2024г'
-        elif 'РН' in contractor:
-            date_str = ''
+
+        date_str = data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]
+
         # print(f' ПВО {kat_pvo}')
         pvo_2 = f'Установить ПВО по схеме №2 утвержденной главным инженером {contractor} {date_str} (тип плашечный ' \
                 f'сдвоенный ПШП-2ФТ-152х21) и посадить пакер. ' \

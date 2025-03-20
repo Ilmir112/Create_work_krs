@@ -18,7 +18,8 @@ from io import BytesIO
 
 from openpyxl.reader.excel import load_workbook
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
-    QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog, QTabWidget, QTableWidgetItem
+    QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog, QTabWidget, QTableWidgetItem, \
+    QSplashScreen
 from PyQt5 import QtCore, QtWidgets
 
 from datetime import datetime
@@ -30,9 +31,9 @@ from block_name import region_select
 
 from log_files.log import logger, QPlainTextEditLogger
 from openpyxl.drawing.image import Image
-from PyQt5.QtCore import QThread, pyqtSlot
+from PyQt5.QtCore import QThread, pyqtSlot, Qt, QObject, pyqtSignal,  QTimer
+from PyQt5.QtGui import QPixmap
 
-from PyQt5.QtCore import Qt, QObject, pyqtSignal
 
 
 class UncaughtExceptions(QObject):
@@ -3084,14 +3085,28 @@ class SaveInExcel(MyWindow):
         return False
 
 
+def show_splash_screen():
+    # Создаем приложение
+    app = QApplication(sys.argv)
+
+    # Загружаем изображение для заставки
+    splash_pix = QPixmap("imageFiles/icon/zima.png")  # Укажите путь к вашему изображению
+    splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+    splash.setMask(splash_pix.mask())
+    splash.show()
+
+    # Задержка на 5 секунд
+    QTimer.singleShot(5000, splash.close)
+
+    # Создаем главное окно
+    window = MyWindow()
+    window.show()
+
 if __name__ == "__main__":
     from data_base.config_base import connect_to_database
     from users.login_users import LoginWindow
 
-    # app3 = QApplication(sys.argv)
-
-    app = QApplication(sys.argv)
-    #  MyMainWindow.delete_files()
+    show_splash_screen()
 
     if MyWindow.check_process():
         MyWindow.show_confirmation()
