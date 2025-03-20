@@ -3084,20 +3084,35 @@ class SaveInExcel(MyWindow):
                     podpis_dict[data_list.costumer][region]["grr"]['surname'])
         return False
 
+class LoadThread(QThread):
+    finished = pyqtSignal()
+
+    def run(self):
+        import time
+        # Здесь вы можете выполнять длительные операции, например, загрузку данных
+        time.sleep(5)  # Симуляция длительной загрузки
+        self.finished.emit()
+
 
 def show_splash_screen():
-    # Создаем приложение
     app = QApplication(sys.argv)
 
     # Загружаем изображение для заставки
-    splash_pix = QPixmap("imageFiles/icon/zima.png")  # Укажите путь к вашему изображению
+    # splash_pix = QPixmap("imageFiles/icon/zima.png")  # Укажите путь к вашему изображению
+    splash_pix = QPixmap("imageFiles/icon/zima_fon.png")  # Укажите путь к вашему изображению
     splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
     splash.setMask(splash_pix.mask())
     splash.show()
 
-    # Задержка на 5 секунд
-    QTimer.singleShot(5000, splash.close)
+    # Создаем и запускаем поток загрузки
+    load_thread = LoadThread()
+    load_thread.finished.connect(splash.close)  # Закрываем заставку по завершении загрузки
+    load_thread.finished.connect(show_main_window)  # Показываем главное окно
+    load_thread.start()  # Запускаем поток
 
+    sys.exit(app.exec_())
+
+def show_main_window():
     # Создаем главное окно
     window = MyWindow()
     window.show()
