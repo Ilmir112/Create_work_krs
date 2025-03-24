@@ -719,7 +719,12 @@ class AcidPakerWindow(WindowUnion):
             QMessageBox.warning(self, 'Ошибка', f'Ошибка сохранения данных {type(e).__name__}\n\n{str(e)}')
             return
         work_template_list = []
+        self.depth_gauge = ''
+
+        self.need_change_zgs_combo = 'Нет'
+
         if self.depth_gauge_combo == 'Да':
+            self.depth_gauge = 'контейнер с манометром МТГ-25 + '
             work_template_list = [
                 [f'Заявить глубинные манометры', None,
                  f'Подать заявку на завоз глубиныx манометров с контейнером',
@@ -954,11 +959,7 @@ class AcidPakerWindow(WindowUnion):
                 if self.check_true_depth_template(self.swab_paker_depth) is False:
                     return
 
-                swab_work_list = SwabWindow.swabbing_with_paker(self, self.diameter_paker, self.swab_paker_depth,
-                                                                self.paker_khost,
-                                                                self.plast_combo, self.swab_type_combo,
-                                                                self.swab_volume_edit,
-                                                                self.depth_gauge_combo)
+                swab_work_list = SwabWindow.swabbing_with_paker(self)
 
                 work_template_list.extend(swab_work_list[1:])
             elif self.paker_layout_combo in ['двухпакерная', 'двухпакерная, упорные']:

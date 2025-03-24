@@ -12,6 +12,7 @@ from openpyxl.utils import column_index_from_string
 from openpyxl.utils.cell import range_boundaries, get_column_letter
 from openpyxl.workbook import Workbook
 from openpyxl_image_loader import SheetImageLoader
+from work_py.data_informations import dict_data_cdng
 
 from decrypt import decrypt
 from main import ExcelWorker, MyMainWindow, MyWindow
@@ -30,6 +31,7 @@ class FindIndexPZ(MyMainWindow):
         self.prs_copy_index = ProtectedIsDigit(0)
         self.perforation_sole = 5000
         self.number_dp = 0
+        self.skm_interval = []
         self.head_column = 0
         self.image_loader = None
         self.water_density = ProtectedIsDigit(1.18)
@@ -1339,6 +1341,10 @@ class WellName(FindIndexPZ):
                         # well_data.appointment_well = ProtectedIsDigit(row[col + 1])
                         # print(f' ЦДНГ {self.cdng.get_value}')
 
+        if self.cdng.get_value not in list(dict_data_cdng.keys()):
+            QMessageBox.warning(self, 'Ошибка', f'ЦДНГ - {self.cdng.get_value} отсутствует в списках, '
+                                                f'нужно уточнить промысел')
+            return
         return self
 
 
@@ -1357,7 +1363,6 @@ class WellData(FindIndexPZ):
             for col, cell in enumerate(row[:15]):
                 value = cell
                 if value:
-
                     if 'пробуренный забой' in str(value).lower() or 'пробуренный:' in str(value).lower():
                         self.bottom_hole_drill = ProtectedIsDigit(row[col + 1])
                         self.bottom_hole_drill = self.definition_is_none(
@@ -1365,7 +1370,7 @@ class WellData(FindIndexPZ):
                             row_index, col, 2)
 
                         self.bottom_hole_artificial = ProtectedIsDigit(row[col + 4])
-                        # print(f'пробуренный забой {self.bottom_hole_artificial}')
+
                         self.bottom_hole_artificial = \
                             self.definition_is_none(self.bottom_hole_artificial,
                                                     row_index, col, 5)

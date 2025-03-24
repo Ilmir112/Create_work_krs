@@ -143,7 +143,7 @@ class CorrectPlanWindow(WindowUnion):
             if data_well:
                 self.data_well.type_kr = data_well[2]
                 if data_well[3]:
-                    self.data_well.dict_category = json.loads(data_well[3])
+
                     self.data_well.well_oilfield = ProtectedIsNonNone(data_well[4])
                     self.data_well.appointment_well = ProtectedIsNonNone(data_well[5])
                     self.data_well.inventory_number = ProtectedIsNonNone(data_well[6])

@@ -1,17 +1,14 @@
-import logging
-
 from PyQt5.QtGui import QIntValidator
 
 import data_list
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, QTabWidget, \
-    QTableWidget, QHeaderView, QPushButton, QTableWidgetItem, QApplication, QMainWindow
+from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, \
+    QPushButton, QApplication
 
-from main import MyMainWindow
-from work_py.emergencyWork import magnet_select, sbt_select
+from work_py.emergencyWork import sbt_select
 from work_py.parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
-from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm
 
 
 class TabPageSoLar(TabPageUnion):
@@ -22,7 +19,7 @@ class TabPageSoLar(TabPageUnion):
         self.lar_diameter_label = QLabel("Диаметр ловителя", self)
         self.lar_diameter_line = QLineEdit(self)
 
-        self.lar_type_label = QLabel("Тип ловителя", self)
+        self.lar_type_label = QLabel("Тип л овителя", self)
         self.lar_type_combo = QComboBox(self)
         raid_type_list = ['ОВ', 'ВТ', 'метчик', 'колокол', 'МЭС', 'МБУ', 'штанголовитель']
         self.lar_type_combo.addItems(raid_type_list)
@@ -47,12 +44,12 @@ class TabPageSoLar(TabPageUnion):
         self.udlinitelel_length = QLineEdit(self)
         self.udlinitelel_length.setValidator(self.validator_int)
         self.udlinitelel_length.setText('2')
-
-        if self.data_well.column_additional is False or (self.data_well.column_additional and
-                                                    self.data_well.head_column_additional.get_value < self.data_well.current_bottom):
-            self.nkt_select_combo.setCurrentIndex(0)
-        else:
-            self.nkt_select_combo.setCurrentIndex(1)
+        if self.data_well:
+            if self.data_well.column_additional is False or \
+                    (self.data_well.column_additional and self.data_well.head_column_additional.get_value < self.data_well.current_bottom):
+                self.nkt_select_combo.setCurrentIndex(0)
+            else:
+                self.nkt_select_combo.setCurrentIndex(1)
 
         self.emergency_bottom_label = QLabel("аварийный забой", self)
         self.emergency_bottom_line = QLineEdit(self)
@@ -102,17 +99,19 @@ class TabPageSoLar(TabPageUnion):
         # self.nkt_select_combo.currentTextChanged.connect(self.update_raid_edit)
 
         self.nkt_select_combo.setCurrentIndex(1)
-        self.bottom_line.setText(f'{self.data_well.current_bottom}')
+        if self.data_well:
+            self.bottom_line.setText(f'{self.data_well.current_bottom}')
 
-        if self.data_well.column_additional is False or \
-                (self.data_well.column_additional and self.data_well.current_bottom < self.data_well.head_column_additional.get_value):
-            self.nkt_select_combo.setCurrentIndex(1)
-            self.nkt_select_combo.setCurrentIndex(0)
-        else:
-            self.nkt_select_combo.setCurrentIndex(1)
+            if self.data_well.column_additional is False or \
+                    (self.data_well.column_additional and self.data_well.current_bottom < self.data_well.head_column_additional.get_value):
+                self.nkt_select_combo.setCurrentIndex(1)
+                self.nkt_select_combo.setCurrentIndex(0)
+            else:
+                self.nkt_select_combo.setCurrentIndex(1)
 
-        if self.data_well.emergency_well is True:
-            self.emergency_bottom_line.setText(f'{self.data_well.emergency_bottom}')
+            if self.data_well.emergency_well is True:
+                if self.data_well:
+                    self.emergency_bottom_line.setText(f'{self.data_well.emergency_bottom}')
 
 
 class TabWidget(TabWidgetUnion):
@@ -123,13 +122,14 @@ class TabWidget(TabWidgetUnion):
 
 class EmergencyLarWork(WindowUnion):
 
-    def __init__(self, data_well, table_widget, parent=None):
+    def __init__(self, data_well=None, table_widget=None, parent=None):
         super().__init__(data_well)
-        self.insert_index = data_well.insert_index
+        self.data_well = data_well
+        if self.data_well:
+            self.insert_index = data_well.insert_index
         self.tab_widget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-
         
         self.table_widget = table_widget
 
@@ -142,33 +142,34 @@ class EmergencyLarWork(WindowUnion):
         vbox.addWidget(self.buttonadd_work, 3, 0)
 
     def closeEvent(self, event):
-                # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window  = None
+        # Закрываем основное окно при закрытии окна входа
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
+
     def add_work(self):
-        gidroayss_combo = self.tab_widget.currentWidget().gidroayss_combo.currentText()
-        ubt_combo = self.tab_widget.currentWidget().gidroayss_combo.currentText()
-        nkt_str_combo = self.tab_widget.currentWidget().nkt_str_combo.currentText()
-        lar_diameter_line = self.tab_widget.currentWidget().lar_diameter_line.text()
-        udlinitelel = self.tab_widget.currentWidget().udlinitelel.currentText()
-        udlinitelel_length = self.tab_widget.currentWidget().udlinitelel_length.text()
-        if lar_diameter_line == '':
+        self.gidroayss_combo = self.tab_widget.currentWidget().gidroayss_combo.currentText()
+        self.ubt_combo = self.tab_widget.currentWidget().ubt_combo.currentText()
+        self.nkt_str_combo = self.tab_widget.currentWidget().nkt_str_combo.currentText()
+        self.lar_diameter_line = self.tab_widget.currentWidget().lar_diameter_line.text()
+        self.udlinitelel = self.tab_widget.currentWidget().udlinitelel.currentText()
+        self.udlinitelel = self.tab_widget.currentWidget().udlinitelel_length.text()
+        if self.lar_diameter_line == '':
             QMessageBox.warning(self, 'Ошибка',
                                       'Выберете диаметр ловильного оборудования')
             return
-        nkt_key = self.tab_widget.currentWidget().nkt_select_combo.currentText()
-        lar_type_combo = self.tab_widget.currentWidget().lar_type_combo.currentText()
-        emergency_bottom_line = self.tab_widget.currentWidget().emergency_bottom_line.text().replace(',', '.')
-        bottom_line = self.tab_widget.currentWidget().bottom_line.text().replace(',', '.')
-        if lar_type_combo in ['метчик', 'колокол', 'МЭС', 'МБУ'] and nkt_str_combo == 'НКТ':
-            QMessageBox.warning(self, 'Недопустимая операция', f'Нельзя спускать {lar_type_combo} '
+        self.nkt_key = self.tab_widget.currentWidget().nkt_select_combo.currentText()
+        self.lar_type_combo = self.tab_widget.currentWidget().lar_type_combo.currentText()
+        self.emergency_bottom_line = self.tab_widget.currentWidget().emergency_bottom_line.text().replace(',', '.')
+        self.bottom_line = self.tab_widget.currentWidget().bottom_line.text().replace(',', '.')
+        if self.lar_type_combo in ['метчик', 'колокол', 'МЭС', 'МБУ'] and self.nkt_str_combo == 'НКТ':
+            QMessageBox.warning(self, 'Недопустимая операция', f'Нельзя спускать {self.lar_type_combo} '
                                                                f'на не извлекаемые ловитель на НКТ')
             return
-        if bottom_line != '':
-            bottom_line = int(float(bottom_line))
+        if self.bottom_line != '':
+            bottom_line = int(float(self.bottom_line))
 
-        if emergency_bottom_line != '':
-            emergency_bottom_line = int(float(emergency_bottom_line))
+        if self.emergency_bottom_line != '':
+            emergency_bottom_line = int(float(self.emergency_bottom_line))
 
             if emergency_bottom_line > self.data_well.current_bottom:
                 QMessageBox.warning(self, 'Ошибка',
@@ -179,68 +180,64 @@ class EmergencyLarWork(WindowUnion):
                                       'ВВедите аварийный забой')
             return
 
-        if nkt_key == 'оборудование в ЭК' and self.data_well.column_additional and \
+        if self.nkt_key == 'оборудование в ЭК' and self.data_well.column_additional and \
                 emergency_bottom_line > self.data_well.head_column_additional.get_value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для доп колонны')
             return
-        elif nkt_key == 'оборудование в ДП' and self.data_well.column_additional and \
+        elif self.nkt_key == 'оборудование в ДП' and self.data_well.column_additional and \
                 emergency_bottom_line < self.data_well.head_column_additional.get_value:
             QMessageBox.warning(self, 'Ошибка',
                                       'Не корректно выбрана компоновка для основной колонны')
             return
-        if nkt_str_combo == 'НКТ':
-            raid_list = self.emergencyNKT(lar_diameter_line, nkt_key, lar_type_combo, nkt_str_combo,
-                                          emergency_bottom_line, bottom_line)
-            self.data_well.current_bottom = bottom_line
-        elif nkt_str_combo == 'СБТ':
-            raid_list = self.emergence_sbt(lar_diameter_line, nkt_key, lar_type_combo,
-                                           emergency_bottom_line, bottom_line, gidroayss_combo, ubt_combo, udlinitelel,
-                                           udlinitelel_length)
-            self.data_well.current_bottom = bottom_line
-        elif nkt_str_combo == 'штанги':
-            raid_list = self.emergency_pods(lar_diameter_line, nkt_key, lar_type_combo, nkt_str_combo,
-                                          emergency_bottom_line, bottom_line)
+        raid_list = []
+        if self.nkt_str_combo == 'НКТ':
+            raid_list = self.emergency_nkt()
+        elif self.nkt_str_combo == 'СБТ':
+            raid_list = self.emergence_sbt()
+        elif self.nkt_str_combo == 'штанги':
+            raid_list = self.emergency_pods()
 
-        self.populate_row(self.insert_index, raid_list, self.table_widget)
-        data_list.pause = False
-        self.close()
+        self.data_well.current_bottom = float(self.bottom_line)
 
-    def emergence_sbt(self, lar_diameter_line, nkt_key, lar_type_combo,
-                      emergency_bottom_line, bottom_line, gidroayss_combo,
-                      ubt_combo, udlinitelel, udlinitelel_length):
+        if raid_list:
+            self.populate_row(self.insert_index, raid_list, self.table_widget)
+            data_list.pause = False
+            self.close()
+
+    def emergence_sbt(self):
         bp_str = '+ БРП '
         gidroayss_str = ''
         usilit_gidroayss_str = ''
         ubt_str = ''
         udlinitelel_str = ''
-        if udlinitelel == 'Да':
-            udlinitelel_str = f' + удлинитель  (L={udlinitelel_length}м) '
-        if gidroayss_combo == 'Да':
+        if self.udlinitelel == 'Да':
+            udlinitelel_str = f' + удлинитель  (L={self.udlinitelel_length}м) '
+        if self.gidroayss_combo == 'Да':
             gidroayss_str = 'гидроясс '
             usilit_gidroayss_str = ' + усилитель гидроясса '
-        if ubt_combo == 'Да':
+        if self.ubt_combo == 'Да':
             ubt_str = '+ УБТ 3шт '
 
-        if lar_type_combo in ['ВТ', 'ОВ']:
+        if self.lar_type_combo in ['ВТ', 'ОВ']:
             bp_str = ''
-            if gidroayss_combo == 'Нет':
-                emergency_str = f'{lar_type_combo}-{lar_diameter_line} ' \
+            if self.gidroayss_combo == 'Нет':
+                emergency_str = f'{self.lar_type_combo}-{self.lar_diameter_line} ' \
                                 f'(типоразмер согласовать с аварийной службой УСРСиСТ){udlinitelel_str}{gidroayss_str} {bp_str}'
             else:
-                emergency_str = f'{lar_type_combo}-{lar_diameter_line} ' \
+                emergency_str = f'{self.lar_type_combo}-{self.lar_diameter_line} ' \
                                 f'(типоразмер согласовать с аварийной службой УСРСиСТ){udlinitelel_str} + мех ясс ' \
                                 f'+ {gidroayss_str}{ubt_str}{usilit_gidroayss_str}'
         else:
-            emergency_str = f'{lar_type_combo}-{lar_diameter_line} (типоразмер согласовать с аварийной службой УСРСиСТ)'\
+            emergency_str = f'{self.lar_type_combo}-{self.lar_diameter_line} (типоразмер согласовать с аварийной службой УСРСиСТ)'\
                             f' {udlinitelel_str}{bp_str}{gidroayss_str} + патрубок 1м +' \
                             f'{ubt_str} {usilit_gidroayss_str}'
 
         emergence_sbt = [
             [f'СПО ловильного оборудования ', None,
              f'По согласованию с аварийной службой УСРСиСТ, сборка и спуск компоновки: {emergency_str} на '
-             f'{sbt_select(self, nkt_key)} '
-             f' до глубины нахождения аварийной головы ({emergency_bottom_line}м)\n '
+             f'{sbt_select(self, self.nkt_key)} '
+             f' до глубины нахождения аварийной головы ({self.emergency_bottom_line}м)\n '
              f'Включение в компоновку ударной компоновки дополнительно согласовать с УСРСиСТ',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(self.data_well.current_bottom, 1)],
@@ -255,9 +252,10 @@ class EmergencyLarWork(WindowUnion):
              f'восстановить '
              f'циркуляцию и промыть скважину тех водой {self.data_well.fluid_work}. При прокачке промывочной '
              f'жидкости спустить '
-             f'{lar_type_combo} до верхнего конца аварийной колонны.\n'
+             f'{self.lar_type_combo} до верхнего конца аварийной колонны.\n'
              f'Произвести ловильные работы на "голове" аварийной компоновки. Количество подходов и оборотов '
-             f'инструмента  согласовать с аварийной службой супервайзинга.'],
+             f'инструмента  согласовать с аварийной службой супервайзинга.', None, None, None, None, None, None, None,
+             'мастер КРС, УСРСиСТ', 3],
             [None, None,
              f'Произвести расхаживание аварийной компоновки с постепенным увеличением'
              f' веса до 50т. Дальнейшие '
@@ -274,7 +272,8 @@ class EmergencyLarWork(WindowUnion):
              'Мастер', lifting_nkt_norm(self.data_well.current_bottom, 1)],
             [None, None,
              f'При необходимости: Сборка и спуск компоновки: кольцевой фрезер с удлинителем '
-             f'L= {udlinitelel_str}м + СБТ, до глубины нахождения аварийной "головы". (Компоновку согласовать дополнительно с УСРСиСТ',
+             f'L= {udlinitelel_str}м + СБТ, до глубины нахождения аварийной "головы". (Компоновку согласовать '
+             f'дополнительно с УСРСиСТ',
              None, None, None, None, None, None, None,
              'мастер КРС, УСРСиСТ', descentNKT_norm(self.data_well.current_bottom, 1.2)],
             [None, None,
@@ -297,19 +296,18 @@ class EmergencyLarWork(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер, подрядчик по ГИС', None]]
 
-        self.data_well.current_bottom = bottom_line
+        self.data_well.current_bottom = self.bottom_line
         return emergence_sbt
 
-    def emergencyNKT(self, lar_diameter_line, nkt_key, lar_type_combo, nkt_str_combo,
-                     emergency_bottom_line, bottom_line):
+    def emergency_nkt(self):
 
-        emergencyNKT_list = [
+        emergency_nkt_list = [
             [None, 'СПО ловильного оборудования',
              f'По согласованию с аварийной службой УСРСиСТ, сборка и спуск компоновки: '
-             f'Спустить с замером {lar_type_combo}-{lar_diameter_line} + штангах на '
-             f'{nkt_str_combo} до Н= {emergency_bottom_line}м с замером . ',
+             f'Спустить с замером {self.lar_type_combo}-{self.lar_diameter_line} + штангах на '
+             f'{self.nkt_str_combo} до Н= {self.emergency_bottom_line}м с замером . ',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(emergency_bottom_line, 1.2)],
+             'мастер КРС', descentNKT_norm(self.emergency_bottom_line, 1.2)],
             [None, None,
              f'Во избежание срабатывания механизма фиксации плашек в освобожденном положении, спуск '
              f'следует производить без вращения труболовки',
@@ -320,7 +318,7 @@ class EmergencyLarWork(WindowUnion):
              f'За 2-5 метров до верхнего конца аварийного объекта при наличии циркуляции рекомендуется '
              f'восстановить циркуляцию и промыть скважину тех водой {self.data_well.fluid_work}. При прокачке промывочной '
              f'жидкости спустить '
-             f'{lar_type_combo} до верхнего конца аварийной колонны.\n'
+             f'{self.lar_type_combo} до верхнего конца аварийной колонны.\n'
              f'Произвести ловильные работы на "голове" аварийной компоновки. Количество подходов и оборотов '
              f'инструмента  согласовать с аварийной службой супервайзинга.'],
             [None, None,
@@ -338,21 +336,19 @@ class EmergencyLarWork(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер', lifting_nkt_norm(self.data_well.current_bottom, 1)],
         ]
-        self.data_well.current_bottom = bottom_line
+        self.data_well.current_bottom = self.bottom_line
 
-        return emergencyNKT_list
+        return emergency_nkt_list
 
-    def emergency_pods(self, lar_diameter_line, nkt_key, lar_type_combo, nkt_str_combo,
-                     emergency_bottom_line, bottom_line):
+    def emergency_pods(self):
 
-        emergencyNKT_list = [
+        emergency_nkt_list = [
             [None, 'СПО ловильного оборудования',
              f'По согласованию с аварийной службой УСРСиСТ, сборка и спуск компоновки: '
-             f'Спустить с замером {lar_type_combo}-{lar_diameter_line} + штангах на '
-             f'{nkt_str_combo} до Н= {emergency_bottom_line}м с замером . ',
+             f'Спустить с замером {self.lar_type_combo}-{self.lar_diameter_line} на '
+             f'{self.nkt_str_combo} до Н= {self.emergency_bottom_line}м с замером . ',
              None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(emergency_bottom_line, 1.2)],
-
+             'мастер КРС', descentNKT_norm(self.emergency_bottom_line, 1.2)],
             [f'ЛАР', None,
              f'Произвести ловильные работы на "голове" аварийной компоновки. Количество подходов '
              f'инструмента  согласовать с аварийной службой супервайзинга.'],
@@ -364,22 +360,21 @@ class EmergencyLarWork(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС, УСРСиСТ', 10],
             [None, None,
-             f'П. '
-             f'Поднять компоновку с доливом тех жидкости в '
-             f'объеме {round(self.data_well.current_bottom * 0.25 / 1000, 1)}м3'
+             f'Поднять компоновку с доливом тех жидкости в объеме '
+             f'{round(self.data_well.current_bottom * 0.25 / 1000, 1)}м3'
              f' удельным весом {self.data_well.fluid_work}.',
              None, None, None, None, None, None, None,
              'Мастер', lifting_nkt_norm(self.data_well.current_bottom, 1)],
         ]
-        self.data_well.current_bottom = bottom_line
+        self.data_well.current_bottom = self.bottom_line
 
-        return emergencyNKT_list
+        return emergency_nkt_list
 
-# if __name__ == "__main__":
-#     import sys
-#
-#     app = QApplication(sys.argv)
-#     # app.setStyleSheet()
-#     window = Raid()
-#     # window.show()
-#     sys.exit(app.exec_())
+if __name__ == "__main__":
+    import sys
+
+    app = QApplication(sys.argv)
+    # app.setStyleSheet()
+    window = EmergencyLarWork()
+    window.show()
+    sys.exit(app.exec_())

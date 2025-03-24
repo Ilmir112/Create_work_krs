@@ -1344,7 +1344,6 @@ class WindowUnion(MyMainWindow):
             self.data_well.leakiness = True
             self.data_well.leakiness_interval = list(self.data_well.dict_leakiness['НЭК']['интервал'].keys())
 
-        self.data_well.dict_perforation_short = json.loads(result[ind][2])
 
         self.data_well.category_pressure = result[ind][8]
         self.data_well.category_pvo = 2
@@ -1357,6 +1356,25 @@ class WindowUnion(MyMainWindow):
         if str(self.data_well.category_pressure) == '1' or str(self.data_well.category_h2s) == '1' \
                 or self.data_well.category_gas_factor == '1':
             self.data_well.category_pvo = 1
+
+        self.data_well.template_depth, self.data_well.template_length, \
+        self.data_well.template_depth_addition, self.data_well.template_length_addition = \
+            json.loads(result[ind][11])
+
+        self.data_well.skm_interval = json.loads(result[ind][12])
+
+        self.data_well.problem_with_ek_depth = result[ind][13]
+        self.data_well.problem_with_ek_diameter = result[ind][14]
+        try:
+            self.data_well.head_column = ProtectedIsDigit(ind[ind][16])
+        except Exception:
+            print('отсутствуют данные по голове хвостовика')
+        self.data_well.dict_perforation_short = json.loads(result[ind][2])
+
+        try:
+            self.data_well.ribbing_interval = json.loads(result[ind][15])
+        except Exception:
+            print('отсутствуют данные по интервалам райбирования')
 
         definition_plast_work(self)
         return True

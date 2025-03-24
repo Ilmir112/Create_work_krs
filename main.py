@@ -315,7 +315,7 @@ class MyMainWindow(QMainWindow):
                     self.pause_app()
 
                     # print(f'словарь нарушений {self.data_well.dict_leakiness}')
-                    self.data_well.pause = True
+                    data_list.pause = True
                     WellCondition.leakage_window = None  # Discard reference.
 
             if self.data_well.emergency_well is True:
@@ -412,7 +412,6 @@ class MyMainWindow(QMainWindow):
                     self.pause_app()
 
                 if self.work_plan in ['krs', 'dop_plan']:
-
                     self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
                     self.copy_pz(self.ws, self.table_widget, self.work_plan)
                     if self.work_plan == 'dop_plan':

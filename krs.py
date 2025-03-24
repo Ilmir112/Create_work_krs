@@ -222,7 +222,7 @@ class GnoWindow(WindowUnion):
     def add_work(self):
         from work_py.advanted_file import definition_plast_work
 
-        if len(self.data_well.check_data_in_pz) != 0:
+        if len(self.data_well.check_data_in_pz) != 0 and self.data_well.work_plan in ['krs', 'prs']:
             check_str = ''
             for ind, check_data in enumerate(self.data_well.check_data_in_pz):
                 if check_data not in check_str:
@@ -797,8 +797,7 @@ class LiftPaker(GnoParent):
              f'{self.data_well.max_admissible_pressure.get_value}атм в '
              f'присутствии представителя ЦДНГ. '
              f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением '
-             f'за 2 часа до начала работ)',
-             None, None, None, None, None, None, None,
+             f'за 2 часа до начала работ)',  None, None, None, None, None, None, None,
              'Мастер КРС, Представ заказчика', 1.2],
             [f'При наличии Избыточного давления не позволяющее сорвать пакера:\n'
              f'Произвести определение приемистости скважины', None,
@@ -806,11 +805,9 @@ class LiftPaker(GnoParent):
              f'Произвести определение приемистости скважины при давлении не более '
              f'{self.data_well.max_admissible_pressure.get_value}атм. '
              f'{self.well_jamming_str_in_nkt}',
-             None, None,
-             None, None, None, None, None,
+             None, None, None, None, None, None, None,
              'Мастер КРС, Представ заказчика', 1.2],
-            [None, None,
-             f'{self.lifting_unit()}', None, None, None, None, None, None, None,
+            [None, None, f'{self.lifting_unit()}', None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
             [None, None,
              f'За 24 часа до готовности бригады вызвать Пусковую комиссию и представителя супервайзерской '
