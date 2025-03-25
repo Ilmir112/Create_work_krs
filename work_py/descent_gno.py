@@ -534,12 +534,15 @@ class Conservation(DescentParent):
             volume_nkt_metal = 0.55 * 1.0 / 1000
 
         length_nkt = volume_well_30 / volume_nkt_metal
+        lenght_nkt_descent = length_nkt + sum(list(self.data_well.dict_nkt_after.values()))
+        if lenght_nkt_descent > self.data_well.current_bottom:
+            lenght_nkt_descent = self.data_well.current_bottom
 
         descent_voronka = [
             [f'Не замерзающая жидкость 0,3м3', None,
              f'С целью вытеснения тех. жидкости из скважины и заполнения скважины не замерзающей жидкостью: '
              f'Допустить компоновку на технологических НКТ на глубину '
-             f'{sum(list(self.data_well.dict_nkt_after.values())) + length_nkt:.1f}м. ',
+             f'{lenght_nkt_descent:.1f}м. ',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', descentNKT_norm(length_nkt, 1)],
             [None, None,

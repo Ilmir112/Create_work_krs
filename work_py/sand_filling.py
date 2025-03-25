@@ -3,14 +3,12 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBo
     QMainWindow, QPushButton
 
 import data_list
-from main import MyMainWindow
-from .alone_oreration import volume_vn_ek
-from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
-from .rir import RirWindow
+from work_py.alone_oreration import volume_vn_ek
+from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
+from work_py.rir import RirWindow
 
-from .opressovka import OpressovkaEK
-from .rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
-
+from work_py.opressovka import OpressovkaEK
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm
 
 
 class TabPageSoSand(TabPageUnion):
@@ -237,9 +235,7 @@ class SandWindow(WindowUnion):
             work_list = work_list[:-1]
             roof_rir_edit = int(float(self.tab_widget.currentWidget().roof_rir_edit.text()))
             sole_rir_edit = int(float(self.tab_widget.currentWidget().sole_rir_edit.text()))
-            rir_list = RirWindow.rir_with_pero_gl(self, "Не нужно", '', roof_rir_edit, sole_rir_edit, volume_cement,
-                                                need_change_zgs_combo, plast_new_combo, fluid_new_edit,
-                                                pressure_new_edit)
+            rir_list = RirWindow.rir_with_pero_gl(self, "Не нужно", '', roof_rir_edit, sole_rir_edit, volume_cement)
             work_list.extend(rir_list[1:])
 
         self.populate_row(self.insert_index, work_list, self.table_widget)

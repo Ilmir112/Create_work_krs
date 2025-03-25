@@ -959,7 +959,7 @@ class MyWindow(MyMainWindow):
             print(f"Путь к изображению: {data_list.path_image}")
 
             # Загружаем изображение для заставки
-            splash_pix = QPixmap("imageFiles/icon/zima.png")  # Укажите путь к вашему изображению
+            splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima.png")  # Укажите путь к вашему изображению
 
             # splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima.png")  # Укажите путь к вашему изображению
             splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
