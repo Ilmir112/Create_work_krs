@@ -544,6 +544,8 @@ class AcidPakerWindow(WindowUnion):
         vbox.addWidget(self.buttonDel, 2, 1)
         vbox.addWidget(self.buttonadd_work, 3, 0, 1, 0)
 
+        self.mtg_count = None
+
     def add_string(self):
         self.current_widget = self.tab_widget.currentWidget()
         self.paker_layout_combo = self.current_widget.paker_layout_combo.currentText()
@@ -1120,11 +1122,11 @@ class AcidPakerWindow(WindowUnion):
         if self.need_privyazka_q_combo == 'Да' and self.paker_layout_combo in ['двухпакерная']:
             if self.privyazka_nkt()[0] not in paker_list:
                 paker_list.insert(1, self.privyazka_nkt()[0])
-
+        if self.depth_gauge_combo == 'Да':
             paker_list.insert(0, [f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС', None,
-                                  f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС',
-                                  None, None, None, None, None, None, None,
-                                  'мастер КРС', None])
+                              f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС',
+                              None, None, None, None, None, None, None,
+                              'мастер КРС', None])
         return paker_list
 
     def paker_layout_one(self):
