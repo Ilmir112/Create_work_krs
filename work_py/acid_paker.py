@@ -722,9 +722,15 @@ class AcidPakerWindow(WindowUnion):
         self.depth_gauge = ''
 
         self.need_change_zgs_combo = 'Нет'
-
         if self.depth_gauge_combo == 'Да':
             self.depth_gauge = 'контейнер с манометром МТГ-25 + '
+            if self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
+                self.mtg_count = 2
+            elif self.paker_layout_combo in ['воронка']:
+                self.mtg_count = 1
+            else:
+                self.mtg_count = 3
+
             work_template_list = [
                 [f'Заявить глубинные манометры', None,
                  f'Подать заявку на завоз глубиныx манометров с контейнером',
@@ -757,6 +763,7 @@ class AcidPakerWindow(WindowUnion):
                 self.dict_nkt = {
                     nkt_diam: round(self.data_well.head_column_additional.get_value, 0),
                     nkt_pod: int(float(self.paker_khost - self.data_well.head_column_additional.get_value))}
+
             work_template_list.insert(-2, [f'Определить приемистость при Р-{self.pressure_edit}атм', None,
                                            f'Определить приемистость при Р-{self.pressure_edit}атм '
                                            f'в присутствии представителя заказчика.'
@@ -963,7 +970,7 @@ class AcidPakerWindow(WindowUnion):
 
                 work_template_list.extend(swab_work_list[1:])
             elif self.paker_layout_combo in ['двухпакерная', 'двухпакерная, упорные']:
-                self.swab_paker_depth = int(self.current_widget.swab_paker_depth.text())
+                self.swab_paker_depth = int(float(self.current_widget.swab_paker_depth.text()))
                 if self.check_true_depth_template(self.swab_paker_depth) is False:
                     return
                 if self.true_set_paker(self.swab_paker_depth) is False:
@@ -979,21 +986,11 @@ class AcidPakerWindow(WindowUnion):
                 if self.check_depth_in_skm_interval(self.paker_depth2_swab) is False:
                     return
 
-                swab_work_list = SwabWindow.swabbing_with_2paker(self, self.diameter_paker, self.paker_depth,
-                                                                 self.paker2_depth, self.paker_khost,
-                                                                 self.plast_combo, self.swab_type_combo,
-                                                                 self.swab_volume_edit, self.depth_gauge_combo,
-                                                                 need_change_zgs_combo='Нет', plast_new='',
-                                                                 fluid_new='', pressure_new='')
+                swab_work_list = SwabWindow.swabbing_with_2paker(self)
                 work_template_list.extend(swab_work_list[-10:])
 
             elif self.paker_layout_combo == 'воронка':
-                swab_work_list = SwabWindow.swabbing_with_voronka(self, self.swab_paker_depth, self.plast_combo,
-                                                                  self.swab_type_combo,
-                                                                  self.swab_volume_edit, self.depth_gauge_combo,
-                                                                  need_change_zgs_combo='Нет', plast_new='',
-                                                                  fluid_new='', pressure_new=''
-                                                                  )
+                swab_work_list = SwabWindow.swabbing_with_voronka(self)
                 work_template_list.append(
                     [f'Поднять до глубины {self.swab_paker_depth}', None,
                      f'Поднять воронку до глубины {self.swab_paker_depth}м',
@@ -1123,15 +1120,9 @@ class AcidPakerWindow(WindowUnion):
         if self.need_privyazka_q_combo == 'Да' and self.paker_layout_combo in ['двухпакерная']:
             if self.privyazka_nkt()[0] not in paker_list:
                 paker_list.insert(1, self.privyazka_nkt()[0])
-        if self.depth_gauge_combo == 'Да':
-            if self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
-                mtg_count = 2
-            elif self.paker_layout_combo in ['воронка']:
-                mtg_count = 1
-            else:
-                mtg_count = 3
-            paker_list.insert(0, [f'Заявить {mtg_count} глубинных манометра подрядчику по ГИС', None,
-                                  f'Заявить {mtg_count} глубинных манометра подрядчику по ГИС',
+
+            paker_list.insert(0, [f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС', None,
+                                  f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС',
                                   None, None, None, None, None, None, None,
                                   'мастер КРС', None])
         return paker_list
@@ -1148,18 +1139,19 @@ class AcidPakerWindow(WindowUnion):
             mtg_str = 'контейнер с манометром МТГ'
         else:
             mtg_str = ''
-        if self.swab_true_edit_type == 'без освоения' and 'Ойл' in data_list.contractor:
+        swab_layout2 = ''
+        if (self.swab_true_edit_type == 'без освоения' or paker_type == 'ПУ') and 'Ойл' in data_list.contractor:
             swab_layout = 'Заглушку + щелевой фильтр'
-            swab_layout2 = 'сбивной клапан с ввертышем'
+            if paker_type != 'ПУ':
+                swab_layout2 = 'сбивной клапан с ввертышем'
         else:
             swab_layout = 'воронку c свабоограничителем'
-            swab_layout2 = ''
 
         nkt_diam, nkt_pod, nkt_template = self.select_diameter_nkt(self.paker_depth, self.swab_true_edit_type)
 
         if (self.data_well.column_additional is False) or \
-                (
-                        self.data_well.column_additional is True and self.paker_depth < self.data_well.head_column_additional.get_value):
+                (self.data_well.column_additional is True and self.paker_depth <
+                 self.data_well.head_column_additional.get_value):
             self.paker_select = f'{swab_layout} {mtg_str} + НКТ{nkt_diam}мм {self.paker_khost}м + ' \
                                 f'пакер {paker_type}-' \
                                 f'{self.diameter_paker}мм (либо аналог) ' \
@@ -1192,10 +1184,9 @@ class AcidPakerWindow(WindowUnion):
                     self.data_well.head_column_additional.get_value, 0))}
         if self.pressure_zumph_combo == 'Нет':
             paker_list = [
-                [
-                    f' СПО {self.paker_short} до глубины {self.paker_depth}м, воронкой до {self.paker_depth + self.paker_khost}м',
-                    None,
-                    f'Спустить {self.paker_select} + {gidroyakor_str} на НКТ{nkt_diam}мм до глубины '
+                [f'СПО {self.paker_short} до глубины {self.paker_depth}м, воронкой до '
+                 f'{self.paker_depth + self.paker_khost}м',
+                    None, f'Спустить {self.paker_select} + {gidroyakor_str} на НКТ{nkt_diam}мм до глубины '
                     f'{self.paker_depth}м, воронкой до {self.paker_depth + self.paker_khost}м'
                     f' с замером, шаблонированием шаблоном {nkt_template}. '
                     f'{("Произвести пробную посадку на глубине 50м" if self.data_well.column_additional is False else "")} ',
@@ -1275,14 +1266,8 @@ class AcidPakerWindow(WindowUnion):
                 paker_list.insert(1, self.privyazka_nkt()[0])
 
         if self.depth_gauge_combo == 'Да':
-            if self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
-                mtg_count = 2
-            elif self.paker_layout_combo == 'воронка':
-                mtg_count = 1
-            else:
-                mtg_count = 3
-            paker_list.insert(0, [f'Заявить {mtg_count} глубинных манометра подрядчику по ГИС', None,
-                                  f'Заявить {mtg_count} глубинных манометра подрядчику по ГИС',
+            paker_list.insert(0, [f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС', None,
+                                  f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС',
                                   None, None, None, None, None, None, None,
                                   'мастер КРС', None])
 
@@ -1354,14 +1339,8 @@ class AcidPakerWindow(WindowUnion):
                     if self.privyazka_nkt()[0] not in paker_list:
                         paker_list.insert(1, self.privyazka_nkt()[0])
         if self.depth_gauge_combo == 'Да':
-            if self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
-                mtg_count = 2
-            elif self.paker_layout_combo == 'воронка':
-                mtg_count = 1
-            else:
-                mtg_count = 3
-            paker_list.insert(0, [f'Заявить {mtg_count} глубинных манометра подрядчику по ГИС', None,
-                                  f'Заявить {mtg_count} глубинных манометра подрядчику по ГИС',
+            paker_list.insert(0, [f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС', None,
+                                  f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС',
                                   None, None, None, None, None, None, None,
                                   'мастер КРС', None])
 
@@ -1410,14 +1389,8 @@ class AcidPakerWindow(WindowUnion):
             ]
 
         if self.depth_gauge_combo == 'Да':
-            if self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
-                mtg_count = 2
-            elif self.paker_layout_combo == 'воронка':
-                mtg_count = 1
-            else:
-                mtg_count = 3
-            paker_list.insert(0, [f'Заявить {mtg_count} глубинных манометра подрядчику по ГИС', None,
-                                  f'Заявить {mtg_count} глубинных манометра подрядчику по ГИС',
+            paker_list.insert(0, [f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС', None,
+                                  f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС',
                                   None, None, None, None, None, None, None,
                                   'мастер КРС', None])
 
