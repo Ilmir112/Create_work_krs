@@ -954,6 +954,10 @@ class DataWindow(WindowUnion):
                     if key.text() != '' and value.text() != '':
                         self.data_well.dict_nkt_after[key.text()] = self.check_if_none(float(value.text()))
 
+            if len(self.data_well.dict_nkt_before) == 0:
+                mes = QMessageBox.question(self, 'Расчет на ГНО', 'НКТ на спуск отсутствует?')
+                if mes == QMessageBox.StandardButton.No:
+                    return
             if self.current_widget.labels_sucker:
                 for key, value in self.current_widget.labels_sucker.values():
                     if key.text() != '' and value.text() != '':
@@ -1222,7 +1226,7 @@ class DataWindow(WindowUnion):
                     QMessageBox.warning(self, 'ОШИБКА',
                                         f'при спущенном насосе {self.data_well.dict_pump_shgn["before"]} '
                                         f'не указаны штанги, либо не корректно прочитаны данные ')
-                    self.pause_app()
+                    # self.pause_app()
 
                     return
                 if str(self.data_well.dict_pump_shgn["after"]) != '0' and len(
@@ -1230,7 +1234,7 @@ class DataWindow(WindowUnion):
                     QMessageBox.warning(self, 'ОШИБКА',
                                         f'при плановом насосе {self.data_well.dict_pump_shgn["before"]} '
                                         f'не указаны штанги, либо не корректно прочитаны данные ')
-                    self.pause_app()
+                    # self.pause_app()
 
                     return
                 if self.data_well.column_additional is False or\
@@ -1358,6 +1362,7 @@ class DataWindow(WindowUnion):
 
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
     @staticmethod
     def check_date_format(date_string):
         pattern = r'^\d{2}\.\d{2}\.\d{4}$'

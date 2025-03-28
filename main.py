@@ -465,6 +465,9 @@ class MyMainWindow(QMainWindow):
             self.rir_window.setGeometry(200, 400, 800, 200)
             self.set_modal_window(self.rir_window)
             data_list.pause = True
+            self.pause_app()
+
+            data_list.pause = True
             
 
             self.ws = insert_data_new_excel_file(self, data_list.data, data_list.row_heights, data_list.col_width,
@@ -2300,14 +2303,15 @@ class MyWindow(MyMainWindow):
                     plast_str += f'{plast[:4]} :{interval[0]}- {interval[1]} (изол)\n'
             try:
 
-                filter_list_pressure = list(
-                    filter(lambda x: type(x) in [int, float],
-                           list(self.data_well.dict_perforation_short[plast]["давление"])))
+                if "давление" in self.data_well.dict_perforation_short[plast].keys():
+                    filter_list_pressure = list(
+                        filter(lambda x: type(x) in [int, float],
+                               list(self.data_well.dict_perforation_short[plast]["давление"])))
                 # print(f'фильтр -{filter_list_pressure}')
                 if filter_list_pressure:
                     pressur_set.add(f'{plast[:4]} - {filter_list_pressure[0]}')
             except Exception as e:
-                QMessageBox.warning(self, 'Ошибка', f'Ошибка вставки давления в краткое описание {e}')
+                QMessageBox.warning(None, 'Ошибка', f'Ошибка вставки давления в краткое описание {e}')
 
         ws4.cell(row=6, column=1).value = f'НКТ: \n {TabPageGno.gno_nkt_opening(self.data_well.dict_nkt_before)}'
         ws4.cell(row=7, column=1).value = f'Рпл: \n {" ".join(list(pressur_set))}атм'
@@ -2495,7 +2499,8 @@ class SaveInExcel(MyWindow):
 
         if not self.table_widget is None:
             self.wb2 = Workbook()
-            self.ws2 = self.wb2.create_sheet(title="План работ")
+            self.ws2 = self.wb2.active
+            self.ws2.title = "План работ"
 
             insert_index = self.data_well.insert_index2 + 2
 
@@ -2747,7 +2752,7 @@ class SaveInExcel(MyWindow):
                     cell = ws2.cell(row=i, column=j)
                     cell.number_format = 'General'
                     if 'инв. №' in str(work_list[i - 1][j - 1]).lower():
-                        ws2.cell(row=i, column=j + 1).number_format = 'Text'
+                        ws2.cell(row=i, column=j + 1).number_format = '@'
                     cell.value = str(work_list[i - 1][j - 1])
             elif 'по H2S' in work_list[i - 1] or 'по H2S :' in work_list[i - 1] or \
                     'по Pпл :' in work_list[i - 1] or 'по Pпл' in work_list[i - 1] or \

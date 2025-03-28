@@ -175,8 +175,10 @@ class CorrectPlanWindow(WindowUnion):
                 self.data_well.region)
 
             data_list.pause = False
-            self.close()
-            self.close_modal_forcefully()
+            if well_number != '' and well_area != '':
+                self.close()
+                self.close_modal_forcefully()
+
 
     def add_work_excel(self, ws2, work_list, ind_ins):
         from data_list import ProtectedIsDigit

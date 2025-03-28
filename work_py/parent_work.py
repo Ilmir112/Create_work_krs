@@ -1366,7 +1366,7 @@ class WindowUnion(MyMainWindow):
         self.data_well.problem_with_ek_depth = result[ind][13]
         self.data_well.problem_with_ek_diameter = result[ind][14]
         try:
-            self.data_well.head_column = ProtectedIsDigit(ind[ind][16])
+            self.data_well.head_column = ProtectedIsDigit(result[ind][16])
         except Exception:
             print('отсутствуют данные по голове хвостовика')
         self.data_well.dict_perforation_short = json.loads(result[ind][2])
