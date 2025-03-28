@@ -1172,10 +1172,10 @@ class WellHistoryData(FindIndexPZ):
         if self.max_admissible_pressure.get_value in ['', 0, '0']:
             self.check_data_in_pz.append('не указано максимально допустимое давление на устье\n')
         if float(self.max_admissible_pressure.get_value) < 30:
-            QMessageBox.warning(None, 'допустимое давление ', 'максимально допустимое давление на устье слишком маленькое')
+            QMessageBox.warning(None, 'допустимое давление ',
+                                'максимально допустимое давление на устье слишком маленькое')
             self.check_data_in_pz.append(f'максимально допустимое давление на устье слишком маленькое'
                                          f' {self.max_admissible_pressure}\n')
-
 
 
 class WellCondition(FindIndexPZ):
@@ -1961,12 +1961,14 @@ class WellPerforation(FindIndexPZ):
                             round(0, 1))
                     if 'давление' in self.dict_perforation[plast]:
                         self.dict_perforation[plast]['давление'] = [max(self.dict_perforation[plast]['давление'])]
-                    asadawdawd = row[col_date_pressure_index]
+
                     if row[col_date_pressure_index]:
                         self.dict_perforation.setdefault(
                             plast, {}).setdefault('замер', []).append(row[col_date_pressure_index])
-                    if 'замер' not in list(self.dict_perforation.keys()):
-                        self.dict_perforation[plast]['замер'] = []
+                    else:
+                        self.dict_perforation.setdefault(
+                            plast, {}).setdefault('замер', []).append(0)
+
                     self.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость',
                                                                            []).append(
                         calculation_fluid_work(self, row[col_vert_index], row[col_pressure_index]))

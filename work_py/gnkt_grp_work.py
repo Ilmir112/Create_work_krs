@@ -707,7 +707,7 @@ class GnktModel(WindowUnion):
                       f' ОТСУТСТВИЯ ДАВЛЕНИЯ '
                       f'ПРОДАВКИ ПРИ СКО, РАБОТЫ ПРОИЗВОДИМ БЕЗ РЕАГИРОВАНИЯ.СОСТАВИТЬ АКТ)',
                       None, None, None, None, None, None, None,
-                      'Мастер ГНКТ, состав бригады', 3.06],
+                      'Мастер ГНКТ, состав бригады', 2.16],
                      ['разрядку скважины для извлечения продуктов',
                       21,
                       'Произвести разрядку скважины для извлечения продуктов реакции кислоты в объёме не менее объёма '
@@ -733,7 +733,14 @@ class GnktModel(WindowUnion):
                       None, None, None, None, None, None, None,
                       'Мастер ГНКТ, состав бригады, представитель Заказчика', 1.33],
                      ]
+        if self.data_well.region == 'ТГМ' and acid_edit == 'HF':
+            work_list[2] = [None, 20,
+                      'без реагирования',
+                      None, None, None, None, None, None, None,
+                      'Мастер ГНКТ, состав бригады', None]
+
         opz.extend(work_list)
+
         return opz
 
     def check_volume_well(self, data_well):
@@ -1185,11 +1192,17 @@ class GnktModel(WindowUnion):
                         else:
                             vertikal_1 = sorted(self.data_well.dict_perforation[plast]['вертикаль'])[0]
                     pressure_1 = ''
-                    if 'давление' in list(self.data_well.dict_perforation.keys()):
-                        pressure_1 = self.data_well.dict_perforation[plast]['давление'][0]
+                    if 'давление' in list(self.data_well.dict_perforation[plast].keys()):
+                        pressure_1 = list(filter(lambda  x: x != 0, self.data_well.dict_perforation[plast]['давление']))
+                        if len(pressure_1) != 0:
+                            pressure_1 = pressure_1[0]
                     zamer_1 = ''
-                    if 'замер' in list(self.data_well.dict_perforation.keys()):
-                        zamer_1 = self.data_well.dict_perforation[plast]['замер'][0]
+                    if 'замер' in list(self.data_well.dict_perforation[plast].keys()):
+                        asdawda = self.data_well.dict_perforation[plast]['замер']
+                        if len(self.data_well.dict_perforation[plast]['замер']) != 0:
+                            zamer_1 = list(filter(lambda x: x != 0, self.data_well.dict_perforation[plast]['замер']))
+                            if len(zamer_1) != 0:
+                                zamer_1 = zamer_1[0]
 
                     pvr_list.append(
                         [None, None, None, None, None, None, None, None, None, None, None, None, plast, None, vertikal_1,
