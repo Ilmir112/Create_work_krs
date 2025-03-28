@@ -161,6 +161,7 @@ class EmergencyPo(WindowUnion):
         self.populate_row(self.insert_index, raid_list, self.table_widget)
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
 
 
     def emergency_sticking(self, emergence_type, nkt_key, emergency_bottom_line, bottom_line):

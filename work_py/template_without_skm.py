@@ -676,6 +676,7 @@ class TemplateWithoutSkm(WindowUnion):
 
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
@@ -927,7 +928,7 @@ class TemplateWithoutSkm(WindowUnion):
                     self.raid_window = DrillWindow(self.table_widget, self.insert_index)
                     # self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
-                    self.pause_app()
+                    
                     drill_work_list = self.raid_window.add_work()
                     data_list.pause = True
 
@@ -943,7 +944,7 @@ class TemplateWithoutSkm(WindowUnion):
                     self.raid_window = DrillWindow(self.table_widget, self.insert_index)
                     # self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
-                    self.pause_app()
+                    
                     drill_work_list = self.raid_window.add_work()
                     data_list.pause = True
 

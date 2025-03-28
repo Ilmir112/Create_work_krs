@@ -163,6 +163,7 @@ class KompressWindow(WindowUnion):
         self.populate_row(self.insert_index, work_list, self.table_widget)
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
 
     def kompress(self, plast_combo, kompress_TypeCombo, khvost_edit, kompress_volume, count_muft,
                  depth_gauge_combo, dictance_without_murt):

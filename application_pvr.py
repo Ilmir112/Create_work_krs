@@ -328,6 +328,7 @@ class PvrApplication(WindowUnion):
 
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
         self.ws_pvr.print_area = f'B1:AP{114}'
 
         filenames = f'{self.data_well.well_number.get_value} {self.data_well.well_area.get_value} ПВР {data_list.current_date.date()}.xlsx'

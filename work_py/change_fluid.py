@@ -295,6 +295,7 @@ class Change_fluid_Window(WindowUnion):
         self.populate_row(self.insert_index, work_list, self.table_widget)
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа

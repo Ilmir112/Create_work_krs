@@ -206,7 +206,9 @@ class PerforationCorrect(WindowUnion):
         plast_raid = []
         plast_project = []
         plast_del = []
-
+        dict_perforation_project = {}
+        dict_perforation_short = {}
+        dict_perforation = {}
         for index, plast_dict in plast_all.items():
             plast = plast_dict[0].text()
             roof = plast_dict[1].text()
@@ -243,32 +245,45 @@ class PerforationCorrect(WindowUnion):
                 if plast in self.dict_perforation_project:
                     self.dict_perforation_project.setdefault(
                         plast, {}).setdefault('интервал', []).append([float(roof), float(sole)])
-
-
-
-
             else:
                 if plast in self.data_well.dict_perforation:
-                    if all([oktl is True for oktl in plast_oktl]):
-                        self.data_well.dict_perforation_short[plast]['отключение'] = True
-                        self.data_well.dict_perforation[plast]["отключение"] = True
-                    else:
-                        self.data_well.dict_perforation_short[plast]['отключение'] = False
-                        self.data_well.dict_perforation[plast]['отключение'] = False
-                    if all([oktl is True for oktl in plast_templ]):
-                        self.data_well.dict_perforation[plast]['Прошаблонировано'] = True
-                    else:
-                        self.data_well.dict_perforation[plast]['Прошаблонировано'] = False
-                    if all([oktl is True for oktl in plast_raid]):
-                        self.data_well.dict_perforation[plast]['отрайбировано'] = True
-                    else:
-                        self.data_well.dict_perforation[plast]['отрайбировано'] = False
 
-            if len(plast_del) > 0:
-                
-                for plast in list(self.data_well.dict_perforation.keys()):
-                    if plast in plast_del:
-                        self.data_well.dict_perforation.pop(plast)
+                    if all([oktl is True for oktl in plast_oktl]):
+                        dict_perforation_short.setdefault(plast, {}).setdefault('отключение', True)
+                        dict_perforation.setdefault(plast, {}).setdefault('отключение', True)
+                    else:
+                        dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
+                        dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
+                    if all([oktl is True for oktl in plast_templ]):
+                        dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', True)
+                        dict_perforation_short.setdefault(plast, {}).setdefault('Прошаблонировано', True)
+                    else:
+                        dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+                        dict_perforation_short.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+                    if all([oktl is True for oktl in plast_raid]):
+                        dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', True)
+                    else:
+                        dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', True)
+
+                    dict_perforation.setdefault(
+                        plast, {}).setdefault('интервал', []).append([float(roof), float(sole)])
+                    dict_perforation_short.setdefault(
+                        plast, {}).setdefault('интервал', []).append([float(roof), float(sole)])
+
+        for plast in list(self.data_well.dict_perforation.keys()):
+            self.data_well.dict_perforation[plast]['отключение'] = dict_perforation[plast]["отключение"]
+            self.data_well.dict_perforation_short[plast]['отключение'] = dict_perforation_short[plast]["отключение"]
+            self.data_well.dict_perforation[plast]['интервал'] = dict_perforation[plast]["интервал"]
+            self.data_well.dict_perforation_short[plast]['интервал'] = dict_perforation_short[plast]["интервал"]
+            self.data_well.dict_perforation[plast]['Прошаблонировано'] = dict_perforation[plast]["Прошаблонировано"]
+            self.data_well.dict_perforation_short[plast]['Прошаблонировано'] = dict_perforation_short[plast]["Прошаблонировано"]
+            self.data_well.dict_perforation[plast]['отрайбировано'] = dict_perforation[plast]["отрайбировано"]
+            # self.data_well.dict_perforation_short[plast]['отрайбировано'] = dict_perforation_short[plast]["отрайбировано"]
+
+        if len(plast_del) > 0:
+            for plast in list(self.data_well.dict_perforation.keys()):
+                if plast in plast_del:
+                    self.data_well.dict_perforation.pop(plast)
 
 
         definition_plast_work(self)
@@ -282,12 +297,14 @@ class PerforationCorrect(WindowUnion):
 
                 data_list.pause = False
                 self.close()
+                self.close_modal_forcefully()
                 return
             else:
 
                 return
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
 
 
 if __name__ == "__main__":

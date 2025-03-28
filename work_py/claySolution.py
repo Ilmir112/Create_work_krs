@@ -181,6 +181,7 @@ class ClayWindow(WindowUnion):
             self.populate_row(self.insert_index, work_list, self.table_widget)
             data_list.pause = False
             self.close()
+            self.close_modal_forcefully()
 
     def clay_solution_q(self, current_bottom_edit, volume_clay_edit):
         if self.data_well.column_additional is True and \

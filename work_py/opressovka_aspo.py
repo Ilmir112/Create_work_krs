@@ -1,17 +1,15 @@
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 
 import data_list
-from main import MyMainWindow
-from PyQt5.QtWidgets import QMessageBox, QInputDialog, QMainWindow, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
+from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
     QTabWidget, QPushButton
 
-from work_py.alone_oreration import privyazka_nkt
-from .opressovka import OpressovkaEK, TabPageSo
-from .parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
-from .rationingKRS import descentNKT_norm, lifting_nkt_norm
+from work_py.opressovka import OpressovkaEK, TabPageSo
+from work_py.parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm
 
 
-class TabPageSo_aspo(TabPageUnion):
+class TabPageSoAspo(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -69,7 +67,7 @@ class TabPageSo_aspo(TabPageUnion):
 class TabWidget(TabWidgetUnion):
     def __init__(self, parent=None):
         super().__init__()
-        self.addTab(TabPageSo(parent), 'Очистка колонны с пакером')
+        self.addTab(TabPageSoAspo(parent), 'Очистка колонны с пакером')
 
 
 class PakerAspo(WindowUnion):
@@ -109,6 +107,7 @@ class PakerAspo(WindowUnion):
         self.populate_row(self.insert_index, work_list, self.table_widget)
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
 
     def closeEvent(self, event):
                 # Закрываем основное окно при закрытии окна входа

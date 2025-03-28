@@ -380,6 +380,7 @@ class GisApplication(MyMainWindow):
 
         pause = False
         self.close()
+        self.close_modal_forcefully()
 
         self.ws_pvr.print_area = f'B1:AP{85}'
 

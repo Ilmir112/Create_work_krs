@@ -217,6 +217,7 @@ class PerforationCorrectGnktFrez(WindowUnion):
 
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
         return dict_ports
 
 

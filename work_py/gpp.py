@@ -107,6 +107,7 @@ class GppWindow(WindowUnion):
             self.populate_row(self.insert_index, work_list, self.table_widget)
             data_list.pause = False
             self.close()
+            self.close_modal_forcefully()
 
     def grp_gpp_work(self, gpp_depth, current_depth, diameter_paker, gis_otz_after_true_quest):
         schema_grp = ''

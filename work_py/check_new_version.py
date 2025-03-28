@@ -91,6 +91,7 @@ class UpdateChecker(QWidget):
     def def_complete_prog(self):
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
 
     def start_update(self):
         self.update_button.setEnabled(False)

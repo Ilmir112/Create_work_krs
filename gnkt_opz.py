@@ -273,6 +273,7 @@ class GnktOpz(GnktModel):
 
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
 
     def add_string(self):
 

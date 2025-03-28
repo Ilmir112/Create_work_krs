@@ -1028,6 +1028,7 @@ class AcidPakerWindow(WindowUnion):
             self.populate_row(self.insert_index, work_template_list, self.table_widget)
             data_list.pause = False
             self.close()
+            self.close_modal_forcefully()
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()

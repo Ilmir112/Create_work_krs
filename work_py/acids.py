@@ -157,6 +157,7 @@ class GonsWindow(WindowUnion):
         self.calculate_chemistry(acid_edit, acid_volume_edit)
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
         return work_list
 
     def closeEvent(self, event):

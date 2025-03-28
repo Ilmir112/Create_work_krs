@@ -272,6 +272,7 @@ class PakerIzvlek(WindowUnion):
         self.populate_row(self.insert_index, raid_list, self.table_widget)
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
 
     def rir_izvelPaker(self, paker_depth_line, pero_diameter_line, paker_type_combo, sand_question, roof_sand_edit):
         from work_py.template_work import TemplateKrs

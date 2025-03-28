@@ -172,6 +172,7 @@ class PeroWindow(WindowUnion):
         self.populate_row(self.insert_index, work_list, self.table_widget)
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
 
     def pero(self, current_edit, pero_combo_combo, solvent_question_combo, solvent_volume_edit):
         from work_py.rir import RirWindow

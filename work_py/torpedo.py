@@ -71,6 +71,7 @@ class TorpedoWindow(WindowUnion):
             self.data_well.diameter_doloto_ek = data_list.ProtectedIsDigit(self.diameter_doloto_ek)
             data_list.pause = False
             self.close()
+        self.close_modal_forcefully()
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа

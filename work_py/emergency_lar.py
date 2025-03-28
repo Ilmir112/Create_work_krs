@@ -204,6 +204,7 @@ class EmergencyLarWork(WindowUnion):
             self.populate_row(self.insert_index, raid_list, self.table_widget)
             data_list.pause = False
             self.close()
+            self.close_modal_forcefully()
 
     def emergence_sbt(self):
         bp_str = '+ БРП '

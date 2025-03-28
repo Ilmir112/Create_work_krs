@@ -155,7 +155,7 @@ class GnktOsvWindow(GnktModel):
         if self.work_plan == 'gnkt_opz':
 
             self.data_gnkt_opz = GnktOpz(self.table_widget, self.data_gnkt.fluid_edit, self.data_well)
-            self.data_gnkt_opz.show()
+            self.set_modal_window(self.data_gnkt_opz)
             data_list.pause = True
             self.pause_app()
 

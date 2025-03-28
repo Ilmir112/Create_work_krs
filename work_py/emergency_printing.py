@@ -189,6 +189,7 @@ class EmergencyPrintWork(WindowUnion):
         self.populate_row(self.insert_index, raid_list, self.table_widget)
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
 
     def emergencyNKT(self, print_diameter_line, nkt_str_combo, print_type_combo, nkt_key,
                      emergency_bottom_line):

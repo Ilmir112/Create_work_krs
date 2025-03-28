@@ -2,7 +2,7 @@ import psutil
 
 import data_list
 
-from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox, QGridLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox, QGridLayout, QDialog
 from PyQt5.QtCore import Qt
 
 from data_base.config_base import UserService, connection_to_database, \
@@ -10,7 +10,7 @@ from data_base.config_base import UserService, connection_to_database, \
 from decrypt import decrypt
 
 
-class LoginWindow(QWidget):
+class LoginWindow(QDialog):
     def __init__(self, ):
         super().__init__()
         self.register_window = None
@@ -86,6 +86,7 @@ class LoginWindow(QWidget):
 
             data_list.pause = False
             self.close()
+
         else:
             QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
             data_list.pause = True
@@ -105,7 +106,7 @@ class LoginWindow(QWidget):
         self.register_window.show()
 
 
-class RegisterWindow(QWidget):
+class RegisterWindow(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Окно регистрация')

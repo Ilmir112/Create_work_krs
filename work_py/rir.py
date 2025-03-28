@@ -805,7 +805,7 @@ class RirWindow(WindowUnion):
                 f'В интервале {roof_rir_edit}-30м заполнить ствол скважины тех. жидкостью уд.в.'
                 f' {self.data_well.fluid_work} в объеме '
                 f'{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии '
-                f'{well_volume(self, roof_rir_edit) * 11}гр с удельной дозировкой 11гр/м3 ',
+                f'{round(well_volume(self, roof_rir_edit) * 11, 1)}гр с удельной дозировкой 11гр/м3 ',
                 None, None, None, None, None, None, None,
                 'мастер КРС', 0.67])
         RirWindow.perf_new(self, roof_rir_edit, sole_rir_edit)
@@ -1355,6 +1355,7 @@ class RirWindow(WindowUnion):
         self.populate_row(self.insert_index, work_list, self.table_widget)
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
 
     def calc_buffer(self, roof, sole, dict_nkt):
         volume_in_nkt = round(100 * volume_vn_nkt(dict_nkt, roof, sole) / 1000, 1)

@@ -19,7 +19,7 @@ from io import BytesIO
 from openpyxl.reader.excel import load_workbook
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
     QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog, QTabWidget, QTableWidgetItem, \
-    QSplashScreen
+    QSplashScreen, QDialog, QVBoxLayout
 from PyQt5 import QtCore, QtWidgets
 
 from datetime import datetime
@@ -33,7 +33,6 @@ from log_files.log import logger, QPlainTextEditLogger
 from openpyxl.drawing.image import Image
 from PyQt5.QtCore import QThread, pyqtSlot, Qt, QObject, pyqtSignal,  QTimer
 from PyQt5.QtGui import QPixmap
-
 
 
 class UncaughtExceptions(QObject):
@@ -97,7 +96,17 @@ class ExcelWorker(QThread):
         # Завершение работы потока
         self.finished.emit()
 
+class ModalDialog(QDialog):
+    def __init__(self, window, parent=None):
+        super().__init__(parent)
+        # self.setWindowTitle("окно")
+        # self.setGeometry(150, 150, 300, 200)
 
+        layout = QVBoxLayout()
+        # label = QLabel("Это модальное окно", self)
+        layout.addWidget(window)
+
+        self.setLayout(layout)
 class MyMainWindow(QMainWindow):
 
     def __init__(self):
@@ -110,6 +119,8 @@ class MyMainWindow(QMainWindow):
         self.perforation_correct_window2 = None
         self.work_plan = None
         self.gnkt_data = None
+
+
 
     @staticmethod
     def close_process():
@@ -181,7 +192,7 @@ class MyMainWindow(QMainWindow):
             self.operation_window = window(self.data_well, self.table_widget)
             self.operation_window.move(100, 100)
             self.set_modal_window(self.operation_window)
-            self.pause_app()
+
 
             self.operation_window = None
         else:
@@ -198,11 +209,14 @@ class MyMainWindow(QMainWindow):
         img.anchor = coordinate
         ws.add_image(img, coordinate)
 
-    @staticmethod
-    def set_modal_window(window):
-        # Установка модальности окна
-        window.setWindowModality(Qt.ApplicationModal)
-        window.show()
+    def set_modal_window(self, window):
+        self.data_well.modal_dialog = ModalDialog(window)
+        self.data_well.modal_dialog.setModal(True)  # Установка модальности
+        self.data_well.modal_dialog.show()
+
+    def close_modal_forcefully(self):
+        if self.data_well.modal_dialog:
+            self.data_well.modal_dialog.close()  # Закрытие модального окна
 
     def read_excel_file(self):
         from find import FindIndexPZ
@@ -258,7 +272,6 @@ class MyMainWindow(QMainWindow):
                                                         self.data_well.work_plan)
                         # self.rir_window.setGeometry(200, 400, 100, 200)
                         self.rir_window.show()
-                        self.pause_app()
                         data_list.pause = True
 
                         return
@@ -291,7 +304,7 @@ class MyMainWindow(QMainWindow):
 
             WellData.read_well(self.data_well, self.data_well.cat_well_max.get_value,
                                self.data_well.data_pvr_min.get_value)
-            # Сохранение изменений
+
 
             WellPerforation.read_well(self.data_well, self.data_well.data_pvr_min.get_value,
                                       self.data_well.data_pvr_max.get_value + 1)
@@ -302,13 +315,14 @@ class MyMainWindow(QMainWindow):
 
             # self.set_modal_window(self.data_list.pdata_window)
 
-            # self.pause_app()
+            
             # data_list.pause = True
 
             if self.data_well.leakiness is True:
                 if WellCondition.leakage_window is None:
                     WellCondition.leakage_window = LeakageWindow(self.data_well)
                     WellCondition.leakage_window.setWindowTitle("Геофизические исследования")
+                    self.set_modal_window(WellCondition.leakage_window)
                     # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
                     WellCondition.leakage_window.show()
                     # self.data_well.dict_leakiness = WellCondition.leakage_window.add_work()
@@ -409,7 +423,7 @@ class MyMainWindow(QMainWindow):
 
                 except FileNotFoundError as f:
                     QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
-                    self.pause_app()
+                    return
 
                 if self.work_plan in ['krs', 'dop_plan']:
                     self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
@@ -419,7 +433,7 @@ class MyMainWindow(QMainWindow):
                         self.set_modal_window(self.rir_window)
 
                         data_list.pause = True
-                        self.pause_app()
+                        
                 elif self.work_plan in ['gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz']:
 
                     self.gnkt_data = GnktOsvWindow(self.ws,
@@ -443,6 +457,7 @@ class MyMainWindow(QMainWindow):
             if self.work_plan == 'plan_change':
                 self.data_well.work_plan = self.work_plan
                 self.rir_window = CorrectPlanWindow(self.data_well, self.table_widget)
+
             elif self.work_plan == 'dop_plan_in_base':
                 self.data_well.work_plan = self.work_plan
                 self.rir_window = DopPlanWindow(self.data_well, self.table_widget)
@@ -450,13 +465,13 @@ class MyMainWindow(QMainWindow):
             self.rir_window.setGeometry(200, 400, 800, 200)
             self.set_modal_window(self.rir_window)
             data_list.pause = True
-            self.pause_app()
+            
 
             self.ws = insert_data_new_excel_file(self, data_list.data, data_list.row_heights, data_list.col_width,
                                                  data_list.boundaries_dict)
 
             self.copy_pz(self.ws, self.table_widget, self.work_plan)
-        self.pause_app()
+        
         data_list.pause = True
         self.rir_window = None
 
@@ -853,18 +868,26 @@ class MyMainWindow(QMainWindow):
                     if item is not None and item.text() != "":
                         row_value_empty = False  # Если хотя бы одна ячейка не пустая, снимаем флаг
                         break
+
                 # Если все ячейки в строке пустые, скрываем строку
                 if row_value_empty:
                     table_widget.setRowHidden(row, True)
                 else:
                     table_widget.setRowHidden(row, False)
 
+            if len(self.data_well.check_data_in_pz) != 0 and self.data_well.work_plan in ['krs', 'prs']:
+                check_str = ''
+                for ind, check_data in enumerate(self.data_well.check_data_in_pz):
+                    if check_data not in check_str:
+                        check_str += f'{ind + 1}. {check_data} \n'
+                self.show_info_message(self.data_well, check_str)
+
             if work_plan in ['krs', 'prs']:
                 self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.data_well)
                 self.set_modal_window(self.work_window)
                 self.ws3 = self.wb.create_sheet("Расчет поглотителя сероводорода", 1)
                 data_list.pause = True
-                self.pause_app()
+                
                 data_list.pause = True
                 self.work_window = None
 
@@ -967,7 +990,7 @@ class MyWindow(MyMainWindow):
             splash.show()
 
             # Задержка на 5 секунд
-            QTimer.singleShot(5000, splash.close)
+            QTimer.singleShot(1000, splash.close)
 
             data_list.connect_in_base, self.db = connect_to_database(decrypt("DB_NAME_USER"))
 
@@ -975,7 +998,7 @@ class MyWindow(MyMainWindow):
             self.login_window.setWindowModality(Qt.ApplicationModal)
 
             self.login_window.show()
-            self.pause_app()
+            
             data_list.pause = False
         except Exception as e:
             QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА',
@@ -1393,7 +1416,6 @@ class MyWindow(MyMainWindow):
             self.rir_window = PvrApplication(self.table_pvr, self.data_well)
             self.set_modal_window(self.rir_window)
 
-            self.pause_app()
             data_list.pause = False
 
     def open_gis_application(self, fname):
@@ -1407,9 +1429,8 @@ class MyWindow(MyMainWindow):
             read_pz = CreatePZ(self.data_well, self.ws, self)
             self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
             self.rir_window = GisApplication(self.table_pvr, self.data_well)
-            self.rir_window.show()
+            self.set_modal_window(self.rir_window.show())
 
-            self.pause_app()
             data_list.pause = False
             # except:
             #     pass
@@ -2105,6 +2126,7 @@ class MyWindow(MyMainWindow):
 
     def descent_gno_action(self):
         from krs import GnoWindow
+
         self.work_window = GnoWindow(self.data_well.insert_index, self.table_widget, self.data_well)
         self.set_modal_window(self.work_window)
 
@@ -2176,7 +2198,6 @@ class MyWindow(MyMainWindow):
 
             # print(f'словарь нарушений {self.data_well.dict_leakiness}')
             data_list.pause = True
-            self.pause_app()
             self.data_well.dict_leakiness = self.leakage_window.add_work()
             self.data_well.data_list[-1][5] = json.dumps(self.data_well.dict_leakiness, default=str,
                                                          ensure_ascii=False, indent=4)
@@ -2193,7 +2214,6 @@ class MyWindow(MyMainWindow):
             self.work_window = DataWindow(self.data_well)
             self.set_modal_window(self.work_window)
 
-            self.pause_app()
             data_list.pause = True
             self.work_window = None
 
@@ -2475,8 +2495,7 @@ class SaveInExcel(MyWindow):
 
         if not self.table_widget is None:
             self.wb2 = Workbook()
-            self.ws2 = self.wb2.get_sheet_by_name('Sheet')
-            self.ws2.title = "План работ"
+            self.ws2 = self.wb2.create_sheet(title="План работ")
 
             insert_index = self.data_well.insert_index2 + 2
 

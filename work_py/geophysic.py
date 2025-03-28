@@ -247,6 +247,7 @@ class GeophysicWindow(WindowUnion):
             data_list.pause = False
 
         self.close()
+        self.close_modal_forcefully()
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()

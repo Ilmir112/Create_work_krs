@@ -222,13 +222,6 @@ class GnoWindow(WindowUnion):
     def add_work(self):
         from work_py.advanted_file import definition_plast_work
 
-        if len(self.data_well.check_data_in_pz) != 0 and self.data_well.work_plan in ['krs', 'prs']:
-            check_str = ''
-            for ind, check_data in enumerate(self.data_well.check_data_in_pz):
-                if check_data not in check_str:
-                    check_str += f'{ind + 1}. {check_data} \n'
-            self.show_info_message(self.data_well, check_str)
-
         self.current_widget = self.tab_widget.currentWidget()
         try:
             self.lift_key = self.current_widget.gno_combo.currentText()
@@ -243,8 +236,6 @@ class GnoWindow(WindowUnion):
                                    1)
             self.data_well.fluid_work, self.data_well.fluid_work_short = \
                 self.calc_work_fluid(self.fluid)
-
-
 
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
@@ -301,6 +292,8 @@ class GnoWindow(WindowUnion):
 
                 data_list.pause = False
                 self.close()
+                self.close_modal_forcefully()
+
 
 
 class GnoParent(ABC):

@@ -154,6 +154,7 @@ class OpressovkaEK(WindowUnion):
         self.populate_row(self.insert_index, work_list, self.table_widget)
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
 
     # Добавление строк с опрессовкой ЭК
     def select_combo_paker(self, paker_khost, paker_depth, paker_diameter):

@@ -38,8 +38,8 @@ class WorkWithGnkt(GnktModel):
             self.perforation_correct_window2 = PerforationCorrectGnktFrez(self.data_well)
             self.perforation_correct_window2.setWindowTitle("Сверка данных по муфтам")
             # self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
-            self.perforation_correct_window2.show()
-            self.pause_app()
+            self.set_modal_window(self.perforation_correct_window2)
+
             data_list.pause = True
             self.dict_ports = self.perforation_correct_window2.dict_ports
 

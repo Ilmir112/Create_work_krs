@@ -264,6 +264,7 @@ class GnoDescentWindow(WindowUnion):
             self.populate_row(self.insert_index, work_list, self.table_widget)
             data_list.pause = False
             self.close()
+            self.close_modal_forcefully()
 
     def on_execute_strategy(self, index):
         strategy = self.lift_dict_strategies.get(index)

@@ -593,6 +593,7 @@ class GnktModel(WindowUnion):
 
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
         # return work_list
 
     def select_text_acid(self, plast_combo, roof, sole, acid_edit, acid_proc_edit, acid_volume_edit):
@@ -749,7 +750,7 @@ class GnktModel(WindowUnion):
                                                        'Введите корректный объем',
                                                        data_well.well_volume_in_pz[0], 1,
                                                        80, 1)
-            well_volume_dp = well_volume(self, data_well.current_bottom) - well_volume_ek
+            well_volume_dp = round(well_volume(self, data_well.current_bottom) - well_volume_ek, 1)
         else:
             well_volume_dp = well_volume(self, data_well.current_bottom) - well_volume_ek
         return well_volume_ek, well_volume_dp
@@ -1183,9 +1184,12 @@ class GnktModel(WindowUnion):
                             vertikal_1 = sorted(self.data_well.dict_perforation[plast]['вертикаль'])[count_interval-1]
                         else:
                             vertikal_1 = sorted(self.data_well.dict_perforation[plast]['вертикаль'])[0]
-
-                    pressure_1 = self.data_well.dict_perforation[plast]['давление'][0]
-                    zamer_1 = self.data_well.dict_perforation[plast]['замер'][0]
+                    pressure_1 = ''
+                    if 'давление' in list(self.data_well.dict_perforation.keys()):
+                        pressure_1 = self.data_well.dict_perforation[plast]['давление'][0]
+                    zamer_1 = ''
+                    if 'замер' in list(self.data_well.dict_perforation.keys()):
+                        zamer_1 = self.data_well.dict_perforation[plast]['замер'][0]
 
                     pvr_list.append(
                         [None, None, None, None, None, None, None, None, None, None, None, None, plast, None, vertikal_1,

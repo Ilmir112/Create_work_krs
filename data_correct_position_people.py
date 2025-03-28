@@ -250,6 +250,7 @@ class CorrectSignaturesWindow(QMainWindow):
                 json.dump(self.podpis_dict, json_file, indent=4, ensure_ascii=False)
 
             self.close()
+        self.close_modal_forcefully()
 
 
 if __name__ == "__main__":

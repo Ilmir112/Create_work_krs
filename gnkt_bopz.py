@@ -240,6 +240,7 @@ class GnktBopz(GnktModel):
 
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
         return work_list
 
     def gnkt_work(self, data_gnkt):

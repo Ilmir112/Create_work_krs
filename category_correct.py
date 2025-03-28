@@ -329,6 +329,7 @@ class CategoryWindow(WindowUnion):
             self.data_well.category_pvo = 1
             self.data_well.bvo = True
         self.close()
+        self.close_modal_forcefully()
 
     def if_none(self, string):
         # метод для проверки и преобразования введенных значений

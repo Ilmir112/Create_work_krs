@@ -360,10 +360,12 @@ class DrillWindow(WindowUnion):
             data_list.pause = False
 
             self.close()
+            self.close_modal_forcefully()
         except Exception:
 
             data_list.pause = False
             self.close()
+            self.close_modal_forcefully()
             return drill_list
 
 

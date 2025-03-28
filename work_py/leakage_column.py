@@ -187,6 +187,7 @@ class LeakageWindow(WindowUnion):
 
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
         return dict_leakiness
 
     def del_row_table(self):

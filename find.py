@@ -33,6 +33,7 @@ class FindIndexPZ(MyMainWindow):
         self.number_dp = 0
         self.skm_interval = []
         self.head_column = 0
+        self.modal_dialog = None
         self.image_loader = None
         self.water_density = ProtectedIsDigit(1.18)
         self.result_pressure_date = None
@@ -202,7 +203,7 @@ class FindIndexPZ(MyMainWindow):
         self.category_pressure = None
         self.skm_interval = []
         self.leakiness = False
-        self.check_data_in_pz = []
+
         self.emergency_well = False
         self.problem_with_ek = False
         self.gips_in_well = False
@@ -213,13 +214,14 @@ class FindIndexPZ(MyMainWindow):
         self.value_h2s_mg = []
         self.value_h2s_mg_m3 = []
         self.dict_category = {}
-        self.check_data_in_pz = []
+
         self.plast_project = []
         self.bcu_level = False
         self.plast_work = []
         self.category_p_p = []
         self.image_data = []
-        self.check_data_in_pz = []
+        self.check_data_in_pz = ['Рассмотрев план заказ были выявлены следующие нарушения, '
+                                 'прошу дополнить и внести изменения:\n']
 
         self.gis_list = []
         self.index_row_pvr_list = []
@@ -235,7 +237,6 @@ class FindIndexPZ(MyMainWindow):
             self.read_pz()
         else:
             self.read_pz_prs()
-
 
     def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
         boundaries_dict = {}
@@ -270,6 +271,7 @@ class FindIndexPZ(MyMainWindow):
         # print(f'{ws.max_row, len(data_list.prow_heights)}dd')
         for index_row, row in enumerate(ws.iter_rows()):  # Копирование высоты строки
             ws.row_dimensions[index_row + 17].height = data_list.row_heights[index_row - 1]
+
     @staticmethod
     def check_text_in_row(text, row):
         return any([text.lower() in str(col).lower() for col in row])
@@ -288,7 +290,7 @@ class FindIndexPZ(MyMainWindow):
             self.ws.row_dimensions[row_ind].hidden = False
             if self.cat_well_min.get_value != 0:
                 coord_image = list(map(
-                    lambda x: int("".join([y for y in x if y.isdigit()])),  list(self.image_loader._images.keys())))
+                    lambda x: int("".join([y for y in x if y.isdigit()])), list(self.image_loader._images.keys())))
                 if self.data_x_max.get_value == 0 and row_ind in coord_image:
                     self.work_with_img(self.image_loader, row_ind)
 
@@ -331,14 +333,15 @@ class FindIndexPZ(MyMainWindow):
             elif 'ШТАНГИ' == str(row[1]).upper():
                 self.sucker_rod_ind = ProtectedIsDigit(row_ind + 1)
 
-            elif (self.check_text_in_row('Планируемый объём работ', row) or\
-                  self.check_text_in_row('Порядок работы', row)\
-                  or self.check_text_in_row('Ранее проведенные работ', row)) and\
+            elif (self.check_text_in_row('Планируемый объём работ', row) or \
+                  self.check_text_in_row('Планируемый объём работ', row) or \
+                  self.check_text_in_row('Порядок работы', row) \
+                  or self.check_text_in_row('Ранее проведенные работ', row)) and \
                     self.data_x_max.get_value == 0:
                 self.data_x_max = ProtectedIsDigit(row_ind)
                 if self.check_text_in_row('Ранее проведенные работ', row):
-                    self.data_x_max = ProtectedIsDigit(row_ind-2)
-            elif  any(['Должность' == str(col) for col in row]):
+                    self.data_x_max = ProtectedIsDigit(row_ind - 2)
+            elif any(['Должность' == str(col) for col in row]):
                 break
             elif any(['II. История эксплуатации скважины' in str(col) for col in row]):
                 self.data_pvr_max = ProtectedIsDigit(row_ind)
@@ -361,31 +364,31 @@ class FindIndexPZ(MyMainWindow):
         if self.data_x_max.get_value == 0:
             QMessageBox.warning(self, 'Ошибка', 'Не корректный файл excel, либо отсутствует строка с '
                                                 'текстом Порядок работ')
-            self.pause_app()
+            # self.pause_app()
             return
 
         if self.cat_well_max.get_value == 0:
             QMessageBox.warning(self, 'Ошибка', 'Не корректный файл excel, либо отсутствует строка с '
                                                 'текстом ПЛАН-ЗАКАЗ или ПЛАН-РАБОТ')
-            self.pause_app()
+            # self.pause_app()
             return
 
         if self.cat_well_min.get_value == 0:
             QMessageBox.warning(self, 'индекс начала копирования',
                                 'Программа не смогла определить строку начала копирования, нужно '
                                 'добавить "Категория скважины" в ПЗ для определения начала копирования')
-            self.pause_app()
+            # self.pause_app()
             return
         if self.data_well_max.get_value == 0:
             QMessageBox.warning(self, 'индекс окончания копирования',
                                 'Программа не смогла определить строку с IX. Мероприятия по предотвращению аварий '
                                 'нужно добавить "IX. Мероприятия по предотвращению аварии" в ПЗ')
-            self.pause_app()
+            # self.pause_app()
             return
         if self.data_well_min.get_value == 0:
             QMessageBox.warning(self, 'индекс начала строки после план заказ',
                                 'Программа не смогла найти начала строку с названием "План работ" или "план заказ"')
-            self.pause_app()
+            # self.pause_app()
             return
 
         if self.sucker_rod_none:
@@ -396,34 +399,34 @@ class FindIndexPZ(MyMainWindow):
                     self.sucker_rod_ind = ProtectedIsDigit(0)
                 else:
                     QMessageBox.information(self, 'ШТАНГИ', 'Нужно добавить "ШТАНГИ" в таблицу?')
-                    self.pause_app()
+                    # self.pause_app()
                     return
 
         if self.data_x_min.get_value == 0:
             QMessageBox.warning(self, 'индекс начала копирования ожидаемых показателей',
                                 'Программа не смогла определить строку начала копирования ожидаемых показателей')
-            self.pause_app()
+            # self.pause_app()
             return
 
         if self.data_pvr_max.get_value == 0:
             QMessageBox.warning(self, 'индекс историю',
                                 'Программа не смогла найти "II. История эксплуатации скважины"')
-            self.pause_app()
+            # self.pause_app()
             return
 
         if self.pipes_ind.get_value == 0:
             QMessageBox.warning(self, 'индекс начала строки с НКТ',
                                 'Программа не смогла найти строку с НКТ, необходимо проверить столбец В')
-            self.pause_app()
+            # self.pause_app()
             return
         if self.data_pvr_min.get_value == 0:
             QMessageBox.warning(self, 'индекс начала начала ПВР', 'Программа не смогла найти индекс начала ПВР')
-            self.pause_app()
+            # self.pause_app()
             return
         if self.data_fond_min.get_value == 0:
             QMessageBox.warning(self, 'индекс начала строки с таблицей фондового оборудования',
                                 'Программа не смогла найти строку с таблицей фондового оборудования')
-            self.pause_app()
+            # self.pause_app()
             return
         if self.type_kr == '':
             QMessageBox.information(self, 'Вид ГТМ', 'Приложение не смогло найти тип КР, '
@@ -432,7 +435,7 @@ class FindIndexPZ(MyMainWindow):
             QMessageBox.warning(
                 self, 'индекс копирования',
                 'Программа не смогла определить строку n\ III. Состояние скважины к началу ремонта ')
-            self.pause_app()
+            # self.pause_app()
             return
         if self.type_kr in ['', None]:
             self.check_data_in_pz.append('Не указан Вид и категория ремонта, его шифр\n')
@@ -449,7 +452,9 @@ class FindIndexPZ(MyMainWindow):
         if self.bcu_level is False:
             QMessageBox.warning(self, 'безопасный статический уровень',
                                 'В план заказе не указан безопасный статический уровень')
-            self.check_data_in_pz.append('Согласно правил НГВП В план заказе должен быть указан безопасный статический уровень')
+            self.check_data_in_pz.append('В план заказе не указан безопасный статический уровень\n'
+                                         'Нарушен п. 9.1.9 инструкции БНД по предупреждению '
+                                         'ГНВП №ПЗ-05 И-102089 ЮЛ-305 ')
 
     def read_pz_prs(self):
 
@@ -463,7 +468,8 @@ class FindIndexPZ(MyMainWindow):
             QMessageBox.warning(None, 'Ошибка', f'Ошибка в копировании изображений {e}')
         if any([self.ws.cell(row=i, column=1).value != None for i in range(1, 20)]):
             QMessageBox.warning(self, 'Ошибка', 'Для корректной работы приложения нужно сместить колонку "А" в право')
-            self.pause_app()
+            # self.pause_app()
+            return
 
         for row_ind, row in enumerate(self.ws.iter_rows(values_only=True, max_row=300, max_col=20)):
             self.ws.row_dimensions[row_ind].hidden = False
@@ -547,37 +553,37 @@ class FindIndexPZ(MyMainWindow):
         if self.data_x_max_prs.get_value == 0:
             QMessageBox.warning(self, 'Ошибка', 'Не корректный файл excel, либо отсутствует строка с '
                                                 'текстом "Запуск скважины из ремонта:"')
-            self.pause_app()
+            # self.pause_app()
             return
 
         if self.prs_copy_index.get_value == 0:
             QMessageBox.warning(self, 'Ошибка', 'Не корректный файл excel, либо отсутствует строка с '
                                                 'текстом "XI. ПЛАН РАБОТ"')
-            self.pause_app()
+            # self.pause_app()
             return
 
         if self.cat_well_max.get_value == 0:
             QMessageBox.warning(self, 'Ошибка', 'Не корректный файл excel, либо отсутствует строка с '
                                                 'текстом ПЛАН-ЗАКАЗ или ПЛАН-РАБОТ')
-            self.pause_app()
+            # self.pause_app()
             return
 
         if self.cat_well_min.get_value == 0:
             QMessageBox.warning(self, 'индекс начала копирования',
                                 'Программа не смогла определить строку начала копирования, нужно '
                                 'добавить "Категория скважины" в ПЗ для определения начала копирования')
-            self.pause_app()
+            # self.pause_app()
             return
         if self.data_well_max.get_value == 0:
             QMessageBox.warning(self, 'индекс окончания копирования',
                                 'Программа не смогла определить строку с IX. Мероприятия по предотвращению аварий '
                                 'нужно добавить "IX. Мероприятия по предотвращению аварии" в ПЗ')
-            self.pause_app()
+            # self.pause_app()
             return
         if self.data_well_min.get_value == 0:
             QMessageBox.warning(self, 'индекс начала строки после план заказ',
                                 'Программа не смогла найти начала строку с названием "План работ" или "план заказ"')
-            self.pause_app()
+            # self.pause_app()
             return
 
         if self.sucker_rod_none:
@@ -588,41 +594,41 @@ class FindIndexPZ(MyMainWindow):
                     self.sucker_rod_ind = ProtectedIsDigit(0)
                 else:
                     QMessageBox.information(self, 'ШТАНГИ', 'Нужно добавить "ШТАНГИ" в таблицу?')
-                    self.pause_app()
+                    # self.pause_app()
                     return
 
         if self.data_x_max.get_value == 0:
             QMessageBox.warning(self, 'индекс окончания копирования ожидаемых показателей',
                                 'Программа не смогла определить строку окончания копирования'
                                 ' ожидаемых показателей "ХI Планируемый объём работ"')
-            self.pause_app()
+            # self.pause_app()
             return
 
         if self.data_x_min.get_value == 0:
             QMessageBox.warning(self, 'индекс начала копирования ожидаемых показателей',
                                 'Программа не смогла определить строку начала копирования ожидаемых показателей')
-            self.pause_app()
+            # self.pause_app()
             return
 
         if self.data_pvr_max.get_value == 0:
             QMessageBox.warning(self, 'индекс историю',
                                 'Программа не смогла найти "II. История эксплуатации скважины"')
-            self.pause_app()
+            # self.pause_app()
             return
 
         if self.pipes_ind.get_value == 0:
             QMessageBox.warning(self, 'индекс начала строки с НКТ',
                                 'Программа не смогла найти строку с НКТ, необходимо проверить столбец В')
-            self.pause_app()
+            # self.pause_app()
             return
         if self.data_pvr_min.get_value == 0:
             QMessageBox.warning(self, 'индекс начала начала ПВР', 'Программа не смогла найти индекс начала ПВР')
-            self.pause_app()
+            # self.pause_app()
             return
         if self.data_fond_min.get_value == 0:
             QMessageBox.warning(self, 'индекс начала строки с таблицей фондового оборудования',
                                 'Программа не смогла найти строку с таблицей фондового оборудования')
-            self.pause_app()
+            # self.pause_app()
             return
         if self.type_kr == '':
             QMessageBox.information(self, 'Вид ГТМ', 'Приложение не смогло найти тип КР, '
@@ -631,7 +637,7 @@ class FindIndexPZ(MyMainWindow):
             QMessageBox.warning(
                 self, 'индекс копирования',
                 'Программа не смогла определить строку n\ III. Состояние скважины к началу ремонта ')
-            self.pause_app()
+            # self.pause_app()
             return
         if self.type_kr in ['', None]:
             self.check_data_in_pz.append('Не указан Вид и категория ремонта, его шифр\n')
@@ -797,13 +803,13 @@ class WellNkt(FindIndexPZ):
                         self.column_index_lenght_nkt = col_index
         if self.column_index_lenght_nkt is None:
             QMessageBox.warning(self, 'Ошибка', 'Ошибка в поиске индекса длины НКТ')
-            self.pause_app()
+            # self.pause_app()
             return
 
         if a_plan == 0:
             QMessageBox.warning(self, 'Индекс планового НКТ',
                                 'Программа не могла определить начала строку с ПЗ НКТ - план')
-            self.pause_app()
+            # self.pause_app()
             return
 
         for row_ind, row in enumerate(
@@ -868,7 +874,7 @@ class WellSuckerRod(FindIndexPZ):
                     QMessageBox.warning(self, 'Индекс планового НКТ',
                                         'Программа не могла определить начала строку с ПЗ'
                                         ' штанги - план')
-                    self.pause_app()
+                    # self.pause_app()
                     return
             # print(f'б {b_plan}')
 
@@ -887,7 +893,7 @@ class WellSuckerRod(FindIndexPZ):
                             except Exception:
                                 QMessageBox.warning(self, 'Ошибка', 'Ошибка в определении длины штанг до ремонта, '
                                                                     'скорректируйте план заказ')
-                                self.pause_app()
+                                # self.pause_app()
                                 break
 
                                 return
@@ -898,7 +904,7 @@ class WellSuckerRod(FindIndexPZ):
                             except Exception:
                                 QMessageBox.warning(self, 'Ошибка', 'Ошибка в определении длины штанг до ремонта, '
                                                                     'скорректируйте план заказ')
-                                self.pause_app()
+                                # self.pause_app()
                                 break
 
                                 return
@@ -1122,6 +1128,7 @@ class WellHistoryData(FindIndexPZ):
                         if type(self.date_commissioning.get_value) is datetime:
                             self.date_commissioning = ProtectedIsNonNone(self.date_commissioning.get_value.strftime(
                                 '%d.%m.%Y'))
+
                     elif 'ствол скважины' in str(row[col]).lower() and 'буров' in str(row[col]).lower():
                         self.bur_rastvor = row[col]
 
@@ -1129,6 +1136,7 @@ class WellHistoryData(FindIndexPZ):
                         self.max_expected_pressure = ProtectedIsDigit(row[col + 1])
                         self.max_expected_pressure = FindIndexPZ.definition_is_none(
                             self, self.max_expected_pressure, row_index + begin_index, col + 1, 1)
+
                     elif 'Результат предыдущей ' in str(value):
                         self.result_pressure = ProtectedIsDigit(row[col + 1])
                         self.result_pressure = self.definition_is_none(
@@ -1154,10 +1162,20 @@ class WellHistoryData(FindIndexPZ):
 
         if self.date_commissioning.get_value == '':
             self.check_data_in_pz.append('не указано дата ввода\n')
-        if self.max_expected_pressure == '':
+        if self.max_expected_pressure.get_value < 30:
+            QMessageBox.warning(None, 'допустимое давление ',
+                                'максимально ожидаемое давление на устье слишком маленькое')
+
+            self.max_expected_pressure = ProtectedIsDigit(30)
+        if self.max_expected_pressure.get_value in ['', 0, '0']:
             self.check_data_in_pz.append('не указано максимально ожидаемое давление на устье\n')
-        if self.max_admissible_pressure == '':
+        if self.max_admissible_pressure.get_value in ['', 0, '0']:
             self.check_data_in_pz.append('не указано максимально допустимое давление на устье\n')
+        if float(self.max_admissible_pressure.get_value) < 30:
+            QMessageBox.warning(None, 'допустимое давление ', 'максимально допустимое давление на устье слишком маленькое')
+            self.check_data_in_pz.append(f'максимально допустимое давление на устье слишком маленькое'
+                                         f' {self.max_admissible_pressure}\n')
+
 
 
 class WellCondition(FindIndexPZ):
@@ -1409,8 +1427,9 @@ class WellData(FindIndexPZ):
                             self.column_direction_mine_true = True
                             if self.column_direction_mine_true:
                                 column_direction_mine_data = row[col + 3]
-                                column_direction_mine_data = FindIndexPZ.definition_is_none(self, column_direction_mine_data,
-                                                                                       row_index, col, 2)
+                                column_direction_mine_data = FindIndexPZ.definition_is_none(self,
+                                                                                            column_direction_mine_data,
+                                                                                            row_index, col, 2)
                                 self.column_direction_mine_diameter, self.column_direction_mine_wall_thickness, \
                                 self.column_direction_mine_length = insert_column_direction(column_direction_mine_data)
                                 self.level_cement_direction_mine = ProtectedIsNonNone(row[col + 9])
@@ -1598,11 +1617,12 @@ class WellData(FindIndexPZ):
                         QMessageBox.warning(self, 'Ошибка',
                                             f'Длина штанг {sum(list(self.dict_sucker_rod_after.values()))}м '
                                             f'после ремонта не равно глубине насоса '
-                                            f'{self.dict_pump_shgn_depth["before"]}м')
+                                            f'{self.dict_pump_shgn_depth["after"]}м')
                         self.check_data_in_pz.append(
-                            f'Ошибка в карте спуска: \nОшибка в карте спуска: Длина штанг {sum(list(self.dict_sucker_rod.values()))}м '
+                            f'Ошибка в карте спуска: \nОшибка в карте спуска: Длина штанг '
+                            f'{sum(list(self.dict_sucker_rod_after.values()))}м '
                             f'после ремонта не равно глубине насоса '
-                            f'{self.dict_pump_shgn_depth["before"]}м')
+                            f'{self.dict_pump_shgn_depth["after"]}м')
                 if self.dict_nkt_after:
                     if sum(list((self.dict_nkt_after.values()))) - self.dict_pump_shgn_depth["after"] < 0:
                         QMessageBox.warning(self, 'Ошибка',
@@ -1631,8 +1651,8 @@ class WellData(FindIndexPZ):
                 if angle_true_question == QMessageBox.StandardButton.Yes:
                     self.angle_data = WellData.read_angle_well()
                     if self.angle_data is None:
-                        self.pause_app()
-
+                        # self.pause_app()
+                        return
             if self.dict_pump_ecn["before"] != '0' and self.dict_pump_shgn["before"] != '0':
                 if self.paker_before["before"] in ['0', None, 0]:
                     self.check_data_in_pz.append(
@@ -1694,7 +1714,7 @@ class WellData(FindIndexPZ):
                                            f'В базе имеется план работ по скважине:\n {" ".join(tables_filter)}. '
                                            f'При продолжении план пересохранится, продолжить?')
                 if mes == QMessageBox.StandardButton.No:
-                    self.pause_app()
+                    # self.pause_app()
                     return
 
     @staticmethod
@@ -1871,7 +1891,8 @@ class WellPerforation(FindIndexPZ):
                 QMessageBox.warning(self, 'ОШИБКА',
                                     f'Приложение не смогло определить индекс пласта в строке {e}')
                 data_list.pause = True
-                self.pause_app()
+                # self.pause_app()
+                return
 
             for ind, row in enumerate(perforations_intervals):
                 if row[col_plast_index]:
@@ -1894,8 +1915,7 @@ class WellPerforation(FindIndexPZ):
                     self.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append(
                         (roof_int, sole_int))
                     self.dict_perforation_short.setdefault(plast, {}).setdefault('интервал',
-                                                                                 []).append(
-                        (roof_int, sole_int))
+                                                                                 []).append((roof_int, sole_int))
                     # for interval in list(self.dict_perforation[plast]["интервал"]):
                     # print(interval)
 
@@ -1939,9 +1959,14 @@ class WellPerforation(FindIndexPZ):
                         self.dict_perforation_short.setdefault(plast, {}).setdefault('давление',
                                                                                      []).append(
                             round(0, 1))
-
-                    self.dict_perforation.setdefault(
-                        plast, {}).setdefault('замер', []).append(row[col_date_pressure_index])
+                    if 'давление' in self.dict_perforation[plast]:
+                        self.dict_perforation[plast]['давление'] = [max(self.dict_perforation[plast]['давление'])]
+                    asadawdawd = row[col_date_pressure_index]
+                    if row[col_date_pressure_index]:
+                        self.dict_perforation.setdefault(
+                            plast, {}).setdefault('замер', []).append(row[col_date_pressure_index])
+                    if 'замер' not in list(self.dict_perforation.keys()):
+                        self.dict_perforation[plast]['замер'] = []
                     self.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость',
                                                                            []).append(
                         calculation_fluid_work(self, row[col_vert_index], row[col_pressure_index]))
@@ -2103,7 +2128,8 @@ class WellCategory(FindIndexPZ):
                 QMessageBox.warning(self, 'ОШИБКА', 'Приложение не смогла найти значение '
                                                     'сероводорода в процентах')
                 data_list.pause = True
-                self.pause_app()
+                # self.pause_app()
+                return
 
             if self.data_window is None:
                 from category_correct import CategoryWindow
@@ -2136,7 +2162,8 @@ class WellCategory(FindIndexPZ):
                 self.well_number.get_value, self.well_area.get_value,
                 self.region)
             if stop_app:
-                self.pause_app()
+                # self.pause_app()
+                return
 
             try:
                 category_pressure_well, categoty_h2s_well, categoty_gf, data = self.thread_excel.check_category(
@@ -2227,7 +2254,4 @@ class WellCategory(FindIndexPZ):
 
             self.insert_index = self.data_well_max.get_value - self.cat_well_min.get_value + 19
 
-
         return self
-
-

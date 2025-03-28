@@ -176,6 +176,7 @@ class CorrectPlanWindow(WindowUnion):
 
             data_list.pause = False
             self.close()
+            self.close_modal_forcefully()
 
     def add_work_excel(self, ws2, work_list, ind_ins):
         from data_list import ProtectedIsDigit
