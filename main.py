@@ -99,14 +99,12 @@ class ExcelWorker(QThread):
 class ModalDialog(QDialog):
     def __init__(self, window, parent=None):
         super().__init__(parent)
-        # self.setWindowTitle("окно")
-        # self.setGeometry(150, 150, 300, 200)
 
         layout = QVBoxLayout()
-        # label = QLabel("Это модальное окно", self)
         layout.addWidget(window)
 
         self.setLayout(layout)
+
 class MyMainWindow(QMainWindow):
 
     def __init__(self):
@@ -213,6 +211,8 @@ class MyMainWindow(QMainWindow):
         self.data_well.modal_dialog = ModalDialog(window)
         self.data_well.modal_dialog.setModal(True)  # Установка модальности
         self.data_well.modal_dialog.show()
+
+
 
     def close_modal_forcefully(self):
         if self.data_well.modal_dialog:
