@@ -161,12 +161,12 @@ class TabPageGno(TabPageUnion):
             self.data_well.current_bottom = current_bottom
         # Задаем начальную и конечную даты периода
         current_date = data_list.current_date.date()
-        if current_date.month > 4:
+        if current_date.month >= 4:
             start_date = datetime(current_date.year, 12, 1).date()
-            end_date = datetime(current_date.year + 1, 4, 1).date()
+            end_date = datetime(current_date.year + 1, 3, 31).date()
         else:
             start_date = datetime(current_date.year - 1, 12, 1).date()
-            end_date = datetime(current_date.year, 4, 1).date()
+            end_date = datetime(current_date.year, 3, 31).date()
 
         # Проверяем условие: если текущая дата находится в указанном периоде
         if self.data_well.region in ['КГМ', 'АГМ']:

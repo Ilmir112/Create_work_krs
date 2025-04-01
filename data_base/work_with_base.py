@@ -35,7 +35,7 @@ class ClassifierWell(MyMainWindow):
         self.region = region
         self.costumer = costumer
         self.number_well = None
-        self.db = connection_to_database(decrypt("DB_CLASSIFICATION"))
+        self.db = connection_to_database(decrypt("DB_NAME_USER"))
         # if self.well_number:
         #     self.number_well = self.data_well.well_number.get_value
 
@@ -56,7 +56,6 @@ class ClassifierWell(MyMainWindow):
     def open_to_sqlite_without_juming(self, costumer, region):
         layout = QVBoxLayout()
         self.edit_well_number = QLineEdit()
-
         self.edit_well_number.setPlaceholderText("Ввести номер скважины для фильтрации")
 
         self.edit_well_number.textChanged.connect(self.filter)
@@ -87,9 +86,8 @@ class ClassifierWell(MyMainWindow):
             event.accept()  # Принимаем событие закрытия
 
     def get_data_from_class_well_db(self, region):
-        db = connection_to_database(decrypt("DB_CLASSIFICATION"))
 
-        well_classification = CheckWellExistence(db)
+        well_classification = CheckWellExistence(self.db)
         data = well_classification.get_data_from_class_well_db(region)
 
         return data
@@ -143,8 +141,8 @@ class ClassifierWell(MyMainWindow):
         # layout.addWidget(table)
         self.setLayout(layout)
 
-    @staticmethod
-    def insert_database(data_base, data_work, query):
+
+    def insert_database(self, data_base, data_work, query):
         if data_list.connect_in_base:
 
             # Параметры подключения к PostgreSQL
@@ -266,7 +264,7 @@ class ClassifierWell(MyMainWindow):
                                     area_well = row[area_column]
 
                                     if well_number and len(str(well_number)) <= 5:
-                                        print(well_number)
+
                                         self.classification_well.insert_data_in_table_without_juming(
                                             str(well_number), area_well, version_year, region_name, costumer)
 
@@ -328,8 +326,7 @@ class ClassifierWell(MyMainWindow):
         ws = wb.active
 
         try:
-            db = connection_to_database(decrypt("DB_CLASSIFICATION"))
-            self.classification_well = CheckWellExistence(db)
+            self.classification_well = CheckWellExistence(self.db)
 
             check_param, well_column, cdng, area_column, oilfield, categoty_pressure, pressure_Gst, \
             date_measurement, pressure_Ppl, categoty_h2s, h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, \
@@ -337,11 +334,10 @@ class ClassifierWell(MyMainWindow):
 
             for region_name in REGION_LIST:
                 if region in region_name:
-                    self.classification_well.create_table_classification(region_name)
-
                     if check_param in region_name:
                         QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                             f'регион выбрано корректно  {region_name}')
+                        self.classification_well.create_table_classification(region_name)
 
                         try:
                             # Вставка данных в таблицу

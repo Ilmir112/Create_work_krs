@@ -263,7 +263,7 @@ class PerforationCorrect(WindowUnion):
                     if all([oktl is True for oktl in plast_raid]):
                         dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', True)
                     else:
-                        dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', True)
+                        dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
 
                     dict_perforation.setdefault(
                         plast, {}).setdefault('интервал', []).append([float(roof), float(sole)])

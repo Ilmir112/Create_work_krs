@@ -2205,16 +2205,19 @@ class WellCategory(FindIndexPZ):
 
         for plast in self.dict_perforation:
             if self.dict_perforation[plast]['отключение'] is False:
-                try:
-                    zamer = self.dict_perforation[plast]['замер'][0]
+
+                zamer = self.dict_perforation[plast]['замер'][0]
+                if zamer != 0:
                     if type(zamer) != datetime:
                         if zamer:
                             zamer = str(zamer).replace(' ', '')
                         date = re.search(r'\d{2}\.\d{2}\.\d{4}', zamer)
-                        if date:
-                            extracted_date = date.group()
-
-                            zamer_str = datetime.strptime(extracted_date, '%d.%m.%Y').date()
+                        if date is None:
+                            date = re.search(r'\d{2}\.\d{2}\.\d{2}', zamer)
+                            if date:
+                                extracted_date = date.group()
+                                extracted_date = extracted_date[:-2] + "20" + extracted_date[6:]
+                                zamer_str = datetime.strptime(extracted_date, '%d.%m.%Y').date()
                     else:
                         zamer_str = zamer.date()
                     date_now = datetime.now().date()
@@ -2243,8 +2246,7 @@ class WellCategory(FindIndexPZ):
                                 f'пласту {plast} не соответствует регламенту '
                                 f'для скважин 1-й категории не более 3 дней до '
                                 f'начала ремонта')
-                except Exception as e:
-                    print(f'Ошибка добавления в информационное сообщение {e}')
+
 
         if self.work_plan not in ['gnkt_frez', 'application_pvr',
                                   'application_gis', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz', 'plan_change', 'prs']:

@@ -62,7 +62,7 @@ class ExcelWorker(QThread):
         from data_base.config_base import CheckWellExistence, connection_to_database
         check_true = True
         try:
-            db = connection_to_database(decrypt("DB_CLASSIFICATION"))
+            db = connection_to_database(decrypt("DB_NAME_USER"))
             self.check_correct_well = CheckWellExistence(db)
             check_true, stop_app = self.check_correct_well.checking_well_database_without_juming(well_number,
                                                                                                  deposit_area, region)
@@ -1197,8 +1197,8 @@ class MyWindow(MyMainWindow):
         self.without_jamming_AGM = self.costumer_select.addMenu('&Арланский регион')
         self.without_jamming_AGM_open = self.without_jamming_AGM.addAction('&открыть перечень', self.action_clicked)
 
-        asd = data_list.user[1]
-        if 'Зуфаров' in data_list.user[1] and 'И' in data_list.user[1] and 'М' in data_list.user[1]:
+
+        if getattr(sys, 'frozen', True):
             self.class_well_TGM_reload = self.class_well_TGM.addAction('&обновить', self.action_clicked)
             self.class_well_IGM_reload = self.class_well_IGM.addAction('&обновить', self.action_clicked)
             self.class_well_CHGM_reload = self.class_well_CHGM.addAction('&обновить', self.action_clicked)
@@ -1318,8 +1318,6 @@ class MyWindow(MyMainWindow):
         elif action == self.class_well_AGM_open:
             costumer = 'ООО Башнефть-добыча'
             self.open_class_well(costumer, 'АГМ')
-
-
 
         elif action == self.application_pvr:
             self.work_plan = 'application_pvr'
@@ -1455,7 +1453,8 @@ class MyWindow(MyMainWindow):
                                                               "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
         if self.fname:
             try:
-                ClassifierWell.export_to_sqlite_without_juming(self, self.fname, costumer, region)
+                self.work_with_data = ClassifierWell
+                self.work_with_data.export_to_sqlite_without_juming(self, self.fname, costumer, region)
 
             except FileNotFoundError:
                 print('Файл не найден')

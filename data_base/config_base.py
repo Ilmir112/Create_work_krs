@@ -544,6 +544,7 @@ class CheckWellExistence:
 
             cursor.execute(query,
                            (well_number, area_well, version_year, region_name, costumer))
+            # print(well_number, version_year)
             # Не забудьте сделать коммит
             self.db_connection.commit()
 
@@ -576,6 +577,8 @@ class CheckWellExistence:
                                 costumer TEXT
                             );
                         """)
+            # Не забудьте сделать коммит
+            self.db_connection.commit()
 
     @staticmethod
     def read_excel_file_classification(ws):
@@ -658,6 +661,7 @@ class CheckWellExistence:
                     date_measurement, categoty_h2s,
                     h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf,
                     gas_factor, version_year, region, costumer)
+            # print(well_number, version_year)
 
             cursor.execute(query, data)
 
