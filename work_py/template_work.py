@@ -289,8 +289,8 @@ class TabPageSoWith(TabPageUnion):
         if self.current_bottom_edit.text() != '':
             current_bottom = round(float(self.current_bottom_edit.text()), 1)
 
-        roof_plast, roof_add_column_plast = self.definition_roof_not_raiding(current_bottom)
-        dictance_template_first = int(current_bottom - roof_plast + 5)
+        self.roof_plast, self.roof_add_column_plast = self.definition_roof_not_raiding(current_bottom)
+        dictance_template_first = int(current_bottom - self.roof_plast + 5)
         if int(float(self.dictance_template_first_edit.text())) == dictance_template_first:
             self.dictance_template_first_edit.setText(str(int(dictance_template_first)))
         else:
@@ -525,8 +525,8 @@ class TabPageSoWith(TabPageUnion):
             self.skm_edit.setText(str(self.data_well.column_diameter.get_value))
             self.dictance_template_second_edit.setText(str(1))
 
-            roof_plast, roof_add_column_plast = self.definition_roof_not_raiding(current_bottom)
-            dictance_template_first = float(current_bottom - roof_plast + 5)
+            self.roof_plast, self.roof_add_column_plast = self.definition_roof_not_raiding(current_bottom)
+            dictance_template_first = float(current_bottom - self.roof_plast + 5)
             self.dictance_template_first_edit.setText(str(int(dictance_template_first)))
 
             length_template_first, length_template_second = self.definition_ecn_true(
@@ -622,7 +622,7 @@ class TabPageSoWith(TabPageUnion):
 
                 self.length_template_first_edit.setText(str(length_template_first))
                 length_template_first = int(float(self.length_template_first_edit.text()))
-                dictance_template_first1 = int(float(current_bottom - roof_add_column_plast + 5))
+                dictance_template_first1 = int(float(current_bottom - self.roof_add_column_plast + 5))
 
                 self.skm_edit.setText(str(self.data_well.column_diameter.get_value))
                 self.dictance_template_first_edit.setText(str(int(dictance_template_first1)))
@@ -634,7 +634,7 @@ class TabPageSoWith(TabPageUnion):
                 self.length_template_second_edit.setText(str(length_template_second))
 
                 dictance_template_three = round(current_bottom - dictance_template_first - \
-                                                int(dictance_template_second) - length_template_first - roof_plast + 10,
+                                                int(dictance_template_second) - length_template_first - self.roof_plast + 10,
                                                 0)
                 self.dictance_three_edit.setText(str(dictance_template_three))
 
@@ -671,11 +671,11 @@ class TabPageSoWith(TabPageUnion):
                 skm = str(self.data_well.column_additional_diameter.get_value)
                 self.skm_edit.setText(skm)
 
-                dictance_template_first = int(float(current_bottom - roof_add_column_plast + 5))
+                dictance_template_first = int(float(current_bottom - self.roof_add_column_plast + 5))
                 self.dictance_template_first_edit.setText(str(int(dictance_template_first)))
 
                 dictance_template_three = round((current_bottom - dictance_template_first - \
-                                                 int(dictance_template_second) - length_template_first) - roof_plast + 10,
+                                                 int(dictance_template_second) - length_template_first) - self.roof_plast + 10,
                                                 0)
 
                 self.dictance_three_edit.setText(str(dictance_template_three))
@@ -722,7 +722,7 @@ class TabPageSoWith(TabPageUnion):
                 self.dictance_template_second_edit.setText(str(int(float(dictance_template_second))))
 
                 dictance_template_three = round((current_bottom - dictance_template_first - \
-                                                 dictance_template_second - length_template_first) - roof_plast + 10,
+                                                 dictance_template_second - length_template_first) - self.roof_plast + 10,
                                                 0)
 
                 self.dictance_three_edit.setText(str(dictance_template_three))
@@ -755,11 +755,11 @@ class TabPageSoWith(TabPageUnion):
                 skm = str(self.data_well.column_additional_diameter.get_value)
                 self.skm_edit.setText(skm)
 
-                dictance_template_first = int(float(current_bottom - roof_add_column_plast + 5))
+                dictance_template_first = int(float(current_bottom - self.roof_add_column_plast + 5))
                 self.dictance_template_first_edit.setText(str(int(dictance_template_first)))
 
                 dictance_template_three = round((current_bottom - dictance_template_first - \
-                                                 dictance_template_second - length_template_first) - roof_plast + 10,
+                                                 dictance_template_second - length_template_first) - self.roof_plast + 10,
                                                 0)
                 self.dictance_three_edit.setText(str(dictance_template_three))
 
@@ -1138,6 +1138,9 @@ class TemplateKrs(WindowUnion):
 
         template_str = str(self.current_widget.template_str_edit.text())
         self.template_key = str(self.current_widget.template_combo.currentText())
+        self.roof_plast = self.current_widget.roof_plast
+        self.roof_add_column_plast = self.current_widget.roof_add_column_plast
+
         if self.template_key == 'ПСШ + пакер':
             if self.data_well.gips_in_well:
                 QMessageBox.warning(self, 'ПСШ + пакер', 'Нельзя спускать ПСШ в осложненный фонд')
@@ -1174,6 +1177,7 @@ class TemplateKrs(WindowUnion):
 
         if self.data_well.column_additional:
             template_length_addition = int(float(self.current_widget.length_template_first_edit.text()))
+
         # if self.data_well.skm_depth > self.data_well.perforation_roof:
         #     question = QMessageBox.question(self, 'Проверка глубины СКМ',
         #                                     f'Согласно указания главного инженера СКМ (на глубине '
@@ -1184,12 +1188,27 @@ class TemplateKrs(WindowUnion):
         #                                     'быть согласован с заказчиком письменной телефонограммой, продолжить?')
         #     if question == QMessageBox.StandardButton.No:
         #         return
+        if self.roof_plast < self.data_well.template_depth:
+            mes = QMessageBox.question(self, 'Ошибка', f'Глубина спуска шаблона-{self.data_well.template_depth}м '
+                                                       f'ниже кровли не отрайбированного ИП ({self.roof_plast}м), '
+                                                       f'продолжить?')
+            if mes == QMessageBox.StandardButton.No:
+                return
+
         if self.data_well.column_additional is False or \
                 (self.data_well.column_additional is True and
                  float(self.data_well.head_column_additional.get_value) >= self.data_well.current_bottom):
             template_diameter = int(self.current_widget.template_second_edit.text())
         else:
             template_diameter = int(self.current_widget.template_first_edit.text())
+            if self.roof_add_column_plast < self.data_well.template_depth_addition:
+                mes = QMessageBox.question(self, 'Ошибка',
+                                           f'Глубина спуска шаблона-{self.data_well.template_depth_addition}м '
+                                           f'ниже кровли не отрайбированного ИП'
+                                           f' ({self.roof_add_column_plast}м), продолжить?')
+                if mes == QMessageBox.StandardButton.No:
+                    return
+
         # print(self.data_well.problem_with_ek_diameter)
         if (template_diameter >= int(self.data_well.problem_with_ek_diameter) - 2
                 and self.data_well.template_depth > float(self.data_well.problem_with_ek_depth)):
@@ -1205,6 +1224,7 @@ class TemplateKrs(WindowUnion):
             if self.data_well.template_depth >= self.data_well.current_bottom:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
                 return
+
         else:
             if self.data_well.template_depth_addition >= self.data_well.current_bottom:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')

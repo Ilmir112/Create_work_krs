@@ -883,7 +883,7 @@ class MyMainWindow(QMainWindow):
                 for ind, check_data in enumerate(self.data_well.check_data_in_pz):
                     if check_data not in check_str:
                         check_str += f'{ind + 1}. {check_data} \n'
-                self.show_info_message(self.data_well, check_str)
+
 
             if work_plan in ['krs', 'prs']:
                 self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.data_well)
@@ -893,6 +893,9 @@ class MyMainWindow(QMainWindow):
                 
                 data_list.pause = True
                 self.work_window = None
+
+            self.show_info_message(self.data_well, check_str)
+
 
         if work_plan in ['gnkt_frez'] and list_page == 2:
             col_width = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,

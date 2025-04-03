@@ -7,11 +7,10 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QTabWidget, QWidget, QLab
 
 from work_py.calculate_work_parametrs import volume_work
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
-from .rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
 
 from PyQt5.QtGui import QDoubleValidator
 from work_py.template_work import TemplateKrs, TabPageSoWith
-
 
 
 class TabPageSo(TabPageUnion):
@@ -643,10 +642,10 @@ class TemplateWithoutSkm(WindowUnion):
             if self.data_well.template_depth >= self.data_well.head_column_additional.get_value:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже головы хвостовика')
                 return
-            # if self.template_combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне' and\
-            #         self.data_well.skm_depth >= self.data_well.head_column_additional.get_value:
-            #     QMessageBox.warning(self, "ВНИМАНИЕ", 'СКМ спускается ниже головы хвостовика')
-            #     return
+            if self.template_combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне' and\
+                    self.data_well.skm_depth >= self.data_well.head_column_additional.get_value:
+                QMessageBox.warning(self, "ВНИМАНИЕ", 'СКМ спускается ниже головы хвостовика')
+                return
         if distance_second < 0 or distance_first < 0:
             QMessageBox.warning(self, "ВНИМАНИЕ", 'Расстояние между шаблонами не корректно')
             return
