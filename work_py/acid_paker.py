@@ -7,9 +7,9 @@ from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox,
     QTableWidgetItem, QLineEdit
 
 import data_list
-from work_py.alone_oreration import volume_vn_nkt, well_volume, kot_work
+from work_py.alone_oreration import  kot_work
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
-from work_py.rationingKRS import descentNKT_norm, well_volume_norm, lifting_nkt_norm
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm
 from work_py.swabbing import SwabWindow
 
 
@@ -606,6 +606,12 @@ class AcidPakerWindow(WindowUnion):
             self.paker_khost = self.check_if_none((self.current_widget.paker_khost.text()))
             self.paker_depth = int(self.check_if_none(self.current_widget.paker_depth_edit.text()))
             self.paker2_depth = int(self.check_if_none(self.current_widget.paker2_depth.text()))
+
+            if self.data_well.current_bottom < float(self.paker_khost + self.paker_depth) or \
+                    0 < self.paker_khost + self.paker_depth < self.data_well.current_bottom is False:
+                QMessageBox.information(self, 'Внимание',
+                                        f'Компоновка ниже {self.paker_khost + self.paker_depth}м текущего забоя '
+                                        f'{self.data_well.current_bottom}м')
 
             if self.data_well:
                 if self.check_true_depth_template(self.paker_depth) is False:

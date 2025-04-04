@@ -66,12 +66,13 @@ class ExcelWorker(QThread):
             self.check_correct_well = CheckWellExistence(db)
             check_true, stop_app = self.check_correct_well.checking_well_database_without_juming(well_number,
                                                                                                  deposit_area, region)
+            # Завершение работы потока
+            self.finished.emit()
+            return check_true, stop_app
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {type(e).__name__}\n\n{str(e)}")
+            return check_true
 
-        # Завершение работы потока
-        self.finished.emit()
-        return check_true, stop_app
 
     def check_category(self, well_number, deposit_area, region):
         result = self.check_correct_well.check_category(well_number, deposit_area, region)
@@ -877,9 +878,9 @@ class MyMainWindow(QMainWindow):
                     table_widget.setRowHidden(row, True)
                 else:
                     table_widget.setRowHidden(row, False)
-
+            check_str = ''
             if len(self.data_well.check_data_in_pz) != 0 and self.data_well.work_plan in ['krs', 'prs']:
-                check_str = ''
+
                 for ind, check_data in enumerate(self.data_well.check_data_in_pz):
                     if check_data not in check_str:
                         check_str += f'{ind + 1}. {check_data} \n'
@@ -893,8 +894,8 @@ class MyMainWindow(QMainWindow):
                 
                 data_list.pause = True
                 self.work_window = None
-
-            self.show_info_message(self.data_well, check_str)
+            if check_str != '':
+                self.show_info_message(self.data_well, check_str)
 
 
         if work_plan in ['gnkt_frez'] and list_page == 2:
@@ -1339,8 +1340,8 @@ class MyWindow(MyMainWindow):
         elif action == self.application_geophysical:
             pass
 
-        elif 'Зуфаров' in data_list.user[1] and 'И' in data_list.user[1] and 'М' in data_list.user[1]:
 
+        elif getattr(sys, 'frozen', True):
             if action == self.class_well_TGM_reload:
                 costumer = 'ООО Башнефть-добыча'
                 self.reload_class_well(costumer, 'ТГМ')
@@ -1372,10 +1373,12 @@ class MyWindow(MyMainWindow):
                 costumer = 'ООО Башнефть-добыча'
                 self.reload_class_well(costumer, 'ИГМ')
 
-        else:
-            mes = QMessageBox.question(self, 'Информация', 'Необходимо закрыть текущий проект, закрыть?')
-            if mes == QMessageBox.StandardButton.Yes:
-                self.close_file()
+            else:
+                mes = QMessageBox.question(self, 'Информация', 'Необходимо закрыть текущий проект, закрыть?')
+                if mes == QMessageBox.StandardButton.Yes:
+                    self.close_file()
+
+
 
     def reload_class_well(self, costumer, region):
         from data_base.work_with_base import ClassifierWell
