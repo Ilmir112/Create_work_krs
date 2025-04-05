@@ -12,7 +12,6 @@ additional_files = [
     ('data_base/data_base_well/config_base.py', '.'),  # Пример включения другой зависимости
     ('data_base/data_base_well/databaseWell.db', '.'),
     ('data_base/work_with_base.py', '.'),
-    ('data_base/databaseclassification.db', '.'),
     ('gnkt_data/gnkt_data.py', '.'),
     ('imageFiles', '.'),
     ('users/login_users.py', '.'),

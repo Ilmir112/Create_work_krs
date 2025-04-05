@@ -31,7 +31,7 @@ from block_name import region_select
 
 from log_files.log import logger, QPlainTextEditLogger
 from openpyxl.drawing.image import Image
-from PyQt5.QtCore import QThread, pyqtSlot, Qt, QObject, pyqtSignal,  QTimer
+from PyQt5.QtCore import QThread, pyqtSlot, Qt, QObject, pyqtSignal, QTimer
 from PyQt5.QtGui import QPixmap
 
 
@@ -61,6 +61,7 @@ class ExcelWorker(QThread):
     def check_well_existence(self, well_number, deposit_area, region):
         from data_base.config_base import CheckWellExistence, connection_to_database
         check_true = True
+        stop_app = None
         try:
             db = connection_to_database(decrypt("DB_NAME_USER"))
             self.check_correct_well = CheckWellExistence(db)
@@ -72,7 +73,6 @@ class ExcelWorker(QThread):
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f"Ошибка при проверке записи: {type(e).__name__}\n\n{str(e)}")
             return check_true
-
 
     def check_category(self, well_number, deposit_area, region):
         result = self.check_correct_well.check_category(well_number, deposit_area, region)
@@ -97,6 +97,7 @@ class ExcelWorker(QThread):
         # Завершение работы потока
         self.finished.emit()
 
+
 class ModalDialog(QDialog):
     def __init__(self, window, parent=None):
         super().__init__(parent)
@@ -105,6 +106,7 @@ class ModalDialog(QDialog):
         layout.addWidget(window)
 
         self.setLayout(layout)
+
 
 class MyMainWindow(QMainWindow):
 
@@ -118,8 +120,6 @@ class MyMainWindow(QMainWindow):
         self.perforation_correct_window2 = None
         self.work_plan = None
         self.gnkt_data = None
-
-
 
     @staticmethod
     def close_process():
@@ -192,7 +192,6 @@ class MyMainWindow(QMainWindow):
             self.operation_window.move(100, 100)
             self.set_modal_window(self.operation_window)
 
-
             self.operation_window = None
         else:
             self.operation_window.close()  # Close window.
@@ -212,8 +211,6 @@ class MyMainWindow(QMainWindow):
         self.data_well.modal_dialog = ModalDialog(window)
         self.data_well.modal_dialog.setModal(True)  # Установка модальности
         self.data_well.modal_dialog.show()
-
-
 
     def close_modal_forcefully(self):
         if self.data_well.modal_dialog:
@@ -306,7 +303,6 @@ class MyMainWindow(QMainWindow):
             WellData.read_well(self.data_well, self.data_well.cat_well_max.get_value,
                                self.data_well.data_pvr_min.get_value)
 
-
             WellPerforation.read_well(self.data_well, self.data_well.data_pvr_min.get_value,
                                       self.data_well.data_pvr_max.get_value + 1)
 
@@ -316,7 +312,6 @@ class MyMainWindow(QMainWindow):
 
             # self.set_modal_window(self.data_list.pdata_window)
 
-            
             # data_list.pause = True
 
             if self.data_well.leakiness is True:
@@ -434,7 +429,7 @@ class MyMainWindow(QMainWindow):
                         self.set_modal_window(self.rir_window)
 
                         data_list.pause = True
-                        
+
                 elif self.work_plan in ['gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz']:
 
                     self.gnkt_data = GnktOsvWindow(self.ws,
@@ -469,13 +464,12 @@ class MyMainWindow(QMainWindow):
             self.pause_app()
 
             data_list.pause = True
-            
 
             self.ws = insert_data_new_excel_file(self, data_list.data, data_list.row_heights, data_list.col_width,
                                                  data_list.boundaries_dict)
 
             self.copy_pz(self.ws, self.table_widget, self.work_plan)
-        
+
         data_list.pause = True
         self.rir_window = None
 
@@ -885,18 +879,16 @@ class MyMainWindow(QMainWindow):
                     if check_data not in check_str:
                         check_str += f'{ind + 1}. {check_data} \n'
 
-
             if work_plan in ['krs', 'prs']:
                 self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.data_well)
                 self.set_modal_window(self.work_window)
                 self.ws3 = self.wb.create_sheet("Расчет поглотителя сероводорода", 1)
                 data_list.pause = True
-                
+
                 data_list.pause = True
                 self.work_window = None
             if check_str != '':
                 self.show_info_message(self.data_well, check_str)
-
 
         if work_plan in ['gnkt_frez'] and list_page == 2:
             col_width = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
@@ -926,6 +918,7 @@ class MyMainWindow(QMainWindow):
 class MyWindow(MyMainWindow):
 
     def __init__(self):
+
         super().__init__()
 
         self.initUI()
@@ -1005,7 +998,7 @@ class MyWindow(MyMainWindow):
             self.login_window.setWindowModality(Qt.ApplicationModal)
 
             self.login_window.show()
-            
+
             data_list.pause = False
         except Exception as e:
             QMessageBox.warning(None, 'КРИТИЧЕСКАЯ ОШИБКА',
@@ -1201,7 +1194,6 @@ class MyWindow(MyMainWindow):
         self.without_jamming_AGM = self.costumer_select.addMenu('&Арланский регион')
         self.without_jamming_AGM_open = self.without_jamming_AGM.addAction('&открыть перечень', self.action_clicked)
 
-
         if getattr(sys, 'frozen', True):
             self.class_well_TGM_reload = self.class_well_TGM.addAction('&обновить', self.action_clicked)
             self.class_well_IGM_reload = self.class_well_IGM.addAction('&обновить', self.action_clicked)
@@ -1378,18 +1370,9 @@ class MyWindow(MyMainWindow):
                 if mes == QMessageBox.StandardButton.Yes:
                     self.close_file()
 
-
-
     def reload_class_well(self, costumer, region):
-        from data_base.work_with_base import ClassifierWell
-        self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
-                                                              "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
-        if self.fname:
-            try:
-                ClassifierWell.export_to_database_class_well(self, self.fname, costumer, region)
-
-            except FileNotFoundError:
-                print('Файл не найден')
+        self.open_parent_class(costumer, region)
+        self.classifier_well.export_to_database_class_well(self.fname)
 
     def close_splash(self):
         splash_hwnd = win32gui.FindWindow(None, "Splash Screen")  # При необходимости измените название окна
@@ -1402,6 +1385,7 @@ class MyWindow(MyMainWindow):
         if self.new_window is None:
 
             self.new_window = ClassifierWell(costumer, region, 'damping')
+            self.new_window.open_to_sqlite_without_juming()
             self.new_window.setWindowTitle("Перечень скважин без глушения")
             # self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
@@ -1446,6 +1430,7 @@ class MyWindow(MyMainWindow):
         from data_base.work_with_base import ClassifierWell
         if self.new_window is None:
             self.new_window = ClassifierWell(costumer, region, 'ClassifierWell')
+            self.new_window.open_to_sqlite_class_well()
             self.new_window.setWindowTitle("Классификатор")
             # self.new_window.setGeometry(200, 400, 300, 400)
             self.new_window.show()
@@ -1453,17 +1438,17 @@ class MyWindow(MyMainWindow):
             self.new_window.close()  # Close window.
             self.new_window = None  # Discard reference.
 
-    def reload_without_damping(self, costumer, region):
+    def open_parent_class(self, costumer, region):
+
         from data_base.work_with_base import ClassifierWell
         self.fname, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Выберите файл', '.',
                                                               "Файлы Exсel (*.xlsx);;Файлы Exсel (*.xls)")
         if self.fname:
-            try:
-                self.work_with_data = ClassifierWell
-                self.work_with_data.export_to_sqlite_without_juming(self, self.fname, costumer, region)
+            self.classifier_well = ClassifierWell(costumer, region)
 
-            except FileNotFoundError:
-                print('Файл не найден')
+    def reload_without_damping(self, costumer, region):
+        self.open_parent_class(costumer, region)
+        self.classifier_well.export_to_sqlite_without_juming(self.fname)
 
     def table_widget_open(self, work_plan='krs'):
 
@@ -1832,7 +1817,7 @@ class MyWindow(MyMainWindow):
                         os.remove(file_path)
 
         except Exception as e:
-            QMessageBox.critical(window, "Ошибка", f"Не удалось очистить папку с временными файлами: {e}")
+            QMessageBox.critical(self, "Ошибка", f"Не удалось очистить папку с временными файлами: {e}")
         self.rir_window = None
         self.data_well = None
         if not self.table_widget is None:
@@ -1915,7 +1900,7 @@ class MyWindow(MyMainWindow):
 
         self.data_well.fluid_work = data[row][7]
         self.data_well.template_depth, self.data_well.template_length, \
-        self.data_well.template_depth_addition, self.data_well.template_length_addition = json.loads(
+            self.data_well.template_depth_addition, self.data_well.template_length_addition = json.loads(
             data[row][11])
         self.data_well.skm_interval = json.loads(data[row][12])
 
@@ -3138,12 +3123,11 @@ def show_splash_screen():
     # Создаем приложение
     app = QApplication(sys.argv)
 
-
-
     # Создаем главное окно
     window = MyWindow()
     window.show()
     sys.exit(app.exec_())
+
 
 if __name__ == "__main__":
     from data_base.config_base import connect_to_database
@@ -3156,4 +3140,3 @@ if __name__ == "__main__":
 
     # window = MyWindow()
     # window.show()
-

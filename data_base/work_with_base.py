@@ -27,8 +27,9 @@ from work_py.alone_oreration import well_volume
 class ClassifierWell(MyMainWindow):
     number_well = None
 
-    def __init__(self, costumer, region, ClassifierWell, parent=None):
+    def __init__(self, costumer, region, parent=None):
         super().__init__()
+        self.classification_well = None
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_class = QTableWidget()
@@ -53,7 +54,7 @@ class ClassifierWell(MyMainWindow):
 
         return data
 
-    def open_to_sqlite_without_juming(self, costumer, region):
+    def open_to_sqlite_without_juming(self):
         layout = QVBoxLayout()
         self.edit_well_number = QLineEdit()
         self.edit_well_number.setPlaceholderText("Ввести номер скважины для фильтрации")
@@ -62,7 +63,7 @@ class ClassifierWell(MyMainWindow):
         self.edit_well_number.setText(self.number_well)
         layout.addWidget(self.edit_well_number)
 
-        data = self.get_data_from_db(region)
+        data = self.get_data_from_db(self.region)
         if data:
 
             self.table_class.setColumnCount(len(data[0]))
@@ -86,13 +87,12 @@ class ClassifierWell(MyMainWindow):
             event.accept()  # Принимаем событие закрытия
 
     def get_data_from_class_well_db(self, region):
-
         well_classification = CheckWellExistence(self.db)
         data = well_classification.get_data_from_class_well_db(region)
 
         return data
 
-    def open_to_sqlite_class_well(self, costumer, region):
+    def open_to_sqlite_class_well(self):
         layout = QVBoxLayout()
         self.edit_well_number = QLineEdit()
         self.edit_well_number.setPlaceholderText("Ввести номер скважины для фильтрации")
@@ -105,7 +105,7 @@ class ClassifierWell(MyMainWindow):
         self.edit_well_area.setPlaceholderText("Ввести площадь для фильтрации")
         self.edit_well_area.textChanged.connect(self.filter_class_area)
         layout.addWidget(self.edit_well_area)
-        region = f'{region}_классификатор'
+        region = f'{self.region}_классификатор'
         # print(region)
         data = self.get_data_from_class_well_db(region)
         if data:
@@ -201,7 +201,7 @@ class ClassifierWell(MyMainWindow):
         if conn:
             conn.close()
 
-    def export_to_sqlite_without_juming(self, fname, costumer, region):
+    def export_to_sqlite_without_juming(self, fname):
         # Загрузка файла Excel
         wb = load_workbook(fname)
         ws = wb.active
@@ -239,7 +239,7 @@ class ClassifierWell(MyMainWindow):
             REGION_LIST = ['ЧГМ', 'АГМ', 'ТГМ', 'ИГМ', 'КГМ', ]
 
             for region_name in REGION_LIST:
-                if region_name == region:
+                if region_name == self.region:
                     if check_param in region_name:
                         self.classification_well.create_table_without_juming(region_name)
                         QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
@@ -266,7 +266,7 @@ class ClassifierWell(MyMainWindow):
                                     if well_number and len(str(well_number)) <= 5:
 
                                         self.classification_well.insert_data_in_table_without_juming(
-                                            str(well_number), area_well, version_year, region_name, costumer)
+                                            str(well_number), area_well, version_year, region_name, self.costumer)
 
                             QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
                         except Exception as e:
@@ -316,7 +316,7 @@ class ClassifierWell(MyMainWindow):
                     if not match:
                         break
 
-    def export_to_database_class_well(self, fname, costumer, region):
+    def export_to_database_class_well(self, fname):
 
         REGION_LIST = ['ЧГМ_классификатор', 'АГМ_классификатор', 'ТГМ_классификатор', 'ИГМ_классификатор',
                        'КГМ_классификатор']
@@ -333,7 +333,7 @@ class ClassifierWell(MyMainWindow):
             gas_factor, area_row, check_file = self.classification_well.read_excel_file_classification(ws)
 
             for region_name in REGION_LIST:
-                if region in region_name:
+                if self.region in region_name:
                     if check_param in region_name:
                         QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                             f'регион выбрано корректно  {region_name}')
@@ -374,7 +374,7 @@ class ClassifierWell(MyMainWindow):
                                             row[categoty_h2s],
                                             row[h2s_pr], row[h2s_mg_l], row[h2s_mg_m], row[categoty_gf],
                                             row[gas_factor],
-                                            version_year, region, costumer
+                                            version_year, self.region, self.costumer
                                         )
                         except Exception as e:
                             QMessageBox.warning(self, 'ОШИБКА', f'Выбран файл с не корректными данными {e}')
