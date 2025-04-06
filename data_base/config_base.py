@@ -661,20 +661,13 @@ class CheckWellExistence:
                     date_measurement, categoty_h2s,
                     h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf,
                     gas_factor, version_year, region, costumer)
-            # print(well_number, version_year)
+            print(well_number, version_year)
 
             cursor.execute(query, data)
 
-            # print(cdng, well_number, area_well,
-            #     oilfield_str, categoty_pressure, pressure_Ppl, pressure_Gst,
-            #     date_measurement, categoty_h2s,
-            #     h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf,
-            #     gas_factor, version_year, region, costumer)
-            # Не забудьте сделать коммит
             self.db_connection.commit()
 
     def drop_table(self, cursor, region_name):
-
         cursor.execute(f"DROP TABLE IF EXISTS {region_name}")
 
     def checking_well_database_month(self, region: str):
@@ -723,17 +716,20 @@ class CheckWellExistence:
             return False, stop_app
 
     def check_category(self, well_number: str, deposit_area: str, region: str) -> List:
-        if not self.db_connection:
-            return None
-        with CursorContext(self.db_connection.cursor()) as cursor:
-            # Проверка наличия записи в базе данных
-            query = f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор "\
-                    f"WHERE well_number =({self.path_index}) and deposit_area =({self.path_index})"
-            data = (str(well_number.get_value), str(deposit_area.get_value).replace("_", " "))
-            cursor.execute(query, data)
+        try:
+            if not self.db_connection:
+                return None
+            with CursorContext(self.db_connection.cursor()) as cursor:
+                # Проверка наличия записи в базе данных
+                query = f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор "\
+                        f"WHERE well_number =({self.path_index}) and deposit_area =({self.path_index})"
+                data = (str(well_number.get_value), str(deposit_area.get_value).replace("_", " "))
+                cursor.execute(query, data)
 
-            result = cursor.fetchone()
-            return result
+                result = cursor.fetchone()
+                return result
+        except Exception as e:
+            QMessageBox.warning(self, 'Ошибка', f'Ошибка работы с базой данных {e}')
 
     def get_data_from_class_well_db(self, region) -> List:
         # Выполнение SQL-запроса для получения данных

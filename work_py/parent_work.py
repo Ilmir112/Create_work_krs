@@ -1211,21 +1211,6 @@ class WindowUnion(MyMainWindow):
 
         return data, row_heights, col_width, boundaries_dict
 
-    def definition_open_trunk_well(self):
-        self.data_well.nkt_diam = 73 if self.data_well.column_diameter.get_value > 110 else 60
-        self.data_well.nkt_template = 59.6 if self.data_well.column_diameter.get_value > 110 else 47.9
-
-        if self.data_well.column_additional:
-            if self.data_well.current_bottom > self.data_well.shoe_column_additional.get_value:
-                self.data_well.open_trunk_well = True
-            else:
-                self.data_well.open_trunk_well = False
-        else:
-            if self.data_well.current_bottom > self.data_well.shoe_column.get_value:
-                self.data_well.open_trunk_well = True
-            else:
-                self.data_well.open_trunk_well = False
-
     def extraction_data(self, table_name, paragraph_row=0):
         date_table = table_name.split(' ')[-1]
         well_number = table_name.split(' ')[0]

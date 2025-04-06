@@ -274,7 +274,6 @@ class TabPageDp(TabPageUnion):
             self.tableWidget.show()
         else:
             self.pressure_pvr_label.setParent(None)
-
             self.date_pressure_label.setParent(None)
             self.pressure_pvr_edit.setParent(None)
             self.date_pressure_edit.setParent(None)

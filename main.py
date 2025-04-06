@@ -34,6 +34,9 @@ from openpyxl.drawing.image import Image
 from PyQt5.QtCore import QThread, pyqtSlot, Qt, QObject, pyqtSignal, QTimer
 from PyQt5.QtGui import QPixmap
 
+from work_py.alone_oreration import kot_select
+from work_py.rationingKRS import lifting_nkt_norm, descentNKT_norm
+
 
 class UncaughtExceptions(QObject):
     _exception_caught = pyqtSignal(object)
@@ -76,7 +79,8 @@ class ExcelWorker(QThread):
 
     def check_category(self, well_number, deposit_area, region):
         result = self.check_correct_well.check_category(well_number, deposit_area, region)
-        return result
+        if result:
+            return result
 
     def insert_data_in_database(self, excel_data_dict, data_well):
         from data_base.config_base import connection_to_database, WorkDatabaseWell
@@ -147,6 +151,95 @@ class MyMainWindow(QMainWindow):
                 return float(value.replace(',', '.'))
         else:
             return 0
+
+    def definition_open_trunk_well(self):
+        self.data_well.nkt_diam = 73 if self.data_well.column_diameter.get_value > 110 else 60
+        self.data_well.nkt_template = 59.6 if self.data_well.column_diameter.get_value > 110 else 47.9
+
+        if self.data_well.column_additional:
+            if self.data_well.current_bottom > self.data_well.shoe_column_additional.get_value:
+                self.data_well.open_trunk_well = True
+            else:
+                self.data_well.open_trunk_well = False
+        else:
+            if self.data_well.current_bottom > self.data_well.shoe_column.get_value:
+                self.data_well.open_trunk_well = True
+            else:
+                self.data_well.open_trunk_well = False
+
+    def normalization(self, current_depth, diameter_paker, gis_otz_after_true_quest):
+
+        nkt_diam = self.data_well.nkt_diam
+
+        normalization_list = [
+            [f'Согласовать Алгоритм нормализации до H- {current_depth}м', None,
+             f'Алгоритм работ согласовать с Заказчиком: \n'
+             f'В случае освоения скважины ГНКТ и дохождение до гл. не ниже {self.data_well.current_bottom}м '
+             f'работы по нормализации не планировать'
+             f'В случае если скважину не осваивали ГНКТ продолжить работы со следующего пункта.\n'
+             f'В случае наличия ЗУМПФА не менее 10м продолжить работы со следующего пункта.\n',
+             None, None, None, None, None, None, None,
+             'Мастер КРС', None],
+
+            [None, None,
+             f'Спустить {kot_select(self, current_depth)} на НКТ{nkt_diam}мм до глубины текущего забоя'
+             f' с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', descentNKT_norm(self.data_well.current_bottom, 1)],
+            [None, None,
+             f'Произвести очистку забоя скважины до гл.{current_depth}м закачкой обратной промывкой тех жидкости'
+             f' уд.весом {self.data_well.fluid_work}, по согласованию с Заказчиком',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 0.4],
+            [None, None,
+             f'При необходимости согласовать закачку блок пачки по технологическому плану работ подрядчика',
+             None, None, None, None, None, None, None,
+             'мастер КРС, предст. заказчика', None],
+            [None, None,
+             f'Поднять {kot_select(self, current_depth)} на НКТ{nkt_diam}мм c глубины {current_depth}м с '
+             f'доливом скважины в '
+             f'объеме {round(current_depth * 1.12 / 1000, 1)}м3 удельным весом {self.data_well.fluid_work}',
+             None, None, None, None, None, None, None,
+             'мастер КРС', lifting_nkt_norm(current_depth, 1)],
+            [None, None,
+             f'В случае наличия ЗУМПФа 10м и более продолжить работы с п. по отбивки забоя '
+             f'В случае ЗУМПФа менее 10м: и не жесткая посадка компоновки СПО КОТ повторить. '
+             f'В случае образование твердой корки (жесткой посадки): выполнить взрыхление ПМ с ВЗД'
+             f' и повторить работы СПО КОТ.',
+             None, None, None, None, None, None, None,
+             'Мастер КРС', None],
+            [None, None,
+             f'Спустить компоновку с замером и шаблонированием НКТ:  долото Д='
+             f'{diameter_paker + 2}мм, забойный двигатель,'
+             f' НКТ - 20м, вставной фильтр, НКТмм до кровли проппантной пробки. '
+             f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) ',
+             None, None, None, None, None, None, None,
+             'Мастер КРС', descentNKT_norm(current_depth, 1.2)],
+            [None, None,
+             f'Подогнать рабочую трубу патрубками на заход 9-10м. Вызвать циркуляцию прямой промывкой. '
+             f'Произвести допуск с прямой промывкой и рыхление проппантной пробки 10м с проработкой э/колонны по 10 раз. ',
+             None, None, None, None, None, None, None,
+             'Мастер КРС', 0.9],
+            [None, None,
+             f'Поднять компоновку с глубины {current_depth}м с доливом скважины тех.жидкостью уд. весом'
+             f' {self.data_well.fluid_work}  в объеме '
+             f'{round(self.data_well.current_bottom * 1.12 / 1000, 1)}м3',
+             None, None, None, None, None, None, None,
+             'Мастер КРС', lifting_nkt_norm(current_depth, 1.2)],
+            [f'по согласованию с заказчиком: Отбивка забоя',
+             None, f'по согласованию с заказчиком: \n'
+                   f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+                   f'Произвести монтаж ПАРТИИ ГИС согласно схемысхема №11 утвержденной главным инженером '
+                   f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
+                   f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, подрядчик по ГИС', 4]]
+
+        if gis_otz_after_true_quest == 'Нет':
+            normalization_list = normalization_list[:-1]
+        self.data_well.current_bottom = current_depth
+
+        return normalization_list
 
     def check_gpp_upa(self, table_widget):
         for row in range(table_widget.rowCount()):
@@ -1907,7 +2000,7 @@ class MyWindow(MyMainWindow):
         self.data_well.problem_with_ek_depth = data[row][13]
         self.data_well.problem_with_ek_diameter = data[row][14]
 
-        DataWindow.definition_open_trunk_well(self)
+        self.definition_open_trunk_well()
 
         definition_plast_work(self)
         try:

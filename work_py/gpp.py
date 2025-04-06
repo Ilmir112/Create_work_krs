@@ -1,18 +1,12 @@
-from PyQt5 import QtWidgets
-from PyQt5.QtGui import QDoubleValidator
-from PyQt5.QtWidgets import QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayout, QWidget, QTabWidget, \
-     QPushButton
-
+from PyQt5.QtWidgets import QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayout, QWidget, \
+    QPushButton
 
 import krs
-import main
 import data_list
-from main import MyMainWindow
-from .parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
+from work_py.parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
 
-from .rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
-from .opressovka import TabPageSo
-from .grp import GrpWindow
+from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
+from work_py.grp import GrpWindow
 
 
 class TabPageSoGrp(TabPageUnion):
@@ -78,7 +72,7 @@ class GppWindow(WindowUnion):
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.table_widget = table_widget
-        
+
         self.paker_select = None
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
@@ -89,9 +83,9 @@ class GppWindow(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window  = None
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
-        
+
     def add_work(self):
         diameter_paker = int(float(self.tab_widget.currentWidget().diameter_paker_edit.text()))
         paker_depth = int(float(self.tab_widget.currentWidget().paker_depth_edit.text()))
@@ -122,7 +116,7 @@ class GppWindow(WindowUnion):
         if gpp_300 is False:
             return
 
-        main.MyWindow.check_gpp_upa(self, self.table_widget)
+        self.check_gpp_upa(self.table_widget)
 
         gpp_list = [
             ['За 48 часов оформить заявку на завоз оборудования ГРП.',
@@ -281,30 +275,12 @@ class GppWindow(WindowUnion):
              'Мастер КРС, представ. заказчика', lifting_nkt_norm(gpp_depth, 1.2)],
         ]
 
-        for row in GrpWindow.normalization(self, current_depth, diameter_paker, gis_otz_after_true_quest):
+        for row in self.normalization(current_depth, diameter_paker, gis_otz_after_true_quest):
             gpp_list.append(row)
 
         return gpp_list
 
-    def check_gpp_upa(self):
-        QMessageBox.information(self, 'Смена подъемника',
-                                      'Согласно регламента для проведения ГПП ГРП необходим тяжелый подьемник')
-        for row in range(self.table_widget.rowCount()):
-            for column in range(self.table_widget.columnCount()):
-                value = self.table_widget.item(row, column)
-                if value is not None:
-                    value = value.text()
-                    if 'Установить подъёмный агрегат на устье не менее 40т' in value:
-                        new_value = QtWidgets.QTableWidgetItem(
-                            f'Установить подъёмный агрегат на устье не менее 60т. '
-                            f'Пусковой комиссией составить акт готовности подъемного '
-                            f'агрегата и бригады для проведения ремонта скважины.')
-
-                        self.table_widget.setItem(row, column, new_value)
-
     def gpp_select(self, paker_depth):
-
-        from .opressovka import TabPageSo
         if self.data_well.column_diameter.get_value > 120:
             nkt_diam = '89'
         else:
@@ -335,5 +311,3 @@ class GppWindow(WindowUnion):
                           f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
 
         return paker_select, paker_short
-
-
