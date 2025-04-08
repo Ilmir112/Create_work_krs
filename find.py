@@ -1716,6 +1716,7 @@ class WellData(FindIndexPZ):
                 if mes == QMessageBox.StandardButton.No:
                     # self.pause_app()
                     return
+            return True
 
     @staticmethod
     def read_angle_well():

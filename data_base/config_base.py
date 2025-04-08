@@ -287,7 +287,7 @@ class WorkDatabaseWell:
                             str(well_number), well_area, contractor, costumer, work_plan_str,
                             type_kr, date_in_base))
 
-                        QMessageBox.information(None, 'Успешно', 'Данные удалены')
+                        QMessageBox.information(None, 'Успешно', 'Данные в базе обновлены')
                     else:
                         # Не забудьте сделать коммит
                         self.db_connection.commit()

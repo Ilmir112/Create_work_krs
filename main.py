@@ -34,7 +34,7 @@ from openpyxl.drawing.image import Image
 from PyQt5.QtCore import QThread, pyqtSlot, Qt, QObject, pyqtSignal, QTimer
 from PyQt5.QtGui import QPixmap
 
-from work_py.alone_oreration import kot_select
+
 from work_py.rationingKRS import lifting_nkt_norm, descentNKT_norm
 
 
@@ -168,6 +168,7 @@ class MyMainWindow(QMainWindow):
                 self.data_well.open_trunk_well = False
 
     def normalization(self, current_depth, diameter_paker, gis_otz_after_true_quest):
+        from work_py.alone_oreration import kot_select
 
         nkt_diam = self.data_well.nkt_diam
 
@@ -393,8 +394,10 @@ class MyMainWindow(QMainWindow):
                 WellFondData.read_well(
                     self.data_well, self.data_well.data_fond_min.get_value, self.data_well.pipes_ind.get_value)
 
-            WellData.read_well(self.data_well, self.data_well.cat_well_max.get_value,
+            read_data = WellData.read_well(self.data_well, self.data_well.cat_well_max.get_value,
                                self.data_well.data_pvr_min.get_value)
+            if read_data is None:
+                return
 
             WellPerforation.read_well(self.data_well, self.data_well.data_pvr_min.get_value,
                                       self.data_well.data_pvr_max.get_value + 1)
@@ -508,6 +511,8 @@ class MyMainWindow(QMainWindow):
                     self.read_pz(self.fname)
                     data_list.pause = True
                     self.data_well = self.read_excel_file()
+                    if self.data_well is None:
+                        return
                     read_pz = CreatePZ(self.data_well, self.ws, self)
 
                 except FileNotFoundError as f:
@@ -1307,6 +1312,12 @@ class MyWindow(MyMainWindow):
         from data_correct_position_people import CorrectSignaturesWindow
 
         action = self.sender()
+        if not self.table_widget is None:
+            mes = QMessageBox.question(self, 'Информация', 'Необходимо закрыть текущий проект, закрыть?')
+            if mes == QMessageBox.StandardButton.Yes:
+                self.close_file()
+            else:
+                return 
 
         if action == self.create_KRS and self.table_widget is None:
             self.work_plan = 'krs'
@@ -1458,10 +1469,6 @@ class MyWindow(MyMainWindow):
                 costumer = 'ООО Башнефть-добыча'
                 self.reload_class_well(costumer, 'ИГМ')
 
-            else:
-                mes = QMessageBox.question(self, 'Информация', 'Необходимо закрыть текущий проект, закрыть?')
-                if mes == QMessageBox.StandardButton.Yes:
-                    self.close_file()
 
     def reload_class_well(self, costumer, region):
         self.open_parent_class(costumer, region)
