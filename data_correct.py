@@ -1047,7 +1047,7 @@ class DataWindow(WindowUnion):
                     or (paker2_posle != 'отсут' and depth_fond_paker2_posle == 'отсут') \
                     or any(['ЭЦН' in dict_pump_ecn_do.upper(), 'ВНН' in dict_pump_ecn_do.upper(),
                             dict_pump_ecn_do == 'отсут']) is False:
-                QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
+                QMessageBox.information(self, 'Внимание', 'Не все поля в даннахы по насосом соответствуют значениям')
                 close_file = False
             if isinstance(self.if_none(head_column_additional), str):
                 # print(self.check_if_none(head_column_additional), isinstance(self.if_none(head_column_additional), str))
