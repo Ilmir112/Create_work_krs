@@ -115,6 +115,7 @@ class FindIndexPZ(MyMainWindow):
         self.static_level = ProtectedIsNonNone('не корректно')
         self.dinamic_level = ProtectedIsNonNone('не корректно')
         self.well_volume_in_pz = []
+        self.well_fluid_in_pz = []
         self.pressure_mkp = ProtectedIsNonNone('не корректно')
 
         self.column_direction_true = False
@@ -1240,6 +1241,14 @@ class WellCondition(FindIndexPZ):
                                                                               50,
                                                                               1, 70)
                                 self.well_volume_in_pz.append(well_volume_in_pz)
+
+                            if 'prs' in self.work_plan:
+                                well_fluid_in_pz = str(row[col + 2]).replace(',', '.')
+                            else:
+                                well_fluid_in_pz = str(row[col + 2]).replace(',', '.')
+
+                            self.well_fluid_in_pz.append(round(float(well_fluid_in_pz), 2))
+
 
         if self.static_level.get_value == 'не корректно':
             self.check_data_in_pz.append('не указан статический уровень')

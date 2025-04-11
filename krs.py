@@ -191,7 +191,7 @@ class TabPageGno(TabPageUnion):
             fluid_max = max(fluid_list)
         if fluid_max not in self.data_well.well_volume_in_pz:
             QMessageBox.warning(self, 'Удельный вес', f'Расчетный удельный вес {fluid_max}г/см3 не соответствует '
-                                                      f'указанныом у в ПЗ {self.data_well.well_volume_in_pz}')
+                                                      f'указанныом у в ПЗ {self.data_well.well_fluid_in_pz}')
         if work_plan == 'gnkt_frez' or work_plan == 'gnkt_opz':
             fluid_max = 1.18
         return fluid_max
