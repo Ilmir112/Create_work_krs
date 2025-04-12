@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox,
     QTableWidgetItem, QLineEdit
 
 import data_list
-from work_py.alone_oreration import  kot_work
+from work_py.alone_oreration import kot_work
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm
 from work_py.swabbing import SwabWindow
@@ -1008,8 +1008,6 @@ class AcidPakerWindow(WindowUnion):
                            * 30 / 9.52 + 0.003 * 30 / 9.52, 2)], )
                 work_template_list.extend(swab_work_list[1:])
 
-
-
         else:
             if self.paker_layout_combo != 'без монтажа компоновки на спуск':
                 work_template_list.append([None, None,
@@ -1131,9 +1129,9 @@ class AcidPakerWindow(WindowUnion):
                 paker_list.insert(1, self.privyazka_nkt()[0])
         if self.depth_gauge_combo == 'Да':
             paker_list.insert(0, [f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС', None,
-                              f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС',
-                              None, None, None, None, None, None, None,
-                              'мастер КРС', None])
+                                  f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС',
+                                  None, None, None, None, None, None, None,
+                                  'мастер КРС', None])
         return paker_list
 
     def paker_layout_one(self):
@@ -1195,12 +1193,12 @@ class AcidPakerWindow(WindowUnion):
             paker_list = [
                 [f'СПО {self.paker_short} до глубины {self.paker_depth}м, воронкой до '
                  f'{self.paker_depth + self.paker_khost}м',
-                    None, f'Спустить {self.paker_select} + {gidroyakor_str} на НКТ{nkt_diam}мм до глубины '
-                    f'{self.paker_depth}м, воронкой до {self.paker_depth + self.paker_khost}м'
-                    f' с замером, шаблонированием шаблоном {nkt_template}. '
-                    f'{("Произвести пробную посадку на глубине 50м" if self.data_well.column_additional is False else "")} ',
-                    None, None, None, None, None, None, None,
-                    'мастер КРС', descentNKT_norm(self.paker_depth, 1.2)],
+                 None, f'Спустить {self.paker_select} + {gidroyakor_str} на НКТ{nkt_diam}мм до глубины '
+                       f'{self.paker_depth}м, воронкой до {self.paker_depth + self.paker_khost}м'
+                       f' с замером, шаблонированием шаблоном {nkt_template}. '
+                       f'{("Произвести пробную посадку на глубине 50м" if self.data_well.column_additional is False else "")} ',
+                 None, None, None, None, None, None, None,
+                 'мастер КРС', descentNKT_norm(self.paker_depth, 1.2)],
                 [f'Посадить пакер на глубине {self.paker_depth}м', None,
                  f'Посадить пакер на глубине {self.paker_depth}м',
                  None, None, None, None, None, None, None,
@@ -1233,9 +1231,9 @@ class AcidPakerWindow(WindowUnion):
                     f'{("Произвести пробную посадку на глубине 50м" if self.data_well.column_additional is False else "")} ',
                     None, None, None, None, None, None, None,
                     'мастер КРС', descentNKT_norm(self.paker_depth, 1.2)],
-                [f'Опрессовать ЗУМПФ в инт {self.self.paker_depth_zumpf} - {self.data_well.current_bottom}м на '
+                [f'Опрессовать ЗУМПФ в инт {self.paker_depth_zumpf} - {self.data_well.current_bottom}м на '
                  f'Р={self.data_well.max_admissible_pressure.get_value}атм', None,
-                 f'Посадить пакер. Опрессовать ЗУМПФ в интервале {self.self.paker_depth_zumpf} - '
+                 f'Посадить пакер. Опрессовать ЗУМПФ в интервале {self.paker_depth_zumpf} - '
                  f'{self.data_well.current_bottom}м на '
                  f'Р={self.data_well.max_admissible_pressure.get_value}атм в течение 30 минут в '
                  f'присутствии представителя заказчика, '

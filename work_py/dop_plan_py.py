@@ -333,7 +333,7 @@ class TabPageDp(TabPageUnion):
             skm_interval = ''
 
             try:
-                if len(self.data_well.skm_interval) != 0:
+                if not self.data_well.skm_interval:
                     for roof, sole in self.data_well.skm_interval:
                         if f'{roof}-{sole}' not in skm_interval:
                             skm_interval += f'{roof}-{sole}, '
