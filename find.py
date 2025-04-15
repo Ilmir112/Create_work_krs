@@ -36,7 +36,7 @@ class FindIndexPZ(MyMainWindow):
         self.modal_dialog = None
         self.image_loader = None
         self.water_density = ProtectedIsDigit(1.18)
-        self.result_pressure_date = None
+        self.result_pressure_date = ProtectedIsNonNone('01.01.2000')
         self.column_direction_mine_diameter, self.column_direction_mine_wall_thickness, \
         self.column_direction_mine_length, self.level_cement_direction_mine = None, None, None, None
         self.fluid_work = None
@@ -1525,7 +1525,7 @@ class WellData(FindIndexPZ):
 
                     elif 'Уровень цемента за колонной' in str(value):
 
-                        self.level_cement_column = ProtectedIsDigit(str(row[col + 3]).strip())
+                        self.level_cement_column = ProtectedIsDigit(str(row[col + 2]).strip())
                         self.level_cement_column = self.definition_is_none(
                             self.level_cement_column, row_index, col, 1)
 

@@ -288,7 +288,7 @@ class GnoWindow(WindowUnion):
             if check_question == QMessageBox.StandardButton.No:
                 return
             if work_list:
-                if self.data_well.work_plan != 'krs':
+                if self.data_well.work_plan not in ['krs', 'prs']:
                     work_list = work_list[2:]
 
                 self.populate_row(self.insert_index, work_list, self.table_widget)
@@ -455,12 +455,13 @@ class GnoParent(ABC):
             water_fresh = data_list.DICT_CALC_CAZHG[float(self.fluid)][0]
             volume_chemistry = data_list.DICT_CALC_CAZHG[float(self.fluid)][1]
 
-        krs_begin = [[None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None, None,
+        krs_begin = [
+            [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None, None,
                       None, None, None],
-                     [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
+            [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
                       'Ответственный',
                       'Нормы времени \n мин/час.'],
-                     [None, None,
+            [None, None,
                       f'Начальнику смены ЦТКРС, вызвать телефонограммой представителя Заказчика для оформления АКТа '
                       f'приёма-передачи скважины в ремонт. \n'
                       f'Совместно с представителем Заказчика оформить схему расстановки оборудования при КРС с обязательной '

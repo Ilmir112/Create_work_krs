@@ -16,6 +16,7 @@ import win32gui
 import base64
 from io import BytesIO
 
+from work_py.progress_bar_save import ProgressBarWindow
 from openpyxl.reader.excel import load_workbook
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
     QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog, QTabWidget, QTableWidgetItem, \
@@ -396,8 +397,8 @@ class MyMainWindow(QMainWindow):
 
             read_data = WellData.read_well(self.data_well, self.data_well.cat_well_max.get_value,
                                self.data_well.data_pvr_min.get_value)
-            if read_data is None:
-                return
+            # if read_data is None:
+            #     return
 
             WellPerforation.read_well(self.data_well, self.data_well.data_pvr_min.get_value,
                                       self.data_well.data_pvr_max.get_value + 1)
@@ -537,7 +538,6 @@ class MyMainWindow(QMainWindow):
                     self.gnkt_data = WorkWithGnkt(self.ws, self.table_title, self.table_schema, self.table_widget,
                                                   self.data_well)
                 elif self.work_plan in ['prs']:
-
                     self.wb2_prs = Workbook()
                     self.ws2_prs = self.wb2_prs.active
 
@@ -896,7 +896,7 @@ class MyMainWindow(QMainWindow):
         from krs import GnoWindow
         if sheet:
             rows = sheet.max_row
-            if work_plan == 'krs':
+            if work_plan in ['krs', 'prs']:
                 self.data_well.insert_index2 = rows
 
             merged_cells = sheet.merged_cells
@@ -2640,7 +2640,7 @@ class SaveInExcel(MyWindow):
             self.data_well.itog_ind_max = len(work_list)
             if 'prs' not in self.data_well.work_plan:
                 self.ws2_prs = None
-            self.add_itog(self.ws2, self.table_widget.rowCount() + 1, self.data_well.work_plan, self.ws2_prs)
+            self.add_itog(self.ws2, self.table_widget.rowCount() + 1, self.data_well.work_plan)
 
             # try:
             for row_ind, row in enumerate(self.ws2.iter_rows(values_only=True)):
@@ -2799,6 +2799,10 @@ class SaveInExcel(MyWindow):
         from openpyxl.utils.cell import range_boundaries, get_column_letter
         from PIL import Image
 
+        stop_str = len(work_list)
+        self.progress_bar_window = ProgressBarWindow(stop_str)
+        self.progress_bar_window.show()
+
         boundaries_dict = {}
 
         text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 95: (301, 400), 110: (401, 500),
@@ -2834,6 +2838,7 @@ class SaveInExcel(MyWindow):
         boundaries_dict_index = 1000
         stop_str = 1500
         for i in range(1, len(work_list) + 1):  # Добавлением работ
+            self.progress_bar_window.start_loading(i)
             if 'Наименование работ' in work_list[i - 1][2]:
                 boundaries_dict_index = i + 1
 

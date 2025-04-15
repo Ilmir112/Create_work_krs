@@ -292,11 +292,13 @@ class TabPageSoCorrect(TabPageUnion):
 
         self.date_commissioning_Label = QLabel('Дата ввода в эксплуатацию')
         self.date_commissioning_line = QLineEdit(self)
-        self.date_commissioning_line.setText(self.data_well.date_commissioning.get_value)
+        if self.data_well.date_commissioning:
+            self.date_commissioning_line.setText(self.data_well.date_commissioning.get_value)
 
         self.result_pressure_date_label = QLabel('Дата последней опрессовки')
         self.result_pressure_date = QLineEdit(self)
-        self.result_pressure_date.setText(self.data_well.result_pressure_date.get_value)
+        if self.data_well.result_pressure_date.get_value != '01.01.2000':
+            self.result_pressure_date.setText(self.data_well.result_pressure_date.get_value)
 
         self.curator_Label = QLabel('Куратор ремонта')
         self.curator_Combo = QComboBox(self)
@@ -339,7 +341,6 @@ class TabPageSoCorrect(TabPageUnion):
         self.grid.addWidget(self.well_oilfield_line, 93, 4)
         self.grid.addWidget(self.appointment_well_label, 92, 5)
         self.grid.addWidget(self.appointment_well_line, 93, 5)
-
 
         self.grid.addWidget(self.column_conductor_diameter_Label, 2, 0)
         self.grid.addWidget(self.column_conductor_diameter_edit, 3, 0)
@@ -1363,6 +1364,7 @@ class DataWindow(WindowUnion):
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()
+
     @staticmethod
     def check_date_format(date_string):
         pattern = r'^\d{2}\.\d{2}\.\d{4}$'
