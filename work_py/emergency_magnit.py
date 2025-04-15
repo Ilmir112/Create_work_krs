@@ -141,6 +141,7 @@ class EmergencyMagnit(WindowUnion):
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
         data_list.operation_window = None
+        self.close_modal_forcefully()
         event.accept()  # Принимаем событие закрытия
 
     def add_work(self):
@@ -184,6 +185,7 @@ class EmergencyMagnit(WindowUnion):
         self.populate_row(self.insert_index, raid_list, self.table_widget)
         data_list.pause = False
         self.close()
+        self.close_modal_forcefully()
 
     def emergency_magnit(self, print_diameter_line, nkt_str_combo, print_type_combo, nkt_key,
                          emergency_bottom_line):
