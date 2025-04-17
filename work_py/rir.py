@@ -1204,6 +1204,9 @@ class RirWindow(WindowUnion):
             current_widget = self.tab_widget.currentWidget()
             plast_combo = str(current_widget.plast_combo.combo_box.currentText())
             self.rir_type_combo = str(current_widget.rir_type_combo.currentText())
+            if self.rir_type_combo == '':
+                QMessageBox.warning(self, 'Ошибка', 'Не выбран тип РИР')
+                return
             self.need_privyazka_q_combo = current_widget.need_privyazka_q_combo.currentText()
             roof_rir_edit = current_widget.roof_rir_edit.text().replace(',', '.')
             if roof_rir_edit != '':

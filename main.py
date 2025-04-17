@@ -601,6 +601,8 @@ class MyMainWindow(QMainWindow):
             string_work = 'ГНКТ ОПЗ'
         elif self.data_well.work_plan == 'gnkt_after_grp':
             string_work = 'ГНКТ ОСВ ГРП'
+        elif self.data_well.work_plan == 'prs':
+            string_work = 'ПРС'
         else:
             string_work = 'ГНКТ'
 
@@ -637,15 +639,17 @@ class MyMainWindow(QMainWindow):
             data_list.DICT_VOLUME_CHEMISTRY['гидрофабизатор'] += volume
 
     def save_file_dialog(self, wb2, full_path):
-        try:
-            file_name, _ = QFileDialog.getSaveFileName(self, "Save excel-file",
-                                                       f"{full_path}", "Excel Files (*.xlsx)")
-            if file_name:
-                wb2.save(file_name)
-        except Exception as e:
-            QMessageBox.critical(self, 'Ошибка',
-                                 f'файл под таким именем открыт, закройте его: {type(e).__name__}\n\n{str(e)}')
-            return
+        while True:  # Начинаем бесконечный цикл
+            try:
+                file_name, _ = QFileDialog.getSaveFileName(None, "Save excel-file",
+                                                           f"{full_path}", "Excel Files (*.xlsm)")
+                if file_name:  # Если имя файла не пустое
+                    wb2.save(file_name)  # Пытаемся сохранить
+                    break  # Если сохранение успешно, выходим из цикла
+
+            except Exception as e:
+                QMessageBox.critical(None, 'Ошибка',
+                                     f'файл под таким именем открыт, закройте его: {type(e).__name__}\n  {str(e)}')
         try:
             # Создаем объект Excel
             excel = win32com.client.Dispatch("Excel.Application")
@@ -2747,17 +2751,17 @@ class SaveInExcel(MyWindow):
                 self.save_file_dialog(self.wb2, full_path)
 
     def save_file_dialog(self, wb2, full_path):
-        try:
-            file_name, _ = QFileDialog.getSaveFileName(None, "Save excel-file",
-                                                       f"{full_path}", "Excel Files (*.xlsx)")
-            if file_name:
-                wb2.save(file_name)
-                # wb2.save(full_path)
-                print(f'Table data saved to Excel {full_path}')
-        except Exception as e:
-            QMessageBox.critical(None, 'Ошибка',
-                                 f'файл под таким именем открыт, закройте его: {type(e).__name__}\n\n{str(e)}')
-            return
+        while True:  # Начинаем бесконечный цикл
+            try:
+                file_name, _ = QFileDialog.getSaveFileName(None, "Save excel-file",
+                                                           f"{full_path}", "Excel Files (*.xlsm)")
+                if file_name:  # Если имя файла не пустое
+                    wb2.save(file_name)  # Пытаемся сохранить
+                    break  # Если сохранение успешно, выходим из цикла
+
+            except Exception as e:
+                QMessageBox.critical(None, 'Ошибка',
+                                     f'файл под таким именем открыт, закройте его: {type(e).__name__}\n  {str(e)}')
         try:
             # Создаем объект Excel
             excel = win32com.client.Dispatch("Excel.Application")

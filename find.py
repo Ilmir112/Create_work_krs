@@ -1144,7 +1144,7 @@ class WellHistoryData(FindIndexPZ):
                             self.result_pressure,
                             row_index + begin_index,
                             col + 1, 1)
-                    elif 'Дата опрессовки' in str(value):
+                    elif 'дата опрессовки' in str(value).lower():
                         self.result_pressure_date = ProtectedIsDigit(row[col + 2])
                         if type(self.result_pressure_date.get_value) is datetime:
                             self.result_pressure_date = ProtectedIsDigit(self.result_pressure_date.get_value.strftime(

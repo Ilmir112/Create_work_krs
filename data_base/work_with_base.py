@@ -22,6 +22,7 @@ from decrypt import decrypt
 
 from main import MyMainWindow, ExcelWorker
 from work_py.alone_oreration import well_volume
+from work_py.progress_bar_save import ProgressBarWindow
 
 
 class ClassifierWell(MyMainWindow):
@@ -206,6 +207,8 @@ class ClassifierWell(MyMainWindow):
         wb = load_workbook(fname)
         ws = wb.active
         check_param = ''
+        self.progress_bar_window = ProgressBarWindow(ws.max_row)
+        self.progress_bar_window.show()
         # Получение данных из Excel и запись их в базу данных
         for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
             for col, value in enumerate(row):
@@ -259,6 +262,7 @@ class ClassifierWell(MyMainWindow):
                                                 area_column = col
 
                             for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
+                                self.progress_bar_window.start_loading(index_row + 1)
                                 if index_row > area_row:
                                     well_number = row[well_column]
                                     area_well = row[area_column]
@@ -324,6 +328,8 @@ class ClassifierWell(MyMainWindow):
         # Загрузка файла Excel
         wb = load_workbook(fname)
         ws = wb.active
+        self.progress_bar_window = ProgressBarWindow(ws.max_row)
+        self.progress_bar_window.show()
 
         try:
             self.classification_well = CheckWellExistence(self.db)
@@ -344,6 +350,7 @@ class ClassifierWell(MyMainWindow):
 
                             for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
                                 if index_row < area_row and check_file:
+                                    self.progress_bar_window.start_loading(index_row + 1)
                                     for col, value in enumerate(row):
                                         if not value is None and col <= 18:
                                             if '01.01.' in str(value) or '01.04.' in str(value) or '01.07.' in str(

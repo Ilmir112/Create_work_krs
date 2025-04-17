@@ -122,7 +122,7 @@ class RegisterWindow(QDialog):
 
         self.label_position = QLabel("Должность:", self)
         self.position = QComboBox(self)
-        self.position.addItems(['Ведущий геолог ', 'Главный геолог', 'геолог'])
+        self.position.addItems(['Ведущий геолог ', 'Главный геолог', 'Геолог', 'Ведущий технолог', 'Нормировщик', 'Заместитель начальника ПТО'])
 
         self.label_organization = QLabel("Организация:", self)
         self.organization = QComboBox(self)
