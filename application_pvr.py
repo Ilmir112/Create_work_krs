@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout,  QPushButton, \
-    QMessageBox, QApplication, QTableWidget, QTableWidgetItem, QVBoxLayout, QHeaderView
+    QMessageBox, QTableWidget, QTableWidgetItem, QHeaderView
 import openpyxl
 
 import data_list
@@ -77,13 +77,13 @@ class TabPageSoPvr(TabPageUnion):
         self.ComboBoxCharges.setProperty("value", 'ГП')
 
         self.labelHolesMetr = QLabel("отверстий на 1п.м", self)
-        self.lineEditHolesMetr = QComboBox(self)
-        self.lineEditHolesMetr.addItems(['6', '8', '10', '16', '18', '20', '30'])
-        self.lineEditHolesMetr.setProperty("value", '20')
+        self.lineedit_holes_metr = QComboBox(self)
+        self.lineedit_holes_metr.addItems(['6', '8', '10', '16', '18', '20', '30'])
+        self.lineedit_holes_metr.setProperty("value", '20')
 
         self.labelIndexFormation = QLabel("Индекс пласта", self)
-        self.lineEditIndexFormation = QLineEdit(self)
-        self.lineEditIndexFormation.setClearButtonEnabled(True)
+        self.lineedit_index_formation = QLineEdit(self)
+        self.lineedit_index_formation.setClearButtonEnabled(True)
 
         self.label_type_pvr = QLabel("Вид перфорации", self)
         self.combo_pvr_type = QComboBox(self)
@@ -135,16 +135,16 @@ class TabPageSoPvr(TabPageUnion):
         self.grid.addWidget(self.ComboBoxCharges, 23, 4)
 
         self.grid.addWidget(self.labelHolesMetr, 22, 5)
-        self.grid.addWidget(self.lineEditHolesMetr, 23, 5)
+        self.grid.addWidget(self.lineedit_holes_metr, 23, 5)
 
         self.grid.addWidget(self.labelIndexFormation, 22, 6)
-        self.grid.addWidget(self.lineEditIndexFormation, 23, 6)
+        self.grid.addWidget(self.lineedit_index_formation, 23, 6)
         self.grid.addWidget(self.label_type_pvr, 22, 7)
         self.grid.addWidget(self.combo_pvr_type, 23, 7)
 
         self.number_brigada_combo.currentTextChanged.connect(self.update_brigade)
 
-    def update_brigade(self, index):
+    def update_brigade(self):
         self.number_telephone_edit.setText(str(data_list.DICT_TELEPHONE[self.number_brigada_combo.currentText()]))
 
 
@@ -184,7 +184,7 @@ class PvrApplication(WindowUnion):
         self.buttonadd_work = QPushButton('Создать заявку')
         self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
         self.buttonAddProject = QPushButton('Добавить интервалы перфорации из плана')
-        self.buttonAddProject.clicked.connect(self.addPerfProject)
+        self.buttonAddProject.clicked.connect(self.add_perforation_project)
 
 
         vbox = QGridLayout(self.centralWidget)
@@ -195,7 +195,7 @@ class PvrApplication(WindowUnion):
         vbox.addWidget(self.buttonadd_work, 3, 0)
         vbox.addWidget(self.buttonAddProject, 3, 1)
 
-    def addPerfProject(self):
+    def add_perforation_project(self):
         for row_ind, row in enumerate(self.data_well.ws.iter_rows(values_only=True)):
             for col_ind, col in enumerate(row):
                 if col_ind in [3, 2]:
@@ -234,10 +234,11 @@ class PvrApplication(WindowUnion):
         edit_type = self.tab_widget.currentWidget().lineedit_type.text().replace(',', '.')
         edit_type2 = self.tab_widget.currentWidget().lineedit_type2.text().replace(',', '.')
         chargesx = str(self.tab_widget.currentWidget().ComboBoxCharges.currentText())
-        editHolesMetr = self.tab_widget.currentWidget().lineEditHolesMetr.currentText()
-        editIndexFormation = self.tab_widget.currentWidget().lineEditIndexFormation.text()
-        dopInformation = self.tab_widget.currentWidget().lineEditDopInformation.text()
-        if not edit_type or not edit_type2 or not chargesx or not editIndexFormation:
+        edit_holes_metr = self.tab_widget.currentWidget().lineedit_holes_metr.currentText()
+        edit_index_formation = self.tab_widget.currentWidget().lineedit_index_formation.text()
+        dop_information = self.tab_widget.currentWidget().lineEditdop_information.text()
+
+        if not edit_type or not edit_type2 or not chargesx or not edit_index_formation:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
         if float(edit_type2.replace(',', '.')) >= float(self.data_well.current_bottom):
@@ -247,16 +248,17 @@ class PvrApplication(WindowUnion):
         # chargesx = PerforationWindow.charge(self, int(float(edit_type2)))[0][:-2] + chargesx)
 
         self.tableWidget.setSortingEnabled(False)
+
         rows = self.tableWidget.rowCount()
         self.tableWidget.insertRow(rows)
         self.tableWidget.setItem(rows, 0, QTableWidgetItem(edit_type))
         self.tableWidget.setItem(rows, 1, QTableWidgetItem(edit_type2))
         self.tableWidget.setItem(rows, 2, QTableWidgetItem(chargesx))
-        self.tableWidget.setItem(rows, 3, QTableWidgetItem(editHolesMetr))
+        self.tableWidget.setItem(rows, 3, QTableWidgetItem(edit_holes_metr))
         self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(int((float(edit_type2) - float(
-            edit_type)) * int(editHolesMetr)))))
-        self.tableWidget.setItem(rows, 5, QTableWidgetItem(editIndexFormation))
-        self.tableWidget.setItem(rows, 6, QTableWidgetItem(dopInformation))
+            edit_type)) * int(edit_holes_metr)))))
+        self.tableWidget.setItem(rows, 5, QTableWidgetItem(edit_index_formation))
+        self.tableWidget.setItem(rows, 6, QTableWidgetItem(dop_information))
         self.tableWidget.setSortingEnabled(True)
         # print(edit_type, spinYearOfIssue, editSerialNumber, editSpecifications)
 

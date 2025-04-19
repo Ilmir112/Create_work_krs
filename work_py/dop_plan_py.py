@@ -413,7 +413,7 @@ class DopPlanWindow(WindowUnion):
         self.buttonadd_work = QPushButton('Создать доп план работ')
         self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
         self.buttonAddProject = QPushButton('Добавить проектные интервалы перфорации')
-        self.buttonAddProject.clicked.connect(self.addPerfProject)
+        self.buttonAddProject.clicked.connect(self.add_perforation_project)
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
@@ -475,7 +475,7 @@ class DopPlanWindow(WindowUnion):
             self.tableWidget.setItem(rows, 8, QTableWidgetItem(str(self.pressure_pvr_edit)))
             self.tableWidget.setItem(rows, 9, QTableWidgetItem(str(self.date_pressure_edit)))
 
-    def addPerfProject(self):
+    def add_perforation_project(self):
         current_widget = self.tab_widget.currentWidget()
         table_in_base_combo = str(current_widget.well_data_in_base_combo.currentText())
 

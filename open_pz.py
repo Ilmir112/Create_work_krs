@@ -1,4 +1,4 @@
-import base64
+import json
 from abc import ABC, abstractmethod
 
 from openpyxl import styles
@@ -6,13 +6,12 @@ from openpyxl import styles
 import data_list
 from datetime import datetime
 from openpyxl.utils import get_column_letter
-
 from openpyxl.styles import Font, Alignment, Border, Side
 
 from cdng import events_gnvp, add_itog, events_gnvp_gnkt
 from main import MyMainWindow
 
-from block_name import razdel_1, curator_sel, pop_down
+from block_name import curator_sel, pop_down, current_datetime
 from work_py.dop_plan_py import DopPlanWindow
 
 
@@ -96,8 +95,6 @@ class CreatePZ(MyMainWindow):
                                                                  shrink_to_fit=cell.alignment.shrink_to_fit,
                                                                  indent=cell.alignment.indent)
 
-
-
             # Копирование высоты строки
             target_sheet.row_dimensions[target_start_row + row - start_row + 1].height = \
                 source_sheet.row_dimensions[row].height
@@ -110,11 +107,197 @@ class CreatePZ(MyMainWindow):
         for merged_range in source_sheet.merged_cells.ranges:
             if merged_range.bounds[0] >= start_col and merged_range.bounds[2] <= end_col and \
                     merged_range.bounds[1] >= start_row and merged_range.bounds[3] <= end_row:
-
                 target_sheet.merge_cells(start_row=target_start_row + merged_range.bounds[1] - start_row + 1,
                                          start_column=merged_range.bounds[0],
                                          end_row=target_start_row + merged_range.bounds[3] - start_row + 1,
                                          end_column=merged_range.bounds[2])
+
+
+    def work_podpisant_list(self, region, contractor):
+        with open(f'{data_list.path_image}podpisant.json', 'r', encoding='utf-8') as file:
+            podpis_dict = json.load(file)
+        work_podpisant_list = ''
+        if 'prs' in self.data_well.work_plan:
+            if 'Ойл' in contractor:
+                if region == 'ЧГМ' or region == 'ТГМ' or 'gnkt' in self.data_well.work_plan:
+                    data_list.ctkrs = "ЦТКРС №1"
+                elif region == 'КГМ' or region == 'АГМ':
+                    data_list.ctkrs = "ЦТКРС №2"
+                elif region == 'ИГМ':
+                    data_list.ctkrs = 'ЦТКРС №4'
+
+            nach_cdng_post = \
+                podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value][
+                    'Начальник'][
+                    'post'] + ' ' + self.data_well.cdng.get_value
+            nach_cdng_name = \
+                podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value][
+                    'Начальник'][
+                    "surname"]
+            nach_cdng_name = nach_cdng_name.split(' ')
+            nach_cdng_name = f'{nach_cdng_name[0]} {nach_cdng_name[1][0]}.{nach_cdng_name[1][0]}.'
+            technol_cdng_post = \
+                podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value][
+                    'Ведущий инженер-технолог']['post'] + ' ' + self.data_well.cdng.get_value
+            technol_cdng_name = \
+                podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value][
+                    'Ведущий инженер-технолог']["surname"]
+            technol_cdng_name = technol_cdng_name.split(' ')
+            technol_cdng_name = f'{technol_cdng_name[0]} {technol_cdng_name[1][0]}.{technol_cdng_name[1][0]}.'
+            geolog_cdng_post = \
+                podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value][
+                    'Ведущий геолог']['post'] + ' ' + self.data_well.cdng.get_value
+            geolog_cdng_name = \
+                podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value][
+                    'Ведущий геолог']["surname"]
+            geolog_cdng_name = geolog_cdng_name.split(' ')
+            geolog_cdng_name = f'{geolog_cdng_name[0]} {geolog_cdng_name[1][0]}.{geolog_cdng_name[1][0]}.'
+            nach_ctkrs_post = podpis_dict[data_list.contractor][data_list.ctkrs]['начальник']['post']
+            nach_ctkrs_name = podpis_dict[data_list.contractor][data_list.ctkrs]['начальник']["surname"]
+
+            work_podpisant_list = [
+                [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
+                [None, nach_cdng_post, None, None, None, None, None, nach_ctkrs_post, None, None, None, None],
+                [None, f'____________{nach_cdng_name}',
+                 None, None, None, None, None,
+                 f'_____________{nach_ctkrs_name}', None, None, None, None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
+                 f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None,
+                 technol_cdng_post,
+                 None, None, None, None, None, None, None, None, None, None],
+                [None,
+                 f'____________{technol_cdng_name}',
+                 None, None, None, None, None, None, None, None, None, None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
+                 None, None, None, None, None],
+                [None,
+                 geolog_cdng_post,
+                 None, None, None, None, None, None, None, None, None, None],
+                [None,
+                 f'____________{geolog_cdng_name}',
+                 None, None, None, None, None, None, None, None, None, None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
+                 None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None]]
+        else:
+            if 'Ойл' in contractor:
+                сhief_engineer_post = podpis_dict[data_list.contractor]["Руководство"]["сhief_engineer"]["post"]
+                сhief_engineer_surname = podpis_dict[data_list.contractor]["Руководство"]["сhief_engineer"]["surname"]
+                chief_geologist_post = podpis_dict[data_list.contractor]["Руководство"]["chief_geologist"]["post"]
+                chief_geologist_surname = podpis_dict[data_list.contractor]["Руководство"]["chief_geologist"]["surname"]
+            elif 'РН' in contractor:
+                asdwd = data_list.user
+                number_expedition = [number for number in data_list.user[0] if number.isdigit()][0]
+                expedition = f'Экспедиция № {number_expedition}'
+
+                сhief_engineer_post = podpis_dict[data_list.contractor]['Экспедиция'][expedition]["сhief_engineer"]["post"]
+                сhief_engineer_surname = podpis_dict[data_list.contractor]['Экспедиция'][expedition]["сhief_engineer"]["surname"]
+                chief_geologist_post = podpis_dict[data_list.contractor]['Экспедиция'][expedition]["chief_geologist"]["post"]
+                chief_geologist_surname = podpis_dict[data_list.contractor]['Экспедиция'][expedition]["chief_geologist"]["surname"]
+
+            work_podpisant_list = [
+                [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
+                [None, podpis_dict[data_list.costumer][region]['gi']['post'], None, None, None, None, None,
+                 сhief_engineer_post, None, None, None, None],
+                [None, f'____________{podpis_dict[data_list.costumer][region]["gi"]["surname"]}', None, None, None,
+                 None, None,
+                 f'_____________{сhief_engineer_surname}', None, None, None,
+                 None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
+                 f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, podpis_dict[data_list.costumer][region]['gg']['post'], None, None, None,
+                 None, None, f'{chief_geologist_post}', None, None, None, None],
+                [None, f'_____________{podpis_dict[data_list.costumer][region]["gg"]["surname"]}', None, None, None,
+                 None,
+                 None,
+                 f'_____________{chief_geologist_surname}', None, None, '',
+                 None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, '', None, None,
+                 f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None]]
+
+        podp_grp = [[None, 'Представитель подрядчика по ГРП', None, None, None, None, None, None, None, None, None,
+                     None],
+                    [None, '_____________', None, None, None, None, None, None, None, None, None, None],
+                    [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None, None,
+                     None, None, None,
+                     None]]
+        podp_bvo = [
+            [None, 'Районный инженер Башкирского ', None, None, None, None, None, None, None, None, None, None],
+            [None, 'военизированного отряда ', None, None, None, None, None, None, None, None, None, None],
+            [None, '_____________', None, None, None, None, None, None, None, None, None, None],
+            [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None, None,
+             None, None, None,
+             None]]
+        if data_list.data_in_base is False:
+
+            if len(self.data_well.plast_work) != 0:
+
+                try:
+                    cat_P_1 = self.data_well.dict_category[self.data_well.plast_work[0]]['по давлению'].category
+                    category_h2s_list = self.data_well.dict_category[self.data_well.plast_work[0]][
+                        'по сероводороду'].category
+                    cat_gaz = self.data_well.dict_category[self.data_well.plast_work[0]]['по газовому фактору'].category
+                except:
+                    cat_P_1 = self.data_well.category_pressure_well[0]
+                    category_h2s_list = self.data_well.category_h2s_list[0]
+                    cat_gaz = self.data_well.category_gaz_factor_percent[0]
+            else:
+                cat_P_1 = self.data_well.category_pressure_well[0]
+                category_h2s_list = self.data_well.category_h2s_list[0]
+                cat_gaz = self.data_well.category_gaz_factor_percent[0]
+            try:
+                cat_P_1_plan = self.data_well.dict_category[self.data_well.plast_project[0]]['по давлению'].category
+                category_h2s_list_plan = self.data_well.dict_category[self.data_well.plast_project[0]][
+                    'по сероводороду'].category
+                cat_gaz_plan = self.data_well.dict_category[self.data_well.plast_project[0]][
+                    'по газовому фактору'].category
+            except:
+                cat_P_1_plan = 3
+                category_h2s_list_plan = 3
+                cat_gaz_plan = 3
+
+            if 1 in [cat_P_1, cat_P_1_plan, category_h2s_list, cat_gaz, category_h2s_list_plan, cat_gaz_plan,
+                     self.data_well.category_pressure] or '1' in [cat_P_1, cat_P_1_plan, category_h2s_list, cat_gaz,
+                                                                  category_h2s_list_plan, cat_gaz_plan,
+                                                                  self.data_well.category_pressure] or \
+                    self.data_well.curator == 'ВНС':
+                for row in range(len(podp_bvo)):
+                    for col in range(len(podp_bvo[row])):
+                        work_podpisant_list[row + 9][col] = podp_bvo[row][col]
+
+            if self.data_well.grp_plan is True and 'gnkt' not in self.data_well.work_plan:
+                for row in range(len(podp_grp)):
+                    for col in range(len(podp_grp[row])):
+                        work_podpisant_list[row + 13][col] = podp_grp[row][col]
+
+        return work_podpisant_list
+
+    def append_podpisant_up(self, ws):
+        razdel = self.work_podpisant_list(self.data_well.region, data_list.contractor)
+        for i in range(1, len(razdel)):  # Добавлением подписантов на вверху
+            for j in range(1, 13):
+                ws.cell(row=i, column=j).value = razdel[i - 1][j - 1]
+                ws.cell(row=i, column=j).font = Font(name='Arial Cyr', size=13, bold=True)
+            ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=7)
+            ws.merge_cells(start_row=i, start_column=8, end_row=i, end_column=12)
+            ws.row_dimensions[i].height = 20
+        ws.row_dimensions[i + 1].height = 20
+        ws.row_dimensions[i + 1].height = 20
 
     def insert_events_gnvp(self, ws, dict_events_gnvp, merge_count=0):
         # if work_plan != 'dop_plan':
@@ -132,10 +315,10 @@ class CreatePZ(MyMainWindow):
         if 'Ойл' in data_list.contractor:
             for row_index, row_gnvp in enumerate(dict_events_gnvp[self.data_well.work_plan]):
 
-                data = ws.cell(row=row_index + max_row+1, column=2)
+                data = ws.cell(row=row_index + max_row + 1, column=2)
 
                 data.value = row_gnvp[1]
-                ws.merge_cells(start_row=row_index + max_row+1, start_column=2, end_row=row_index + max_row+1,
+                ws.merge_cells(start_row=row_index + max_row + 1, start_column=2, end_row=row_index + max_row + 1,
                                end_column=12 + merge_count)
                 if 'Мероприятия' in str(data.value) or \
                         'Меры по предупреждению' in str(data.value) or \
@@ -161,7 +344,7 @@ class CreatePZ(MyMainWindow):
                     text = data.value
                     for key, value in text_width_dict.items():
                         if value[0] <= len(text) <= value[1]:
-                            ws.row_dimensions[row_index + max_row + 1].height = int(key)*1.1
+                            ws.row_dimensions[row_index + max_row + 1].height = int(key) * 1.1
 
         elif 'РН' in data_list.contractor:
             # Устанавливаем красный цвет для текста
@@ -235,8 +418,6 @@ class CreatePZ(MyMainWindow):
 
     def open_excel_file(self, ws, work_plan, ws2=None):
 
-        razdel = razdel_1(self, self.data_well.region, data_list.contractor)
-
         # print(f' индекс вставки ГНВП{self.data_well.insert_index}')
         dict_events_gnvp = {}
         dict_events_gnvp['krs'] = events_gnvp(self, data_list.contractor)
@@ -266,15 +447,7 @@ class CreatePZ(MyMainWindow):
                                                 'application_gis', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz',
                                                 'plan_change', 'prs']:
                 # print(f'план работ {self.data_well.work_plan}')
-                for i in range(1, len(razdel)):  # Добавлением подписантов на вверху
-                    for j in range(1, 13):
-                        ws.cell(row=i, column=j).value = razdel[i - 1][j - 1]
-                        ws.cell(row=i, column=j).font = Font(name='Arial Cyr', size=13, bold=True)
-                    ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=7)
-                    ws.merge_cells(start_row=i, start_column=8, end_row=i, end_column=12)
-                    ws.row_dimensions[i].height = 20
-                ws.row_dimensions[i + 1].height = 20
-                ws.row_dimensions[i + 1].height = 20
+                self.append_podpisant_up(ws)
 
                 # if work_plan != 'dop_plan':
                 text_width_dict = {20: (0, 100), 30: (101, 200), 40: (201, 300), 60: (301, 400), 70: (401, 500),
@@ -320,7 +493,7 @@ class CreatePZ(MyMainWindow):
                                 text = data.value
                                 for key, value in text_width_dict.items():
                                     if value[0] <= len(text) <= value[1]:
-                                        ws.row_dimensions[i].height = int(key*1.1)
+                                        ws.row_dimensions[i].height = int(key * 1.1)
 
                     elif 'РН' in data_list.contractor:
 
@@ -427,16 +600,7 @@ class CreatePZ(MyMainWindow):
 
                 return ws
             elif 'prs' in self.data_well.work_plan:
-
-                for i in range(1, len(razdel)):  # Добавлением подписантов на вверху
-                    for j in range(1, 13):
-                        ws2.cell(row=i, column=j).value = razdel[i - 1][j - 1]
-                        ws2.cell(row=i, column=j).font = Font(name='Arial Cyr', size=13, bold=True)
-                    ws2.merge_cells(start_row=i, start_column=2, end_row=i, end_column=7)
-                    ws2.merge_cells(start_row=i, start_column=8, end_row=i, end_column=12)
-                    ws2.row_dimensions[i].height = 20
-                ws2.row_dimensions[i + 1].height = 20
-                ws2.row_dimensions[i + 1].height = 20
+                self.append_podpisant_up(ws)
 
                 self.data_well.insert_index = ws2.max_row
 
@@ -458,7 +622,7 @@ class CreatePZ(MyMainWindow):
 
                 return ws2
 
-    def add_itog(self, ws, insert_index, work_plan, ws2 = None):
+    def add_itog(self, ws, insert_index, work_plan, ws2=None):
         if ws.merged_cells.ranges:
             merged_cells_copy = list(ws.merged_cells.ranges)  # Создаем копию множества объединенных ячеек
             for merged_cell in merged_cells_copy:
@@ -506,7 +670,7 @@ class CreatePZ(MyMainWindow):
                         ws.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                        vertical='center')
 
-                    ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=merge_column+1)
+                    ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=merge_column + 1)
                     ws.cell(row=i, column=j).alignment = Alignment(wrap_text=False, horizontal='left',
                                                                    vertical='center')
 
@@ -544,13 +708,13 @@ class CreatePZ(MyMainWindow):
 
         ws.delete_rows(insert_index, aaa - insert_index)
         if 'prs' in self.data_well.work_plan:
+            CreatePZ.copy_data_excel_in_excel(
+                self.data_well.ws, ws, self.data_well.prs_copy_index.get_value, self.data_well.data_fond_min.get_value,
+                1, 17,
+                ws.max_row + 1)
 
             CreatePZ.copy_data_excel_in_excel(
-                self.data_well.ws, ws, self.data_well.prs_copy_index.get_value, self.data_well.data_fond_min.get_value, 1, 17,
-                                                          ws.max_row + 1)
-
-            CreatePZ.copy_data_excel_in_excel(
-                self.data_well.ws, ws,  self.data_well.condition_of_wells.get_value, self.data_well.ws.max_row, 1, 17,
+                self.data_well.ws, ws, self.data_well.condition_of_wells.get_value, self.data_well.ws.max_row, 1, 17,
                 ws.max_row + 1)
 
     def is_valid_date(date):

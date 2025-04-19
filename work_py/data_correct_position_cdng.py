@@ -38,12 +38,15 @@ class TabPageSO(QWidget):
         self.surname_Label = QLabel("Фамилия И.О.", self)
 
         self.nach_chng_edit_type = QLineEdit(self)
+        self.nach_chng_edit_type.setReadOnly(True)
         self.nach_chng_name_edit_type = QLineEdit(self)
 
         self.tehnolog_edit_type = QLineEdit(self)
+        self.tehnolog_edit_type.setReadOnly(True)
         self.tehnolog_name_edit_type = QLineEdit(self)
 
         self.geolog_edit_type = QLineEdit(self)
+        self.geolog_edit_type.setReadOnly(True)
         self.geolog_name_edit_type = QLineEdit(self)
 
         self.region_combo_box.currentIndexChanged.connect(self.update_line_edit)

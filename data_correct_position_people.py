@@ -43,18 +43,22 @@ class TabPageSO(QWidget):
         self.head_of_usrsist_Label = QLabel("Сектор супервайзерской службы", self)
 
         self.chief_engineer_edit_type = QLineEdit(self)
+        self.chief_engineer_edit_type.setReadOnly(True)
         self.chief_engineer_name_edit_type = QLineEdit(self)
 
         self.chief_geologist_edit_type = QLineEdit(self)
+        self.chief_geologist_edit_type.setReadOnly(True)
         self.chief_geologist_name_edit_type = QLineEdit(self)
 
         self.head_of_orm_edit_type = QLineEdit(self)
+        self.head_of_orm_edit_type.setReadOnly(True)
         self.head_of_orm_name_edit_type = QLineEdit(self)
 
         self.representative_of_orm_edit_type = QLineEdit(self)
         self.representative_of_orm_name_edit_type = QLineEdit(self)
 
         self.head_of_gtm_edit_type = QLineEdit(self)
+        self.head_of_gtm_edit_type.setReadOnly(True)
         self.head_of_gtm_name_edit_type = QLineEdit(self)
 
         self.representative_of_gtm_edit_type = QLineEdit(self)

@@ -165,7 +165,7 @@ class GisApplication(MyMainWindow):
         self.buttonadd_work = QPushButton('Создать заявку')
         self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
         self.buttonAddProject = QPushButton('Добавить исследования из плана')
-        self.buttonAddProject.clicked.connect(self.addPerfProject)
+        self.buttonAddProject.clicked.connect(self.add_perforation_project)
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
@@ -176,7 +176,7 @@ class GisApplication(MyMainWindow):
         vbox.addWidget(self.buttonAddProject, 3, 1)
 
 
-    def addPerfProject(self):
+    def add_perforation_project(self):
         for row_ind, row in enumerate(self.data_well.ws.iter_rows(values_only=True)):
             for col_ind, col in enumerate(row):
                 if col_ind in [3, 2]:

@@ -35,7 +35,6 @@ from openpyxl.drawing.image import Image
 from PyQt5.QtCore import QThread, pyqtSlot, Qt, QObject, pyqtSignal, QTimer
 from PyQt5.QtGui import QPixmap
 
-
 from work_py.rationingKRS import lifting_nkt_norm, descentNKT_norm
 
 
@@ -286,7 +285,6 @@ class MyMainWindow(QMainWindow):
             self.operation_window = window(self.data_well, self.table_widget)
             self.operation_window.move(100, 100)
             self.set_modal_window(self.operation_window)
-
             self.operation_window = None
         else:
             self.operation_window.close()  # Close window.
@@ -396,7 +394,7 @@ class MyMainWindow(QMainWindow):
                     self.data_well, self.data_well.data_fond_min.get_value, self.data_well.pipes_ind.get_value)
 
             read_data = WellData.read_well(self.data_well, self.data_well.cat_well_max.get_value,
-                               self.data_well.data_pvr_min.get_value)
+                                           self.data_well.data_pvr_min.get_value)
             # if read_data is None:
             #     return
 
@@ -974,12 +972,6 @@ class MyMainWindow(QMainWindow):
                     table_widget.setRowHidden(row, True)
                 else:
                     table_widget.setRowHidden(row, False)
-            check_str = ''
-            if len(self.data_well.check_data_in_pz) != 0 and self.data_well.work_plan in ['krs', 'prs']:
-
-                for ind, check_data in enumerate(self.data_well.check_data_in_pz):
-                    if check_data not in check_str:
-                        check_str += f'{ind + 1}. {check_data} \n'
 
             if work_plan in ['krs', 'prs']:
                 self.work_window = GnoWindow(table_widget.rowCount(), self.table_widget, self.data_well)
@@ -989,21 +981,24 @@ class MyMainWindow(QMainWindow):
 
                 data_list.pause = True
                 self.work_window = None
+            check_str = ''
+            if len(self.data_well.check_data_in_pz) != 0 and self.data_well.work_plan in ['krs', 'prs']:
+
+                for ind, check_data in enumerate(self.data_well.check_data_in_pz):
+                    if check_data not in check_str:
+                        check_str += f'{ind + 1}. {check_data} \n'
             if check_str != '':
                 self.show_info_message(self.data_well, check_str)
 
         if work_plan in ['gnkt_frez'] and list_page == 2:
             col_width = [2.28515625, 13.0, 4.5703125, 13.0, 13.0, 13.0, 5.7109375, 13.0, 13.0, 13.0, 4.7109375,
                          13.0, 5.140625, 13.0, 13.0, 13.0, 13.0, 13.0, 4.7109375, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
-                         13.0,
-                         13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
-                         13.0,
-                         13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
+                         13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0, 13.0,
+                         13.0, 13.0, 13.0, 13.0, 5.42578125, 13.0, 4.5703125, 2.28515625, 10.28515625]
             for column in range(table_widget.columnCount()):
                 table_widget.setColumnWidth(column, int(col_width[column]))  # Здесь задайте требуемую ширину столбца
 
         elif work_plan in ['gnkt_after_grp', 'gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz'] and list_page == 2:
-
             col_width = property_excel.property_excel_pvr.col_width_gnkt_osv
             for column in range(table_widget.columnCount()):
                 table_widget.setColumnWidth(column,
@@ -1310,68 +1305,13 @@ class MyWindow(MyMainWindow):
 
         self.signatories_Bnd = self.signatories.addAction('&БашНефть-Добыча', self.action_clicked)
         self.signatories_cdng = self.signatories.addAction('&ЦДНГ', self.action_clicked)
+        self.signatories_contractor = self.signatories.addAction('&Подрядчик КРС', self.action_clicked)
 
     @QtCore.pyqtSlot()
     def action_clicked(self):
         from data_correct_position_people import CorrectSignaturesWindow
-
         action = self.sender()
-        if not self.table_widget is None:
-            mes = QMessageBox.question(self, 'Информация', 'Необходимо закрыть текущий проект, закрыть?')
-            if mes == QMessageBox.StandardButton.Yes:
-                self.close_file()
-            else:
-                return 
-
-        if action == self.create_KRS and self.table_widget is None:
-            self.work_plan = 'krs'
-            self.table_widget_open(self.work_plan)
-            self.ws = self.open_read_excel_file_pz()
-
-        elif action == self.create_KRS_DP and self.table_widget is None:
-            self.work_plan = 'dop_plan'
-
-            self.table_widget_open(self.work_plan)
-            self.ws = self.open_read_excel_file_pz()
-        elif action == self.create_KRS_DP_in_base and self.table_widget is None:
-            self.work_plan = 'dop_plan_in_base'
-
-            self.table_widget_open(self.work_plan)
-            self.ws = self.open_read_excel_file_pz()
-
-        elif action == self.create_KRS_change and self.table_widget is None:
-            self.work_plan = 'plan_change'
-            self.table_widget_open(self.work_plan)
-            self.ws = self.open_read_excel_file_pz()
-
-        elif action == self.create_gnkt_opz and self.table_widget is None:
-            self.work_plan = 'gnkt_opz'
-            self.table_widget_open(self.work_plan)
-            self.ws = self.open_read_excel_file_pz()
-
-        elif action == self.create_GNKT_GRP and self.table_widget is None:
-            self.work_plan = 'gnkt_after_grp'
-            self.table_widget_open(self.work_plan)
-            self.ws = self.open_read_excel_file_pz()
-
-        elif action == self.create_GNKT_BOPZ and self.table_widget is None:
-            self.work_plan = 'gnkt_bopz'
-            self.table_widget_open(self.work_plan)
-            self.ws = self.open_read_excel_file_pz()
-
-        elif action == self.create_GNKT_frez and self.table_widget is None:
-            self.work_plan = 'gnkt_frez'
-            self.table_widget_open(self.work_plan)
-            self.ws = self.open_read_excel_file_pz()
-
-        elif action == self.create_PRS and self.table_widget is None:
-            self.work_plan = 'prs'
-            self.table_widget_open(self.work_plan)
-            self.ws = self.open_read_excel_file_pz()
-
-
-
-        elif action == self.signatories_Bnd:
+        if action == self.signatories_Bnd:
             if self.signatures_window is None:
                 self.signatures_window = CorrectSignaturesWindow()
                 self.signatures_window.setWindowTitle("Подписанты")
@@ -1385,6 +1325,16 @@ class MyWindow(MyMainWindow):
                 from work_py.data_correct_position_cdng import CorrectSignaturesCdng
                 self.signatures_window = CorrectSignaturesCdng()
                 self.signatures_window.setWindowTitle("Подписанты")
+                # self.signatures_window.setGeometry(200, 400, 300, 400)
+                self.signatures_window.show()
+            else:
+                self.signatures_window.close()
+                self.signatures_window = None
+        elif action == self.signatories_contractor:
+            if self.signatures_window is None:
+                from work_py.data_correct_position_contractor import CorrectSignaturesContractor
+                self.signatures_window = CorrectSignaturesContractor()
+                self.signatures_window.setWindowTitle("Подписанты КРС")
                 # self.signatures_window.setGeometry(200, 400, 300, 400)
                 self.signatures_window.show()
             else:
@@ -1473,6 +1423,58 @@ class MyWindow(MyMainWindow):
                 costumer = 'ООО Башнефть-добыча'
                 self.reload_class_well(costumer, 'ИГМ')
 
+        if not self.table_widget is None:
+            mes = QMessageBox.question(self, 'Информация', 'Необходимо закрыть текущий проект, закрыть?')
+            if mes == QMessageBox.StandardButton.Yes:
+                self.close_file()
+            else:
+                return
+
+        if action == self.create_KRS and self.table_widget is None:
+            self.work_plan = 'krs'
+            self.table_widget_open(self.work_plan)
+            self.ws = self.open_read_excel_file_pz()
+
+        elif action == self.create_KRS_DP and self.table_widget is None:
+            self.work_plan = 'dop_plan'
+
+            self.table_widget_open(self.work_plan)
+            self.ws = self.open_read_excel_file_pz()
+        elif action == self.create_KRS_DP_in_base and self.table_widget is None:
+            self.work_plan = 'dop_plan_in_base'
+
+            self.table_widget_open(self.work_plan)
+            self.ws = self.open_read_excel_file_pz()
+
+        elif action == self.create_KRS_change and self.table_widget is None:
+            self.work_plan = 'plan_change'
+            self.table_widget_open(self.work_plan)
+            self.ws = self.open_read_excel_file_pz()
+
+        elif action == self.create_gnkt_opz and self.table_widget is None:
+            self.work_plan = 'gnkt_opz'
+            self.table_widget_open(self.work_plan)
+            self.ws = self.open_read_excel_file_pz()
+
+        elif action == self.create_GNKT_GRP and self.table_widget is None:
+            self.work_plan = 'gnkt_after_grp'
+            self.table_widget_open(self.work_plan)
+            self.ws = self.open_read_excel_file_pz()
+
+        elif action == self.create_GNKT_BOPZ and self.table_widget is None:
+            self.work_plan = 'gnkt_bopz'
+            self.table_widget_open(self.work_plan)
+            self.ws = self.open_read_excel_file_pz()
+
+        elif action == self.create_GNKT_frez and self.table_widget is None:
+            self.work_plan = 'gnkt_frez'
+            self.table_widget_open(self.work_plan)
+            self.ws = self.open_read_excel_file_pz()
+
+        elif action == self.create_PRS and self.table_widget is None:
+            self.work_plan = 'prs'
+            self.table_widget_open(self.work_plan)
+            self.ws = self.open_read_excel_file_pz()
 
     def reload_class_well(self, costumer, region):
         self.open_parent_class(costumer, region)
@@ -1965,7 +1967,7 @@ class MyWindow(MyMainWindow):
 
             data_list.dict_pump_h = {"before": 0, "after": 0}
 
-            data_list.len_razdel_1 = 0
+            data_list.len_work_podpisant_list = 0
             data_list.data_well_is_True = False
             data_list.countAcid = 0
             data_list.swab_type_comboIndex = 1
