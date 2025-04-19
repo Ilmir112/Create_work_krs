@@ -24,20 +24,20 @@ class TabPageSo(TabPageUnion):
             ['Гироскоп', 'АКЦ', 'АКЦ + СГДТ', 'СГДТ', 'ИНГК', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ'])
         self.ComboBoxGeophygist.currentTextChanged.connect(self.geophygist_data)
 
-        self.labelDopInformation = QLabel("Доп информация", self)
-        self.lineEditDopInformation = QLineEdit(self)
-        self.lineEditDopInformation.setClearButtonEnabled(True)
+        self.labeldop_information = QLabel("Доп информация", self)
+        self.lineEditdop_information = QLineEdit(self)
+        self.lineEditdop_information.setClearButtonEnabled(True)
 
         # grid = QGridLayout(self)
         self.grid.addWidget(self.labelGeores, 0, 0)
         self.grid.addWidget(self.labelType, 0, 1)
         self.grid.addWidget(self.labelType2, 0, 2)
-        self.grid.addWidget(self.labelDopInformation, 0, 3)
+        self.grid.addWidget(self.labeldop_information, 0, 3)
 
         self.grid.addWidget(self.ComboBoxGeophygist, 1, 0)
         self.grid.addWidget(self.lineedit_type, 1, 1)
         self.grid.addWidget(self.lineedit_type2, 1, 2)
-        self.grid.addWidget(self.lineEditDopInformation, 1, 3)
+        self.grid.addWidget(self.lineEditdop_information, 1, 3)
 
     def geophygist_data(self):
         if self.ComboBoxGeophygist.currentText() in ['Гироскоп', 'АКЦ', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ']:
@@ -98,7 +98,7 @@ class GeophysicWindow(WindowUnion):
         edit_type2 = self.tab_widget.currentWidget().lineedit_type2.text().replace(',', '.')
         researchGis = self.geophysicalSelect(str(self.tab_widget.currentWidget().ComboBoxGeophygist.currentText()))
 
-        dopInformation = self.tab_widget.currentWidget().lineEditDopInformation.text()
+        dop_information = self.tab_widget.currentWidget().lineEditdop_information.text()
         if not edit_type or not edit_type2 or not researchGis:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
@@ -113,7 +113,7 @@ class GeophysicWindow(WindowUnion):
         self.tableWidget.setItem(rows, 0, QTableWidgetItem(researchGis))
         self.tableWidget.setItem(rows, 1, QTableWidgetItem(edit_type))
         self.tableWidget.setItem(rows, 2, QTableWidgetItem(edit_type2))
-        self.tableWidget.setItem(rows, 3, QTableWidgetItem(dopInformation))
+        self.tableWidget.setItem(rows, 3, QTableWidgetItem(dop_information))
         self.tableWidget.setSortingEnabled(True)
 
     def geophysic_sel(self, geophysic, edit_type, edit_type2):

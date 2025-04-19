@@ -15,7 +15,7 @@ class CustomMessageBox(QDialog):
         # Создаем текстовое поле для отображения информации
         self.text_edit = QTextEdit(self)
         self.text_edit.setPlainText(message)
-        self.text_edit.setReadOnly(True)  # Запрет редактирования текста
+        # self.text_edit.setReadOnly(True)  # Запрет редактирования текста
 
         # Кнопка для закрытия окна
         close_button = QPushButton("Закрыть", self)

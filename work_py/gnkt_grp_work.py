@@ -8,8 +8,9 @@ from openpyxl.utils import get_column_letter
 
 from decrypt import decrypt
 from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict, read_database_gnkt
-from block_name import razdel_1
 from openpyxl.styles import PatternFill, Font, Alignment
+
+from open_pz import CreatePZ
 from work_py.acid_paker import CheckableComboBox
 from work_py.alone_oreration import well_volume
 from work_py.parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
@@ -20,6 +21,13 @@ class TabPageGnkt(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        self.iznos_gnkt_edit = None
+        self.gnkt = None
+        self.iznos_gnkt_label = None
+        self.length_gnkt_edit = None
+        self.length_gnkt_label = None
+        self.gnkt_number_combo = None
+        self.gnkt_number_label = None
         self.validator_int = QIntValidator(0, 8000)
         self.validator_float = QDoubleValidator(0, 8000, 2)
 
@@ -1249,7 +1257,7 @@ class GnktModel(WindowUnion):
             [None, None, None, None, None, None, None, 'цех:', f'{self.data_well.cdng.get_value}',
              None, None, None]]
 
-        razdel = razdel_1(self, self.data_well.region, data_list.contractor)
+        razdel = CreatePZ.work_podpisant_list(self, self.data_well.region, data_list.contractor)
 
         for row in razdel:  # Добавлением работ
             title_list.append(row)

@@ -27,22 +27,22 @@ class TabPageSo(TabPageUnion):
         self.ComboBoxCharges.setProperty("value", 'ГП')
 
         self.labelHolesMetr = QLabel("отверстий на 1п.м", self)
-        self.lineEditHolesMetr = QComboBox(self)
-        self.lineEditHolesMetr.addItems(['6', '8', '10', '16', '18', '20', '30'])
-        self.lineEditHolesMetr.setCurrentIndex(3)
+        self.lineedit_holes_metr = QComboBox(self)
+        self.lineedit_holes_metr.addItems(['6', '8', '10', '16', '18', '20', '30'])
+        self.lineedit_holes_metr.setCurrentIndex(3)
 
         self.labelIndexFormation = QLabel("Индекс пласта", self)
-        self.lineEditIndexFormation = QLineEdit(self)
-        self.lineEditIndexFormation.setClearButtonEnabled(True)
+        self.lineedit_index_formation = QLineEdit(self)
+        self.lineedit_index_formation.setClearButtonEnabled(True)
 
         self.label_type_perforation = QLabel("Тип перфорации", self)
         TabPageSo.combobox_type_perforation = QComboBox(self)
         TabPageSo.combobox_type_perforation.addItems(
             ['ПВР на кабеле', 'Трубная перфорация', 'Трубная перфорация на депрессии'])
 
-        self.labelDopInformation = QLabel("Доп информация", self)
-        self.lineEditDopInformation = QLineEdit(self)
-        self.lineEditDopInformation.setClearButtonEnabled(True)
+        self.labeldop_information = QLabel("Доп информация", self)
+        self.lineEditdop_information = QLineEdit(self)
+        self.lineEditdop_information.setClearButtonEnabled(True)
 
         # self.grid = QGridLayout(self)
         self.grid.addWidget(self.labelType, 0, 0)
@@ -51,13 +51,13 @@ class TabPageSo(TabPageUnion):
         self.grid.addWidget(self.labelHolesMetr, 0, 3)
 
         self.grid.addWidget(self.labelIndexFormation, 0, 4)
-        self.grid.addWidget(self.labelDopInformation, 0, 5)
+        self.grid.addWidget(self.labeldop_information, 0, 5)
         self.grid.addWidget(self.lineedit_type, 1, 0)
         self.grid.addWidget(self.lineedit_type2, 1, 1)
         self.grid.addWidget(self.ComboBoxCharges, 1, 2)
-        self.grid.addWidget(self.lineEditHolesMetr, 1, 3)
-        self.grid.addWidget(self.lineEditIndexFormation, 1, 4)
-        self.grid.addWidget(self.lineEditDopInformation, 1, 5)
+        self.grid.addWidget(self.lineedit_holes_metr, 1, 3)
+        self.grid.addWidget(self.lineedit_index_formation, 1, 4)
+        self.grid.addWidget(self.lineEditdop_information, 1, 5)
         self.grid.addWidget(self.label_type_perforation, 0, 6)
         self.grid.addWidget(TabPageSo.combobox_type_perforation, 1, 6)
 
@@ -208,7 +208,7 @@ class PerforationWindow(WindowUnion):
         self.buttonadd_work = QPushButton('Добавить в план работ')
         self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
         self.buttonAddProject = QPushButton('Добавить проектные интервалы перфорации')
-        self.buttonAddProject.clicked.connect(self.addPerfProject)
+        self.buttonAddProject.clicked.connect(self.add_perforation_project)
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
@@ -223,7 +223,7 @@ class PerforationWindow(WindowUnion):
         data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
-    def addPerfProject(self):
+    def add_perforation_project(self):
 
         if self.data_well.grp_plan:
             chargePM_GP = QInputDialog.getInt(self, 'кол-во отверстий на 1 п.м.',
@@ -361,18 +361,18 @@ class PerforationWindow(WindowUnion):
         edit_type = self.current_widget.lineedit_type.text().replace(',', '.')
         edit_type2 = self.current_widget.lineedit_type2.text().replace(',', '.')
         chargesx = str(self.current_widget.ComboBoxCharges.currentText())
-        editHolesMetr = self.current_widget.lineEditHolesMetr.currentText()
-        editIndexFormation = self.current_widget.lineEditIndexFormation.text()
-        dopInformation = self.current_widget.lineEditDopInformation.text()
-        if not edit_type or not edit_type2 or not chargesx or not editIndexFormation:
+        edit_holes_metr = self.current_widget.lineedit_holes_metr.currentText()
+        edit_index_formation = self.current_widget.lineedit_index_formation.text()
+        dop_information = self.current_widget.lineEditdop_information.text()
+        if not edit_type or not edit_type2 or not chargesx or not edit_index_formation:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
         if float(edit_type2.replace(',', '.')) >= float(self.data_well.current_bottom):
             QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
             return
-        self.plast_combo = editIndexFormation
+        self.plast_combo = edit_index_formation
         chargesx = self.charge(int(float(edit_type2)))[0][:-2] + chargesx
-        count_otv = int((float(edit_type2) - float(edit_type)) * int(editHolesMetr))
+        count_otv = int((float(edit_type2) - float(edit_type)) * int(edit_holes_metr))
         if count_otv < 0:
             QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
             return
@@ -383,10 +383,10 @@ class PerforationWindow(WindowUnion):
         self.tableWidget.setItem(rows, 0, QTableWidgetItem(edit_type))
         self.tableWidget.setItem(rows, 1, QTableWidgetItem(edit_type2))
         self.tableWidget.setItem(rows, 2, QTableWidgetItem(chargesx))
-        self.tableWidget.setItem(rows, 3, QTableWidgetItem(editHolesMetr))
+        self.tableWidget.setItem(rows, 3, QTableWidgetItem(edit_holes_metr))
         self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(count_otv)))
-        self.tableWidget.setItem(rows, 5, QTableWidgetItem(editIndexFormation))
-        self.tableWidget.setItem(rows, 6, QTableWidgetItem(dopInformation))
+        self.tableWidget.setItem(rows, 5, QTableWidgetItem(edit_index_formation))
+        self.tableWidget.setItem(rows, 6, QTableWidgetItem(dop_information))
         self.tableWidget.setSortingEnabled(True)
         # print(edit_type, spinYearOfIssue, editSerialNumber, editSpecifications)
 
