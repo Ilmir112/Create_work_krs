@@ -1432,7 +1432,8 @@ class WellData(FindIndexPZ):
                         self.stol_rotor = FindIndexPZ.definition_is_none(
                             self, ProtectedIsDigit(row[col + 5]), row_index, col + 1, 1)
                     elif 'Шахтное направление' in str(value):
-                        if row[col + 3] not in ['-', None, '0', 0, '', 'отсутствует', '(мм), (мм), -(м)', 'отсут']:
+                        if row[col + 3] not in ['-', None, '0', 0, '', 'отсутствует', '(мм), (мм), -(м)', 'отсут'] or \
+                                'отсут' not in str(row[col+3]).lower():
                             self.column_direction_mine_true = True
                             if self.column_direction_mine_true:
                                 column_direction_mine_data = row[col + 3]

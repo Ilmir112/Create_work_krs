@@ -2754,7 +2754,7 @@ class SaveInExcel(MyWindow):
         while True:  # Начинаем бесконечный цикл
             try:
                 file_name, _ = QFileDialog.getSaveFileName(None, "Save excel-file",
-                                                           f"{full_path}", "Excel Files (*.xlsm)")
+                                                           f"{full_path}", "Excel Files (*.xlsx)")
                 if file_name:  # Если имя файла не пустое
                     wb2.save(file_name)  # Пытаемся сохранить
                     break  # Если сохранение успешно, выходим из цикла

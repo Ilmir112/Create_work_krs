@@ -621,7 +621,7 @@ class DescentPaker(DescentParent):
 
     def paker_down(self) -> List:
         from work_py.opressovka import OpressovkaEK
-        from .rgdVcht import rgd_with_paker, rgd_without_paker
+        from work_py.rgdVcht import rgd_with_paker, rgd_without_paker
         paker_descent = [
             [None, None,
              f'Заменить технологические НКТ на опрессованные эксплуатационные НКТ. Заменить подвесной '

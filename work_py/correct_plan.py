@@ -179,7 +179,6 @@ class CorrectPlanWindow(WindowUnion):
                 self.close()
                 self.close_modal_forcefully()
 
-
     def add_work_excel(self, ws2, work_list, ind_ins):
         from data_list import ProtectedIsDigit
         for i in range(1, len(work_list) + 1):  # Добавлением работ
