@@ -91,6 +91,7 @@ class ExcelWorker(QThread):
                                                         data_list.contractor, data_list.costumer, excel_data_dict)
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f"Ошибка при вставке данных в базу: {type(e).__name__}\n\n{str(e)}")
+
         if self.data_well.work_plan == 'krs':
             try:
                 data_well_base.insert_data_in_chemistry(data_well)
