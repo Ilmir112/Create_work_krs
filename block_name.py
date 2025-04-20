@@ -41,14 +41,14 @@ def pop_down(self, region, curator_sel):
         nach_tkrs = ''
         nach_tkrs_post = ''
         if region == 'ЧГМ' or region == 'ТГМ' or 'gnkt' in self.data_well.work_plan:
-            nach_tkrs = podpis_dict[data_list.contractor]["ЦТКРС №1"]["начальник"]["surname"]
-            nach_tkrs_post = podpis_dict[data_list.contractor]["ЦТКРС №1"]["начальник"]["post"]
+            nach_tkrs = podpis_dict[data_list.contractor]['Экспедиция']["ЦТКРС №1"]["сhief_engineer"]["surname"]
+            nach_tkrs_post = podpis_dict[data_list.contractor]['Экспедиция']["ЦТКРС №1"]["сhief_engineer"]["post"]
         elif region == 'КГМ' or region == 'АГМ':
-            nach_tkrs = podpis_dict[data_list.contractor]["ЦТКРС №2"]["начальник"]["surname"]
-            nach_tkrs_post = podpis_dict[data_list.contractor]["ЦТКРС №2"]["начальник"]["post"]
+            nach_tkrs = podpis_dict[data_list.contractor]['Экспедиция']["ЦТКРС №2"]["сhief_engineer"]["surname"]
+            nach_tkrs_post = podpis_dict[data_list.contractor]['Экспедиция']["ЦТКРС №2"]["сhief_engineer"]["post"]
         elif region == 'ИГМ':
-            nach_tkrs = podpis_dict[data_list.contractor]["ЦТКРС №4"]["начальник"]["surname"]
-            nach_tkrs_post = podpis_dict[data_list.contractor]["ЦТКРС №4"]["начальник"]["post"]
+            nach_tkrs = podpis_dict[data_list.contractor]['Экспедиция']["ЦТКРС №4"]["сhief_engineer"]["surname"]
+            nach_tkrs_post = podpis_dict[data_list.contractor]['Экспедиция']["ЦТКРС №4"]["сhief_engineer"]["post"]
 
         nach_list = [
             [None, f'План работ составил {data_list.user[0]}', None, None, None, None, '___________________', None,

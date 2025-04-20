@@ -169,7 +169,6 @@ class RegisterWindow(QDialog):
     def update_organization(self, index):
 
         if index == 'ООО "Ойл-cервис"':
-
             self.label_region.setText("ЦЕХ:")
             self.region.clear()
             self.region.addItems(['ЦТКРС №1', 'ЦТКРС №2', 'ЦТКРС №3', 'ЦТКРС №4',
@@ -206,7 +205,8 @@ class RegisterWindow(QDialog):
         else:  # Если пользователя с таким именем еще нет
             position_in = position_in + " " + region
             if password == password2:
-                registration.registration_user(last_name, first_name, second_name, position_in, organization, password)
+                registration.registration_user(last_name, first_name, second_name, position_in,
+                                               organization, password, region)
 
                 QMessageBox.information(self, 'Регистрация', 'пользователь успешно создан')
                 self.close()
