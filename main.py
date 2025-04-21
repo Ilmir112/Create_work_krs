@@ -388,16 +388,23 @@ class MyMainWindow(QMainWindow):
             WellExpectedPickUp.read_well(
                 self.data_well, self.data_well.data_x_min.get_value, self.data_well.data_x_max.get_value)
             if self.work_plan not in ['application_pvr', 'application_gis']:
-                WellSuckerRod.read_well(
+                read_data = WellSuckerRod.read_well(
                     self.data_well, self.data_well.sucker_rod_ind.get_value, self.data_well.pipes_ind.get_value)
+                if read_data is None:
+                    self.data_well = None
+                    return
 
-                WellFondData.read_well(
+                read_data = WellFondData.read_well(
                     self.data_well, self.data_well.data_fond_min.get_value, self.data_well.pipes_ind.get_value)
+                if read_data is None:
+                    self.data_well = None
+                    return
 
             read_data = WellData.read_well(self.data_well, self.data_well.cat_well_max.get_value,
                                            self.data_well.data_pvr_min.get_value)
-            # if read_data is None:
-            #     return
+            if read_data is None:
+                self.data_well = None
+                return
 
             WellPerforation.read_well(self.data_well, self.data_well.data_pvr_min.get_value,
                                       self.data_well.data_pvr_max.get_value + 1)
@@ -2852,10 +2859,12 @@ class SaveInExcel(MyWindow):
             if 'код площади' in work_list[i - 1] or 'код площади :' in work_list[i - 1]:
                 for j in range(1, 13):
                     cell = ws2.cell(row=i, column=j)
-                    cell.number_format = 'General'
-                    if 'инв. №' in str(work_list[i - 1][j - 1]).lower():
-                        ws2.cell(row=i, column=j + 1).number_format = '@'
+                    # cell.number_format = 'General'
                     cell.value = str(work_list[i - 1][j - 1])
+                    if 'инв. №' in str(work_list[i - 1][j - 1]).lower():
+                        ws2.cell(row=i, column=j + 1).number_format = '0'
+                    elif 'код площади' in str(work_list[i - 1][j - 1]).lower():
+                        ws2.cell(row=i, column=j + 2).number_format = 'General'
             elif 'по H2S' in work_list[i - 1] or 'по H2S :' in work_list[i - 1] or \
                     'по Pпл :' in work_list[i - 1] or 'по Pпл' in work_list[i - 1] or \
                     'по газовому фактору' in work_list[i - 1] or 'по ГФ' in work_list[i - 1]:
