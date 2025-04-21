@@ -594,8 +594,12 @@ class FindIndexPZ(MyMainWindow):
                 if sucker_mes == QMessageBox.StandardButton.Yes:
                     self.sucker_rod_ind = ProtectedIsDigit(0)
                 else:
-                    QMessageBox.information(self, 'ШТАНГИ', 'Нужно добавить "ШТАНГИ" в таблицу?')
-                    # self.pause_app()
+                    QMessageBox.information(self, 'ШТАНГИ', 'Ключевое слово для поиска индекса строк в п ПЗ это \n'
+                                                              'ШТАНГИ,\n до ремонта, \nпосле ремонта \nплан. '
+                                                              'При необходимости нужно исправить ПЗ в '
+                                                              'соответствии с этими данными')
+                    data_list.pause = False
+                    self.pause_app()
                     return
 
         if self.data_x_max.get_value == 0:
@@ -804,13 +808,13 @@ class WellNkt(FindIndexPZ):
                         self.column_index_lenght_nkt = col_index
         if self.column_index_lenght_nkt is None:
             QMessageBox.warning(self, 'Ошибка', 'Ошибка в поиске индекса длины НКТ')
-            # self.pause_app()
+            self.pause_app()
             return
 
         if a_plan == 0:
             QMessageBox.warning(self, 'Индекс планового НКТ',
                                 'Программа не могла определить начала строку с ПЗ НКТ - план')
-            # self.pause_app()
+            self.pause_app()
             return
 
         for row_ind, row in enumerate(
@@ -874,8 +878,12 @@ class WellSuckerRod(FindIndexPZ):
                 if self.sucker_rod_none is True:
                     QMessageBox.warning(self, 'Индекс планового НКТ',
                                         'Программа не могла определить начала строку с ПЗ'
-                                        ' штанги - план')
-                    # self.pause_app()
+                                        ' штанги - план.\n'
+                                        'Ключевое слово для поиска индекса строк в п ПЗ это \n'
+                                          '"ШТАНГИ",\n "до ремонта", \n"после ремонта" \nплан. '
+                                          'При необходимости нужно исправить ПЗ в '
+                                          'соответствии с этими данными. Приложение нужно перезапустить')
+                    self.pause_app()
                     return
             # print(f'б {b_plan}')
 
@@ -912,6 +920,7 @@ class WellSuckerRod(FindIndexPZ):
         self.dict_sucker_rod = dict_sucker_rod
         self.dict_sucker_rod_after = dict_sucker_rod_po
 
+        return True
 
 class WellFondData(FindIndexPZ):
 
@@ -1050,15 +1059,15 @@ class WellFondData(FindIndexPZ):
                             if paker_do["after"] != 0:
                                 depth_fond_paker_do["after"] = row[col_plan]
 
-        if self.depth_fond_paker_before["after"] < 900 and self.paker_before['after'] != 0 and \
-                '89' not in list(self.dict_nkt_after.keys) and self.dict_pump_ecn['after'] == 0 and \
+        if self.depth_fond_paker_before["after"] <= 900 and self.paker_before['after'] != 0 and \
+                '89' not in list(self.dict_nkt_after.keys()) and self.dict_pump_ecn['after'] == 0 and \
                 self.dict_pump_shgn['after'] == 0:
             QMessageBox.warning(self, 'НКТ89мм', f'При глубине спуска ф.пакера до глубины 900м '
-                                                 f'необходимо использование НКТ89мм, а не {list(self.dict_nkt_after.keys)}')
+                                                 f'необходимо использование НКТ89мм, а не {list(self.dict_nkt_after.keys())}')
             self.check_data_in_pz.append(
                 f'Согласно мероприятий по недопущению разгерметизации системы НКТ- пакер от 20.04.2021:\n'
                 f'При глубине спуска ф.пакера до глубины 900м '
-                f'необходимо использование НКТ89мм, а не {list(self.dict_nkt_after.keys)}')
+                f'необходимо использование НКТ89мм, а не {list(self.dict_nkt_after.keys())}')
 
         if wellhead_fittings in [None, '']:
             self.check_data_in_pz.append('Не указан тип устьевой арматуры\n '
@@ -1082,6 +1091,8 @@ class WellFondData(FindIndexPZ):
         self.column_head_m = column_head_m
         self.wellhead_fittings = wellhead_fittings
         self.groove_diameter = groove_diameter
+
+        return True
 
 
 class WellHistoryData(FindIndexPZ):
@@ -1228,26 +1239,40 @@ class WellCondition(FindIndexPZ):
                             self.distance_from_well_to_sampling_point = str(row[col + 2]).replace(',', '.')
 
                         elif 'плотность жидкости ' in str(value).lower():
-                            try:
-                                if 'prs' in self.work_plan:
-                                    well_volume_in_pz = str(row[col + 4]).replace(',', '.')
-                                else:
-                                    well_volume_in_pz = str(row[col + 5]).replace(',', '.')
 
-                                self.well_volume_in_pz.append(round(float(well_volume_in_pz), 1))
-                            except Exception as e:
+                            if 'prs' in self.work_plan:
+                                well_volume_in_pz = str(row[col + 4]).replace(',', '.')
+                            else:
+                                well_volume_in_pz = str(row[col + 5]).replace(',', '.')
+                            while self.check_str_isdigit(well_volume_in_pz) is False:
+                                for step in range(4, 8):
+                                    well_volume_in_pz = str(row[col + step]).replace(',', '.')
+                                    if self.check_str_isdigit(well_volume_in_pz):
+                                        break
+                            if self.check_str_isdigit(well_volume_in_pz) is False:
                                 well_volume_in_pz, _ = QInputDialog.getDouble(self, 'Объем глушения',
-                                                                              f'Введите объем глушения согласно ПЗ {e}',
-                                                                              50,
-                                                                              1, 70)
-                                self.well_volume_in_pz.append(well_volume_in_pz)
+                                                                          f'Введите объем глушения согласно ПЗ',
+                                                                          50, 1, 70)
+                            self.well_volume_in_pz.append(round(float(well_volume_in_pz), 1))
 
                             if 'prs' in self.work_plan:
                                 well_fluid_in_pz = str(row[col + 2]).replace(',', '.')
                             else:
                                 well_fluid_in_pz = str(row[col + 2]).replace(',', '.')
 
-                            self.well_fluid_in_pz.append(round(float(well_fluid_in_pz), 2))
+                            while self.check_str_isdigit(well_fluid_in_pz) is False:
+                                for step in range(2, 5):
+                                    well_fluid_in_pz = str(row[col + step]).replace(',', '.')
+                                    if self.check_str_isdigit(well_fluid_in_pz):
+                                        break
+
+                            if self.check_str_isdigit(well_fluid_in_pz):
+                                self.well_fluid_in_pz.append(round(float(well_fluid_in_pz), 2))
+                            else:
+                                QMessageBox.warning(self, 'Ошибка', f'Не корректно прочитан удельный '
+                                                                    f'вес {well_fluid_in_pz}')
+
+
 
 
         if self.static_level.get_value == 'не корректно':
@@ -1265,6 +1290,7 @@ class WellCondition(FindIndexPZ):
                                                    f'верно ли?')
             if leakiness_quest == QMessageBox.StandardButton.Yes:
                 self.leakiness = True
+        return True
 
 
 class WellExpectedPickUp(FindIndexPZ):
@@ -1432,7 +1458,8 @@ class WellData(FindIndexPZ):
                         self.stol_rotor = FindIndexPZ.definition_is_none(
                             self, ProtectedIsDigit(row[col + 5]), row_index, col + 1, 1)
                     elif 'Шахтное направление' in str(value):
-                        if row[col + 3] not in ['-', None, '0', 0, '', 'отсутствует', '(мм), (мм), -(м)', 'отсут']:
+                        if row[col + 3] not in ['-', None, '0', 0, '', 'отсутствует', '(мм), (мм), -(м)', 'отсут'] or \
+                                'отсут' not in str(row[col+3]).lower():
                             self.column_direction_mine_true = True
                             if self.column_direction_mine_true:
                                 column_direction_mine_data = row[col + 3]
@@ -2097,10 +2124,15 @@ class WellCategory(FindIndexPZ):
                                                                                                     'None'] or \
                                             'отс' in str(self.ws.cell(row=row, column=col - 1).value).lower():
                                         self.value_h2s_mg.append(0)
-                                        a = self.ws.cell(row=row, column=col - 2).value
+
                                         if self.ws.cell(row=row, column=col - 2).value not in ['3', 3]:
                                             self.check_data_in_pz.append(
-                                                'Не указано значение сероводорода в мг/л')
+                                                'Не указано значение сероводорода в мг/л \n'
+                                                'Согласно п.4 '
+                                                'Распоряжения от 11.04.2022г об утверждении методики расчета '
+                                                'расходной нормы нейтрализатора сероводорода необходимо обеспечить '
+                                                'в план-заказах на ТиКРС двух параметров по содержанию сероводороду '
+                                                'объемного (в %) и массового в мг/дм3 (мг/л)')
 
                                     else:
                                         self.value_h2s_mg.append(

@@ -44,14 +44,14 @@ class TabPageSO(QWidget):
 
         self.сhief_engineer_edit = QLineEdit(self)
         self.сhief_engineer_name_edit = QLineEdit(self)
-        self.сhief_engineer_edit.setReadOnly(True)
+        # self.сhief_engineer_edit.setReadOnly(True)
 
         self.chief_geologist_edit_type = QLineEdit(self)
-        self.chief_geologist_edit_type.setReadOnly(True)
+        # self.chief_geologist_edit_type.setReadOnly(True)
         self.chief_geologist_name_edit_type = QLineEdit(self)
         self.сhief_engineer_expedition_edit = QLineEdit(self)
         self.сhief_engineer_expedition_name_edit = QLineEdit(self)
-        self.сhief_engineer_expedition_edit.setReadOnly(True)
+        # self.сhief_engineer_expedition_edit.setReadOnly(True)
         grid.addWidget(self.сhief_engineer_expedition_edit, 14, 0, 1, 2)
         grid.addWidget(self.сhief_engineer_expedition_name_edit, 14, 2, 1, 2)
 

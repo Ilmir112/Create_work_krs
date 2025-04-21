@@ -385,6 +385,7 @@ class TabPageSoWith(TabPageUnion):
                                f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
             elif self.template_combo.currentText() == 'ПСШ открытый ствол':
+
                 # if dictance_template_second is not None:
                 self.template_first_edit.setText('фильтр направление')
                 template_str = f'фильтр-направление L {length_template_first}м {kot_str} + НКТ{nkt_diam}мм ' \
@@ -493,6 +494,11 @@ class TabPageSoWith(TabPageUnion):
                 self.template_str_edit.setText(template_str)
                 self.skm_teml_str_edit.setText(skm_teml_str)
 
+        if self.data_well.plast_work and self.template_combo.currentText() not in ['ПСШ открытый ствол',
+                                                       'ПСШ СКМ в доп колонне + открытый ствол']:
+            self.kot_question_qcombo.setCurrentIndex(1)
+        else:
+            self.kot_question_qcombo.setCurrentIndex(0)
     def update_template_edit(self, index):
         current_bottom = float(self.current_bottom_edit.text())
         if index != '':
@@ -552,6 +558,7 @@ class TabPageSoWith(TabPageUnion):
             self.dictance_template_first_edit.setParent(None)
             self.dictance_three_Label.setParent(None)
             self.dictance_three_edit.setParent(None)
+
 
             if self.data_well.column_additional or \
                     (self.data_well.head_column_additional.get_value >= current_bottom and \
@@ -834,6 +841,12 @@ class TabPageSoWith(TabPageUnion):
 
             self.template_str_edit.setText(template_str)
             self.skm_teml_str_edit.setText(skm_teml_str)
+
+            if self.data_well.plast_work and index not in ['ПСШ открытый ствол',
+                                                           'ПСШ СКМ в доп колонне + открытый ствол' ]:
+                self.kot_question_qcombo.setCurrentIndex(1)
+            else:
+                self.kot_question_qcombo.setCurrentIndex(0)
 
     def update_paker_depth(self, text):
         if text:
@@ -1293,6 +1306,11 @@ class TemplateKrs(WindowUnion):
 
         self.note_question_qcombo = self.current_widget.note_question_qcombo.currentText()
         self.kot_question_qcombo = self.current_widget.kot_question_qcombo.currentText()
+        if self.kot_question_qcombo == 'Да':
+            mes = QMessageBox.question(self, 'вопрос', 'В компоновке будет использоваться система обратных клапанов,'
+                                                       ' продолжить?')
+            if mes == QMessageBox.StandardButton.No:
+                return
 
         current_bottom = self.current_widget.current_bottom_edit.text()
         if current_bottom != '':

@@ -1345,14 +1345,20 @@ class DataWindow(WindowUnion):
             data_list.pause = False
             return
 
-        if str(self.data_well.paker_before["before"]).lower() not in ['0', 0, '-', 'отсут', '', None]:
+        if str(self.data_well.paker_before["after"]).lower() not in ['0', 0, '-', 'отсут', '', None]:
             try:
                 paker_diameter = TabPageSo.paker_diameter_select(self, float(
-                    self.data_well.depth_fond_paker_before["before"]))
-                if str(paker_diameter) not in str(self.data_well.paker_before["before"]):
+                    self.data_well.depth_fond_paker_before["after"]))
+                if str(paker_diameter) not in str(self.data_well.paker_before["after"]):
+                    QMessageBox.information(self, 'Ошибка обработки',
+                                            f'Не корректно указан диаметр фондового пакера в карте спуска '
+                                            f'ремонта {self.data_well.paker_before["after"].split("/")[0]}'
+                                            f' требуется пакер '
+                                            f'диаметром {paker_diameter}')
+
                     self.data_well.check_data_in_pz.append(
                         f'Не корректно указан диаметр фондового пакера в карте спуска '
-                        f'ремонта {self.data_well.paker_before["after"].split("/")[0]} требуется пакер '
+                        f'ремонта {self.data_well.paker_before["before"].split("/")[0]} требуется пакер '
                         f'диаметром {paker_diameter}')
 
             except Exception as e:

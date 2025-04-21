@@ -243,7 +243,7 @@ class Change_fluid_Window(WindowUnion):
             if pressure_new_edit != '':
                 pressure_new_edit = int(float(pressure_new_edit.replace(',', '.')))
 
-            aassdaad = self.data_well.dict_category
+
 
             if self.data_well.dict_category[plast_new_combo]['отключение'] != 'планируемый':
                 h2s_pr_edit = self.tab_widget.currentWidget().h2s_pr_edit.text().replace(',', '.')
@@ -251,8 +251,6 @@ class Change_fluid_Window(WindowUnion):
                 gf_edit = self.tab_widget.currentWidget().gf_edit.text().replace(',', '.')
                 calc_plast_h2s = self.tab_widget.currentWidget().calc_plast_h2s.text()
                 if h2s_pr_edit != '' and h2s_mg_edit and gf_edit != '' and calc_plast_h2s != '' and pressure_new_edit != '':
-
-                    asdwd = self.data_well.dict_category
 
                     pressure = namedtuple("pressure", "category data_pressure")
                     Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
