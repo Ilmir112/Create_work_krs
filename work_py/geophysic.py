@@ -195,7 +195,7 @@ class GeophysicWindow(WindowUnion):
         geophysical_research = [
             [" ", None,
              f'Вызвать геофизическую партию{cable_type_text}. Заявку оформить за 16 часов сутки через '
-             f'ЦИТС {data_list.contractor}". '
+             f'РИТС {data_list.contractor}". '
              f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
              f'Произвести  монтаж ГИС согласно схемы схема №11 утвержденной главным инженером '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',

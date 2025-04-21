@@ -287,7 +287,7 @@ class PakerIzvlek(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик РИР, УСРСиСТ', lifting_nkt_norm(paker_depth_line, 1.2)],
             [f'Привязка', None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через РИТС {data_list.contractor}". '
              f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4],

@@ -360,8 +360,7 @@ class CreatePZ(MyMainWindow):
                     data_1 = ws.cell(row=i, column=2).value
                     ws.cell(row=i, column=col + 1).font = Font(name='Arial Cyr', size=13, bold=False)
 
-                if 'IX.I. Мероприятия по предотвращению технологических аварий при ремонте скважин:' in \
-                        str(data_1):
+                if 'Мероприятия' in str(data.value):
                     ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
                     ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                    vertical='center')
@@ -510,8 +509,7 @@ class CreatePZ(MyMainWindow):
                                 data_1 = ws.cell(row=i, column=2).value
                                 ws.cell(row=i, column=col + 1).font = Font(name='Arial Cyr', size=13, bold=False)
 
-                            if 'IX.I. Мероприятия по предотвращению технологических аварий при ремонте скважин:' in \
-                                    str(data_1):
+                            if 'Мероприятия ' in str(data_1):
                                 ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
                                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                                vertical='center')
@@ -612,7 +610,7 @@ class CreatePZ(MyMainWindow):
                     ws, ws2, self.data_well.data_fond_min.get_value, self.data_well.condition_of_wells.get_value, 1, 17,
                     ws2.max_row + 1)
 
-                self.insert_events_gnvp(ws2, dict_events_gnvp, 3)
+                self.insert_events_gnvpinsert_events_gnvp(ws2, dict_events_gnvp, 3)
 
                 self.copy_data_excel_in_excel(
                     ws, ws2, self.data_well.data_x_min.get_value, self.data_well.data_x_min.get_value + 2, 1, 17,

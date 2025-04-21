@@ -111,42 +111,44 @@ ade='15.СОГЛАСНО ПИСЬМА ООО "БАШНЕФТЬ-ДОБЫЧА" №
              'зоны (внутри ПКС) каждые 30 мин с фиксацией в журнале ГВС. '
 print(len(ade))
 
-wb = openpyxl.load_workbook('D:\Documents\Create_work_krs\Копия Приложение 1 - Расчёт расходной нормы НС в ЖГ при ТиКРС.xlsx')
+wb = openpyxl.load_workbook('шаблон обновленная отсыпка песка.xlsx')
 ws = wb.active
 
 dict_tel = {}
 colii2 = []
-for row_ind, row in enumerate(ws.iter_rows(values_only=True, min_row=1, max_row=300, max_col=8)):
+for row_ind, row in enumerate(ws.iter_rows(values_only=True, min_row=1, max_row=35, max_col=12)):
     colii = []
     for col in row:
         colii.append(col)
-        if col == 'Начальник':
-            dict_tel.setdefault(
-                'ОАО "Башнефть"', {}).setdefault(
-                "регион", {}).setdefault(
-                row[0], {}).setdefault("ЦДНГ", {}).setdefault(row[1], {}).setdefault("Начальник", {
-                "post": row[2], "surname": row[3], "telephone": row[4], "email": row[5]})
-        if col == 'Заместитель начальника':
-            dict_tel.setdefault(
-                'ОАО "Башнефть"', {}).setdefault(
-                "регион", {}).setdefault(
-                row[0], {}).setdefault("ЦДНГ", {}).setdefault(row[1], {}).setdefault("Заместитель начальника", {
-                "post": row[2], "surname": row[3], "telephone": row[4], "email": row[5]})
-        if col == 'Ведущий геолог':
-            dict_tel.setdefault(
-                'ОАО "Башнефть"', {}).setdefault(
-                "регион", {}).setdefault(
-                row[0], {}).setdefault("ЦДНГ", {}).setdefault(row[1], {}).setdefault("Ведущий геолог", {
-                "post": row[2], "surname": row[3], "telephone": row[4], "email": row[5]})
-        if col == 'Ведущий инженер-технолог':
-            dict_tel.setdefault(
-                'ОАО "Башнефть"', {}).setdefault(
-                "регион", {}).setdefault(
-                row[0], {}).setdefault("ЦДНГ", {}).setdefault(row[1], {}).setdefault("Ведущий инженер-технолог", {
-                "post": row[2], "surname": row[3], "telephone": row[4], "email": row[5]})
+        # if col == 'Начальник':
+        #     dict_tel.setdefault(
+        #         'ОАО "Башнефть"', {}).setdefault(
+        #         "регион", {}).setdefault(
+        #         row[0], {}).setdefault("ЦДНГ", {}).setdefault(row[1], {}).setdefault("Начальник", {
+        #         "post": row[2], "surname": row[3], "telephone": row[4], "email": row[5]})
+        # if col == 'Заместитель начальника':
+        #     dict_tel.setdefault(
+        #         'ОАО "Башнефть"', {}).setdefault(
+        #         "регион", {}).setdefault(
+        #         row[0], {}).setdefault("ЦДНГ", {}).setdefault(row[1], {}).setdefault("Заместитель начальника", {
+        #         "post": row[2], "surname": row[3], "telephone": row[4], "email": row[5]})
+        # if col == 'Ведущий геолог':
+        #     dict_tel.setdefault(
+        #         'ОАО "Башнефть"', {}).setdefault(
+        #         "регион", {}).setdefault(
+        #         row[0], {}).setdefault("ЦДНГ", {}).setdefault(row[1], {}).setdefault("Ведущий геолог", {
+        #         "post": row[2], "surname": row[3], "telephone": row[4], "email": row[5]})
+        # if col == 'Ведущий инженер-технолог':
+        #     dict_tel.setdefault(
+        #         'ОАО "Башнефть"', {}).setdefault(
+        #         "регион", {}).setdefault(
+        #         row[0], {}).setdefault("ЦДНГ", {}).setdefault(row[1], {}).setdefault("Ведущий инженер-технолог", {
+        #         "post": row[2], "surname": row[3], "telephone": row[4], "email": row[5]})
     colii2.append(colii)
 
-asdw = colii2
+# for row in colii2:
+#     print(row)
+print(colii2, sep='\n')
 
 
 

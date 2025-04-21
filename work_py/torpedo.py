@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QLineEdit, QGridLayout
     QPushButton
 
 import data_list
+from data_list import contractor
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
 class TabPageSoTorpedo(TabPageUnion):
@@ -85,7 +86,7 @@ class TorpedoWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер КР', None],
             [f'Торпедирование ЭК на глубине {self.roof_torpedo}',
-             None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС "Ойл-сервис". '
+             None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов через РИТС {data_list.contractor}. '
                    f'По результатам ПО произвести торпедирование э/колонны в муфтовом соединении при обязательном '
                    f'натяжении э/колонны в присутствии представитель заказчика, составить акт. '
                    f'Предварительно на глубине {self.roof_torpedo}м. '

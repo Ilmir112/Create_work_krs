@@ -217,7 +217,7 @@ class KompressWindow(WindowUnion):
              'мастер КРС', round(
                 descentNKT_norm(khvost_edit, 1))],
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через РИТС {data_list.contractor}". '
              f' Составить акт готовности скважины и передать его начальнику партии',
              None, None, None, None, None, None, None,
              'мастер КРС', None],

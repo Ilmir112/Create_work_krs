@@ -351,7 +351,7 @@ class RirWindow(WindowUnion):
             rir_rpk_plast_true = False
         rir_work_list = [
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 24 часов сутки через ЦИТС {data_list.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 24 часов сутки через РИТС {data_list.contractor}". '
              f'Произвести  монтаж ПАРТИИ ГИС согласно схемы схема №11 утвержденной главным инженером  '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. ',
              None, None, None, None, None, None, None,
@@ -408,7 +408,7 @@ class RirWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(sole_rir_edit, 1.2)],
             [f'Привязка по ГК и ЛМ', None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через РИТС {data_list.contractor}". '
              f'Произвести  монтаж ПАРТИИ ГИС согласно схемы схема №11 утвержденной главным инженером  '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
@@ -605,7 +605,7 @@ class RirWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(roof_rir_edit, 1.2)],
             [f'Привязка по ГК и ЛМ', None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через РИТС {data_list.contractor}". '
              f'Произвести  монтаж ПАРТИИ ГИС согласно схемы схема №11 утвержденной главным инженером '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины Отбить забой по ГК и ЛМ',
@@ -1384,7 +1384,7 @@ class RirWindow(WindowUnion):
                      None, None, None, None, None, None, None,
                      'Мастер КРС, подрядчик РИР, УСРСиСТ', lifting_nkt_norm(paker_izv_paker, 1.2)],
                     [f'Привязка', None,
-                     f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
+                     f'Вызвать геофизическую партию. Заявку оформить за 16 часов через РИТС {data_list.contractor}". '
                      f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
                      None, None, None, None, None, None, None,
                      'Мастер КРС, подрядчик по ГИС', 4],

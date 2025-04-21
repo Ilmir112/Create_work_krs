@@ -162,7 +162,7 @@ class VpWindow(WindowUnion):
             vp_list = [
                 [None, None,
                  f'Вызвать геофизическую партию {self.cable_type_text} {self.angle_text}. '
-                 f'Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+                 f'Заявку оформить за 16 часов сутки через РИТС {data_list.contractor}". '
                  f'При необходимости подготовить место для установки партии ГИС напротив мостков. '
                  f'Произвести  монтаж ГИС согласно схемы схема №11 утвержденной главным инженером '
                  f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',
@@ -219,7 +219,7 @@ class VpWindow(WindowUnion):
         else:
             vp_list = [
                 [None, None,
-                 f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+                 f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через РИТС {data_list.contractor}". '
                  f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
                  f'Произвести  монтаж ГИС согласно схемы схема №11 утвержденной главным инженером от '
                  f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',
@@ -255,7 +255,7 @@ class VpWindow(WindowUnion):
         if need_question_qcombo == 'Нет':
             vp_list = [
                 [None, None,
-                 f'Вызвать геофизическую партию {self.cable_type_text}. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+                 f'Вызвать геофизическую партию {self.cable_type_text}. Заявку оформить за 16 часов сутки через РИТС {data_list.contractor}". '
                  f'При необходимости подготовить место для установки партии ГИС напротив мостков. '
                  f'Произвести  монтаж ГИС согласно схемы схема №11 утвержденной главным инженером '
                  f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',
@@ -291,7 +291,7 @@ class VpWindow(WindowUnion):
     def czh(self, cement_vp):
         vp_list = [
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через РИТС {data_list.contractor}". '
              f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
              f'Произвести  монтаж ГИС согласно схемы схема №11 утвержденной главным инженером от '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',

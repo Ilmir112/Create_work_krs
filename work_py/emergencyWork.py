@@ -48,7 +48,7 @@ def emergencyECN(self):
            None, None, None, None, None, None, None,
            'мастер КРС', None],
           [None, None,
-           f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
+           f'Вызвать геофизическую партию. Заявку оформить за 16 часов через РИТС {data_list.contractor}". '
            f'Составить акт готовности скважины и передать его начальнику партии  ',
            None, None, None, None, None, None, None,
            'мастер КРС', None],
@@ -120,7 +120,7 @@ def emergency_sticking(self, lar_diameter_line, nkt_key, lar_type_combo,
          None, None, None, None, None, None, None,
          'Аварийный Мастер КРС, УСРСиСТ', 12],
         [None, None,
-         f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
+         f'Вызвать геофизическую партию. Заявку оформить за 16 часов через РИТС {data_list.contractor}". '
          f'Составить акт готовности скважины и передать его начальнику партии',
          None, None, None, None, None, None, None,
          'Мастер, подрядчик по ГИС', None],

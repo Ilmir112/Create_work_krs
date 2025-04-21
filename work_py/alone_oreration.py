@@ -240,7 +240,7 @@ def definition_q_nek(self):
 
 def definition_bottom_gklm(self):
     priv_list = [[f'Отбить забой по ГК и ЛМ', None,
-                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". '
+                  f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через РИТС {data_list.contractor}". '
                   f'Произвести  монтаж ПАРТИИ ГИС согласно схемы схема №11 утвержденной главным инженером '
                   f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                   f'ЗАДАЧА 2.8.2 Отбить забой по ГК и ЛМ',
@@ -252,7 +252,7 @@ def definition_bottom_gklm(self):
 def pressure_gis(self):
     priv_list = [[f'Замер Рпл', None,
                   f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через '
-                  f'ЦИТС {data_list.contractor}". '
+                  f'РИТС {data_list.contractor}". '
                   f'Произвести  монтаж ПАРТИИ ГИС согласно схемы схема №11 утвержденной главным инженером '
                   f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                   f'Произвести замер Рпл в течении 4часов. При необходимости согласовать с заказчиком смену категории',

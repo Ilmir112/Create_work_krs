@@ -1054,7 +1054,7 @@ class SwabWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', 1.2],
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через РИТС {data_list.contractor}". '
              f' Составить акт готовности скважины и передать его начальнику партии',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
@@ -1199,7 +1199,7 @@ class SwabWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', lifting_nkt_norm(float(self.data_well.current_bottom) - (self.depth_opy + 200), 1)],
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через РИТС {data_list.contractor}". '
              f' Составить акт готовности скважины и передать его начальнику партии',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
@@ -1338,7 +1338,7 @@ class SwabWindow(WindowUnion):
              'мастер КРС', 0.4],
 
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через РИТС {data_list.contractor}". '
              f' Составить акт готовности скважины и передать его начальнику партии',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
@@ -1548,7 +1548,7 @@ class SwabWindow(WindowUnion):
 
         paker_list.extend([
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через РИТС {data_list.contractor}". '
              f' Составить акт готовности скважины и передать его начальнику партии',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
@@ -1709,7 +1709,7 @@ class SwabWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через РИТС {data_list.contractor}". '
              f' Составить акт готовности скважины и передать его начальнику партии',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
@@ -1813,7 +1813,7 @@ class SwabWindow(WindowUnion):
                 * self.swab_paker_depth / 9.52 + 0.003 * self.data_well.current_bottom / 9.52,
                 2)],
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через ЦИТС {data_list.contractor}". '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов через РИТС {data_list.contractor}". '
              f' Составить акт готовности скважины и передать его начальнику партии',
              None, None, None, None, None, None, None,
              'мастер КРС', None],

@@ -192,7 +192,6 @@ class SandWindow(WindowUnion):
     def __init__(self, data_well, table_widget, parent=None):
         super().__init__(data_well)
 
-
         self.insert_index = data_well.insert_index
         self.tab_widget = TabWidget(self.data_well)
         self.centralWidget = QWidget()
@@ -245,14 +244,14 @@ class SandWindow(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window  = None
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
     def sand_select(self):
 
         if self.data_well.column_additional is False or (self.data_well.column_additional is True and \
-                                                                 self.data_well.current_bottom <=
-                                                                 self.data_well.head_column_additional.get_value):
+                                                         self.data_well.current_bottom <=
+                                                         self.data_well.head_column_additional.get_value):
             sand_select = f'перо + НКТ{self.data_well.nkt_diam}мм 20м + реперный патрубок'
 
         elif self.data_well.column_additional is True and \
@@ -277,31 +276,65 @@ class SandWindow(WindowUnion):
         sand_volume = round(volume_vn_ek(self, filling_depth) * (sole_sand_edit - filling_depth), 1)
 
         filling_list = [
-            [f'Спустить  {self.sand_select()} на НКТ{nkt_diam}м до глубины {round(filling_depth - 100, 0)}м', None,
-             f'Спустить  {self.sand_select()}  на НКТ{nkt_diam}м до глубины {round(filling_depth - 100, 0)}м с замером, '
+            [None, 1,
+             'Работы по установке песчаного моста выполнять согласно технологической инструкции'
+             ' П2-05.01 ТИ-1430 ЮЛ-111 "ОТСЫПКА ЗАБОЯ СКВАЖИНЫ КВАРЦЕВЫМ ПЕСКОМ, ПРОППАНТОМ"',
+             None, None, None, None, None, None, None, 'Мастер, бурильщик', None],
+            [f'Спустить  {self.sand_select()} на НКТ{nkt_diam}м до глубины Н={self.data_well.current_bottom - 20}м '
+             f'(т.з. {self.data_well.current_bottom}м)', None,
+             f'Спустить  {self.sand_select()} на НКТ{nkt_diam}м до глубины Н={self.data_well.current_bottom - 20}м '
+             f'(т.з. {self.data_well.current_bottom}м) с замером, '
              f'шаблонированием шаблоном {self.data_well.nkt_template}мм. (При СПО первых десяти НКТ на '
-             f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
+             f'спайдере дополнительно устанавливать элеватор ЭХЛ) ',
              None, None, None, None, None, None, None,
              'Мастер КР', descentNKT_norm(sole_sand_edit, 1)],
+            [f'Промыть скважину  с допуском пера в интервале {sole_sand_edit - 20}-{sole_sand_edit}м',
+             None, f'Промыть скважину обратной циркуляцией жидкостью плотностью {self.data_well.fluid_work} с '
+                   f'допуском пера в интервале {sole_sand_edit - 20}-{sole_sand_edit}м до выхода чистой жидкости, '
+                   f'отбить забой с циркуляцией промывочной жидкости. При несоответствии текущего забоя плановому, '
+                   f'дальнейшие работы согласовать с геологической службой подрядчика по ТКРС.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', 3.5],
+            ['Приподнять перо до Н={sole_sand_edit-50}м', None,
+             f'Приподнять перо до Н={filling_depth - 50}м (на 50 м выше планируемой кровли песчаного моста). '
+             f'В случае отсутствия циркуляции при промывке скважины (поглощение жидкости) глубина нахождения пера '
+             f'должна быть выше поглощающих интервалов.',
+             None, None, None, None, None, None, None,
+             'мастер КРС', lifting_nkt_norm(filling_depth, 1)],
             [f'отсыпка кварцевым песком в инт. {filling_depth} - {sole_sand_edit} в объеме {sand_volume}л',
              None, f'Произвести отсыпку кварцевым песком в инт. {filling_depth} - {sole_sand_edit} '
-                   f'в объеме {sand_volume}л '
-                   f'Закачать в НКТ кварцевый песок  с доводкой тех.жидкостью {self.data_well.fluid_work}',
+                   f'в объеме {sand_volume}л: \n'
+                   f' Включить подачу насосного агрегата с равномерным расходом жидкости 2-3 л/сек. '
+                   f'Отсыпку проппантом (кварцевым песком) выполнять с помощью оттарированной емкости, объем которой '
+                   f'точно определен. Отсыпку выполнять путем постепенного равномерного добавления проппанта '
+                   f'(кварцевого песка) в поток жидкости с концентрацией не более 10 литров песка на 100 литров '
+                   f'жидкости. После каждого введения 50 литров песка подавать чистую жидкость в объеме не менее '
+                   f'100 литров. Чередовать циклы "50 литров песок с жидкостью / 100 литров чистой жидкости" до '
+                   f'отсыпки полного объема.  Продолжить подачу в НКТ жидкости глушения с расходом 2-3 л/сек, '
+                   f'закачать жидкость в объеме, равном внутреннему объему НКТ V=7 м3. Поднять перо на безопасное '
+                   f'расстояние - 200 м. Ожидание оседания песка 7,4 часа. Время начала оседания песка определяется '
+                   f'с момента завершения отсыпки. Расстояние принимается от устья до кровли песчаного моста по '
+                   f'формуле (Н - расстояние от устья до кровли; 320 - скорость оседания, м/час):\n\n\n\n',
              None, None, None, None, None, None, None,
              'мастер КРС', 3.5],
             [f'Ожидание оседания песка 4 часа.',
-             None, f'Ожидание оседания песка 4 часа.',
+             None, f'Ожидание оседания песка 4 часа. \n Во время оседания песка проверять подвижность подвески НКТ '
+                   f'вытяжкой на полную трубу не реже одного раза в 5 мин. После завершения времени оседания песка '
+                   f'допуском НКТ со скоростью спуска не более 0,1 м/с отбить кровлю песчаного моста. Если '
+                   f'кровля определена ниже планируемой глубины – произвести досыпку проппанта (кварцевого песка), '
+                   f'если выше – вымыв излишков песка обратной промывкой.',
              None, None, None, None, None, None, None,
              'мастер КРС', 4],
             [None, None,
-             f'Допустить компоновку с замером и шаблонированием НКТ до кровли песчаного моста '
+             f'Допуском компоновки со скоростью спуска не более 0,1 м/с отбить кровлю песчаного моста'
              f'(плановый забой -{filling_depth}м). '
              f'Определить текущий забой скважины (перо от песчаного моста не поднимать, упереться в песчаный мост).',
              None, None, None, None, None, None, None,
              'мастер КРС', 1.2],
             [None, None,
-             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через ЦИТС {data_list.contractor}". При необходимости '
-             f'подготовить место для установки партии ГИС напротив мостков. Произвести  монтаж ГИС согласно схемы  №8 при '
+             f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через РИТС {data_list.contractor}". '
+             f'При необходимости '
+             f'подготовить место для установки партии ГИС напротив мостков. Произвести  монтаж ГИС согласно схемы №8 при '
              f'привязке утвержденной главным инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г.',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
@@ -325,7 +358,8 @@ class SandWindow(WindowUnion):
                                     None, f'Опрессовать эксплуатационную колонну в интервале {filling_depth}-0м на'
                                           f'Р={self.data_well.max_admissible_pressure.get_value}атм'
                                           f' в течение 30 минут в присутствии представителя заказчика, составить акт. '
-                                          f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа'
+                                          f'(Вызов представителя осуществлять телефонограммой за 12 часов, '
+                                          f'с подтверждением за 2 часа'
                                           f' до начала работ)',
                                     None, None, None, None, None, None, None,
                                     'мастер КРС, предст. заказчика', 0.67])
@@ -339,11 +373,9 @@ class SandWindow(WindowUnion):
                                  None, None, None, None, None, None, None,
                                  'мастер КРС', None])
 
-        if privyazka_question_QCombo == "Да":
-            pass
-        else:
-            filling_list.pop(5)
-            filling_list.pop(4)
+        if privyazka_question_QCombo != "Да":
+            filling_list.pop(8)
+            filling_list.pop(7)
 
         filling_list.append([None, None,
                              f'Поднять {self.sand_select()} НКТ{nkt_diam}м с глубины {filling_depth}м с доливом '
