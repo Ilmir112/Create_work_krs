@@ -13,6 +13,7 @@ from decrypt import decrypt
 class LoginWindow(QDialog):
     def __init__(self, ):
         super().__init__()
+        self.user_dict = None
         self.register_window = None
         self.setWindowTitle('окно входа')
 
@@ -48,11 +49,14 @@ class LoginWindow(QDialog):
         self.box_layout.addWidget(self.password, 1, 2)
         self.box_layout.addWidget(self.button_login, 2, 1)
         self.box_layout.addWidget(self.button_register, 2, 2)
+        self.db = connection_to_database(decrypt("DB_NAME_USER"))
+
+        self.user_service = UserService(self.db)
 
     def update_users(self):
-        users_list = list(map(lambda x: x[1], self.get_list_users()))
+        self.users_list = list(map(lambda x: x[1], self.get_list_users()))
         self.username.clear()
-        self.username.addItems(users_list)
+        self.username.addItems(self.users_list)
 
     def closeEvent(self, event):
         if self.sender() is None:  # Проверяем вызывающий объект
@@ -67,22 +71,18 @@ class LoginWindow(QDialog):
         username = self.username.currentText()
         password = self.password.text()
         last_name, first_name, second_name, _ = username.split(' ')
+        if self.user_dict is None:
+            self.user_dict = self.user_service.get_user(last_name, first_name, second_name)
 
-        db = connection_to_database(decrypt("DB_NAME_USER"))
-
-        user_service = UserService(db)
-
-        user_dict = user_service.get_user(last_name, first_name, second_name)
-        if user_dict['last_name'] == last_name and user_dict['first_name'] == first_name \
-                and user_dict['second_name'] and user_dict['password'] == str(password):
+        if self.user_dict['last_name'] == last_name and self.user_dict['first_name'] == first_name \
+                and self.user_dict['second_name'] and self.user_dict['password'] == str(password):
             # mes = QMessageBox.information(self, 'Пароль', 'вход произведен')
 
+            data_list.user = (self.user_dict["pozition"] + ' ' + self.user_dict["organization"],
+                              f'{self.user_dict["last_name"]} '
+                              f'{self.user_dict["first_name"][0]}.{self.user_dict["second_name"][0]}.')
 
-            data_list.user = (user_dict["pozition"] + ' ' + user_dict["organization"],
-                              f'{user_dict["last_name"]} '
-                              f'{user_dict["first_name"][0]}.{user_dict["second_name"][0]}.')
-
-            data_list.contractor = user_dict["organization"]
+            data_list.contractor = self.user_dict["organization"]
 
             data_list.pause = False
             self.close()
@@ -93,6 +93,7 @@ class LoginWindow(QDialog):
 
         if 'РН' in data_list.contractor:
             data_list.connect_in_base = False
+
     @staticmethod
     def get_list_users():
         db = connection_to_database(decrypt("DB_NAME_USER"))
@@ -122,7 +123,8 @@ class RegisterWindow(QDialog):
 
         self.label_position = QLabel("Должность:", self)
         self.position = QComboBox(self)
-        self.position.addItems(['Ведущий геолог ', 'Главный геолог', 'Геолог', 'Ведущий технолог', 'Нормировщик', 'Заместитель начальника ПТО'])
+        self.position.addItems(['Ведущий геолог ', 'Главный геолог', 'Геолог', 'Ведущий технолог', 'Нормировщик',
+                                'Заместитель начальника ПТО'])
 
         self.label_organization = QLabel("Организация:", self)
         self.organization = QComboBox(self)

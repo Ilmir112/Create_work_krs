@@ -186,18 +186,20 @@ class CreatePZ(MyMainWindow):
                 [None, None, None, None, None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None, None, None, None, None]]
         else:
+            power_of_attorney = None
+            expedition = ''
             if 'Ойл' in contractor:
                 сhief_engineer_post = podpis_dict[data_list.contractor]["Руководство"]["сhief_engineer"]["post"]
                 сhief_engineer_surname = podpis_dict[data_list.contractor]["Руководство"]["сhief_engineer"]["surname"]
                 chief_geologist_post = podpis_dict[data_list.contractor]["Руководство"]["chief_geologist"]["post"]
                 chief_geologist_surname = podpis_dict[data_list.contractor]["Руководство"]["chief_geologist"]["surname"]
             elif 'РН' in contractor:
-                asdwd = data_list.user
                 number_expedition = [number for number in data_list.user[0] if number.isdigit()][0]
                 expedition = f'Экспедиция № {number_expedition}'
 
                 сhief_engineer_post = podpis_dict[data_list.contractor]['Экспедиция'][expedition]["сhief_engineer"]["post"]
                 сhief_engineer_surname = podpis_dict[data_list.contractor]['Экспедиция'][expedition]["сhief_engineer"]["surname"]
+                power_of_attorney = podpis_dict[data_list.contractor]['Экспедиция'][expedition]["сhief_engineer"]["power_of_attorney"]
                 chief_geologist_post = podpis_dict[data_list.contractor]['Экспедиция'][expedition]["chief_geologist"]["post"]
                 chief_geologist_surname = podpis_dict[data_list.contractor]['Экспедиция'][expedition]["chief_geologist"]["surname"]
 
@@ -211,7 +213,7 @@ class CreatePZ(MyMainWindow):
                  None],
                 [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
                  f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
-                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, power_of_attorney, None, None, None, None],
                 [None, podpis_dict[data_list.costumer][region]['gg']['post'], None, None, None,
                  None, None, f'{chief_geologist_post}', None, None, None, None],
                 [None, f'_____________{podpis_dict[data_list.costumer][region]["gg"]["surname"]}', None, None, None,
@@ -229,6 +231,14 @@ class CreatePZ(MyMainWindow):
                 [None, None, None, None, None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None, None, None, None, None]]
+            if '3' in expedition or "2" in expedition:
+                work_podpisant_list[5] = [None, podpis_dict[data_list.costumer][region]['gg']['post'], None, None, None,
+                 None, None, None, None, None, None, None]
+                work_podpisant_list[6] = [None,
+                                          f'_____________{podpis_dict[data_list.costumer][region]["gg"]["surname"]}',
+                                          None, None, None, None, None, None, None, None, '',  None]
+                work_podpisant_list[7] = [None, f'"____"_____________________{current_datetime.year}г.', None,
+                                          None, '', None, None, None, None, None, None, None]
 
         podp_grp = [[None, 'Представитель подрядчика по ГРП', None, None, None, None, None, None, None, None, None,
                      None],
@@ -293,11 +303,17 @@ class CreatePZ(MyMainWindow):
             for j in range(1, 13):
                 ws.cell(row=i, column=j).value = razdel[i - 1][j - 1]
                 ws.cell(row=i, column=j).font = Font(name='Arial Cyr', size=13, bold=True)
+                ws.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='left',
+                                               vertical='center')
+
             ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=7)
             ws.merge_cells(start_row=i, start_column=8, end_row=i, end_column=12)
-            ws.row_dimensions[i].height = 20
-        ws.row_dimensions[i + 1].height = 20
-        ws.row_dimensions[i + 1].height = 20
+            if i < 6:
+                ws.row_dimensions[i].height = 33
+            else:
+                ws.row_dimensions[i].height = 20
+
+
 
     def insert_events_gnvp(self, ws, dict_events_gnvp, merge_count=0):
         # if work_plan != 'dop_plan':
@@ -554,11 +570,11 @@ class CreatePZ(MyMainWindow):
                                     text_length = len(text)
                                     if value[0] <= text_length <= value[1]:
                                         if '\n' in text:
-                                            row_dimension_value = int(len(text) / 4 + text.count('\n') * 5)
-                                            ws.row_dimensions[i].height = row_dimension_value
+                                            row_dimension_value = int(len(text) / 4 + text.count('\n') * 3)
+
                                         else:
                                             row_dimension_value = int(len(text) / 4)
-                                            ws.row_dimensions[i].height = int(len(text) / 4)
+                                        ws.row_dimensions[i].height = row_dimension_value
 
                     self.data_well.insert_index += len(dict_events_gnvp[work_plan]) - 1
 

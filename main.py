@@ -319,6 +319,8 @@ class MyMainWindow(QMainWindow):
 
         # Запуск основного класса и всех дочерних классов в одной строке
         self.data_well = FindIndexPZ(self.ws, self.work_plan, self)
+        if self.data_well is False:
+            return
         self.data_well.work_plan = self.work_plan
         data_well_dict = {}
         self.data_well = WellName.read_well(
@@ -2677,6 +2679,10 @@ class SaveInExcel(MyWindow):
                     elif 'Закиев И.Э.' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
                         self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Закиев.png', coordinate)
+                    elif '320 - скорость оседания' in str(value):
+                        coordinate = f'F{row_ind + 2}'
+                        self.insert_image(
+                            self.ws2, f'{data_list.path_image}imageFiles/schema_well/sanf_formular-Photoroom.png', coordinate, 200, 80)
                     elif 'М.К.Алиев' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
                         self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Алиев махир.png', coordinate)
@@ -2696,7 +2702,7 @@ class SaveInExcel(MyWindow):
                         coordinate = f'{get_column_letter(ind)}{row_ind_ins}'
                         self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/schema_well/формула.png',
                                           coordinate,
-                                          330, 130)
+                                          300, 120)
                         break
             if self.data_well.work_plan in ['krs', 'plan_change']:
                 self.create_short_plan(self.wb2, plan_short)
@@ -2724,13 +2730,14 @@ class SaveInExcel(MyWindow):
 
             # path = 'workiii'
             # print(f'Пользоватль{data_list.puser}')
-            if 'Зуфаров' in data_list.user[1]:
-                path = 'D:/Documents/Desktop/ГТМ'
-            else:
-                path = ""
+
+            path = self.load_last_save_path()
 
             filenames = self.definition_filenames()
-            full_path = path + "/" + filenames
+            if path:
+                full_path = path + "/" + filenames
+            else:
+                full_path = filenames
 
             if self.data_well.work_plan not in ['dop_plan', 'dop_plan_in_base']:
                 from H2S import CalculateH2s
@@ -2759,8 +2766,23 @@ class SaveInExcel(MyWindow):
             if self.wb2:
                 self.wb2.close()
                 self.save_file_dialog(self.wb2, full_path)
+    @staticmethod
+    def load_last_save_path():
+        """Загрузить последний сохраненный путь из файла."""
+        if os.path.exists(f"{data_list.path_image}work_py/last_save_path.txt"):
+            with open(f"{data_list.path_image}work_py/last_save_path.txt", "r") as file:
+                return file.read().strip()
+        return None
+
+
+    @staticmethod
+    def save_last_save_path(path):
+        """Сохранить последний сохраненный путь в файл."""
+        with open(f"{data_list.path_image}work_py/last_save_path.txt", "w") as file:
+            file.write(path)
 
     def save_file_dialog(self, wb2, full_path):
+
         while True:  # Начинаем бесконечный цикл
             try:
                 file_name, _ = QFileDialog.getSaveFileName(None, "Save excel-file",
@@ -2772,6 +2794,11 @@ class SaveInExcel(MyWindow):
             except Exception as e:
                 QMessageBox.critical(None, 'Ошибка',
                                      f'файл под таким именем открыт, закройте его: {type(e).__name__}\n  {str(e)}')
+
+        # Сохраняем последний путь
+        path_new = '/'.join(file_name.split('/')[:-1])
+        asdwdwad = '/'.join(file_name.split('/')[:-1])[:-1]
+        self.save_last_save_path(path_new)
         try:
             # Создаем объект Excel
             excel = win32com.client.Dispatch("Excel.Application")

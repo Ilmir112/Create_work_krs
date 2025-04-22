@@ -226,7 +226,7 @@ class SandWindow(WindowUnion):
         if volume_cement != '':
             volume_cement = round(float(volume_cement), 1)
         elif volume_cement == '' and rir_question_qcombo == "Да":
-            mes = QMessageBox.question(self, 'Вопрос', f'Не указан объем цемента')
+            QMessageBox.question(self, 'Вопрос', f'Не указан объем цемента')
             return
 
         work_list = self.sandFilling(roof_sand_edit, sole_sand_edit, privyazka_question_QCombo)
@@ -314,9 +314,15 @@ class SandWindow(WindowUnion):
                    f'закачать жидкость в объеме, равном внутреннему объему НКТ V=7 м3. Поднять перо на безопасное '
                    f'расстояние - 200 м. Ожидание оседания песка 7,4 часа. Время начала оседания песка определяется '
                    f'с момента завершения отсыпки. Расстояние принимается от устья до кровли песчаного моста по '
-                   f'формуле (Н - расстояние от устья до кровли; 320 - скорость оседания, м/час):\n\n\n\n',
+                   f'формуле (Н - расстояние от устья до кровли; 320 - скорость оседания, м/час):',
              None, None, None, None, None, None, None,
              'мастер КРС', 3.5],
+            [None,
+             None, f'                      Формула:                                                                \n   '
+                   f'                                            '
+                   f'                                            ',
+             None, None, None, None, None, None, None,
+             None, None],
             [f'Ожидание оседания песка 4 часа.',
              None, f'Ожидание оседания песка 4 часа. \n Во время оседания песка проверять подвижность подвески НКТ '
                    f'вытяжкой на полную трубу не реже одного раза в 5 мин. После завершения времени оседания песка '
@@ -335,7 +341,7 @@ class SandWindow(WindowUnion):
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через РИТС {data_list.contractor}". '
              f'При необходимости '
              f'подготовить место для установки партии ГИС напротив мостков. Произвести  монтаж ГИС согласно схемы №8 при '
-             f'привязке утвержденной главным инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г.',
+             f'привязке утвержденной главным инженером {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г.',
              None, None, None, None, None, None, None,
              'мастер КРС', None],
             [f'Привязка ', None,

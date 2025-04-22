@@ -25,6 +25,9 @@ class TabPageSoDrill(TabPageUnion):
         self.drill_select_combo.addItems(
             ['долото в ЭК', 'долото в ДП'])
 
+        self.cutter_calibrator_label = QLabel("Добавлять фрез калибратор в компоновку?", self)
+        self.cutter_calibrator_combo = QComboBox(self)
+        self.cutter_calibrator_combo.addItems(['Да', 'Нет'])
 
         self.downhole_motor_label = QLabel("Забойный двигатель", self)
         self.downhole_motor_line = QLineEdit(self)
@@ -35,8 +38,9 @@ class TabPageSoDrill(TabPageUnion):
         self.nkt_str_combo.addItems(
             ['НКТ', 'СБТ'])
 
-        if self.data_well.column_additional is False or (self.data_well.column_additional and
-                                                   self.data_well.head_column_additional.get_value >= self.data_well.current_bottom):
+        if self.data_well.column_additional is False or \
+                (self.data_well.column_additional and
+                 self.data_well.head_column_additional.get_value >= self.data_well.current_bottom):
             self.drill_select_combo.setCurrentIndex(0)
             if self.data_well.column_diameter.get_value > 127:
                 self.downhole_motor_line.setText('Д-106')
@@ -62,7 +66,6 @@ class TabPageSoDrill(TabPageUnion):
         self.sole_drill_line = QLineEdit(self)
         self.sole_drill_line.setClearButtonEnabled(True)
 
-
         self.drill_True_label = QLabel("Тип разбуриваемого материала", self)
         self.drill_label = QLabel("добавление поинтервального бурения", self)
         self.drill_cm_combo = QComboBox(self)
@@ -82,7 +85,6 @@ class TabPageSoDrill(TabPageUnion):
         self.grid.addWidget(self.drill_type_label, 2, 1)
         self.grid.addWidget(self.drill_type_combo, 3, 1)
 
-
         self.grid.addWidget(self.drill_diameter_label, 2, 2)
         self.grid.addWidget(self.drill_diameter_line, 3, 2)
 
@@ -91,6 +93,9 @@ class TabPageSoDrill(TabPageUnion):
 
         self.grid.addWidget(self.downhole_motor_label, 2, 4)
         self.grid.addWidget(self.downhole_motor_line, 3, 4)
+
+        self.grid.addWidget(self.cutter_calibrator_label, 2, 5)
+        self.grid.addWidget(self.cutter_calibrator_combo, 3, 5)
 
         self.grid.addWidget(self.drill_label, 4, 1, 2, 2)
 
@@ -115,7 +120,6 @@ class TabPageSoDrill(TabPageUnion):
             if data_list.depth_paker_izv <= sole_drill_line:
                 QMessageBox.information(self, 'ОШИБКА', 'Необходимо извлечь извлекаемый пакер')
                 self.sole_drill_line.setText('')
-
 
     def update_drill_edit(self, index):
 
@@ -176,7 +180,6 @@ class DrillWindow(WindowUnion):
     def __init__(self, data_well, table_widget, parent=None):
         super().__init__(data_well)
 
-
         self.insert_index = data_well.insert_index
         self.tab_widget = TabWidget(self.data_well)
 
@@ -212,9 +215,10 @@ class DrillWindow(WindowUnion):
         vbox.addWidget(self.buttonadd_string, 3, 1)
 
     def closeEvent(self, event):
-                # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window  = None
+        # Закрываем основное окно при закрытии окна входа
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
+
     def add_row_table(self):
 
         roof_drill = self.tab_widget.currentWidget().roof_drill_line.text().replace(',', '.')
@@ -235,7 +239,7 @@ class DrillWindow(WindowUnion):
         self.tableWidget.setSortingEnabled(False)
         rows = self.tableWidget.rowCount()
         if rows > 0:
-            if float(sole_drill) <= float(self.tableWidget.item(rows-1, 1).text()):
+            if float(sole_drill) <= float(self.tableWidget.item(rows - 1, 1).text()):
                 QMessageBox.warning(self, 'ОШИБКА', ' Планируемая глубина равна или выше текущего забоя')
                 return
         self.tableWidget.insertRow(rows)
@@ -249,9 +253,7 @@ class DrillWindow(WindowUnion):
         self.tableWidget.setCellWidget(rows, 2, drill_type_combo)
         self.tableWidget.setSortingEnabled(False)
 
-
     def add_string(self):
-
         drill_key = self.tab_widget.currentWidget().drill_select_combo.currentText()
         self.drilling_bit_diam = self.tab_widget.currentWidget().drill_diameter_line.text()
         self.downhole_motor = self.tab_widget.currentWidget().downhole_motor_line.text()
@@ -261,7 +263,8 @@ class DrillWindow(WindowUnion):
             QMessageBox.information(self, 'Внимание', 'Не заполнен необходимый забой')
             return
 
-        drilling_interval = list(set([self.data_well.dict_perforation[plast]["подошва"] for plast in self.data_well.plast_all]))
+        drilling_interval = list(
+            set([self.data_well.dict_perforation[plast]["подошва"] for plast in self.data_well.plast_all]))
         drilling_interval.append(int(current_depth))
         if len(self.data_well.dict_leakiness) != 0:
             # print(self.data_well.dict_leakiness)
@@ -273,7 +276,6 @@ class DrillWindow(WindowUnion):
                 else:
                     if leakness_list[-1] < nek_bur:
                         leakness_list.append(nek_bur)
-
 
             drilling_interval.extend(leakness_list)
         # drilling_interval = list(filter(key = lambda x: x[0] > self.data_well.current_bottom, drilling_interval))
@@ -301,7 +303,6 @@ class DrillWindow(WindowUnion):
                 break
 
     def add_work(self):
-        from main import MyMainWindow
         try:
             self.nkt_str = self.tab_widget.currentWidget().nkt_str_combo.currentText()
             self.drilling_bit_diam = self.tab_widget.currentWidget().drill_diameter_line.text()
@@ -316,13 +317,26 @@ class DrillWindow(WindowUnion):
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
 
+        self.cutter_calibrator_combo = self.tab_widget.currentWidget().cutter_calibrator_combo.currentText()
+        mes = QMessageBox.question(self, 'Фрез калибратор', 'Фрез-калибратор нужно использовать только при '
+                                                            'разбуривании цементного моста вне интервала перфорации, '
+                                                            'в случае разбуривания в ИП, взрыв пакеров или заливочных '
+                                                            'пробок фрез-калибратор стоит из компоновки убрать. '
+                                                            'При наличии компоновку фреза калибратора СПО райбера '
+                                                            'не производить. Gродолжить?')
+
+        self.cutter_calibrator = ''
+        if mes == QMessageBox.StandardButton.No:
+            return
+        else:
+            if self.cutter_calibrator_combo == 'Да':
+                self.cutter_calibrator = '+ фрез калибратор'
 
         rows = self.tableWidget.rowCount()
         if rows == 0:
             QMessageBox.warning(self, "ВНИМАНИЕ", 'Нужно добавить интервалы ,бурения')
             return
         drill_tuple = []
-
 
         for row in range(rows):
             roof_drill = self.tableWidget.item(row, 0)
@@ -333,7 +347,8 @@ class DrillWindow(WindowUnion):
                 sole = int(float(sole_drill.text()))
                 drill_True = drill_type_combo.currentText()
                 if self.drilling_bit_diam != '':
-                    if self.data_well.column_additional is False or (self.data_well.column_additional and sole < self.data_well.head_column_additional.get_value):
+                    if self.data_well.column_additional is False or (
+                            self.data_well.column_additional and sole < self.data_well.head_column_additional.get_value):
                         if self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value <= float(
                                 self.drilling_bit_diam):
                             QMessageBox.warning(self, 'ОШИБКА', 'Не корректный диаметр долото')
@@ -345,7 +360,6 @@ class DrillWindow(WindowUnion):
                             return
 
                 drill_tuple.append((sole, drill_True))
-
 
         drill_tuple = sorted(drill_tuple, key=lambda x: x[0])
         if self.nkt_str == 'НКТ':
@@ -368,8 +382,6 @@ class DrillWindow(WindowUnion):
             self.close_modal_forcefully()
             return drill_list
 
-
-
     def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
@@ -377,7 +389,8 @@ class DrillWindow(WindowUnion):
             return
         self.tableWidget.removeRow(row)
 
-    def drilling_nkt(self, drill_tuple, drill_type_combo, drilling_bit_diam, downhole_motor, need_privyazka_q_combo = 'Нет' ):
+    def drilling_nkt(self, drill_tuple, drill_type_combo, drilling_bit_diam, downhole_motor,
+                     need_privyazka_q_combo='Нет'):
 
         from work_py.alone_oreration import well_volume
 
@@ -394,15 +407,16 @@ class DrillWindow(WindowUnion):
                 or (self.data_well.column_additional is True
                     and self.data_well.head_column_additional.get_value >= self.data_well.current_bottom):
             drilling_str = f'{drill_type_combo}-{drilling_bit_diam} для ' \
-                           f'ЭК {self.data_well.column_diameter.get_value}мм х {self.data_well.column_wall_thickness.get_value}мм +' \
+                           f'ЭК {self.data_well.column_diameter.get_value}мм х ' \
+                           f'{self.data_well.column_wall_thickness.get_value}мм {self.cutter_calibrator} +' \
                            f' забойный двигатель {downhole_motor} + НКТ{nkt_diam} 20м + репер '
             drilling_short = f'{drill_type_combo}-{drilling_bit_diam} + ' \
                              f'забойный двигатель {downhole_motor}  + НКТ{nkt_diam} 20м + репер '
 
         elif self.data_well.column_additional is True:
             drilling_str = f'{drill_type_combo}-{drilling_bit_diam} для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
-                           f'{self.data_well.column_additional_wall_thickness.get_value}мм + забойный двигатель ' \
-                           f'{downhole_motor} +НКТ{nkt_pod} 20м + репер + ' \
+                           f'{self.data_well.column_additional_wall_thickness.get_value}мм + {self.cutter_calibrator}забойный двигатель ' \
+                           f'{downhole_motor} + НКТ{nkt_pod} 20м + репер + ' \
                            f'НКТ{nkt_pod} {round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value, 0)}м'
             drilling_short = f'{drill_type_combo}-{drilling_bit_diam}  + забойный двигатель  {downhole_motor} +НКТ{nkt_pod} 20м + ' \
                              f'репер + ' \
@@ -430,13 +444,13 @@ class DrillWindow(WindowUnion):
         if DrillWindow.check_pressure(self, current_depth):
             drilling_list.append(
                 [f'Опрессовать ЭК и ЦМ на Р={self.data_well.max_admissible_pressure.get_value}атм', None,
-              f'Опрессовать ЭК и ЦМ на Р={self.data_well.max_admissible_pressure.get_value}атм в присутствии '
-              f'представителя заказчика. Составить акт. '
-              f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
-              f'начала работ) \n'
-              f'В случае негерметичности произвести РИР по согласованию с заказчиком',
-              None, None, None, None, None, None, None,
-              'Мастер КРС, УСРСиСТ', 0.67])
+                 f'Опрессовать ЭК и ЦМ на Р={self.data_well.max_admissible_pressure.get_value}атм в присутствии '
+                 f'представителя заказчика. Составить акт. '
+                 f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за 2 часа до '
+                 f'начала работ) \n'
+                 f'В случае негерметичности произвести РИР по согласованию с заказчиком',
+                 None, None, None, None, None, None, None,
+                 'Мастер КРС, УСРСиСТ', 0.67])
         if len(drill_tuple) == 1:
             for drill_sole, bottomType2 in drill_tuple:
                 for row in DrillWindow.reply_drilling(self, drill_sole, bottomType2, drilling_str, nkt_diam):
@@ -448,16 +462,16 @@ class DrillWindow(WindowUnion):
                 for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
                     drilling_list.append(row)
             drilling_list.append([f'Промыть  {self.data_well.fluid_work} в объеме '
-                                             f'{round(well_volume(self, self.data_well.current_bottom) * 2, 1)}м3', None,
-                                             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work}  '
-                                             f'в присутствии представителя заказчика в объеме '
-                                             f'{round(well_volume(self, self.data_well.current_bottom) * 2, 1)}м3. Составить акт.',
-                                             None, None, None, None, None, None, None,
-                                             'мастер КРС, предст. заказчика', 1.5])
+                                  f'{round(well_volume(self, self.data_well.current_bottom) * 2, 1)}м3', None,
+                                  f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work}  '
+                                  f'в присутствии представителя заказчика в объеме '
+                                  f'{round(well_volume(self, self.data_well.current_bottom) * 2, 1)}м3. Составить акт.',
+                                  None, None, None, None, None, None, None,
+                                  'мастер КРС, предст. заказчика', 1.5])
 
         drilling_list_end = [
             [None, None,
-             f'ПРИМЕЧАНИЕ: РАСХОД РАБОЧЕЙ ЖИДКОСТИ 8-10 Л/С;  трёхкратно проработать интервал' 
+             f'ПРИМЕЧАНИЕ: РАСХОД РАБОЧЕЙ ЖИДКОСТИ 8-10 Л/С;  трёхкратно проработать интервал'
              f' ОСЕВАЯ НАГРУЗКА НЕ БОЛЕЕ 75% ОТ ДОПУСТИМОЙ НАГРУЗКИ (УТОЧНИТЬ ПО ПАСПОРТУ ЗАВЕЗЁННОГО ГЗД И ДОЛОТА);'
              f' РАБОЧЕЕ ДАВЛЕНИЕ 4-10 МПА (УТОЧНИТЬ ПО ПАСПОРТУ ЗАВЕЗЁННОГО ВЗД);'
              f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',
@@ -470,16 +484,14 @@ class DrillWindow(WindowUnion):
              'мастер КРС', lifting_nkt_norm(self.data_well.current_bottom, 1.3)]
         ]
         if need_privyazka_q_combo == 'Да':
-
             privyazka_nkt_list = self.privyazka_nkt()[0]
 
             drilling_list_end.insert(-1, privyazka_nkt_list)
             drilling_list_end.insert(-1, [f'Удостоверится в наличии необходимого забоя', None,
                                           f'На привязанных НКТ удостоверится, что текущий забой находится на '
                                           f'глубине {self.data_well.current_bottom}м',
-             None, None, None, None, None, None, None,
-             'Мастер КРС, УСРСиСТ', None])
-
+                                          None, None, None, None, None, None, None,
+                                          'Мастер КРС, УСРСиСТ', None])
 
         drilling_list.extend(drilling_list_end)
 
@@ -496,12 +508,12 @@ class DrillWindow(WindowUnion):
             for row in self.drilling_sbt(drill_tuple, drill_type_combo, drilling_bit_diam, downhole_motor):
                 drilling_list.append(row)
             drilling_list.insert(-2, [f'Промыть  {self.data_well.fluid_work} в объеме '
-                                  f'{round(well_volume(self, self.data_well.current_bottom) * 2, 1)}м3', None,
-                                  f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work}  '
-                                  f'в присутствии представителя заказчика в объеме '
-                                  f'{round(well_volume(self, self.data_well.current_bottom) * 2, 1)}м3. Составить акт.',
-                                  None, None, None, None, None, None, None,
-                                  'мастер КРС, предст. заказчика', 1.5])
+                                      f'{round(well_volume(self, self.data_well.current_bottom) * 2, 1)}м3', None,
+                                      f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work}  '
+                                      f'в присутствии представителя заказчика в объеме '
+                                      f'{round(well_volume(self, self.data_well.current_bottom) * 2, 1)}м3. Составить акт.',
+                                      None, None, None, None, None, None, None,
+                                      'мастер КРС, предст. заказчика', 1.5])
 
         return drilling_list
 
@@ -528,7 +540,6 @@ class DrillWindow(WindowUnion):
                  None, None, None, None, None, None, None,
                  'Мастер КРС, УСРСиСТ', 0.67])
 
-
         self.data_well.current_bottom = current_depth
         return drilling_true_quest_list
 
@@ -543,9 +554,9 @@ class DrillWindow(WindowUnion):
         if self.data_well.column_additional is False or (
                 self.data_well.column_additional is True and self.data_well.head_column_additional.get_value >= current_depth):
             drilling_str = f'{drill_type_combo}-{drilling_bit_diam} для ЭК {self.data_well.column_diameter.get_value}мм х ' \
-                           f'{self.data_well.column_wall_thickness.get_value}мм '
+                           f'{self.data_well.column_wall_thickness.get_value}мм {self.cutter_calibrator}'
             drilling_short = f'{drill_type_combo}-{drilling_bit_diam} для ЭК {self.data_well.column_diameter.get_value}мм х ' \
-                             f'{self.data_well.column_wall_thickness.get_value}мм '
+                             f'{self.data_well.column_wall_thickness.get_value}мм {self.cutter_calibrator}'
             sbt_length = f'СБТ {nkt_diam} - {int(current_depth + 100)}м'
 
         elif self.data_well.column_additional is True:
@@ -556,31 +567,31 @@ class DrillWindow(WindowUnion):
             drilling_short = f'{drill_type_combo}-{drilling_bit_diam}  + СБТ{nkt_pod} ' \
                              f'{self.data_well.current_bottom - self.data_well.head_column_additional.get_value}м'
             sbt_length = f'СБТ {nkt_diam} - {self.data_well.head_column_additional.get_value}м и СБТ {nkt_pod}' \
-                         f' {int(current_depth + 100)-self.data_well.head_column_additional.get_value}м'
+                         f' {int(current_depth + 100) - self.data_well.head_column_additional.get_value}м'
 
         self.data_well.drilling_interval.append([self.data_well.current_bottom, current_depth])
 
         drilling_list = [
             [f'Завезти на скважину {sbt_length}', None,
-                 f'Завезти на скважину СБТ {sbt_length} – Укладка труб на стеллажи.',
-                 None, None, None, None, None, None, None,
-                 'Мастер', None],
+             f'Завезти на скважину СБТ {sbt_length} – Укладка труб на стеллажи.',
+             None, None, None, None, None, None, None,
+             'Мастер', None],
             [f'СПО {drilling_short} на СБТ {nkt_diam} до Н= {self.data_well.current_bottom - 30}', None,
-                 f'Спустить {drilling_str}  на СБТ {nkt_diam} до Н= {self.data_well.current_bottom - 30}м с замером, '
-                 f' (При СПО первых десяти СБТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
-                 f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., '
-                 f'составить акт. СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ '
-                 f'СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
-                 f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС', descentNKT_norm(self.data_well.current_bottom, 1.1)],
+             f'Спустить {drilling_str}  на СБТ {nkt_diam} до Н= {self.data_well.current_bottom - 30}м с замером, '
+             f' (При СПО первых десяти СБТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
+             f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., '
+             f'составить акт. СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ '
+             f'СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
+             f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
+             None, None, None, None, None, None, None,
+             'мастер КРС', descentNKT_norm(self.data_well.current_bottom, 1.1)],
             [f'монтаж мех.ротора', None,
-                 f'Произвести монтаж мех.ротора. Собрать промывочное оборудование: вертлюг, ведущая труба (установить '
-                 f'вставной фильтр под ведущей трубой), '
-                 f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
-                 None, None, None, None, None, None, None,
-                 'Мастер КРС, УСРСиСТ', round(0.14 + 0.17 + 0.08 + 0.48 + 1.1, 1)],
-            ]
+             f'Произвести монтаж мех.ротора. Собрать промывочное оборудование: вертлюг, ведущая труба (установить '
+             f'вставной фильтр под ведущей трубой), '
+             f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, УСРСиСТ', round(0.14 + 0.17 + 0.08 + 0.48 + 1.1, 1)],
+        ]
 
         if self.check_pressure(current_depth):
             drilling_list.append(
@@ -616,10 +627,10 @@ class DrillWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
             [f'д/ж мех ротора',
-                None,
-                f'Демонтировать мех ротор',
-                None, None, None, None, None, None, None,
-                'мастер КРС, предст. заказчика', 0.77],
+             None,
+             f'Демонтировать мех ротор',
+             None, None, None, None, None, None, None,
+             'мастер КРС, предст. заказчика', 0.77],
             [None, None,
              f'Поднять  {drilling_str} на СБТ с глубины {self.data_well.current_bottom}м с доливом скважины в '
              f'объеме {round(self.data_well.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.data_well.fluid_work}',
@@ -630,7 +641,6 @@ class DrillWindow(WindowUnion):
         return drilling_list
 
     def check_pressure(self, depth):
-
 
         check_true = True
 
@@ -673,7 +683,7 @@ class DrillWindow(WindowUnion):
         drilling_bit_diam = TabPageSoDrill.drilling_bit_diam_select(self, current_depth)
 
         drilling_bit_diam, ok = QInputDialog.getDouble(None, 'Диаметр фреза',
-                                                'Введите диаметр фреза', drilling_bit_diam, 50, 210, 1)
+                                                       'Введите диаметр фреза', drilling_bit_diam, 50, 210, 1)
         nkt_pod = "2' 3/8"
 
         nkt_diam = ''.join(["2 7/8" if self.data_well.column_diameter.get_value > 110 else "2 3/8"])
@@ -694,65 +704,65 @@ class DrillWindow(WindowUnion):
 
         self.data_well.drilling_interval.append([self.data_well.current_bottom, current_depth])
         drilling_list = [[f'Завоз на скважину СБТ', None,
-         f'Завоз на скважину СБТ – Укладка труб на стеллажи.',
-         None, None, None, None, None, None, None,
-         'Мастер', None],
-            [f'СПО {drilling_short} на СБТ{nkt_diam} до Н= {min_port - 30}', None,
-             f'Спустить {drilling_str}  на СБТ{nkt_diam} до Н= {min_port - 30}м с замером, '
-             f' (При СПО первых десяти СБТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
-             f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., составить акт.'
-             f'СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
-             f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
-             None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(min_port, 1.1)],
-            [f'монтаж мех.ротора', None,
-             f'Произвести монтаж мех.ротора. Собрать промывочное оборудование: вертлюг, ведущая труба (установить '
-             f'вставной фильтр под ведущей трубой), '
-             f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
-             None, None, None, None, None, None, None,
-             'Мастер КРС, УСРСиСТ', round(0.14 + 0.17 + 0.08 + 0.48 + 1.1, 1)],
-            [f'нормализацию до Н= {current_depth}м', None,
-             f'Произвести фрезерование муфт ГРП  с гл.{min_port}м до '
-             f'гл.{current_depth}м  до первого порта с периодической обратной промывкой, с проработкой э/к в'
-             f' интервале {min_port-20}-{current_depth}м (режим работы 60-80 об/мин, расход '
-             f'6-10 литров, нагрузка на фрезерующий инструмент до 3-х тонн. Приподнимаем инструмент после 15-20 минут '
-             f'работы).',
-             None, None, None, None, None, None, None,
-             'Мастер КРС, УСРСиСТ', 20, ],
-            [f'При отсутствии циркуляции заказчка блок пачки', None,
-             f'При отсутствии циркуляции или потери циркуляции согласовать заказчку блок пачки по дополнительному плану',
-             None, None, None, None, None, None, None,
-             'Мастер КРС, УСРСиСТ', None],
-            [None, None,
-             f'ПРИМЕЧАНИЕ: РАСХОД РАБОЧЕЙ ЖИДКОСТИ 8-10 Л/С;'
-             f' ОСЕВАЯ НАГРУЗКА НЕ БОЛЕЕ 75% ОТ ДОПУСТИМОЙ НАГРУЗКИ (УТОЧНИТЬ ПО ПАСПОРТУ  И ДОЛОТА);'
-             f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ)) \n'
-             f'ПРИПОДНИМАЕМ ИНСТРУМЕНТ ПОСЛЕ 15-20 МИНУТ РАБОТЫ',
-             None, None, None, None, None, None, None,
-             'Мастер КРС, УСРСиСТ', None],
-            [f'Промыть  {self.data_well.fluid_work}  '
-             f'в объеме {round(well_volume(self, current_depth) * 2, 1)}м3', None,
-             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work}  '
-             f'в присутствии представителя заказчика в объеме '
-             f'{round(well_volume(self, current_depth) * 2, 1)}м3. Составить акт.',
-             None, None, None, None, None, None, None,
-             'мастер КРС, предст. заказчика', well_volume_norm(well_volume(self, current_depth))],
-            [None, None,
-             f'Поднять  {drilling_str} на СБТ {nkt_diam} с глубины {current_depth}м с доливом скважины в '
-             f'объеме {round(self.data_well.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.data_well.fluid_work}',
-             None, None, None, None, None, None, None,
-             'мастер КРС', lifting_nkt_norm(self.data_well.current_bottom, 1.3)],
-            [None, None,
-             f'В случае превышении норм времени на фрезерование портов увеличение продолжительности дополнительно '
-             f'согласовать с супервайзерской службой с составление акта на фактически затраченное время. Или согласовать '
-             f'смену вооружения и повторить работы',
-             None, None, None, None, None, None, None,
-             'мастер КРС', lifting_nkt_norm(self.data_well.current_bottom, 1.3)],
-            [None, None,
-             f'При посадке фреза на глубине выше планируемого порта по согласованию с УСРСиСТ произвести следующие работы:',
-             None, None, None, None, None, None, None,
-             'мастер КРС', lifting_nkt_norm(self.data_well.current_bottom, 1.3)]
-        ]
+                          f'Завоз на скважину СБТ – Укладка труб на стеллажи.',
+                          None, None, None, None, None, None, None,
+                          'Мастер', None],
+                         [f'СПО {drilling_short} на СБТ{nkt_diam} до Н= {min_port - 30}', None,
+                          f'Спустить {drilling_str}  на СБТ{nkt_diam} до Н= {min_port - 30}м с замером, '
+                          f' (При СПО первых десяти СБТ на спайдере дополнительно устанавливать элеватор ЭХЛ). '
+                          f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., составить акт.'
+                          f'СКОРОСТЬ СПУСКА НЕ БОЛЕЕ 1 М/С (НЕ ДОХОДЯ 40 - 50 М ДО ПЛАНОВОГО ИНТЕРВАЛА СКОРОСТЬ СПУСКА СНИЗИТЬ ДО 0,25 М/С). '
+                          f'ЗА 20 М ДО ЗАБОЯ СПУСК ПРОИЗВОДИТЬ С ПРОМЫВКОЙ',
+                          None, None, None, None, None, None, None,
+                          'мастер КРС', descentNKT_norm(min_port, 1.1)],
+                         [f'монтаж мех.ротора', None,
+                          f'Произвести монтаж мех.ротора. Собрать промывочное оборудование: вертлюг, ведущая труба (установить '
+                          f'вставной фильтр под ведущей трубой), '
+                          f'буровой рукав, устьевой герметизатор, нагнетательная линия. Застраховать буровой рукав за вертлюг. ',
+                          None, None, None, None, None, None, None,
+                          'Мастер КРС, УСРСиСТ', round(0.14 + 0.17 + 0.08 + 0.48 + 1.1, 1)],
+                         [f'нормализацию до Н= {current_depth}м', None,
+                          f'Произвести фрезерование муфт ГРП  с гл.{min_port}м до '
+                          f'гл.{current_depth}м  до первого порта с периодической обратной промывкой, с проработкой э/к в'
+                          f' интервале {min_port - 20}-{current_depth}м (режим работы 60-80 об/мин, расход '
+                          f'6-10 литров, нагрузка на фрезерующий инструмент до 3-х тонн. Приподнимаем инструмент после 15-20 минут '
+                          f'работы).',
+                          None, None, None, None, None, None, None,
+                          'Мастер КРС, УСРСиСТ', 20, ],
+                         [f'При отсутствии циркуляции заказчка блок пачки', None,
+                          f'При отсутствии циркуляции или потери циркуляции согласовать заказчку блок пачки по дополнительному плану',
+                          None, None, None, None, None, None, None,
+                          'Мастер КРС, УСРСиСТ', None],
+                         [None, None,
+                          f'ПРИМЕЧАНИЕ: РАСХОД РАБОЧЕЙ ЖИДКОСТИ 8-10 Л/С;'
+                          f' ОСЕВАЯ НАГРУЗКА НЕ БОЛЕЕ 75% ОТ ДОПУСТИМОЙ НАГРУЗКИ (УТОЧНИТЬ ПО ПАСПОРТУ  И ДОЛОТА);'
+                          f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ)) \n'
+                          f'ПРИПОДНИМАЕМ ИНСТРУМЕНТ ПОСЛЕ 15-20 МИНУТ РАБОТЫ',
+                          None, None, None, None, None, None, None,
+                          'Мастер КРС, УСРСиСТ', None],
+                         [f'Промыть  {self.data_well.fluid_work}  '
+                          f'в объеме {round(well_volume(self, current_depth) * 2, 1)}м3', None,
+                          f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work}  '
+                          f'в присутствии представителя заказчика в объеме '
+                          f'{round(well_volume(self, current_depth) * 2, 1)}м3. Составить акт.',
+                          None, None, None, None, None, None, None,
+                          'мастер КРС, предст. заказчика', well_volume_norm(well_volume(self, current_depth))],
+                         [None, None,
+                          f'Поднять  {drilling_str} на СБТ {nkt_diam} с глубины {current_depth}м с доливом скважины в '
+                          f'объеме {round(self.data_well.current_bottom * 1.4 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.data_well.fluid_work}',
+                          None, None, None, None, None, None, None,
+                          'мастер КРС', lifting_nkt_norm(self.data_well.current_bottom, 1.3)],
+                         [None, None,
+                          f'В случае превышении норм времени на фрезерование портов увеличение продолжительности дополнительно '
+                          f'согласовать с супервайзерской службой с составление акта на фактически затраченное время. Или согласовать '
+                          f'смену вооружения и повторить работы',
+                          None, None, None, None, None, None, None,
+                          'мастер КРС', lifting_nkt_norm(self.data_well.current_bottom, 1.3)],
+                         [None, None,
+                          f'При посадке фреза на глубине выше планируемого порта по согласованию с УСРСиСТ произвести следующие работы:',
+                          None, None, None, None, None, None, None,
+                          'мастер КРС', lifting_nkt_norm(self.data_well.current_bottom, 1.3)]
+                         ]
         for row in drilling_list:
             kot_list.append(row)
 

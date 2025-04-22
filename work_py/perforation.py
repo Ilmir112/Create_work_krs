@@ -424,7 +424,7 @@ class PerforationWindow(WindowUnion):
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через '
              f'РИТС {data_list.contractor}". '
              f'При необходимости  подготовить место для установки партии ГИС напротив мостков. '
-             f'Произвести  монтаж ГИС согласно схемы  №8{shema_str} утвержденной главным инженером от '
+             f'Произвести  монтаж ГИС согласно схемы №8 утвержденной главным инженером от '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г',
              None, None, None, None, None, None, None,
              'Мастер КРС', None, None, None],
@@ -612,7 +612,7 @@ class PerforationWindow(WindowUnion):
                 if 'Ойл' in data_list.contractor:
                     schema_swab = '9'
                 elif 'РН' in data_list.contractor:
-                    schema_swab = '7'
+                    schema_swab = '9'
                 pipe_perforation.extend([[None, None,
                                           f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
                                           f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г.'

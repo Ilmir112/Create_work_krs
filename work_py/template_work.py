@@ -1590,6 +1590,7 @@ class TemplateKrs(WindowUnion):
                 downhole_motor = 'Д-106'
             else:
                 downhole_motor = 'Д-76'
+            self.cutter_calibrator = ''
 
             if self.data_well.dict_pump_shgn["before"] != 0 and self.data_well.paker_before["before"] == 0:
                 gips_pero_list = [gips_pero_list[-1]]

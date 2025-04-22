@@ -117,7 +117,6 @@ class FindIndexPZ(MyMainWindow):
         self.well_volume_in_pz = []
         self.well_fluid_in_pz = []
         self.pressure_mkp = ProtectedIsNonNone('не корректно')
-
         self.column_direction_true = False
         self.column_additional = False
         self.data_window = None

@@ -899,14 +899,16 @@ class DataWindow(WindowUnion):
             curator = str(self.current_widget.curator_Combo.currentText())
             if self.check_date_format(result_pressure_date) is False:
                 if curator != 'ВНС':
-                    QMessageBox.warning(self, 'Ошибка', 'Не корректна дата последней опрессовки')
+                    QMessageBox.warning(self, 'Ошибка', 'Не корректна дата последней опрессовки, '
+                                                        'ожидается дата в формате "dd.mm.yyyy')
                     return
                 else:
                     self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(self.data_well.date_drilling_cancel)
 
             if self.check_date_format(date_commissioning_line) is False:
                 if curator != 'ВНС':
-                    QMessageBox.warning(self, 'Ошибка', 'Не корректна дата ввода в эскплуатацию')
+                    QMessageBox.warning(self, 'Ошибка', 'Не корректна дата ввода в эскплуатацию, '
+                                                        'ожидается дата в формате "dd.mm.yyyy')
                     return
                 else:
                     self.data_well.date_commissioning = data_list.ProtectedIsNonNone(self.data_well.date_drilling_cancel)
@@ -956,7 +958,7 @@ class DataWindow(WindowUnion):
                         self.data_well.dict_nkt_after[key.text()] = self.check_if_none(float(value.text()))
 
             if len(self.data_well.dict_nkt_before) == 0:
-                mes = QMessageBox.question(self, 'Расчет на ГНО', 'НКТ на спуск отсутствует?')
+                mes = QMessageBox.question(self, 'Расчет на ГНО', 'В скважине НКТ отсутствует?')
                 if mes == QMessageBox.StandardButton.No:
                     return
             if self.current_widget.labels_sucker:
