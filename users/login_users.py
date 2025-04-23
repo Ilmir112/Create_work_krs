@@ -91,8 +91,8 @@ class LoginWindow(QDialog):
             QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
             data_list.pause = True
 
-        if 'РН' in data_list.contractor:
-            data_list.connect_in_base = False
+        # if 'РН' in data_list.contractor:
+        #     data_list.connect_in_base = False
 
     @staticmethod
     def get_list_users():

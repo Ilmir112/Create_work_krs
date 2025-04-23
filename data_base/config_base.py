@@ -273,8 +273,8 @@ class WorkDatabaseWell:
                 if row_exists:
                     row_exists, date_in_base = row_exists
                     reply = QMessageBox.question(None, 'Строка найдена',
-                                                 f'Строка с {well_number} {well_area} {work_plan_str} уже '
-                                                 f'существует от {date_in_base}. '
+                                                 f'План работ {well_number} {well_area} {work_plan_str} уже '
+                                                 f'существует от {date_in_base} в базе данных. '
                                                  f'Обновить данные?')
                     if reply == QMessageBox.Yes:
                         cursor.execute(f"""
