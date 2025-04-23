@@ -1268,7 +1268,7 @@ class RirWindow(WindowUnion):
             paker_depth = int(float(current_widget.paker_depth_edit.text()))
             if self.check_true_depth_template(paker_depth) is False:
                 return
-            if self.true_set_paker(paker_depth) is False:
+            if self.check_depth_paker_in_perforation(paker_depth) is False:
                 return
             if self.check_depth_in_skm_interval(paker_depth) is False:
                 return
@@ -1302,7 +1302,7 @@ class RirWindow(WindowUnion):
             if paker_need_combo == 'Да':
                 if self.check_true_depth_template(paker_depth) is False:
                     return
-                if self.true_set_paker(paker_depth) is False:
+                if self.check_depth_paker_in_perforation(paker_depth) is False:
                     return
                 if self.check_depth_in_skm_interval(paker_depth) is False:
                     return

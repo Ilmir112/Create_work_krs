@@ -642,7 +642,7 @@ class SwabWindow(WindowUnion):
                     return
                 if self.check_true_depth_template(swab_paker_depth) is False:
                     return
-                if self.true_set_paker(swab_paker_depth) is False:
+                if self.check_depth_paker_in_perforation(swab_paker_depth) is False:
                     return
                 if self.check_depth_in_skm_interval(swab_paker_depth) is False:
                     return
@@ -661,13 +661,13 @@ class SwabWindow(WindowUnion):
             paker2_depth = self.check_if_none(self.tab_widget.currentWidget().paker2Edit.text())
             if self.check_true_depth_template(swab_paker_depth) is False:
                 return
-            if self.true_set_paker(swab_paker_depth) is False:
+            if self.check_depth_paker_in_perforation(swab_paker_depth) is False:
                 return
             if self.check_depth_in_skm_interval(swab_paker_depth) is False:
                 return
             if self.check_true_depth_template(paker2_depth) is False:
                 return
-            if self.true_set_paker(paker2_depth) is False:
+            if self.check_depth_paker_in_perforation(paker2_depth) is False:
                 return
             if self.check_depth_in_skm_interval(paker2_depth) is False:
                 return
@@ -773,7 +773,7 @@ class SwabWindow(WindowUnion):
 
                 if self.check_true_depth_template(self.paker_depth_zumpf) is False:
                     return
-                if self.true_set_paker(self.paker_depth_zumpf) is False:
+                if self.check_depth_paker_in_perforation(self.paker_depth_zumpf) is False:
                     return
                 if self.check_depth_in_skm_interval(self.paker_depth_zumpf) is False:
                     return
@@ -989,7 +989,7 @@ class SwabWindow(WindowUnion):
             schema_swab = '7'
         if self.check_true_depth_template(self.swab_paker_depth) is False:
             return
-        if self.true_set_paker(self.swab_paker_depth) is False:
+        if self.check_depth_paker_in_perforation(self.swab_paker_depth) is False:
             return
         if self.check_depth_in_skm_interval(self.swab_paker_depth) is False:
             return

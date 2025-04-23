@@ -789,7 +789,7 @@ class MyMainWindow(QMainWindow):
                                 f'Нужно скорректировать интервалы скреперования или глубину посадки пакера')
             return False
 
-    def true_set_paker(self, depth):
+    def check_depth_paker_in_perforation(self, depth):
 
         check_true = False
 
@@ -2016,7 +2016,7 @@ class MyWindow(MyMainWindow):
 
         self.data_well.fluid_work = data[row][7]
         self.data_well.template_depth, self.data_well.template_length, \
-            self.data_well.template_depth_addition, self.data_well.template_length_addition = json.loads(
+        self.data_well.template_depth_addition, self.data_well.template_length_addition = json.loads(
             data[row][11])
         self.data_well.skm_interval = json.loads(data[row][12])
 
@@ -2682,7 +2682,8 @@ class SaveInExcel(MyWindow):
                     elif '320 - скорость оседания' in str(value):
                         coordinate = f'F{row_ind + 2}'
                         self.insert_image(
-                            self.ws2, f'{data_list.path_image}imageFiles/schema_well/sanf_formular-Photoroom.png', coordinate, 200, 80)
+                            self.ws2, f'{data_list.path_image}imageFiles/schema_well/sanf_formular-Photoroom.png',
+                            coordinate, 200, 80)
                     elif 'М.К.Алиев' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
                         self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Алиев махир.png', coordinate)
@@ -2766,6 +2767,7 @@ class SaveInExcel(MyWindow):
             if self.wb2:
                 self.wb2.close()
                 self.save_file_dialog(self.wb2, full_path)
+
     @staticmethod
     def load_last_save_path():
         """Загрузить последний сохраненный путь из файла."""
@@ -2773,7 +2775,6 @@ class SaveInExcel(MyWindow):
             with open(f"{data_list.path_image}work_py/last_save_path.txt", "r") as file:
                 return file.read().strip()
         return None
-
 
     @staticmethod
     def save_last_save_path(path):
@@ -2795,10 +2796,6 @@ class SaveInExcel(MyWindow):
                 QMessageBox.critical(None, 'Ошибка',
                                      f'файл под таким именем открыт, закройте его: {type(e).__name__}\n  {str(e)}')
 
-        # Сохраняем последний путь
-        path_new = '/'.join(file_name.split('/')[:-1])
-        asdwdwad = '/'.join(file_name.split('/')[:-1])[:-1]
-        self.save_last_save_path(path_new)
         try:
             # Создаем объект Excel
             excel = win32com.client.Dispatch("Excel.Application")

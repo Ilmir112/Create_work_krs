@@ -1110,6 +1110,17 @@ class DataWindow(WindowUnion):
                 else:
                     QMessageBox.warning(self, 'Ошибка', 'Ошибка в доп колонне')
                     close_file = False
+            if self.data_well.paker_before["after"] != 0:
+                self.check_depth_paker_in_perforation(self.data_well.depth_fond_paker_before["after"])
+                self.data_well.check_data_in_pz.append(f'Проверка посадки показала фондовый пакер на спуск сажается '
+                                                       f'в интервал перфорации, необходимо изменить глубину посадки!!!')
+
+            if self.data_well.paker_second_before["after"] != 0:
+                self.check_depth_paker_in_perforation(self.data_well.depth_fond_paker_second_before["after"])
+                self.data_well.check_data_in_pz.append(f'Проверка посадки показала фондовый пакер на спуск сажается '
+                                                       f'в интервал перфорации, необходимо изменить глубину посадки!!!')
+
+
 
             if type_kr_combo in ['КР13-1  Подготовительные работы к ГРП (ПР)',
                                  'КР13-2  Освоение скважины после ГРП (ЗР)',
@@ -1229,7 +1240,7 @@ class DataWindow(WindowUnion):
                     QMessageBox.warning(self, 'ОШИБКА',
                                         f'при спущенном насосе {self.data_well.dict_pump_shgn["before"]} '
                                         f'не указаны штанги, либо не корректно прочитаны данные ')
-                    # self.pause_app()
+                    self.pause_app()
 
                     return
                 if str(self.data_well.dict_pump_shgn["after"]) != '0' and len(
@@ -1237,7 +1248,7 @@ class DataWindow(WindowUnion):
                     QMessageBox.warning(self, 'ОШИБКА',
                                         f'при плановом насосе {self.data_well.dict_pump_shgn["before"]} '
                                         f'не указаны штанги, либо не корректно прочитаны данные ')
-                    # self.pause_app()
+                    self.pause_app()
 
                     return
                 if self.data_well.column_additional is False or\
@@ -1372,6 +1383,7 @@ class DataWindow(WindowUnion):
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()
+        return True
 
     @staticmethod
     def check_date_format(date_string):

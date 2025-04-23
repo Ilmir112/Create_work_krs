@@ -629,6 +629,9 @@ class TemplateWithoutSkm(WindowUnion):
                 and self.data_well.template_depth > int(self.data_well.problem_with_ek_depth)):
             QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
             return
+
+
+
         if self.data_well.column_additional is False or \
                 self.data_well.column_additional and \
                 self.data_well.current_bottom < self.data_well.head_column_additional.get_value:
@@ -705,6 +708,12 @@ class TemplateWithoutSkm(WindowUnion):
 
         self.note_question_qcombo = self.tab_widget.currentWidget().note_question_qcombo.currentText()
         self.kot_question_qcombo = self.tab_widget.currentWidget().kot_question_qcombo.currentText()
+
+        if self.kot_question_qcombo == 'Да':
+            mes = QMessageBox.question(self, 'вопрос', 'В компоновке будет использоваться система обратных клапанов,'
+                                                       ' продолжить?')
+            if mes == QMessageBox.StandardButton.No:
+                return
 
         current_bottom = self.tab_widget.currentWidget().current_bottom_edit.text()
         if current_bottom != '':

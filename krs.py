@@ -1274,7 +1274,7 @@ class LiftVoronka(GnoParent):
              None, None, None, None, None,
              'Мастер КРС', liftingGNO(self.data_well.dict_nkt_before)],
         ]
-        if not self.data_well.dict_nkt_before['before']:
+        if not self.data_well.dict_nkt_before:
             lift_voronka.pop(-1)
         return lift_voronka
 

@@ -152,8 +152,8 @@ class CreatePZ(MyMainWindow):
                     'Ведущий геолог']["surname"]
             geolog_cdng_name = geolog_cdng_name.split(' ')
             geolog_cdng_name = f'{geolog_cdng_name[0]} {geolog_cdng_name[1][0]}.{geolog_cdng_name[1][0]}.'
-            nach_ctkrs_post = podpis_dict[data_list.contractor][data_list.ctkrs]['начальник']['post']
-            nach_ctkrs_name = podpis_dict[data_list.contractor][data_list.ctkrs]['начальник']["surname"]
+            nach_ctkrs_post = podpis_dict[data_list.contractor]["Экспедиция"][data_list.ctkrs]["сhief_engineer"]['post']
+            nach_ctkrs_name = podpis_dict[data_list.contractor]["Экспедиция"][data_list.ctkrs]["сhief_engineer"]["surname"]
 
             work_podpisant_list = [
                 [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
@@ -195,7 +195,16 @@ class CreatePZ(MyMainWindow):
                 chief_geologist_surname = podpis_dict[data_list.contractor]["Руководство"]["chief_geologist"]["surname"]
             elif 'РН' in contractor:
                 number_expedition = [number for number in data_list.user[0] if number.isdigit()][0]
-                expedition = f'Экспедиция № {number_expedition}'
+                if self.data_well.region == 'ТГМ':
+                    expedition = f'Экспедиция № 3'
+                elif self.data_well.region == 'ЧГМ':
+                    expedition = f'Экспедиция № 2'
+                elif self.data_well.region == 'АГМ':
+                    expedition = f'Экспедиция № 5'
+                elif self.data_well.region == 'ИГМ':
+                    expedition = f'Экспедиция № 1'
+                elif self.data_well.region == 'КГМ':
+                    expedition = f'Экспедиция № 4'
 
                 сhief_engineer_post = podpis_dict[data_list.contractor]['Экспедиция'][expedition]["сhief_engineer"]["post"]
                 сhief_engineer_surname = podpis_dict[data_list.contractor]['Экспедиция'][expedition]["сhief_engineer"]["surname"]
@@ -301,10 +310,11 @@ class CreatePZ(MyMainWindow):
         razdel = self.work_podpisant_list(self.data_well.region, data_list.contractor)
         for i in range(1, len(razdel)):  # Добавлением подписантов на вверху
             for j in range(1, 13):
-                ws.cell(row=i, column=j).value = razdel[i - 1][j - 1]
-                ws.cell(row=i, column=j).font = Font(name='Arial Cyr', size=13, bold=True)
-                ws.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='left',
-                                               vertical='center')
+                if razdel[i - 1][j - 1]:
+                    ws.cell(row=i, column=j).value = razdel[i - 1][j - 1]
+                    ws.cell(row=i, column=j).font = Font(name='Arial Cyr', size=13, bold=True)
+                    ws.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                   vertical='center')
 
             ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=7)
             ws.merge_cells(start_row=i, start_column=8, end_row=i, end_column=12)
@@ -613,9 +623,9 @@ class CreatePZ(MyMainWindow):
                     self.insert_index_border = self.data_well.insert_index
 
                 return ws
-            elif 'prs' in self.data_well.work_plan:
-                self.append_podpisant_up(ws)
 
+            elif 'prs' in self.data_well.work_plan:
+                self.append_podpisant_up(ws2)
                 self.data_well.insert_index = ws2.max_row
 
                 self.copy_data_excel_in_excel(
@@ -626,7 +636,7 @@ class CreatePZ(MyMainWindow):
                     ws, ws2, self.data_well.data_fond_min.get_value, self.data_well.condition_of_wells.get_value, 1, 17,
                     ws2.max_row + 1)
 
-                self.insert_events_gnvpinsert_events_gnvp(ws2, dict_events_gnvp, 3)
+                self.insert_events_gnvp(ws2, dict_events_gnvp, 3)
 
                 self.copy_data_excel_in_excel(
                     ws, ws2, self.data_well.data_x_min.get_value, self.data_well.data_x_min.get_value + 2, 1, 17,

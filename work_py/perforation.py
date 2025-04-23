@@ -489,7 +489,7 @@ class PerforationWindow(WindowUnion):
 
                 if self.check_true_depth_template(self.paker_depth) is False:
                     return
-                if self.true_set_paker(self.paker_depth) is False:
+                if self.check_depth_paker_in_perforation(self.paker_depth) is False:
                     return
                 if self.check_depth_in_skm_interval(self.paker_depth) is False:
                     return

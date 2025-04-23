@@ -1281,11 +1281,11 @@ class TemplateKrs(WindowUnion):
         work_template_list = self.template_ek(template_str, template_diameter, skm_list)
         if skm_tuple not in self.data_well.skm_interval:
             self.data_well.skm_interval.extend(skm_list)
-
-        self.populate_row(self.insert_index, work_template_list, self.table_widget)
-        data_list.pause = False
-        self.close()
-        self.close_modal_forcefully()
+        if work_template_list:
+            self.populate_row(self.insert_index, work_template_list, self.table_widget)
+            data_list.pause = False
+            self.close()
+            self.close_modal_forcefully()
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()

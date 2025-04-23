@@ -586,7 +586,7 @@ class AcidPakerWindow(WindowUnion):
                     return
                 if self.check_true_depth_template(paker_depth) is False:
                     return
-                if self.true_set_paker(paker_depth) is False:
+                if self.check_depth_paker_in_perforation(paker_depth) is False:
                     return
                 if self.check_depth_in_skm_interval(paker_depth) is False:
                     return
@@ -616,13 +616,13 @@ class AcidPakerWindow(WindowUnion):
             if self.data_well:
                 if self.check_true_depth_template(self.paker_depth) is False:
                     return
-                if self.true_set_paker(self.paker_depth) is False:
+                if self.check_depth_paker_in_perforation(self.paker_depth) is False:
                     return
                 if self.check_depth_in_skm_interval(self.paker_depth) is False:
                     return
                 if self.check_true_depth_template(self.paker2_depth) is False:
                     return
-                if self.true_set_paker(self.paker2_depth) is False:
+                if self.check_depth_paker_in_perforation(self.paker2_depth) is False:
                     return
                 if self.check_depth_in_skm_interval(self.paker2_depth) is False:
                     return
@@ -715,7 +715,7 @@ class AcidPakerWindow(WindowUnion):
 
                 if self.check_true_depth_template(self.paker_depth_zumpf) is False:
                     return
-                if self.true_set_paker(self.paker_depth_zumpf) is False:
+                if self.check_depth_paker_in_perforation(self.paker_depth_zumpf) is False:
                     return
                 if self.check_depth_in_skm_interval(self.paker_depth_zumpf) is False:
                     return
@@ -967,7 +967,7 @@ class AcidPakerWindow(WindowUnion):
                 return
 
             if self.paker_layout_combo in ['однопакерная', 'пакер с заглушкой', 'однопакерная, упорный']:
-                if self.true_set_paker(self.swab_paker_depth) is False:
+                if self.check_depth_paker_in_perforation(self.swab_paker_depth) is False:
                     return
                 if self.check_depth_in_skm_interval(self.swab_paker_depth) is False:
                     return
@@ -981,7 +981,7 @@ class AcidPakerWindow(WindowUnion):
                 self.swab_paker_depth = int(float(self.current_widget.swab_paker_depth.text()))
                 if self.check_true_depth_template(self.swab_paker_depth) is False:
                     return
-                if self.true_set_paker(self.swab_paker_depth) is False:
+                if self.check_depth_paker_in_perforation(self.swab_paker_depth) is False:
                     return
                 if self.check_depth_in_skm_interval(self.swab_paker_depth) is False:
                     return
@@ -989,7 +989,7 @@ class AcidPakerWindow(WindowUnion):
                 self.paker_depth2_swab = self.swab_paker_depth - (self.paker_depth - self.paker2_depth)
                 if self.check_true_depth_template(self.paker_depth2_swab) is False:
                     return
-                if self.true_set_paker(self.paker_depth2_swab) is False:
+                if self.check_depth_paker_in_perforation(self.paker_depth2_swab) is False:
                     return
                 if self.check_depth_in_skm_interval(self.paker_depth2_swab) is False:
                     return

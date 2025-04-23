@@ -79,7 +79,7 @@ class OpressovkaEK(WindowUnion):
                 paker_depth_zumpf = int(float(paker_depth_zumpf))
             if self.check_true_depth_template(paker_depth_zumpf) is False:
                 return
-            if self.true_set_paker(paker_depth_zumpf) is False:
+            if self.check_depth_paker_in_perforation(paker_depth_zumpf) is False:
                 return
             if self.check_depth_in_skm_interval(paker_depth_zumpf) is False:
                 return
@@ -95,7 +95,7 @@ class OpressovkaEK(WindowUnion):
             return
         if self.check_true_depth_template(paker_depth) is False:
             return
-        if self.true_set_paker(paker_depth) is False:
+        if self.check_depth_paker_in_perforation(paker_depth) is False:
             return
         if self.check_depth_in_skm_interval(paker_depth) is False:
             return

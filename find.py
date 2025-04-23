@@ -738,7 +738,7 @@ class FindIndexPZ(MyMainWindow):
         elif data.__class__ == ProtectedIsDigit:
             data = data.get_value
             while (data is None) and (step < m):
-                data = self.ws.cell(row=row, column=col + step).value
+                data = self.check_once_isdigit(self.ws.cell(row=row, column=col + step).value)
                 step += 1
             return ProtectedIsDigit(data)
         else:
@@ -920,6 +920,7 @@ class WellSuckerRod(FindIndexPZ):
         self.dict_sucker_rod_after = dict_sucker_rod_po
 
         return True
+
 
 class WellFondData(FindIndexPZ):
 
@@ -1144,9 +1145,10 @@ class WellHistoryData(FindIndexPZ):
                         self.bur_rastvor = row[col]
 
                     elif 'Максимально ожидаемое давление на устье' == value:
+                        aaa = row[col + 1]
                         self.max_expected_pressure = ProtectedIsDigit(row[col + 1])
-                        self.max_expected_pressure = FindIndexPZ.definition_is_none(
-                            self, self.max_expected_pressure, row_index + begin_index, col + 1, 1)
+                        self.max_expected_pressure = self.definition_is_none(self.max_expected_pressure,
+                                                                            row_index + begin_index, col + 1, 1)
 
                     elif 'Результат предыдущей ' in str(value):
                         self.result_pressure = ProtectedIsDigit(row[col + 1])
@@ -1703,24 +1705,23 @@ class WellData(FindIndexPZ):
                 self.konte_true = True
 
             if '0' != str(self.dict_pump_ecn['before']):
-                if sum(list((self.dict_nkt_before.values()))) - self.dict_pump_ecn_depth['before'] < 0:
+                if sum(list((self.dict_nkt_before.values()))) - self.dict_pump_ecn_depth['before'] < 10:
                     QMessageBox.warning(self, 'Ошибка',
                                         f'Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
-                                        f'до ремонта меньше глубины '
+                                        f'до ремонта меньше глубины насоса '
                                         f'{self.dict_pump_ecn_depth["before"]}м')
                     self.check_data_in_pz.append(
                         f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
-                        f'до ремонта меньше глубины'
+                        f'до ремонта меньше глубины насоса'
                         f'{self.dict_pump_ecn_depth["before"]}м')
             if '0' != str(self.dict_pump_ecn['after']):
-                if sum(list((self.dict_nkt_after.values()))) - self.dict_pump_ecn_depth['after'] < 0:
+                if sum(list((self.dict_nkt_after.values()))) - self.dict_pump_ecn_depth['after'] < 10:
                     QMessageBox.warning(self, 'Ошибка',
                                         f'Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
-                                        f' меньше глубины насоса '
-                                        f'{self.dict_pump_ecn_depth["after"]}м')
+                                        f' меньше глубины насоса {self.dict_pump_ecn_depth["after"]}м')
                     self.check_data_in_pz.append(
                         f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
-                        f'до ремонта меньше глубины '
+                        f'до ремонта меньше глубины насоса'
                         f'{self.dict_pump_shgn_depth["after"]}м')
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Ошибка в расчетах {e}')
@@ -1736,7 +1737,7 @@ class WellData(FindIndexPZ):
             data_list.pause = True
             self.data_window = None
 
-        if self.work_plan == 'krs':
+        if self.work_plan in ['krs', 'prs']:
             from data_base.config_base import connection_to_database
             from data_base.config_base import WorkDatabaseWell
             db = connection_to_database(decrypt("DB_WELL_DATA"))
@@ -1751,7 +1752,7 @@ class WellData(FindIndexPZ):
                 if mes == QMessageBox.StandardButton.No:
                     # self.pause_app()
                     return
-            return True
+        return True
 
     @staticmethod
     def read_angle_well():
