@@ -130,7 +130,7 @@ class TabPageGno(TabPageUnion):
                 self.check_if_none(self.data_well.paker_before["after"]) == 'отсут' \
                 and self.check_if_none(self.data_well.dict_pump_ecn["after"]) == 'отсут':
             lift_key = 'воронка'
-        elif '89' in self.data_well.dict_nkt_before.keys() and '48' in self.data_well.dict_nkt_before.keys() and \
+        elif '89' in self.data_well.dict_nkt_after.keys() and '48' in self.data_well.dict_nkt_after.keys() and \
                 self.check_if_none(
                     self.data_well.paker_before["after"]) != 'отсут':
             lift_key = 'ОРЗ'

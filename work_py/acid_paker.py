@@ -612,6 +612,7 @@ class AcidPakerWindow(WindowUnion):
                 QMessageBox.information(self, 'Внимание',
                                         f'Компоновка ниже {self.paker_khost + self.paker_depth}м текущего забоя '
                                         f'{self.data_well.current_bottom}м')
+                return
 
             if self.data_well:
                 if self.check_true_depth_template(self.paker_depth) is False:

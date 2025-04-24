@@ -1116,17 +1116,7 @@ class DataWindow(WindowUnion):
                 else:
                     QMessageBox.warning(self, 'Ошибка', 'Ошибка в доп колонне')
                     close_file = False
-            if self.data_well.paker_before["after"] not in [None, 0, '0', '-'] and \
-                    'отсут' not in str(self.data_well.paker_before["after"]).lower():
-                self.check_depth_paker_in_perforation(self.data_well.depth_fond_paker_before["after"])
-                self.data_well.check_data_in_pz.append(f'Проверка посадки показала фондовый пакер на спуск сажается '
-                                                       f'в интервал перфорации, необходимо изменить глубину посадки!!!')
 
-            if self.data_well.paker_before["after"] not in [None, 0, '0', '-'] and \
-                    'отсут' not in str(self.data_well.paker_before["after"]).lower():
-                self.check_depth_paker_in_perforation(self.data_well.depth_fond_paker_second_before["after"])
-                self.data_well.check_data_in_pz.append(f'Проверка посадки показала фондовый пакер на спуск сажается '
-                                                       f'в интервал перфорации, необходимо изменить глубину посадки!!!')
 
             if type_kr_combo in ['КР13-1  Подготовительные работы к ГРП (ПР)',
                                  'КР13-2  Освоение скважины после ГРП (ЗР)',

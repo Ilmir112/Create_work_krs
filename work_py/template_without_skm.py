@@ -177,8 +177,12 @@ class TabPageSo(TabPageUnion):
         self.dictance_template_first_edit.textChanged.connect(self.update_template)
         self.length_template_first_edit.textChanged.connect(self.update_template)
         self.kot_question_qcombo.currentTextChanged.connect(self.update_template)
-
-
+        if self.data_well:
+            if self.data_well.plast_work and 'Ойл' in data_list.contractor and \
+                    'открытый ствол' not in self.template_combo.currentText():
+                self.kot_question_qcombo.setCurrentIndex(1)
+            else:
+                self.kot_question_qcombo.setCurrentIndex(0)
 
     def definition_pssh(self):
 
@@ -705,6 +709,7 @@ class TemplateWithoutSkm(WindowUnion):
 
         self.note_question_qcombo = self.tab_widget.currentWidget().note_question_qcombo.currentText()
         self.kot_question_qcombo = self.tab_widget.currentWidget().kot_question_qcombo.currentText()
+        self.template_combo = self.tab_widget.currentWidget().template_combo.currentText()
 
         if self.kot_question_qcombo == 'Да':
             mes = QMessageBox.question(self, 'вопрос', 'В компоновке будет использоваться система обратных клапанов,'
@@ -715,11 +720,11 @@ class TemplateWithoutSkm(WindowUnion):
         if self.kot_question_qcombo == 'Нет':
             mes = QMessageBox.question(self, 'КОТ', 'Согласно мероприятий по сокращению продолжительности '
                                                     'ТКРС от 31.01.2025 п.20 '
-                                              'при первичном СПО ПСШ необходимо использовать в компоновке систему '
-                                              'КОТ за исключением необходимости прямой или комбинированной промывки, продолжить?')
+                                                    'при первичном СПО ПСШ необходимо использовать в компоновке систему '
+                                                    'КОТ за исключением необходимости прямой или комбинированной промывки, продолжить?')
             if mes == QMessageBox.StandardButton.No:
                 return
-        if self.kot_question_qcombo == 'Да' and 'открытый' in self.template_key:
+        if self.kot_question_qcombo == 'Да' and 'открытый' in self.template_combo:
             mes = QMessageBox.question(self, 'КОТ', 'Необходимо уточнить необходимость применения системы КОТ в '
                                                     'открытом стволе, продолжить?')
             if mes == QMessageBox.StandardButton.No:

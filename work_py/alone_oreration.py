@@ -341,12 +341,13 @@ def update_fluid(self, index_plan, fluid_str, table_widget):
                 for column in range(table_widget.columnCount()):
                     if column == 2 or column == 0:
                         row_change = index_row + self.data_well.count_row_well
-                        value = table_widget.item(row_change, column).text()
-                        if value is not None or value != '':
-                            if fluid_str_old in value:
-                                new_value = value.replace(fluid_str_old, fluid_str)
-                                new_value = QtWidgets.QTableWidgetItem(f'{new_value}')
-                                table_widget.setItem(row_change, column, new_value)
+                        if table_widget.item(row_change, column):
+                            value = table_widget.item(row_change, column).text()
+                            if value is not None or value != '':
+                                if fluid_str_old in value:
+                                    new_value = value.replace(fluid_str_old, fluid_str)
+                                    new_value = QtWidgets.QTableWidgetItem(f'{new_value}')
+                                    table_widget.setItem(row_change, column, new_value)
 
 
 def calculation_fluid_work(data_well, vertical, pressure):

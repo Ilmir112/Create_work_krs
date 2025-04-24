@@ -1233,6 +1233,18 @@ class WindowUnion(MyMainWindow):
 
         if result_table[0]:
             result = json.loads(result_table[0])
+
+            self.data_well.type_absorbent = 'EVASORB марки 121'
+            if 'ХИМТЕХНО 101' in str(result[paragraph_row][7]):
+                self.data_well.type_absorbent = 'ХИМТЕХНО 101 Марка А'
+            elif 'СНПХ-1200' in str(result[paragraph_row][7]):
+                self.data_well.type_absorbent = 'СНПХ-1200'
+            elif 'ПСВ-3401' in str(result[paragraph_row][7]):
+                self.data_well.type_absorbent = 'ПСВ-3401'
+            elif 'Гастрит-К131М' in str(result[paragraph_row][7]):
+                self.data_well.type_absorbent = 'Гастрит-К131М'
+
+
             from data_base.work_with_base import insert_data_well_dop_plan
             insert_data_well_dop_plan(self, result_table[1])
 

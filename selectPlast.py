@@ -46,7 +46,7 @@ class CheckBoxDialog(QDialog):
         print("Selected options:", selected_options)
         plast_select = ', '.join(selected_options)
         self.close()
-        self.close_modal_forcefully()
+
         return data_list.plast_select
 
 if __name__ == '__main__':

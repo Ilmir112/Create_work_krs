@@ -1313,10 +1313,27 @@ class RirWindow(WindowUnion):
                 need_change_zgs_combo, plast_new_combo, fluid_new_edit, pressure_new_edit, pressure_zumpf_question,
                 diameter_paker, paker_khost, paker_depth)
 
-
-
-
         elif self.rir_type_combo in ['РИР с пакером с 2С']:
+            if "Ойл" in data_list.contractor:
+                mes = False
+                if self.data_well.column_additional is False or \
+                    (self.data_well.column_additional and
+                     self.data_well.head_column_additional.get_value > self.data_well.current_bottom):
+                    if self.data_well.template_depth < sole_rir_edit:
+                        mes = True
+
+                else:
+                    if self.data_well.template_depth_addition < sole_rir_edit:
+                        mes = True
+                if mes:
+                    mes = QMessageBox.question(self, 'Шаблон', 'согласно протокола по защите объемов по скважине '
+                                                               '4024 четырманская от 14.04.2025г перед проведением '
+                                                               'РИР скважину все интервалы '
+                                                               'перфорации должны быть прошаблонированы '
+                                                               'крупноразмерным шаблоном')
+                    if mes == QMessageBox.StandardButton.No:
+                        return
+
             # print(paker_need_combo, plast_combo, roof_rir_edit, sole_rir_edit)
             work_list = self.rir_paker(paker_need_combo, plast_combo,
                                        roof_rir_edit, sole_rir_edit, pressure_zumpf_question,

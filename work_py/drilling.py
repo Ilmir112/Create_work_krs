@@ -318,19 +318,23 @@ class DrillWindow(WindowUnion):
             QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
 
         self.cutter_calibrator_combo = self.tab_widget.currentWidget().cutter_calibrator_combo.currentText()
-        mes = QMessageBox.question(self, 'Фрез калибратор', 'Фрез-калибратор нужно использовать только при '
-                                                            'разбуривании цементного моста вне интервала перфорации, '
-                                                            'в случае разбуривания в ИП, взрыв пакеров или заливочных '
-                                                            'пробок фрез-калибратор стоит из компоновки убрать. '
-                                                            'При наличии компоновку фреза калибратора СПО райбера '
-                                                            'не производить. Gродолжить?')
-
         self.cutter_calibrator = ''
-        if mes == QMessageBox.StandardButton.No:
-            return
-        else:
-            if self.cutter_calibrator_combo == 'Да':
-                self.cutter_calibrator = '+ фрез калибратор'
+        if self.cutter_calibrator_combo == 'Да':
+            mes = QMessageBox.question(self, 'Фрез калибратор',
+                                       'Фрез-калибратор нужно использовать только при '
+                                        'разбуривании цементного моста вне интервала перфорации, '
+                                        'в случае разбуривания в ИП, взрыв пакеров или заливочных '
+                                        'пробок фрез-калибратор стоит из компоновки убрать. '
+                                        'При наличии компоновку фреза калибратора СПО райбера '
+                                        'не производить. При наличии в компоновке фрез калибратора,'
+                                        ' необходимость в проведение СПО райбера нет, Продолжить?')
+
+
+            if mes == QMessageBox.StandardButton.No:
+                return
+            else:
+                if self.cutter_calibrator_combo == 'Да':
+                    self.cutter_calibrator = '+ фрез калибратор'
 
         rows = self.tableWidget.rowCount()
         if rows == 0:
@@ -362,6 +366,7 @@ class DrillWindow(WindowUnion):
                 drill_tuple.append((sole, drill_True))
 
         drill_tuple = sorted(drill_tuple, key=lambda x: x[0])
+        drill_list = []
         if self.nkt_str == 'НКТ':
             drill_list = self.drilling_nkt(drill_tuple, self.drill_type_combo,
                                            self.drilling_bit_diam, self.downhole_motor, need_privyazka_q_combo)
@@ -369,18 +374,13 @@ class DrillWindow(WindowUnion):
             drill_list = self.drilling_sbt(drill_tuple, self.drill_type_combo,
                                            self.drilling_bit_diam, self.downhole_motor)
 
-        try:
+        if drill_list:
             self.populate_row(self.insert_index, drill_list, self.table_widget)
             data_list.pause = False
 
             self.close()
             self.close_modal_forcefully()
-        except Exception:
 
-            data_list.pause = False
-            self.close()
-            self.close_modal_forcefully()
-            return drill_list
 
     def del_row_table(self):
         row = self.tableWidget.currentRow()
@@ -573,7 +573,7 @@ class DrillWindow(WindowUnion):
 
         drilling_list = [
             [f'Завезти на скважину {sbt_length}', None,
-             f'Завезти на скважину СБТ {sbt_length} – Укладка труб на стеллажи.',
+             f'Завезти на скважину {sbt_length} – Укладка труб на стеллажи.',
              None, None, None, None, None, None, None,
              'Мастер', None],
             [f'СПО {drilling_short} на СБТ {nkt_diam} до Н= {self.data_well.current_bottom - 30}', None,
@@ -610,22 +610,21 @@ class DrillWindow(WindowUnion):
             if self.check_pressure(drill_sole) is True:
                 for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
                     drilling_list.append(row)
-        if len(drill_tuple) == 1:
-            for drill_sole, bottomType2 in drill_tuple:
-                for row in DrillWindow.reply_drilling(self, drill_sole, bottomType2, drilling_str, nkt_diam):
-                    drilling_list.append(row)
 
-        else:
-            for drill_sole, bottomType2 in drill_tuple:
-                # print(drill_sole, self.check_pressure(drill_sole))
-                for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
-                    drilling_list.append(row)
+        from work_py.alone_oreration import well_volume
         drilling_list_end = [
             [None, None,
              f'ПРИМЕЧАНИЕ: РАСХОД РАБОЧЕЙ ЖИДКОСТИ 8-10 Л/С;'
              f' ПРЕДУСМОТРЕТЬ КОМПЕНСАЦИЮ РЕАКТИВНОГО МОМЕНТА НА ВЕДУЩЕЙ ТРУБЕ))',
              None, None, None, None, None, None, None,
              'Мастер КРС, УСРСиСТ', None],
+            [f'Промыть  {self.data_well.fluid_work}  '
+             f'в объеме {round(well_volume(self, current_depth) * 2, 1)}м3', None,
+             f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work}  '
+             f'в присутствии представителя заказчика в объеме '
+             f'{round(well_volume(self, current_depth) * 2, 1)}м3. Составить акт.',
+             None, None, None, None, None, None, None,
+             'мастер КРС, предст. заказчика', well_volume_norm(well_volume(self, current_depth))],
             [f'д/ж мех ротора',
              None,
              f'Демонтировать мех ротор',

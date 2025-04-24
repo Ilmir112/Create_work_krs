@@ -273,7 +273,13 @@ class MyMainWindow(QMainWindow):
         if string_exit == '':
             return None
         else:
-            return float(string_exit.replace(',', '.'))
+            string_exit = string_exit.replace(',', '.')
+            if string_exit.count('.') > 1:
+                QMessageBox.warning(None, 'ошибка в ячейке ПЗ', f'ошибка в ячейке ПЗ c данными {string} '
+                                                                f'приложение ожидает только одну точку' )
+                return
+            if string_exit.replace('.', '').replace('', '').isdigit():
+                return float(string_exit)
 
     # def move_window(self, x, y):
     #     self.move(x, y)
@@ -1843,7 +1849,7 @@ class MyWindow(MyMainWindow):
                 rows_to_span = []
                 for row in selected_rows:
                     row_data = [self.table_widget.item(row, col).text() for col in
-                                range(self.table_widget.columnCount())]
+                                range(self.table_widget.columnCount()) if self.table_widget.item(row, col)]
                     for column in range(self.table_widget.columnCount()):
                         if self.table_widget.rowSpan(row, column) > 1 or self.table_widget.columnSpan(row, column) > 1:
                             start_row = row + 1

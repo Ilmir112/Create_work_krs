@@ -934,6 +934,7 @@ class DopPlanWindow(WindowUnion):
                     self.data_well.inventory_number = ProtectedIsNonNone(data_well[6])
                     self.data_well.wellhead_fittings = data_well[7]
                     self.data_well.emergency_well = False
+                    self.data_well.type_absorbent == 'EVASORB РјР°СЂРєРё 121'
                     if data_well[8]:
                         self.data_well.angle_data = json.loads(data_well[8])
                     else:

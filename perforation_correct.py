@@ -302,6 +302,21 @@ class PerforationCorrect(WindowUnion):
             else:
 
                 return
+
+        if self.data_well.paker_before["after"] not in [None, 0, '0', '-'] and \
+                'отсут' not in str(self.data_well.paker_before["after"]).lower():
+            check_true = self.check_depth_paker_in_perforation(self.data_well.depth_fond_paker_before["after"])
+            if check_true is False:
+                self.data_well.check_data_in_pz.append(f'Проверка посадки показала фондовый пакер на спуск сажается '
+                                                   f'в интервал перфорации, необходимо изменить глубину посадки!!!')
+
+        if self.data_well.paker_before["after"] not in [None, 0, '0', '-'] and \
+                'отсут' not in str(self.data_well.paker_before["after"]).lower():
+            check_true = self.check_depth_paker_in_perforation(self.data_well.depth_fond_paker_second_before["after"])
+            if check_true is False:
+                self.data_well.check_data_in_pz.append(f'Проверка посадки показала фондовый пакер на спуск сажается '
+                                                       f'в интервал перфорации, необходимо изменить глубину посадки!!!')
+
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()

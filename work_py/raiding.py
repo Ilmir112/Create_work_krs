@@ -249,7 +249,7 @@ class Raid(WindowUnion):
 
     def add_string(self):
 
-        from .advanted_file import raiding_interval
+        from work_py.advanted_file import raiding_interval
         ryber_key = self.tab_widget.currentWidget().raid_select_combo.currentText()
         self.downhole_motor = self.tab_widget.currentWidget().downhole_motor_line.text()
         raiding_interval = raiding_interval(self.data_well, ryber_key)
@@ -304,13 +304,13 @@ class Raid(WindowUnion):
                     return
                 raid_tuple.append((roof, sole))
 
-
+        raid_tuple = sorted(raid_tuple, key=lambda x: x[0])
         if nkt_str_combo == 'НКТ':
-            raid_list = self.raidingColumn(raid_tuple[::-1], ryber_key)
+            raid_list = self.raidingColumn(raid_tuple, ryber_key)
         else:
-            raid_list = self.raiding_sbt(raid_tuple[::-1], ryber_key)
+            raid_list = self.raiding_sbt(raid_tuple, ryber_key)
 
-        self.data_well.ribbing_interval.extend(raid_tuple[::-1])
+        self.data_well.ribbing_interval.extend(raid_tuple)
 
         self.populate_row(self.insert_index, raid_list, self.table_widget)
         data_list.pause = False
@@ -358,7 +358,6 @@ class Raid(WindowUnion):
         rayber_dict = {'райбер в ЭК': ryber_str_EK, 'райбер в ДП': ryber_str_DP}
 
         ryber_str = rayber_dict[ryber_key]
-
 
         if len(raiding_interval_tuple) != 0:
             krovly_raiding = int(raiding_interval_tuple[0][0])
@@ -424,7 +423,6 @@ class Raid(WindowUnion):
             else:
                 self.data_well.template_depth_addition = self.data_well.current_bottom
 
-
         return ryber_list
 
     def raiding_sbt(self, raiding_interval_tuple, ryber_key):
@@ -455,6 +453,7 @@ class Raid(WindowUnion):
                        'райбер в ДП': (ryber_str_DP, ryber_str_short_dp)}
 
         ryber_str, ryber_str_short = rayber_dict[ryber_key]
+
 
         if len(raiding_interval_tuple) != 0:
             krovly_raiding = int(raiding_interval_tuple[0][0])
@@ -504,12 +503,12 @@ class Raid(WindowUnion):
              'мастер КРС', lifting_nkt_norm(current_str, 1.2)]]
 
         # print(f' после отрайбирования {[self.data_well.dict_perforation[plast]["отрайбировано"] for plast in self.data_well.plast_work]}')
-        if len(self.data_well.plast_work) == 0:
-            acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
-                                                   'Нужно ли изменять удельный вес?')
-            if acid_true_quest == QMessageBox.StandardButton.Yes:
-                for row in fluid_change(self):
-                    ryber_list.insert(-1, row)
+        # if len(self.data_well.plast_work) == 0:
+        #     acid_true_quest = QMessageBox.question(self, 'Необходимость смены объема',
+        #                                            'Нужно ли изменять удельный вес?')
+        #     if acid_true_quest == QMessageBox.StandardButton.Yes:
+        #         for row in fluid_change(self):
+        #             ryber_list.insert(-1, row)
         return ryber_list
 
 

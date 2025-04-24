@@ -22,7 +22,11 @@ class TabPageGno(TabPageUnion):
 
         self.current_bottom_label = QLabel('Забой текущий')
         self.current_bottom_edit = QLineEdit(self)
-        self.current_bottom_edit.setText(f'{self.data_well.current_bottom}')
+
+        if self.data_well.need_depth:
+            self.current_bottom_edit.setText(f'{self.data_well.need_depth}')
+        else:
+            self.current_bottom_edit.setText(f'{self.data_well.current_bottom}')
 
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
         self.fluid_edit = QLineEdit(self)
