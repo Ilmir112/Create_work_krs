@@ -81,8 +81,6 @@ class TabPageSo(TabPageUnion):
         self.kot_question_qcombo = QComboBox(self)
 
         self.kot_question_qcombo.addItems(['Нет', 'Да'])
-        if self.data_well.plast_work:
-            self.kot_question_qcombo.setCurrentIndex(1)
 
         self.template_combo.currentTextChanged.connect(self.update_template_edit)
 
@@ -181,6 +179,7 @@ class TabPageSo(TabPageUnion):
         self.kot_question_qcombo.currentTextChanged.connect(self.update_template)
 
 
+
     def definition_pssh(self):
 
         if self.data_well.column_additional is False and self.data_well.open_trunk_well is False and all(
@@ -253,9 +252,10 @@ class TabPageSo(TabPageUnion):
                 dictance_template_first != '' and \
                 dictance_template_second != '' and first_template != '':
 
-            kot_str = ''
-            if 'Ойл' in data_list.contractor and len(self.data_well.plast_work) != 0:
+            if self.kot_question_qcombo.currentText() == 'Да':
                 kot_str = '+ КОТ-50'
+            else:
+                kot_str = ''
 
             if self.template_combo.currentText() == 'шаблон ЭК с хвостом':
                 if dictance_template_second != '':
@@ -277,8 +277,6 @@ class TabPageSo(TabPageUnion):
                     self.data_well.template_depth = self.data_well.current_bottom
                     skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
 
-
-
             elif self.template_combo.currentText() == 'шаблон открытый ствол':
                 if dictance_template_second is not None:
                     self.template_first_edit.setText('фильтр направление')
@@ -297,11 +295,12 @@ class TabPageSo(TabPageUnion):
                                    f'шаблон-{template_second}мм L-{length_template_second}м '
 
                     self.data_well.template_depth = math.ceil(self.data_well.current_bottom - 2 -
-                                                                      int(dictance_template_first) - int(
+                                                              int(dictance_template_first) - int(
                         dictance_template_second) -
-                                                                      int(length_template_first))
+                                                              int(length_template_first))
                     self.data_well.template_depth_addition = math.ceil(
-                        self.data_well.current_bottom - float(dictance_template_first) - float(dictance_template_second))
+                        self.data_well.current_bottom - float(dictance_template_first) - float(
+                            dictance_template_second))
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.' \
                                    f'{self.data_well.template_depth_addition}м, ' \
@@ -332,7 +331,8 @@ class TabPageSo(TabPageUnion):
                                    f' + НКТ{nkt_pod} + шаблон-{template_second}мм ' \
                                    f'L-{length_template_second}м '
                     self.data_well.template_depth = math.ceil(
-                        self.data_well.current_bottom - 2 - float(dictance_template_first) - float(dictance_template_second) - float(length_template_first))
+                        self.data_well.current_bottom - 2 - float(dictance_template_first) - float(
+                            dictance_template_second) - float(length_template_first))
                     self.data_well.template_depth_addition = math.ceil(
                         self.data_well.current_bottom - 2 -
                         float(dictance_template_first) - float(
@@ -350,12 +350,14 @@ class TabPageSo(TabPageUnion):
         template_str = ''
         skm_teml_str = ''
         kot_str = ''
-        if 'Ойл' in data_list.contractor:
-            kot_str = '+ КОТ'
+        if self.kot_question_qcombo.currentText() == 'Да':
+            kot_str = '+ КОТ-50'
+        else:
+            kot_str = ''
         nkt_diam = self.data_well.nkt_diam
         if self.data_well.column_additional is False or (self.data_well.column_additional and
-                                                                 self.data_well.head_column_additional.get_value >=
-                                                                 self.data_well.current_bottom):
+                                                         self.data_well.head_column_additional.get_value >=
+                                                         self.data_well.current_bottom):
 
             first_template, template_second = TabPageSoWith.template_diam_ek(self)
             # print(f'диаметры шаблонов {first_template, template_second}')
@@ -421,8 +423,6 @@ class TabPageSo(TabPageUnion):
             # print(f'строка шаблона {template_str}')
             self.data_well.template_depth = int(roof_plast - 5)
             skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
-
-
 
         elif index == 'шаблон без хвоста':
             self.dictance_template_second_edit.setParent(None)
@@ -592,7 +592,6 @@ class TemplateWithoutSkm(WindowUnion):
     def __init__(self, data_well, table_widget, parent=None):
         super().__init__(data_well)
 
-
         self.insert_index = data_well.insert_index
         self.tab_widget = TabWidget(self.data_well)
 
@@ -630,8 +629,6 @@ class TemplateWithoutSkm(WindowUnion):
             QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
             return
 
-
-
         if self.data_well.column_additional is False or \
                 self.data_well.column_additional and \
                 self.data_well.current_bottom < self.data_well.head_column_additional.get_value:
@@ -645,7 +642,7 @@ class TemplateWithoutSkm(WindowUnion):
             if self.data_well.template_depth >= self.data_well.head_column_additional.get_value:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже головы хвостовика')
                 return
-            if self.template_combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне' and\
+            if self.template_combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне' and \
                     self.data_well.skm_depth >= self.data_well.head_column_additional.get_value:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'СКМ спускается ниже головы хвостовика')
                 return
@@ -673,16 +670,16 @@ class TemplateWithoutSkm(WindowUnion):
                                     f'{self.data_well.column_conductor_length.get_value}м')
 
         work_list = self.template_ek(template_str, template, template_diameter)
+        if work_list:
+            self.populate_row(self.insert_index, work_list, self.table_widget)
 
-        self.populate_row(self.insert_index, work_list, self.table_widget)
-
-        data_list.pause = False
-        self.close()
-        self.close_modal_forcefully()
+            data_list.pause = False
+            self.close()
+            self.close_modal_forcefully()
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window  = None
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
     def update_template(self, index_plan):
@@ -712,6 +709,19 @@ class TemplateWithoutSkm(WindowUnion):
         if self.kot_question_qcombo == 'Да':
             mes = QMessageBox.question(self, 'вопрос', 'В компоновке будет использоваться система обратных клапанов,'
                                                        ' продолжить?')
+            if mes == QMessageBox.StandardButton.No:
+                return
+
+        if self.kot_question_qcombo == 'Нет':
+            mes = QMessageBox.question(self, 'КОТ', 'Согласно мероприятий по сокращению продолжительности '
+                                                    'ТКРС от 31.01.2025 п.20 '
+                                              'при первичном СПО ПСШ необходимо использовать в компоновке систему '
+                                              'КОТ за исключением необходимости прямой или комбинированной промывки, продолжить?')
+            if mes == QMessageBox.StandardButton.No:
+                return
+        if self.kot_question_qcombo == 'Да' and 'открытый' in self.template_key:
+            mes = QMessageBox.question(self, 'КОТ', 'Необходимо уточнить необходимость применения системы КОТ в '
+                                                    'открытом стволе, продолжить?')
             if mes == QMessageBox.StandardButton.No:
                 return
 
@@ -936,7 +946,7 @@ class TemplateWithoutSkm(WindowUnion):
                     self.raid_window = DrillWindow(self.table_widget, self.insert_index)
                     # self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
-                    
+
                     drill_work_list = self.raid_window.add_work()
                     data_list.pause = True
 
@@ -952,7 +962,7 @@ class TemplateWithoutSkm(WindowUnion):
                     self.raid_window = DrillWindow(self.table_widget, self.insert_index)
                     # self.raid_window.setGeometry(200, 400, 300, 400)
                     self.raid_window.show()
-                    
+
                     drill_work_list = self.raid_window.add_work()
                     data_list.pause = True
 

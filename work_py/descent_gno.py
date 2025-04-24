@@ -519,7 +519,7 @@ class Conservation(DescentParent):
         work_list.extend(self.append_finish())
         return work_list
 
-    def Conservation_down(self, nkt_edit: str) -> List:
+    def сonservation_down(self, nkt_edit: str) -> List:
         from work_py.alone_oreration import volume_jamming_well, volume_nkt_metal
         volume_well_30 = volume_jamming_well(self, 30) / 1.1
         dict_nkt = {}
@@ -603,7 +603,7 @@ class Conservation(DescentParent):
              None, None, None, None, None, None, None,
              'ЦДНГ ', 2],
         ]
-        for row in self.Conservation_down(nkt_edit)[::-1]:
+        for row in self.сonservation_down(nkt_edit)[::-1]:
             descent_voronka.insert(2, row)
         return descent_voronka
 
@@ -659,6 +659,15 @@ class DescentPaker(DescentParent):
              f'{OpressovkaEK.testing_pressure(self, self.data_well.depth_fond_paker_before["after"])[0]}',
              None, None, None, None, None, None, None,
              'мастер КРС, предст. заказчика', 0.67],
+            [None, None,
+             f'Произвести опрессовку фонтанной арматуры после монтажа на устье скважины '
+             f'на давление {self.data_well.max_admissible_pressure.get_value}атм в присутствии '
+             f'представителя заказчика'
+             f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), в случае поглощения '
+             f'при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ  о невозможности проведения '
+             f'опрессовки ФА',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, предст. заказчика', 0.7],
         ]
         work_list_depth = self.insert_text_depth_paker_1000(self.data_well.depth_fond_paker_before["after"])
         if work_list_depth:

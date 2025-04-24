@@ -55,9 +55,6 @@ class TabPageSoWith(TabPageUnion):
         self.kot_question_qcombo = QComboBox(self)
 
         self.kot_question_qcombo.addItems(['Нет', 'Да'])
-        if parent:
-            if self.data_well.plast_work:
-                self.kot_question_qcombo.setCurrentIndex(1)
 
         self.solvent_label = QLabel("объем растворителя", self)
         self.solvent_volume_edit = QLineEdit(self)
@@ -170,6 +167,12 @@ class TabPageSoWith(TabPageUnion):
         self.current_bottom_edit.editingFinished.connect(self.update_template)
         self.skm_type_combo.currentTextChanged.connect(self.update_template)
         self.kot_question_qcombo.currentTextChanged.connect(self.update_template)
+        if self.data_well:
+            if self.data_well.plast_work and 'Ойл' in data_list.contractor and \
+                    'открытый ствол' not in self.template_combo.currentText():
+                self.kot_question_qcombo.setCurrentIndex(1)
+            else:
+                self.kot_question_qcombo.setCurrentIndex(0)
 
     def definition_template_work(self, current_bottom):
         if self.data_well.column_additional is False or \
@@ -207,6 +210,7 @@ class TabPageSoWith(TabPageUnion):
                                          'ПСШ СКМ в доп колонне + открытый ствол',
                                          'ПСШ СКМ в доп колонне c хвостом',
                                          'ПСШ СКМ в доп колонне без хвоста']
+
             self.template_combo.addItems(self.template_select_list)
             template_key = self.definition_pssh(current_bottom)
             # print(template_key)
@@ -237,12 +241,12 @@ class TabPageSoWith(TabPageUnion):
 
     def definition_pssh(self, current_bottom):
         if (self.data_well.column_additional is False or \
-                (self.data_well.column_additional and
-                 self.data_well.current_bottom < self.data_well.head_column_additional.get_value) ) \
+            (self.data_well.column_additional and
+             self.data_well.current_bottom < self.data_well.head_column_additional.get_value)) \
                 and self.data_well.open_trunk_well is False and \
-                ((self.difference_date_days(self.data_well.date_commissioning.get_value)/365 < 20 and \
+                ((self.difference_date_days(self.data_well.date_commissioning.get_value) / 365 < 20 and \
                   self.data_well.category_h2s == "3") or (
-                         self.difference_date_days(self.data_well.date_commissioning.get_value)/365 < 10 \
+                         self.difference_date_days(self.data_well.date_commissioning.get_value) / 365 < 10 \
                          and self.data_well.category_h2s != "3")):
             template_key = 'ПСШ + пакер'
 
@@ -319,9 +323,10 @@ class TabPageSoWith(TabPageUnion):
             dictance_three = ''
         nkt_diam = self.data_well.nkt_diam
 
-        kot_str = ''
         if self.kot_question_qcombo.currentText() == 'Да':
             kot_str = '+ КОТ-50'
+        else:
+            kot_str = ''
 
         if self.data_well.column_additional or \
                 (
@@ -494,11 +499,6 @@ class TabPageSoWith(TabPageUnion):
                 self.template_str_edit.setText(template_str)
                 self.skm_teml_str_edit.setText(skm_teml_str)
 
-        if self.data_well.plast_work and self.template_combo.currentText() not in ['ПСШ открытый ствол',
-                                                       'ПСШ СКМ в доп колонне + открытый ствол']:
-            self.kot_question_qcombo.setCurrentIndex(1)
-        else:
-            self.kot_question_qcombo.setCurrentIndex(0)
     def update_template_edit(self, index):
         current_bottom = float(self.current_bottom_edit.text())
         if index != '':
@@ -506,9 +506,10 @@ class TabPageSoWith(TabPageUnion):
             self.diameter_paker_label_type = QLabel("Диаметр пакера", self)
             self.diameter_paker_edit = QLineEdit(self)
 
-            kot_str = ''
             if self.kot_question_qcombo.currentText() == 'Да':
                 kot_str = '+ КОТ-50'
+            else:
+                kot_str = ''
 
             skm_type = self.skm_type_combo.currentText()
 
@@ -558,7 +559,6 @@ class TabPageSoWith(TabPageUnion):
             self.dictance_template_first_edit.setParent(None)
             self.dictance_three_Label.setParent(None)
             self.dictance_three_edit.setParent(None)
-
 
             if self.data_well.column_additional or \
                     (self.data_well.head_column_additional.get_value >= current_bottom and \
@@ -799,7 +799,7 @@ class TabPageSoWith(TabPageUnion):
 
             if index == 'ПСШ + пакер':
                 template_depth = int(current_bottom - dictance_template_first -
-                                                        length_template_first - dictance_template_second)
+                                     length_template_first - dictance_template_second)
                 diameter_paker = int(float(self.paker_diameter_select(template_depth)))
 
                 self.diameter_paker_edit.setText(str(diameter_paker))
@@ -841,12 +841,6 @@ class TabPageSoWith(TabPageUnion):
 
             self.template_str_edit.setText(template_str)
             self.skm_teml_str_edit.setText(skm_teml_str)
-
-            if self.data_well.plast_work and index not in ['ПСШ открытый ствол',
-                                                           'ПСШ СКМ в доп колонне + открытый ствол' ]:
-                self.kot_question_qcombo.setCurrentIndex(1)
-            else:
-                self.kot_question_qcombo.setCurrentIndex(0)
 
     def update_paker_depth(self, text):
         if text:
@@ -1153,6 +1147,20 @@ class TemplateKrs(WindowUnion):
         self.template_key = str(self.current_widget.template_combo.currentText())
         self.roof_plast = self.current_widget.roof_plast
         self.roof_add_column_plast = self.current_widget.roof_add_column_plast
+        self.kot_question_qcombo = self.current_widget.kot_question_qcombo.currentText()
+        if self.kot_question_qcombo == 'Нет':
+            mes = QMessageBox.question(self, 'КОТ', 'Согласно мероприятий по сокращению продолжительности '
+                                                    'ТКРС от 31.01.2025 п.20 '
+                                                    'при первичном СПО ПСШ необходимо использовать в компоновке систему '
+                                                    'КОТ за исключением необходимости прямой или '
+                                                    'комбинированной промывки, продолжить?')
+            if mes == QMessageBox.StandardButton.No:
+                return
+        if self.kot_question_qcombo == 'Да' and 'открытый' in self.template_key:
+            mes = QMessageBox.question(self, 'КОТ', 'Необходимо уточнить необходимость применения системы КОТ в '
+                                                    'открытом стволе, продолжить?')
+            if mes == QMessageBox.StandardButton.No:
+                return
 
         if self.template_key == 'ПСШ + пакер':
             if self.data_well.gips_in_well:
@@ -1162,18 +1170,18 @@ class TemplateKrs(WindowUnion):
             difference_date_well = self.difference_date_days(self.data_well.date_commissioning.get_value)
             if difference_date_well > 365.25 * 20 and self.data_well.category_h2s == "3":
                 mes = QMessageBox.question(self, 'Критерии',
-                                       f'Скважина в эксплуатации более {difference_date_well / 365:.0f}лет '
-                                       f'Согласно технологических мероприятий по сокращению продолжительности'
-                                       f' ТКРС от 31 мая 2025г, Объединение ПСШ + пакер не возможно при '
-                                       f'эксплуатации скважины с периодом более 20 лет при отсутствии сероводорода '
-                                       f'в скважине. \n Продолжить?')
+                                           f'Скважина в эксплуатации более {difference_date_well / 365:.0f}лет '
+                                           f'Согласно технологических мероприятий по сокращению продолжительности'
+                                           f' ТКРС от 31.01.2025г, Объединение ПСШ + пакер не возможно при '
+                                           f'эксплуатации скважины с периодом более 20 лет при отсутствии сероводорода '
+                                           f'в скважине. \n Продолжить?')
                 if mes == QMessageBox.StandardButton.No:
                     return
             if difference_date_well > 365.25 * 10 and self.data_well.category_h2s != "3":
                 mes = QMessageBox.question(self, 'Критерии',
                                            f'Скважина в эксплуатации более {difference_date_well / 365:.0f}лет '
                                            f'Согласно технологических мероприятий по сокращению продолжительности'
-                                           f' ТКРС от 31 мая 2025г, Объединение ПСШ + пакер не возможно'
+                                           f' ТКРС от 31.01.2025г, Объединение ПСШ + пакер не возможно'
                                            f' с периодом эксплуатации более 10 лет и наличии сероводород'
                                            f'\n Продолжить?')
                 if mes == QMessageBox.StandardButton.No:
@@ -1182,7 +1190,6 @@ class TemplateKrs(WindowUnion):
                                        f'в скважину спускается ПСШ + пакер\n Продолжить?')
             if mes == QMessageBox.StandardButton.No:
                 return
-
 
         distance_second = int(float(self.current_widget.dictance_template_second_edit.text()))
         distance_first = int(self.current_widget.dictance_template_first_edit.text())
@@ -1374,8 +1381,8 @@ class TemplateKrs(WindowUnion):
                     f'ПРИ НАЛИЧИИ АСПО НА ФНКТ НЕОБХОДИМО СОГЛАСОВАТЬ С С ОТКРС БНД и ПТО ПРОИЗВЕСТИ СПО "ПСШ+ПАКЕР" '
                     f'в 2 СПО. РАЗДЕЛЕНИЕ ТОЛЬКО ПОСЛЕ ПИСЬМЕННОГО СОГЛАСОВАНИЯ и ОФОРМЛЕНИЯ '
                     f'ДОПОЛНИТЕЛЬНОГО ПЛАНА РАБОТ',
-                 None, None, None, None, None, None, None,
-                 'мастер КРС', None])
+                    None, None, None, None, None, None, None,
+                    'мастер КРС', None])
             paker_depth = self.current_widget.paker_depth
             paker_list = [
                 [f'Посадить пакер на глубине {paker_depth}м', None, f'Посадить пакер на глубине {paker_depth}м',
@@ -1595,14 +1602,14 @@ class TemplateKrs(WindowUnion):
             if self.data_well.dict_pump_shgn["before"] != 0 and self.data_well.paker_before["before"] == 0:
                 gips_pero_list = [gips_pero_list[-1]]
                 drill_list = DrillWindow.drilling_nkt(self,
-                                                       [(self.data_well.current_bottom, 'гипсовых отложений')],
-                                                       'долото', template_diameter, downhole_motor)
+                                                      [(self.data_well.current_bottom, 'гипсовых отложений')],
+                                                      'долото', template_diameter, downhole_motor)
                 for row in drill_list:
                     gips_pero_list.append(row)
             else:
                 drill_list = DrillWindow.drilling_nkt(self,
-                                                       [(self.data_well.current_bottom, 'гипсовых отложений')],
-                                                       'долото', template_diameter, downhole_motor)
+                                                      [(self.data_well.current_bottom, 'гипсовых отложений')],
+                                                      'долото', template_diameter, downhole_motor)
 
                 for row in drill_list:
                     gips_pero_list.append(row)

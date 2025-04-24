@@ -178,11 +178,11 @@ class RegistrationService:
         if not self.db_connection:
             return None
         with CursorContext(self.db_connection.cursor()) as cursor:
+            query = f"INSERT INTO users (last_name, first_name, second_name, position_in, organization, password, ctkrs) " \
+                    f"VALUES ({self.path_index},{self.path_index}, {self.path_index}, {self.path_index}," \
+                    f" {self.path_index}, {self.path_index}, {self.path_index})"
             cursor.execute(
-                f"INSERT INTO users ("
-                f"last_name, first_name, second_name, position_in, organization, password) "
-                f"VALUES ({self.path_index},{self.path_index}, {self.path_index}, {self.path_index},"
-                f" {self.path_index}, {self.path_index}, {self.path_index})",
+                query,
                 (last_name, first_name, second_name, position_in, organization, password, region))
             # Не забудьте сделать коммит
             self.db_connection.commit()

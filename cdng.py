@@ -405,7 +405,8 @@ def events_gnvp(self, contractor):
              ', БКФ или ДОТ и БРИЗ) согласно ПЛА. Результаты замеров заносить в журнал КВС',
              None, None, None, None, None, None, None, None, None],
             [None,
-             f'5. Оборудовать устье скважины согласно по схеме № {self.data_well.category_pvo}, утвержденной главным инженером '
+             f'5. Оборудовать устье скважины согласно по схеме № {self.data_well.category_pvo}, '
+             f'утвержденной главным инженером '
              f'{data_list.contractor}  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}, согласно '
              f'схемы обвязки устья скважин  на месторождениях {data_list.costumer} превенторной '
              f'установкой при капитальном, текущем ремонте, освоении для скважин, соответствующей категории по '

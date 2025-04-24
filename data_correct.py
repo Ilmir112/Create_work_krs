@@ -110,7 +110,8 @@ class TabPageSoCorrect(TabPageUnion):
         self.level_cement_label = QLabel("Высота цемента \nза колонной", self)
         self.level_cement_edit = FloatLineEdit()
         if '-' in str(self.data_well.level_cement_column.get_value):
-            self.level_cement_edit.setText(self.ifNone(self.data_well.level_cement_column.get_value).split("-")[0].strip())
+            self.level_cement_edit.setText(
+                self.ifNone(self.data_well.level_cement_column.get_value).split("-")[0].strip())
         else:
             self.level_cement_edit.setText(f'{self.ifNone(self.data_well.level_cement_column.get_value)}')
         # self.shoe_column_edit_type2.setClearButtonEnabled(True)
@@ -147,7 +148,6 @@ class TabPageSoCorrect(TabPageUnion):
         self.bottomhole_drill_Label = QLabel('Пробуренный забой')
         self.bottomhole_drill_edit_type = FloatLineEdit()
 
-
         self.bottomhole_drill_edit_type.setText(
             f'{self.remove_non_numeric_chars(self.ifNone(self.data_well.bottom_hole_drill.get_value))}')
         if self.bottomhole_drill_edit_type.text() == 'отсут':
@@ -176,7 +176,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.max_angle_depth_Label = QLabel('Глубина \nмаксимального угла')
         self.max_angle_depth_edit_type = FloatLineEdit()
         self.max_angle_depth_edit_type.setText(f'{self.ifNone(self.data_well.max_angle_depth.get_value)}')
-        if  self.max_angle_depth_edit_type.text() == 'отсут':
+        if self.max_angle_depth_edit_type.text() == 'отсут':
             self.data_well.check_data_in_pz.append('Не корректно указана глубина максимального угола\n')
 
         self.max_expected_pressure_Label = QLabel('Максимальный \nожидаемое давление')
@@ -846,7 +846,8 @@ class DataWindow(WindowUnion):
                 self.data_well.column_additional = False
 
             column_additional_diameter = self.current_widget.column_add_edit_type.text().replace(',', '.')
-            column_additional_wall_thickness = self.current_widget.column_add_wall_thicknessedit_type2.text().replace(',', '.')
+            column_additional_wall_thickness = self.current_widget.column_add_wall_thicknessedit_type2.text().replace(
+                ',', '.')
             shoe_column_additional = self.current_widget.shoe_column_add_edit_type2.text().replace(',', '.')
             head_column_additional = self.current_widget.head_column_add_edit_type2.text().replace(',', '.')
             bottomhole_drill = self.current_widget.bottomhole_drill_edit_type.text().replace(',', '.')
@@ -861,11 +862,13 @@ class DataWindow(WindowUnion):
             max_admissible_pressure = self.current_widget.max_admissible_pressure_edit_type.text().replace(',', '.')
 
             column_direction_diameter = self.current_widget.column_direction_diameter_edit.text().replace(',', '.')
-            column_direction_wall_thickness = self.current_widget.column_direction_wall_thickness_edit.text().replace(',', '.')
+            column_direction_wall_thickness = self.current_widget.column_direction_wall_thickness_edit.text().replace(
+                ',', '.')
             column_direction_length = self.current_widget.column_direction_length_edit.text().replace(',', '.')
             level_cement_direction = self.current_widget.level_cement_direction_edit.text()
             column_conductor_diameter = self.current_widget.column_conductor_diameter_edit.text().replace(',', '.')
-            column_conductor_wall_thickness = self.current_widget.column_conductor_wall_thickness_edit.text().replace(',', '.')
+            column_conductor_wall_thickness = self.current_widget.column_conductor_wall_thickness_edit.text().replace(
+                ',', '.')
             column_conductor_length = self.current_widget.column_conductor_length_edit.text().replace(',', '.')
             level_cement_conductor = self.current_widget.level_cement_conductor_edit.text().replace(',', '.')
 
@@ -903,7 +906,8 @@ class DataWindow(WindowUnion):
                                                         'ожидается дата в формате "dd.mm.yyyy')
                     return
                 else:
-                    self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(self.data_well.date_drilling_cancel)
+                    self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(
+                        self.data_well.date_drilling_cancel)
 
             if self.check_date_format(date_commissioning_line) is False:
                 if curator != 'ВНС':
@@ -911,7 +915,8 @@ class DataWindow(WindowUnion):
                                                         'ожидается дата в формате "dd.mm.yyyy')
                     return
                 else:
-                    self.data_well.date_commissioning = data_list.ProtectedIsNonNone(self.data_well.date_drilling_cancel)
+                    self.data_well.date_commissioning = data_list.ProtectedIsNonNone(
+                        self.data_well.date_drilling_cancel)
 
                 # try:
                 #     # Попытка распарсить строку в формате 'ДД.ММ.ГГГГ'
@@ -1013,7 +1018,8 @@ class DataWindow(WindowUnion):
                     or self.if_none(depth_fond_paker_posle) is False \
                     or self.if_none(depth_fond_paker2_do) is False \
                     or self.if_none(depth_fond_paker2_posle) is False:
-                QMessageBox.information(self, 'Внимание', 'Не все поля в спущенном оборудовании соответствуют значениям')
+                QMessageBox.information(self, 'Внимание',
+                                        'Не все поля в спущенном оборудовании соответствуют значениям')
                 close_file = False
             if self.if_none(level_cement) is False:
                 QMessageBox.information(self, 'Внимание', 'Уровень цемента за ЭК не соответствуют значениям')
@@ -1073,13 +1079,13 @@ class DataWindow(WindowUnion):
 
             if self.data_well.column_additional:
                 asdedf = [self.check_str_isdigit(column_additional_diameter),
-                       self.check_str_isdigit(head_column_additional),
-                       self.check_str_isdigit(shoe_column_additional),
-                       self.check_str_isdigit(column_additional_wall_thickness)]
+                          self.check_str_isdigit(head_column_additional),
+                          self.check_str_isdigit(shoe_column_additional),
+                          self.check_str_isdigit(column_additional_wall_thickness)]
                 if all([self.check_str_isdigit(column_additional_diameter),
-                       self.check_str_isdigit(head_column_additional),
-                       self.check_str_isdigit(shoe_column_additional),
-                       self.check_str_isdigit(column_additional_wall_thickness)]):
+                        self.check_str_isdigit(head_column_additional),
+                        self.check_str_isdigit(shoe_column_additional),
+                        self.check_str_isdigit(column_additional_wall_thickness)]):
 
                     if int(float(column_additional_diameter)) >= float(column_type):
                         QMessageBox.information(self, 'Внимание', 'Ошибка в диаметре доп колонны')
@@ -1110,17 +1116,17 @@ class DataWindow(WindowUnion):
                 else:
                     QMessageBox.warning(self, 'Ошибка', 'Ошибка в доп колонне')
                     close_file = False
-            if self.data_well.paker_before["after"] != 0:
+            if self.data_well.paker_before["after"] not in [None, 0, '0', '-'] and \
+                    'отсут' not in str(self.data_well.paker_before["after"]).lower():
                 self.check_depth_paker_in_perforation(self.data_well.depth_fond_paker_before["after"])
                 self.data_well.check_data_in_pz.append(f'Проверка посадки показала фондовый пакер на спуск сажается '
                                                        f'в интервал перфорации, необходимо изменить глубину посадки!!!')
 
-            if self.data_well.paker_second_before["after"] != 0:
+            if self.data_well.paker_before["after"] not in [None, 0, '0', '-'] and \
+                    'отсут' not in str(self.data_well.paker_before["after"]).lower():
                 self.check_depth_paker_in_perforation(self.data_well.depth_fond_paker_second_before["after"])
                 self.data_well.check_data_in_pz.append(f'Проверка посадки показала фондовый пакер на спуск сажается '
                                                        f'в интервал перфорации, необходимо изменить глубину посадки!!!')
-
-
 
             if type_kr_combo in ['КР13-1  Подготовительные работы к ГРП (ПР)',
                                  'КР13-2  Освоение скважины после ГРП (ЗР)',
@@ -1251,15 +1257,16 @@ class DataWindow(WindowUnion):
                     self.pause_app()
 
                     return
-                if self.data_well.column_additional is False or\
-                    (self.data_well.column_additional and
-                     self.data_well.current_bottom > self.data_well.head_column_additional.get_value):
+                if self.data_well.column_additional is False or \
+                        (self.data_well.column_additional and
+                         self.data_well.current_bottom > self.data_well.head_column_additional.get_value):
                     if self.data_well.dict_pump_ecn != '0':
                         self.data_well.template_depth = self.data_well.dict_pump_ecn_depth["before"]
                         self.data_well.template_length = 30
                 else:
                     if self.data_well.dict_pump_ecn != 0:
-                        if self.data_well.dict_pump_ecn_depth["before"] > self.data_well.head_column_additional.get_value:
+                        if self.data_well.dict_pump_ecn_depth[
+                            "before"] > self.data_well.head_column_additional.get_value:
                             self.data_well.template_depth_addition = self.data_well.dict_pump_ecn_depth
                             self.data_well.template_length_addition = 30
                         else:

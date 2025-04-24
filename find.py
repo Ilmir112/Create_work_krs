@@ -1705,7 +1705,8 @@ class WellData(FindIndexPZ):
                 self.konte_true = True
 
             if '0' != str(self.dict_pump_ecn['before']):
-                if sum(list((self.dict_nkt_before.values()))) - self.dict_pump_ecn_depth['before'] < 10:
+                if abs(sum(list((self.dict_nkt_before.values()))) - self.dict_pump_ecn_depth['before']) > 10 and \
+                        '48' not in list(self.dict_nkt_before.values()):
                     QMessageBox.warning(self, 'Ошибка',
                                         f'Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
                                         f'до ремонта меньше глубины насоса '
@@ -1715,14 +1716,17 @@ class WellData(FindIndexPZ):
                         f'до ремонта меньше глубины насоса'
                         f'{self.dict_pump_ecn_depth["before"]}м')
             if '0' != str(self.dict_pump_ecn['after']):
-                if sum(list((self.dict_nkt_after.values()))) - self.dict_pump_ecn_depth['after'] < 10:
+                if abs(sum(list((self.dict_nkt_after.values()))) - self.dict_pump_ecn_depth['after']) > 10 and \
+                    '48' not in list(self.dict_nkt_before.values()):
                     QMessageBox.warning(self, 'Ошибка',
                                         f'Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
                                         f' меньше глубины насоса {self.dict_pump_ecn_depth["after"]}м')
+
                     self.check_data_in_pz.append(
                         f'Ошибка в карте спуска: \n Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
                         f'до ремонта меньше глубины насоса'
                         f'{self.dict_pump_shgn_depth["after"]}м')
+
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Ошибка в расчетах {e}')
 

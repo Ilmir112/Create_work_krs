@@ -128,7 +128,7 @@ class RegisterWindow(QDialog):
 
         self.label_organization = QLabel("Организация:", self)
         self.organization = QComboBox(self)
-        self.organization.addItems(['', 'ООО Ойл-cервис', 'ООО РН-Сервис'])
+        self.organization.addItems(['', 'ООО Ойл-сервис', 'ООО РН-Сервис'])
 
         self.label_password = QLabel("Пароль", self)
         self.password = QLineEdit(self)
@@ -170,7 +170,7 @@ class RegisterWindow(QDialog):
 
     def update_organization(self, index):
 
-        if index == 'ООО "Ойл-cервис"':
+        if index == "ООО Ойл-сервис":
             self.label_region.setText("ЦЕХ:")
             self.region.clear()
             self.region.addItems(['ЦТКРС №1', 'ЦТКРС №2', 'ЦТКРС №3', 'ЦТКРС №4',
@@ -182,6 +182,7 @@ class RegisterWindow(QDialog):
             self.region.addItems(['экспедиции №1', 'экспедиции №2', 'экспедиции №3', 'экспедиции №4',
                                   'экспедиции №5', 'экспедиции №6',
                                   'экспедиции №7'])
+
         self.grid.addWidget(self.label_region, 5, 1)
         self.grid.addWidget(self.region, 5, 2)
 
@@ -195,6 +196,7 @@ class RegisterWindow(QDialog):
         region = self.region.currentText().strip()
         password = self.password.text().strip()
         password2 = self.password2.text().strip()
+
 
         db = connection_to_database(decrypt("DB_NAME_USER"))
 

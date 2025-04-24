@@ -898,6 +898,8 @@ class SwabWindow(WindowUnion):
                                                        f' {self.paker_khost + self.swab_paker_depth} '
                                                        f'и кровлей ПВР меньше 20м '
                                                        f'{self.data_well.dict_perforation[plast]["кровля"]},'
+                                                       f' Профиль притока будет не корректным. \n'
+                                                       f'Необходимо согласовать компоновку и глубину пакера с заказчиком'
                                                        f' Продолжить?')
 
                             if mes == QMessageBox.StandardButton.No:

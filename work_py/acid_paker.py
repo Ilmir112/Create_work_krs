@@ -1163,12 +1163,12 @@ class AcidPakerWindow(WindowUnion):
                                 f'пакер {paker_type}-' \
                                 f'{self.diameter_paker}мм (либо аналог) ' \
                                 f'для ЭК {self.data_well.column_diameter.get_value}мм х ' \
-                                f'{self.data_well.column_wall_thickness.get_value}мм + ' \
-                                f'НКТ{nkt_diam}мм 10м {swab_layout2}  {mtg_str} + репер'
+                                f'{self.data_well.column_wall_thickness.get_value}мм + {swab_layout2}' \
+                                f' +НКТ{nkt_diam}мм 10м   {mtg_str} + репер'
             self.paker_short = f'{swab_layout} {mtg_str} + НКТ{nkt_diam}мм {self.paker_khost}м + ' \
                                f'пакер {paker_type}-' \
-                               f'{self.diameter_paker}мм + ' \
-                               f'НКТ{nkt_diam}мм 10м {swab_layout2} {mtg_str} + репер'
+                               f'{self.diameter_paker}мм + {swab_layout2}+ ' \
+                               f'НКТ{nkt_diam}мм 10м  {mtg_str} + репер'
             self.dict_nkt = {nkt_diam: float(self.paker_khost) + float(self.paker_depth)}
 
         elif self.data_well.column_additional is True and \
