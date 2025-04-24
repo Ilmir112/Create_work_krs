@@ -301,8 +301,8 @@ class TabPageSoCorrect(TabPageUnion):
             self.result_pressure_date.setText(self.data_well.result_pressure_date.get_value)
 
         self.curator_Label = QLabel('Куратор ремонта')
-        self.curator_Combo = QComboBox(self)
-        self.curator_Combo.setMinimumWidth(50)
+        self.curator_сombo = QComboBox(self)
+        self.curator_сombo.setMinimumWidth(50)
 
         self.region_Label = QLabel('Регион')
         self.region_combo = QComboBox(self)
@@ -435,7 +435,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.grid.addWidget(self.result_pressure_date, 22, 6)
 
         self.grid.addWidget(self.curator_Label, 23, 1)
-        self.grid.addWidget(self.curator_Combo, 24, 1)
+        self.grid.addWidget(self.curator_сombo, 24, 1)
 
         self.grid.addWidget(self.region_Label, 23, 2)
         self.grid.addWidget(self.region_combo, 24, 2)
@@ -583,7 +583,7 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(sucker_rod_po_line_edit, 38, 5)
             self.grid.addWidget(length_sucker_po_line_edit, 38, 6)
 
-        if self.curator_Combo.currentText() == 'ОР':
+        if self.curator_сombo.currentText() == 'ОР':
 
             self.expected_pickup_label = QLabel('Ожидаемая приемистость')
             self.expected_pickup_edit = FloatLineEdit()
@@ -631,7 +631,7 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(self.proc_water_edit, 26, 3)
 
         curator_list = ['', 'ГРР', 'ОР', 'ГТМ', 'ГО', 'ВНС']
-        self.curator_Combo.addItems(curator_list)
+        self.curator_сombo.addItems(curator_list)
         # print(self.pump_SHGN_posle_edit_type.text() != 'отсут', self.pump_ECN_posle_edit_type.text() != 'отсут')
 
         curator = 'ОР' if (self.pump_SHGN_posle_edit_type.text() == 'отсут' \
@@ -639,9 +639,9 @@ class TabPageSoCorrect(TabPageUnion):
         if self.data_well.work_plan in ['gnkt_frez', 'gnkt_bopz']:
             curator = 'ВНС'
 
-        self.curator_Combo.currentTextChanged.connect(self.update_curator)
+        self.curator_сombo.currentTextChanged.connect(self.update_curator)
         # print(f'куратор индекс {curator, curator_list.index(curator)}')
-        self.curator_Combo.setCurrentIndex(curator_list.index(curator))
+        self.curator_сombo.setCurrentIndex(curator_list.index(curator))
         self.region_combo.addItems(data_list.REGION_LIST)
         self.region_combo.setCurrentIndex(data_list.REGION_LIST.index(self.data_well.region))
 
@@ -713,7 +713,7 @@ class TabPageSoCorrect(TabPageUnion):
         except:
             pass
 
-        if self.curator_Combo.currentText() == 'ОР':
+        if self.curator_сombo.currentText() == 'ОР':
             self.expected_pickup_label = QLabel('Ожидаемая приемистость')
             self.expected_pickup_edit = FloatLineEdit()
             try:
@@ -899,7 +899,7 @@ class DataWindow(WindowUnion):
             dinamic_level = self.current_widget.dinamic_level_edit_type.text()
             date_commissioning_line = self.current_widget.date_commissioning_line.text()
             result_pressure_date = self.current_widget.result_pressure_date.text()
-            curator = str(self.current_widget.curator_Combo.currentText())
+            curator = str(self.current_widget.curator_сombo.currentText())
             if self.check_date_format(result_pressure_date) is False:
                 if curator != 'ВНС':
                     QMessageBox.warning(self, 'Ошибка', 'Не корректна дата последней опрессовки, '
