@@ -1058,26 +1058,21 @@ class WindowUnion(MyMainWindow):
             self.acid_edit = current_widget.acid_edit.currentText()
             self.acid_volume_edit = current_widget.acid_volume_edit.text().replace(",", ".")
             if self.acid_volume_edit != '':
-                self.acid_volume_edit = float(self.acid_volume_edit)
+                self.acid_volume_edit = float(self.acid_volume_edit.replace(",", "."))
             self.acid_proc_edit = current_widget.acid_proc_edit.text()
             if self.acid_proc_edit != '':
-                self.acid_proc_edit = int(float(self.acid_proc_edit))
+                self.acid_proc_edit = int(float(self.acid_proc_edit.replace(",", ".")))
             self.acid_oil_proc_edit = current_widget.acid_oil_proc_edit.text()
             if self.acid_oil_proc_edit != '':
-                self.acid_oil_proc_edit = float(self.acid_oil_proc_edit)
+                self.acid_oil_proc_edit = float(self.acid_oil_proc_edit.replace(",", "."))
             self.iron_volume_edit = current_widget.iron_volume_edit.text()
             if self.iron_volume_edit != '':
-                self.iron_volume_edit = float(self.acid_oil_proc_edit)
-
+                self.iron_volume_edit = float(self.acid_oil_proc_edit.replace(",", "."))
             self.expected_pressure_edit = current_widget.expected_pressure_edit.text()
-
             self.expected_pickup_edit = current_widget.expected_pickup_edit.text()
-
             self.pressure_three_edit = current_widget.pressure_three_edit.text()
-
             self.pressure_edit = current_widget.pressure_edit.text()
             self.Qplast_after_edit = current_widget.Qplast_after_edit.currentText()
-
             self.iron_true_combo = current_widget.iron_true_combo.currentText()
             return True
         except Exception as e:
