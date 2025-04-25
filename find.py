@@ -696,7 +696,8 @@ class FindIndexPZ(MyMainWindow):
         for row_ind, row in enumerate(self.ws.iter_rows(values_only=True, min_row=self.data_x_max.get_value,
                                                         max_row=self.end_index.get_value)):  # словарь количества НКТ и метраж
             for col_index, col in enumerate(row):
-                if ("до гл" in str(col) and ('восстано' in str(col).lower() or 'нормал' in str(col).lower())) or "до забо" in str(col):
+                if ("до гл" in str(col) and (
+                        'восстано' in str(col).lower() or 'нормал' in str(col).lower())) or "до забо" in str(col):
                     text = list(filter(lambda x: "до гл" in x or "до забо" in x, col.split('.')))
                     if text:
                         need_depth = self.check_once_isdigit(text[0][text[0].index("до"):])
@@ -1165,7 +1166,7 @@ class WellHistoryData(FindIndexPZ):
                     elif 'ствол скважины' in str(row[col]).lower() and 'буров' in str(row[col]).lower():
                         self.bur_rastvor = row[col]
 
-                    elif 'Максимально ожидаемое давление на устье' == value:
+                    elif 'Максимально ожидаемое давление на устье' in str(value):
                         aaa = row[col + 1]
                         self.max_expected_pressure = ProtectedIsDigit(row[col + 1])
                         self.max_expected_pressure = self.definition_is_none(self.max_expected_pressure,
@@ -1183,7 +1184,7 @@ class WellHistoryData(FindIndexPZ):
                             self.result_pressure_date = ProtectedIsDigit(self.result_pressure_date.get_value.strftime(
                                 '%d.%m.%Y'))
 
-                    elif 'Первоначальное давление опрессовки э/колонны' == value:
+                    elif 'Первоначальное давление опрессовки э/колонны' in str(value):
                         self.first_pressure = ProtectedIsDigit(row[col + 3])
                     elif 'максимально допустимое давление' in str(value).lower():
                         self.max_admissible_pressure = ProtectedIsDigit(row[col + 1])
@@ -1268,7 +1269,7 @@ class WellCondition(FindIndexPZ):
                             else:
                                 well_volume_in_pz = str(row[col + 5]).replace(',', '.')
                             step = 0
-                            while self.check_str_isdigit(well_volume_in_pz) is False :
+                            while self.check_str_isdigit(well_volume_in_pz) is False:
                                 for step in range(4, 8):
                                     well_volume_in_pz = str(row[col + step]).replace(',', '.')
                                 if self.check_str_isdigit(well_volume_in_pz) or step == 7:
@@ -1479,7 +1480,8 @@ class WellData(FindIndexPZ):
                         self.stol_rotor = FindIndexPZ.definition_is_none(
                             self, ProtectedIsDigit(row[col + 5]), row_index, col + 1, 1)
                     elif 'Шахтное направление' in str(value):
-                        asawawq = row[col + 3] not in ['-', None, '0', 0, '', 'отсутствует', '(мм), (мм), -(м)', 'отсут'], 'отсут' not in str(row[col + 3]).lower()
+                        asawawq = row[col + 3] not in ['-', None, '0', 0, '', 'отсутствует', '(мм), (мм), -(м)',
+                                                       'отсут'], 'отсут' not in str(row[col + 3]).lower()
                         if row[col + 3] not in ['-', None, '0', 0, '', 'отсутствует', '(мм), (мм), -(м)', 'отсут'] and \
                                 'отсут' not in str(row[col + 3]).lower():
                             self.column_direction_mine_true = True
@@ -2035,8 +2037,6 @@ class WellPerforation(FindIndexPZ):
                     self.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость',
                                                                            []).append(
                         calculation_fluid_work(self, row[col_vert_index], row[col_pressure_index]))
-
-
 
                 elif any([str((i)).lower() == 'проект' for i in row]) is True and all(
                         [str(i).strip() is None for i in row]) is False and is_number(row[col_roof_index]) is True \
