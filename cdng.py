@@ -213,11 +213,12 @@ def events_gnvp_frez(self, distance, fluid):
                   'средства пожаротушения в соответствии с перечнем.',
          None, None, None, None, None, None, None, None,
          'Мастер ГНКТ', None],
-        [None, 6, f'Двухкратный запас жидкости глушения уд.веса {fluid}г/см3 в объеме '
-                  f'{round(float(self.data_well.well_volume_in_pz[0]) * 2, 1)}м3 находится на '
-                  f'{"".join(calc_pntzh(float(fluid), self.data_well.cdng.get_value))} на расстоянии {distance}км от скважины.'
-                  f' {data_list.contractor} в случае необходимости '
-                  '(аварийного глушения) обязуется обеспечить завоз жидкости глушения на объект работ.', None, None,
+        [None, 6, f'Двухкратный запас жидкости глушения  находится на '
+                  f'{"".join(calc_pntzh(float(fluid), self.data_well.cdng.get_value))} на расстоянии {distance}км '
+                  f'от скважины. При необходимости '
+                  f'аварийного запаса глушения {data_list.contractor} обязуется обеспечить завоз жидкости глушения '
+                  f'уд.веса {fluid}г/см3 в объеме '
+                  f'{round(float(self.data_well.well_volume_in_pz[0]) * 2, 1)}м3 на объект работ.', None, None,
          None, None, None, None, None, None, 'Подрядчик по КРС', None],
         [None, 7,
          'До начала работ, а также на все время выполнения работ, всю технику, принимающую участие'

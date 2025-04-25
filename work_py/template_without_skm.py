@@ -268,28 +268,28 @@ class TabPageSo(TabPageUnion):
                                    f'{int(dictance_template_first)}м  + шаблон-{template_second}мм ' \
                                    f'L-{length_template_second}'
 
-                    self.data_well.template_depth = int(
+                    self.template_depth = int(
                         self.data_well.current_bottom - int(dictance_template_first) -
                         int(length_template_first))
 
-                    skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
+                    skm_teml_str = f'шаблон-{template_second}мм до гл.{self.template_depth}м'
 
 
             elif self.template_combo.currentText() == 'шаблон без хвоста':
                 if dictance_template_second is not None:
                     template_str = f'перо {kot_str} + шаблон-{template_second}мм L-{length_template_second}м '
-                    self.data_well.template_depth = self.data_well.current_bottom
-                    skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
+                    self.template_depth = self.data_well.current_bottom
+                    skm_teml_str = f'шаблон-{template_second}мм до гл.{self.template_depth}м'
 
             elif self.template_combo.currentText() == 'шаблон открытый ствол':
                 if dictance_template_second is not None:
                     self.template_first_edit.setText('фильтр направление')
                     template_str = f'фильтр-направление {kot_str} + НКТ{nkt_diam}м {dictance_template_first:.0f}м  ' \
                                    f'шаблон-{template_second}мм L-{length_template_second}м '
-                    self.data_well.template_depth = int(
+                    self.template_depth = int(
                         self.data_well.current_bottom - int(dictance_template_first))
 
-                    skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
+                    skm_teml_str = f'шаблон-{template_second}мм до гл.{self.template_depth}м'
 
             elif self.template_combo.currentText() == 'шаблон ДП с хвостом':
                 if dictance_template_second is not None:
@@ -298,17 +298,17 @@ class TabPageSo(TabPageUnion):
                                    f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_template_second:.0f}м + ' \
                                    f'шаблон-{template_second}мм L-{length_template_second}м '
 
-                    self.data_well.template_depth = math.ceil(self.data_well.current_bottom - 2 -
-                                                              int(dictance_template_first) - int(
+                    self.template_depth = math.ceil(self.data_well.current_bottom - 2 -
+                                                    int(dictance_template_first) - int(
                         dictance_template_second) -
-                                                              int(length_template_first))
-                    self.data_well.template_depth_addition = math.ceil(
+                                                    int(length_template_first))
+                    self.template_depth_addition = math.ceil(
                         self.data_well.current_bottom - float(dictance_template_first) - float(
                             dictance_template_second))
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.' \
-                                   f'{self.data_well.template_depth_addition}м, ' \
-                                   f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
+                                   f'{self.template_depth_addition}м, ' \
+                                   f'шаблон-{template_second}мм до гл.{self.template_depth}м'
 
             elif self.template_combo.currentText() == 'шаблон ДП без хвоста':
 
@@ -317,14 +317,14 @@ class TabPageSo(TabPageUnion):
                                f'НКТ{nkt_pod} {dictance_template_second:.0f}м + шаблон-{template_second}мм ' \
                                f'L-{length_template_second}м '
 
-                self.data_well.template_depth = math.ceil(
+                self.template_depth = math.ceil(
                     self.data_well.current_bottom - int(dictance_template_second) -
                     int(length_template_first))
 
-                self.data_well.template_depth_addition = round(self.data_well.current_bottom, 1)
+                self.template_depth_addition = round(self.data_well.current_bottom, 1)
 
-                skm_teml_str = f'шаблон-{first_template}мм до гл.{self.data_well.template_depth_addition}м, ' \
-                               f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
+                skm_teml_str = f'шаблон-{first_template}мм до гл.{self.template_depth_addition}м, ' \
+                               f'шаблон-{template_second}мм до гл.{self.template_depth}м'
 
 
             elif self.template_combo.currentText() == 'шаблон ДП открытый ствол':
@@ -334,20 +334,20 @@ class TabPageSo(TabPageUnion):
                                    f'L-{length_template_first}м' \
                                    f' + НКТ{nkt_pod} + шаблон-{template_second}мм ' \
                                    f'L-{length_template_second}м '
-                    self.data_well.template_depth = math.ceil(
+                    self.template_depth = math.ceil(
                         self.data_well.current_bottom - 2 - float(dictance_template_first) - float(
                             dictance_template_second) - float(length_template_first))
-                    self.data_well.template_depth_addition = math.ceil(
+                    self.template_depth_addition = math.ceil(
                         self.data_well.current_bottom - 2 -
                         float(dictance_template_first) - float(
                             dictance_template_second))
 
                     skm_teml_str = f'шаблон-{first_template}мм до гл.' \
-                                   f'{self.data_well.template_depth_addition}м, ' \
-                                   f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
-            if dictance_template_second != "":
-                self.template_str_edit.setText(template_str)
-                self.skm_teml_str_edit.setText(skm_teml_str)
+                                   f'{self.template_depth_addition}м, ' \
+                                   f'шаблон-{template_second}мм до гл.{self.template_depth}м'
+
+            self.template_str_edit.setText(template_str)
+            self.skm_teml_str_edit.setText(skm_teml_str)
 
     def update_template_edit(self, index):
 
@@ -425,8 +425,8 @@ class TabPageSo(TabPageUnion):
                            f' L-{length_template_second}м '
 
             # print(f'строка шаблона {template_str}')
-            self.data_well.template_depth = int(roof_plast - 5)
-            skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
+            self.template_depth = int(roof_plast - 5)
+            skm_teml_str = f'шаблон-{template_second}мм до гл.{self.template_depth}м'
 
         elif index == 'шаблон без хвоста':
             self.dictance_template_second_edit.setParent(None)
@@ -435,8 +435,8 @@ class TabPageSo(TabPageUnion):
             self.dictance_template_first_Label.setParent(None)
 
             template_str = f'перо {kot_str} + шаблон-{template_second}мм L-{length_template_second}м '
-            self.data_well.template_depth = self.data_well.current_bottom
-            skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
+            self.template_depth = self.data_well.current_bottom
+            skm_teml_str = f'шаблон-{template_second}мм до гл.{self.template_depth}м'
 
         elif index == 'шаблон открытый ствол':
 
@@ -457,9 +457,9 @@ class TabPageSo(TabPageUnion):
 
             template_str = f'фильтр-направление L-2 {kot_str}+ НКТ{nkt_diam}м {dictance_template_first:.0f}м +' \
                            f'шаблон-{template_second}мм L-{length_template_second}м '
-            self.data_well.template_depth = int(roof_plast - 5)
+            self.template_depth = int(roof_plast - 5)
 
-            skm_teml_str = f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
+            skm_teml_str = f'шаблон-{template_second}мм до гл.{self.template_depth}м'
 
         elif index == 'шаблон ДП с хвостом':
 
@@ -485,12 +485,12 @@ class TabPageSo(TabPageUnion):
                            f' + шаблон-{first_template}мм ' \
                            f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_template_second:.0f}м + ' \
                            f'шаблон-{template_second}мм L-{length_template_second}м '
-            self.data_well.template_depth = math.ceil(
+            self.template_depth = math.ceil(
                 roof_add_column_plast - 5 - length_template_first - dictance_template_second)
-            self.data_well.template_depth_addition = math.ceil(roof_add_column_plast - 5)
+            self.template_depth_addition = math.ceil(roof_add_column_plast - 5)
 
-            skm_teml_str = f'шаблон-{first_template}мм до гл.{self.data_well.template_depth_addition}м, ' \
-                           f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
+            skm_teml_str = f'шаблон-{first_template}мм до гл.{self.template_depth_addition}м, ' \
+                           f'шаблон-{template_second}мм до гл.{self.template_depth}м'
 
         elif index == 'шаблон ДП без хвоста':
             self.dictance_template_first_edit.setParent(None)
@@ -516,13 +516,13 @@ class TabPageSo(TabPageUnion):
                            f'НКТ{nkt_pod} {dictance_template_second:.0f}м + шаблон-{template_second}мм ' \
                            f'L-{length_template_second}м '
 
-            self.data_well.template_depth = math.ceil(
+            self.template_depth = math.ceil(
                 self.data_well.current_bottom - dictance_template_second -
                 length_template_first)
-            self.data_well.template_depth_addition = math.ceil(self.data_well.current_bottom)
+            self.template_depth_addition = math.ceil(self.data_well.current_bottom)
 
-            skm_teml_str = f'шаблон-{first_template}мм до гл.{self.data_well.template_depth_addition}м, ' \
-                           f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
+            skm_teml_str = f'шаблон-{first_template}мм до гл.{self.template_depth_addition}м, ' \
+                           f'шаблон-{template_second}мм до гл.{self.template_depth}м'
 
 
 
@@ -552,12 +552,12 @@ class TabPageSo(TabPageUnion):
                            f' + шаблон-{first_template}мм L-{length_template_first}м' \
                            f' + НКТ{nkt_pod} {dictance_template_second:.0f}м + шаблон-{template_second}мм ' \
                            f'L-{length_template_second}м '
-            self.data_well.template_depth = math.ceil(
+            self.template_depth = math.ceil(
                 roof_add_column_plast - 5 - length_template_first - dictance_template_second)
-            self.data_well.template_depth_addition = math.ceil(roof_add_column_plast - 5)
+            self.template_depth_addition = math.ceil(roof_add_column_plast - 5)
 
-            skm_teml_str = f'шаблон-{first_template}мм до гл.{self.data_well.template_depth_addition}м, ' \
-                           f'шаблон-{template_second}мм до гл.{self.data_well.template_depth}м'
+            skm_teml_str = f'шаблон-{first_template}мм до гл.{self.template_depth_addition}м, ' \
+                           f'шаблон-{template_second}мм до гл.{self.template_depth}м'
 
         self.template_str_edit.setText(template_str)
         self.skm_teml_str_edit.setText(skm_teml_str)
@@ -619,48 +619,49 @@ class TemplateWithoutSkm(WindowUnion):
         template_str = str(self.tab_widget.currentWidget().template_str_edit.text())
         template = str(self.tab_widget.currentWidget().template_combo.currentText())
         template_length = int(float(self.tab_widget.currentWidget().length_template_second_edit.text()))
-        if self.data_well.column_additional:
-            template_length_addition = int(float(self.tab_widget.currentWidget().length_template_first_edit.text()))
+
         if self.data_well.column_additional is False or (
                 self.data_well.column_additional is True and float(
             self.data_well.head_column_additional.get_value) >= self.data_well.current_bottom):
             template_diameter = int(self.tab_widget.currentWidget().template_second_edit.text())
         else:
+            self.template_length_addition = int(
+                float(self.tab_widget.currentWidget().length_template_first_edit.text()))
             template_diameter = int(self.tab_widget.currentWidget().template_first_edit.text())
         # print(f'проблема ЭК {self.data_well.problem_with_ek_diameter}')
+        self.template_depth = self.tab_widget.currentWidget().template_depth
+        if self.data_well.column_additional:
+            self.template_depth_addition = self.tab_widget.currentWidget().template_depth_addition
         if (template_diameter >= int(self.data_well.problem_with_ek_diameter) - 2
-                and self.data_well.template_depth > int(self.data_well.problem_with_ek_depth)):
+                and self.template_depth > int(self.data_well.problem_with_ek_depth)):
             QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже глубины не прохода')
             return
 
         if self.data_well.column_additional is False or \
                 self.data_well.column_additional and \
                 self.data_well.current_bottom < self.data_well.head_column_additional.get_value:
-            if self.data_well.template_depth > self.data_well.current_bottom:
+            if self.template_depth > self.data_well.current_bottom:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
                 return
         else:
-            if self.data_well.template_depth_addition > self.data_well.current_bottom:
+            if self.template_depth_addition > self.data_well.current_bottom:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже текущего забоя')
                 return
-            if self.data_well.template_depth >= self.data_well.head_column_additional.get_value:
+            if self.template_depth >= self.data_well.head_column_additional.get_value:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'шаблон спускается ниже головы хвостовика')
                 return
-            if self.template_combo.currentText() == 'ПСШ Доп колонна СКМ в основной колонне' and \
+            if template == 'ПСШ Доп колонна СКМ в основной колонне' and \
                     self.data_well.skm_depth >= self.data_well.head_column_additional.get_value:
                 QMessageBox.warning(self, "ВНИМАНИЕ", 'СКМ спускается ниже головы хвостовика')
                 return
         if distance_second < 0 or distance_first < 0:
             QMessageBox.warning(self, "ВНИМАНИЕ", 'Расстояние между шаблонами не корректно')
             return
-        self.data_well.template_length = template_length
-        if self.data_well.column_additional:
-            self.data_well.template_length_addition = template_length_addition
+
         current_bottom = self.tab_widget.currentWidget().current_bottom_edit.text()
         if current_bottom != '':
             self.data_well.current_bottom = round(float(current_bottom), 1)
 
-        self.update_template(self.data_well.insert_index)
         self.privyazka_question = self.tab_widget.currentWidget().privyazka_question_QCombo.currentText()
         if self.privyazka_question == 'Да':
             mes = QMessageBox.question(self, 'Привязка', 'ЗУМПФ меньше 10м. '
@@ -668,13 +669,27 @@ class TemplateWithoutSkm(WindowUnion):
             if mes == QMessageBox.StandardButton.No:
                 return
         if self.data_well.head_column.get_value != 0:
-            if self.data_well.column_conductor_length.get_value <= self.data_well.template_depth:
+            if self.data_well.column_conductor_length.get_value <= self.template_depth:
                 QMessageBox.warning(self, 'Ошибка',
                                     f'Нельзя спускать шаблон ниже глубины башмака кондуктора '
                                     f'{self.data_well.column_conductor_length.get_value}м')
 
         work_list = self.template_ek(template_str, template, template_diameter)
+
+        self.data_well.template_length = template_length
+
         if work_list:
+            if self.template_depth > self.data_well.template_depth:
+                self.data_well.template_depth = self.template_depth
+            if self.data_well.column_additional or \
+                    (
+                            self.data_well.column_additional is False and self.data_well.head_column_additional.get_value > self.data_well.current_bottom):
+                if self.template_depth_addition > self.data_well.template_depth_addition:
+                    if self.template_depth_addition > self.data_well.template_depth_addition:
+                        self.data_well.template_depth_addition = self.template_depth_addition
+                        self.data_well.template_length_addition = self.template_length_addition
+
+            self.update_template(self.data_well.insert_index)
             self.populate_row(self.insert_index, work_list, self.table_widget)
 
             data_list.pause = False

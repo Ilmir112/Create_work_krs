@@ -786,6 +786,7 @@ class WindowUnion(MyMainWindow):
             paker_list.append(row)
 
         if self.Qplast_after_edit == 'ДА':
+
             paker_list.append([f'{layout_select}. насыщение 5м3', None,
                                f'{layout_select}. Произвести насыщение скважины до стабилизации '
                                f'давления закачки не менее 5м3. Опробовать  '
@@ -1065,12 +1066,12 @@ class WindowUnion(MyMainWindow):
             self.acid_oil_proc_edit = current_widget.acid_oil_proc_edit.text()
             if self.acid_oil_proc_edit != '':
                 self.acid_oil_proc_edit = float(self.acid_oil_proc_edit.replace(",", "."))
-            self.iron_volume_edit = current_widget.iron_volume_edit.text()
+            self.iron_volume_edit = current_widget.iron_volume_edit.text().replace(",", ".")
             if self.iron_volume_edit != '':
-                self.iron_volume_edit = float(self.acid_oil_proc_edit.replace(",", "."))
-            self.expected_pressure_edit = current_widget.expected_pressure_edit.text()
-            self.expected_pickup_edit = current_widget.expected_pickup_edit.text()
-            self.pressure_three_edit = current_widget.pressure_three_edit.text()
+                self.iron_volume_edit = float(self.iron_volume_edit)
+            self.expected_pressure = current_widget.expected_pressure_edit.text()
+            self.expected_pickup = current_widget.expected_pickup_edit.text()
+            self.pressure_three = current_widget.pressure_three_edit.text()
             self.pressure_edit = current_widget.pressure_edit.text()
             self.Qplast_after_edit = current_widget.Qplast_after_edit.currentText()
             self.iron_true_combo = current_widget.iron_true_combo.currentText()

@@ -318,7 +318,8 @@ class OpressovkaEK(WindowUnion):
         for sole in sorted(leakness_list):
             if paker_depth >= sole:
                 self.tableWidget.insertRow(rows)
-                self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(int(sole))))
+                if self.find_item_in_table(int(sole)):
+                    self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(int(sole))))
         self.tableWidget.setSortingEnabled(True)
         self.tableWidget.sortItems(1)
 

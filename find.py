@@ -1201,8 +1201,7 @@ class WellHistoryData(FindIndexPZ):
             if self.max_expected_pressure.get_value < 30:
                 QMessageBox.warning(None, 'допустимое давление ',
                                     'максимально ожидаемое давление на устье слишком маленькое')
-
-            self.max_expected_pressure = ProtectedIsDigit(30)
+                self.max_expected_pressure = ProtectedIsDigit(30)
         if self.max_expected_pressure.get_value in ['', 0, '0']:
             self.check_data_in_pz.append('не указано максимально ожидаемое давление на устье\n')
         if self.max_admissible_pressure.get_value in ['', 0, '0']:
@@ -1454,7 +1453,7 @@ class WellData(FindIndexPZ):
                         self.bottom_hole_artificial = ProtectedIsDigit(row[col + 1])
 
                     elif 'интервалы темпа набора кривизны ' in str(value).lower():
-                        self.interval_temp = ProtectedIsDigit(row[col + 2])
+                        self.interval_temp = ProtectedIsNonNone(row[col + 2])
                         self.interval_temp = self.definition_is_none(
                             self.interval_temp, row_index, col + 2, 1)
 

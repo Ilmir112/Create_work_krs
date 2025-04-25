@@ -915,11 +915,11 @@ class AcidPakerWindow(WindowUnion):
                 if self.QplastEdit == 'ДА':
                     work_template_list.insert(-2,
                                               [f'Насыщение 5м3.  Q пласт {self.plast_combo} при '
-                                               f'Р={self.pressure_three_edit}атм', None,
+                                               f'Р={self.pressure_three}атм', None,
                                                f'Произвести насыщение скважины до стабилизации давления закачки '
                                                f'не менее 5м3. Опробовать  '
                                                f'пласт {self.plast_combo} на приемистость в трех режимах при '
-                                               f'Р={self.pressure_three_edit}атм в присутствии '
+                                               f'Р={self.pressure_three}атм в присутствии '
                                                f'представителя ЦДНГ. '
                                                f'Составить акт. (Вызов представителя осуществлять телефонограммой за 12 часов, '
                                                f'с подтверждением за 2 часа до '

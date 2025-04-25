@@ -270,7 +270,7 @@ class MyMainWindow(QMainWindow):
         for i in str(string):
             if i in '1234567890,.':
                 string_exit += i
-        if string_exit == '':
+        if string_exit.replace(',', '') == '':
             return None
         else:
             string_exit = string_exit.replace(',', '.')

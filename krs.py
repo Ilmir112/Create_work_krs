@@ -718,8 +718,8 @@ class GnoParent(ABC):
         if 'в перечне скважин' not in well_jamming_str:
             well_jamming_str += h2s_string_volume
 
-        return [well_jamming_str + '\nОпределить приемистость пласта при Р=80-120атм', well_jamming_list2,
-                well_jamming_short + '\nОпределить приемистость пласта при Р=80-120атм']
+        return [well_jamming_str + f'\nОпределить приемистость пласта при Р={self.data_well.max_admissible_pressure.get_value}атм', well_jamming_list2,
+                well_jamming_short + f'\nОпределить приемистость пласта при Р={self.data_well.max_admissible_pressure.get_value}атм']
 
     def calculate_hard_fluid(self):
         current_date = data_list.current_date.date()
