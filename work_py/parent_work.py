@@ -1051,7 +1051,7 @@ class WindowUnion(MyMainWindow):
             string = f'ОЗЦ 12-16 часа: (по качеству пробы) с момента срезки В случае не получения ' \
                      f'технологического "СТОП" ОЗЦ без давления.'
             string_short = 'ОЗЦ 12-16 часа'
-            time = 24
+            time = 16
         return string_short, string, time
 
     def read_sko_need(self, current_widget):

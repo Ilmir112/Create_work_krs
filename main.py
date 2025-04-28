@@ -2708,8 +2708,8 @@ class SaveInExcel(MyWindow):
                     elif 'Закиев И.Э.' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
                         self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Закиев.png', coordinate)
-                    elif '320 - скорость оседания' in str(value):
-                        coordinate = f'F{row_ind + 2}'
+                    elif ' - коэффициент усадки песка' in str(value):
+                        coordinate = f'I{row_ind + 1}'
                         self.insert_image(
                             self.ws2, f'{data_list.path_image}imageFiles/schema_well/sanf_formular-Photoroom.png',
                             coordinate, 200, 80)

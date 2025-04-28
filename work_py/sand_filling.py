@@ -248,43 +248,74 @@ class SandWindow(WindowUnion):
         event.accept()  # Принимаем событие закрытия
 
     def sand_select(self):
-
+        self.dict_nkt = {}
+        self.dict_nkt[self.data_well.nkt_diam] = None
         if self.data_well.column_additional is False or (self.data_well.column_additional is True and \
                                                          self.data_well.current_bottom <=
                                                          self.data_well.head_column_additional.get_value):
             sand_select = f'перо + НКТ{self.data_well.nkt_diam}мм 20м + реперный патрубок'
+            self.dict_nkt[self.data_well.nkt_diam] = self.data_well.current_bottom - 50
 
         elif self.data_well.column_additional is True and \
                 self.data_well.column_additional_diameter.get_value < 110 and \
                 self.data_well.current_bottom >= self.data_well.head_column_additional.get_value:
             sand_select = f'обточную муфту + НКТ{60}мм 20м + реперный патрубок + НКТ60мм ' \
                           f'{round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value, 0)}м '
+
+            self.dict_nkt[self.data_well.nkt_diam] = self.data_well.head_column_additional.get_value - 50
+            self.dict_nkt["60"] = round(
+                self.data_well.current_bottom - self.data_well.head_column_additional.get_value - 50, 0)
         elif self.data_well.column_additional is True and \
                 self.data_well.column_additional_diameter.get_value > 110 and \
                 self.data_well.current_bottom >= self.data_well.head_column_additional.get_value:
             sand_select = f'обточную муфту + НКТ{self.data_well.nkt_diam}мм со снятыми фасками {20}м + реперный патрубок + ' \
                           f'НКТ{self.data_well.nkt_diam}мм со снятыми фасками ' \
                           f'{round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value, 0)}м'
+            self.dict_nkt[self.data_well.nkt_diam] = self.data_well.current_bottom - 50
         return sand_select
 
     def sandFilling(self, filling_depth, sole_sand_edit, privyazka_question_QCombo):
-
-        from work_py.alone_oreration import well_volume, volume_vn_ek
+        from work_py.alone_oreration import well_volume, volume_vn_ek, volume_nkt
 
         nkt_diam = ''.join(['73' if self.data_well.column_diameter.get_value > 110 else '60'])
+        self.dict_nkt = {}
+        self.dict_nkt[self.data_well.nkt_diam] = None
+        if self.data_well.column_additional is False or (self.data_well.column_additional is True and \
+                                                         self.data_well.current_bottom <=
+                                                         self.data_well.head_column_additional.get_value):
+            self.dict_nkt[self.data_well.nkt_diam] = self.data_well.current_bottom - 50
 
-        sand_volume = round(volume_vn_ek(self, filling_depth) * (sole_sand_edit - filling_depth), 1)
+        elif self.data_well.column_additional is True and \
+                self.data_well.column_additional_diameter.get_value < 110 and \
+                self.data_well.current_bottom >= self.data_well.head_column_additional.get_value:
 
+            self.dict_nkt[self.data_well.nkt_diam] = self.data_well.head_column_additional.get_value - 50
+            self.dict_nkt["60"] = round(
+                self.data_well.current_bottom - self.data_well.head_column_additional.get_value - 50, 0)
+        elif self.data_well.column_additional is True and \
+                self.data_well.column_additional_diameter.get_value > 110 and \
+                self.data_well.current_bottom >= self.data_well.head_column_additional.get_value:
+            self.dict_nkt[self.data_well.nkt_diam] = self.data_well.current_bottom - 50
+        volume_vn = volume_vn_ek(self, filling_depth)
+
+        sand_volume = round(1.05 * (sole_sand_edit - filling_depth) * volume_vn, 1)
+
+        hours = round(filling_depth / 320, 1)
+
+        if hours < 4 and "Ойл" in data_list.contractor:
+            hours = 4
+
+        volume_nkt = volume_nkt(self.dict_nkt)
         filling_list = [
             [None, 1,
              'Работы по установке песчаного моста выполнять согласно технологической инструкции'
              ' П2-05.01 ТИ-1430 ЮЛ-111 "ОТСЫПКА ЗАБОЯ СКВАЖИНЫ КВАРЦЕВЫМ ПЕСКОМ, ПРОППАНТОМ"',
              None, None, None, None, None, None, None, 'Мастер, бурильщик', None],
-            [f'Спустить  {self.sand_select()} на НКТ{nkt_diam}м до глубины Н={self.data_well.current_bottom - 20}м '
+            [f'Спустить  {self.sand_select()} на НКТ{nkt_diam}мм до глубины Н={self.data_well.current_bottom - 20}м '
              f'(т.з. {self.data_well.current_bottom}м)', None,
-             f'Спустить  {self.sand_select()} на НКТ{nkt_diam}м до глубины Н={self.data_well.current_bottom - 20}м '
+             f'Спустить  {self.sand_select()} на НКТ{nkt_diam}мм до глубины Н={self.data_well.current_bottom - 20}м '
              f'(т.з. {self.data_well.current_bottom}м) с замером, '
-             f'шаблонированием шаблоном {self.data_well.nkt_template}мм. (При СПО первых десяти НКТ на '
+             f'ШАБЛОНИРОВАНИЕМ шаблоном {self.data_well.nkt_template}мм. (При СПО первых десяти НКТ на '
              f'спайдере дополнительно устанавливать элеватор ЭХЛ) ',
              None, None, None, None, None, None, None,
              'Мастер КР', descentNKT_norm(sole_sand_edit, 1)],
@@ -295,42 +326,47 @@ class SandWindow(WindowUnion):
                    f'дальнейшие работы согласовать с геологической службой подрядчика по ТКРС.',
              None, None, None, None, None, None, None,
              'мастер КРС', 3.5],
-            ['Приподнять перо до Н={sole_sand_edit-50}м', None,
+            [f'Приподнять перо до Н={sole_sand_edit - 50}м', None,
              f'Приподнять перо до Н={filling_depth - 50}м (на 50 м выше планируемой кровли песчаного моста). '
-             f'В случае отсутствия циркуляции при промывке скважины (поглощение жидкости) глубина нахождения пера '
-             f'должна быть выше поглощающих интервалов.',
+             f'В СЛУЧАЕ ОТСУТСТВИЯ ЦИРКУЛЯЦИИ ПРИ ПРОМЫВКЕ СКВАЖИНЫ (ПОГЛОЩЕНИЕ ЖИДКОСТИ) ГЛУБИНА НАХОЖДЕНИЯ ПЕРА '
+             F'ДОЛЖНА БЫТЬ ВЫШЕ ПОГЛОЩАЮЩИХ ИНТЕРВАЛОВ.',
              None, None, None, None, None, None, None,
              'мастер КРС', lifting_nkt_norm(filling_depth, 1)],
+            [None,
+             None, f'Подготовить проппант (кварцевый песок) в объеме {sand_volume * 1.1:.0f} литров.\n'
+                   f' Расчетный объем песка определяется по формуле \n'
+                   f'(H - мощность песчаного моста, м; D-внутренний диаметр ЭК, мм; \n'
+                   f'1,05 - коэффициент усадки песка; 1000 - переводной коэффициент)',
+             None, None, None, None, None, None, None,
+             None, None],
             [f'отсыпка кварцевым песком в инт. {filling_depth} - {sole_sand_edit} в объеме {sand_volume}л',
              None, f'Произвести отсыпку кварцевым песком в инт. {filling_depth} - {sole_sand_edit} '
                    f'в объеме {sand_volume}л: \n'
                    f' Включить подачу насосного агрегата с равномерным расходом жидкости 2-3 л/сек. '
                    f'Отсыпку проппантом (кварцевым песком) выполнять с помощью оттарированной емкости, объем которой '
-                   f'точно определен. Отсыпку выполнять путем постепенного равномерного добавления проппанта '
-                   f'(кварцевого песка) в поток жидкости с концентрацией не более 10 литров песка на 100 литров '
-                   f'жидкости. После каждого введения 50 литров песка подавать чистую жидкость в объеме не менее '
-                   f'100 литров. Чередовать циклы "50 литров песок с жидкостью / 100 литров чистой жидкости" до '
-                   f'отсыпки полного объема.  Продолжить подачу в НКТ жидкости глушения с расходом 2-3 л/сек, '
-                   f'закачать жидкость в объеме, равном внутреннему объему НКТ V=7 м3. Поднять перо на безопасное '
-                   f'расстояние - 200 м. Ожидание оседания песка 7,4 часа. Время начала оседания песка определяется '
+                   f'точно определен. Отсыпку выполнять путем ПОСТЕПЕННОГО РАВНОМЕРНОГО добавления проппанта '
+                   f'(кварцевого песка) в поток жидкости с концентрацией не более 10 ЛИТРОВ ПЕСКА НА 100 ЛИТРОВ '
+                   F'ЖИДКОСТИ. После каждого введения 50 литров песка подавать чистую жидкость в объеме не менее '
+                   f'100 литров. Чередовать циклы "50 ЛИТРОВ ПЕСОК С ЖИДКОСТЬЮ / 100 ЛИТРОВ ЧИСТОЙ ЖИДКОСТИ" до '
+                   f'отсыпки полного объема.  \nПродолжить подачу в НКТ жидкости глушения с расходом 2-3 л/сек, '
+                   f'закачать жидкость в объеме, равном внутреннему объему НКТ V= {volume_nkt:.1f}м3. \n'
+                   f'Поднять перо на безопасное '
+                   f'расстояние - 200 м. \nВремя начала оседания песка определяется '
                    f'с момента завершения отсыпки. Расстояние принимается от устья до кровли песчаного моста по '
-                   f'формуле (Н - расстояние от устья до кровли; 320 - скорость оседания, м/час):',
+                   f'формуле (Н - расстояние от устья до кровли; 320 - скорость оседания, м/час) \n'
+                   f't = H / 320, час',
              None, None, None, None, None, None, None,
              'мастер КРС', 3.5],
-            [None,
-             None, f'                      Формула:                                                                \n   '
-                   f'                                            '
-                   f'                                            ',
+
+            [f'Ожидание оседания песка {hours} часа.',
+             None,
+             f'Ожидание оседания песка {hours} часа. \n Во время оседания песка проверять подвижность подвески НКТ '
+             f'вытяжкой на полную трубу не реже одного раза в 5 мин. \nПосле завершения времени оседания песка '
+             f'допуском НКТ со скоростью спуска не более 0,1 м/с отбить кровлю песчаного моста. Если '
+             f'кровля определена ниже планируемой глубины – произвести досыпку проппанта (кварцевого песка), '
+             f'если выше – вымыв излишков песка обратной промывкой.',
              None, None, None, None, None, None, None,
-             None, None],
-            [f'Ожидание оседания песка 4 часа.',
-             None, f'Ожидание оседания песка 4 часа. \n Во время оседания песка проверять подвижность подвески НКТ '
-                   f'вытяжкой на полную трубу не реже одного раза в 5 мин. После завершения времени оседания песка '
-                   f'допуском НКТ со скоростью спуска не более 0,1 м/с отбить кровлю песчаного моста. Если '
-                   f'кровля определена ниже планируемой глубины – произвести досыпку проппанта (кварцевого песка), '
-                   f'если выше – вымыв излишков песка обратной промывкой.',
-             None, None, None, None, None, None, None,
-             'мастер КРС', 4],
+             'мастер КРС', hours],
             [None, None,
              f'Допуском компоновки со скоростью спуска не более 0,1 м/с отбить кровлю песчаного моста'
              f'(плановый забой -{filling_depth}м). '
@@ -380,8 +416,8 @@ class SandWindow(WindowUnion):
                                  'мастер КРС', None])
 
         if privyazka_question_QCombo != "Да":
+            filling_list.pop(9)
             filling_list.pop(8)
-            filling_list.pop(7)
 
         filling_list.append([None, None,
                              f'Поднять {self.sand_select()} НКТ{nkt_diam}м с глубины {filling_depth}м с доливом '
