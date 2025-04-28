@@ -1000,10 +1000,12 @@ class TabPageSoWith(TabPageUnion):
         for diam, diam_internal in template_second_diam_dict.items():
             if diam_internal[0] <= diam_internal_ek <= diam_internal[1]:
                 template_second_diam = diam
+                break
         for diam, diam_internal in template_second_diam_dict.items():
             if diam_internal[0] <= diam_internal_ek_addition <= diam_internal[1]:
                 # print(diam_internal[0] <= diam_internal_ek_addition <= diam_internal[1], diam_internal[0],diam_internal_ek_addition,diam_internal[1])
                 template_first_diam = diam
+                break
         if 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and '122' in str(
                 self.data_well.paker_before["after"]):
             template_second_diam = 126

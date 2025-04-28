@@ -47,7 +47,7 @@ class FindIndexPZ(MyMainWindow):
         self.perforation_roof = 5000
         self.old_version = False
         self.region = None
-        self.fluid = 1.18
+        self.fluid = None
         self.insert_index = 0
         self.curator = None
         self.data_well_max = ProtectedIsDigit(0)
@@ -696,14 +696,14 @@ class FindIndexPZ(MyMainWindow):
         for row_ind, row in enumerate(self.ws.iter_rows(values_only=True, min_row=self.data_x_max.get_value,
                                                         max_row=self.end_index.get_value)):  # словарь количества НКТ и метраж
             for col_index, col in enumerate(row):
-                if ("до гл" in str(col) and (
+                if ("до гл" in str(col) or (
                         'восстано' in str(col).lower() or 'нормал' in str(col).lower())) or "до забо" in str(col):
                     text = list(filter(lambda x: "до гл" in x or "до забо" in x, col.split('.')))
                     if text:
                         need_depth = self.check_once_isdigit(text[0][text[0].index("до"):])
             if need_depth:
                 break
-
+        '3. Произвести промывку НКТ, ЭК и забоя тех. жидкостью с растворителем - 2 т. до глубины 1283,1 м.'
         if need_depth:
             self.need_depth = need_depth
 
@@ -1484,7 +1484,6 @@ class WellData(FindIndexPZ):
                         if row[col + 3] not in ['-', None, '0', 0, '', 'отсутствует', '(мм), (мм), -(м)', 'отсут'] and \
                                 'отсут' not in str(row[col + 3]).lower():
                             self.column_direction_mine_true = True
-
                             column_direction_mine_data = row[col + 3]
                             column_direction_mine_data = FindIndexPZ.definition_is_none(self,
                                                                                         column_direction_mine_data,
@@ -2064,6 +2063,8 @@ class WellPerforation(FindIndexPZ):
                                                                                    []).append(
                         calculation_fluid_work(self, row[col_vert_index], row[col_pressure_index]))
 
+
+
             # объединение интервалов перфорации если они пересекаются
             for plast, value in self.dict_perforation.items():
                 intervals = value['интервал']
@@ -2076,6 +2077,7 @@ class WellPerforation(FindIndexPZ):
                         merged_segments[-1] = [merged_segments[-1][0], max(sole_int, merged_segments[-1][1])]
 
                 self.dict_perforation[plast]['интервал'] = merged_segments
+
         for plast, data in self.dict_perforation.items():
             try:
                 if data["вертикаль"] and data["давление"][0] != 0 and data['рабочая жидкость']:
@@ -2087,6 +2089,8 @@ class WellPerforation(FindIndexPZ):
             except:
                 self.dict_perforation.setdefault(plast, {}).setdefault('БСУ', 89)
                 print('Ошибка БСУ')
+
+        self.fluid = max([max(data['рабочая жидкость']) for plast, data in self.dict_perforation.items() if data['отключение'] is False])
 
         if self.perforation_correct_window2 is None:
             from perforation_correct import PerforationCorrect

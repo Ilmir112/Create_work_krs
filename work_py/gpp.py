@@ -9,7 +9,7 @@ from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_
 from work_py.grp import GrpWindow
 
 
-class TabPageSoGrp(TabPageUnion):
+class TabPageSoGpp(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -60,7 +60,7 @@ class TabPageSoGrp(TabPageUnion):
 class TabWidget(TabWidgetUnion):
     def __init__(self, parent):
         super().__init__()
-        self.addTab(TabPageSoGrp(parent), 'ГПП')
+        self.addTab(TabPageSoGpp(parent), 'ГПП')
 
 
 class GppWindow(WindowUnion):

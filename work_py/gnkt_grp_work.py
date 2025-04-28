@@ -59,7 +59,7 @@ class TabPageGnkt(TabPageUnion):
 
         self.current_bottom_label = QLabel('необходимый текущий забой')
         self.current_bottom_edit = QLineEdit(self)
-        self.current_bottom_edit.setText(f'{self.data_well.current_bottom}')
+        self.current_bottom_edit.setText(f'{self.data_well.need_depth}')
 
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
         self.fluid_edit = QLineEdit(self)
@@ -934,6 +934,9 @@ class GnktModel(WindowUnion):
         length_paker = 2
         if self.data_well.curator == 'ОР' and self.data_well.region == 'ТГМ':
             length_paker = self.data_well.depth_fond_paker_second_before["before"] - self.data_well.depth_fond_paker_before["before"]
+            if length_paker > 4:
+                QMessageBox.warning(self, 'Длина пакера', 'Длина пакера больше 4м')
+                length_paker = 2.6
 
         schema_well_list = [
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,

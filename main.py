@@ -822,6 +822,32 @@ class MyMainWindow(QMainWindow):
         row_max = table_widget.rowCount()
         # print(f'ДОП {work_plan}')
 
+        if self.__class__.__name__ == 'GppWindow':
+            podp_grp = [[None, 'Представитель подрядчика по ГРП', None, None, None, None, None,
+                         'Представитель OOO НТЦ ЗЭРС', None, None, None,
+                     None],
+                    [None, '_____________', None, None, None, None, None, '_____________', None, None, None, None],
+                    [None, f'"____"_____________________г.', None, None, None, None, None, None,
+                     f'"____"_____________________г.', None, None,
+                     None]]
+            if self.data_well.bvo:
+                podp_grp.extend([
+            [None, 'Районный инженер Башкирского ', None, None, None, None, None, None, None, None, None, None],
+            [None, 'военизированного отряда ', None, None, None, None, None, None, None, None, None, None],
+            [None, '_____________', None, None, None, None, None, None, None, None, None, None],
+            [None, f'"____"_____________________г.', None, None, None, None, None, None,
+             None, None, None,
+             None]])
+            for index_row, row in enumerate(podp_grp):
+                for column, data in enumerate(row):
+                    if not data is None:
+                        item = QtWidgets.QTableWidgetItem(str(data))
+                        item.setFlags(item.flags() | Qt.ItemIsEditable)
+                        table_widget.setItem(9 + index_row, column, item)
+                    else:
+                        table_widget.setItem(9 + index_row, column, QtWidgets.QTableWidgetItem(str('')))
+
+
         for i, row_data in enumerate(work_list):
             if 'prs' in self.data_well.work_plan:
                 row_data.insert(-4, None)

@@ -656,6 +656,7 @@ class TabWidgetUnion(QTabWidget):
 class WindowUnion(MyMainWindow):
     def __init__(self, data_well: FindIndexPZ):
         super().__init__()
+        self.QplastEdit = None
         self.data_well = data_well
         self.tableWidget = None
 
