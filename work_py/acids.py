@@ -97,10 +97,10 @@ class TabPageDp(TabPageUnion):
         if acid_calcul != '':
             acid_calcul = float(acid_calcul)
             if all([char in "0123456789м., " for char in points_sko.replace(' ', '')]):
-                bottom_point = max(list(map(int, points_sko.replace('м', '').replace(',', '').split())))
+                bottom_point = max(list(map(float, points_sko.replace('м', '').replace(',', '').split())))
                 points_sko = len(points_sko.replace('м', '').replace(',', '.').strip().split('.'))
                 self.point_bottom_edit.setText(str(bottom_point))
-                volume = round(acid_calcul * float(points_sko),1)
+                volume = round(acid_calcul * float(points_sko), 1)
                 self.acid_volume_edit.setText(str(volume))
 
 

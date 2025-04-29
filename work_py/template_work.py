@@ -1151,7 +1151,8 @@ class TemplateKrs(WindowUnion):
         self.roof_add_column_plast = self.current_widget.roof_add_column_plast
         self.kot_question_qcombo = self.current_widget.kot_question_qcombo.currentText()
         self.template_depth = self.tab_widget.currentWidget().template_depth
-        if self.data_well.column_additional:
+        if self.data_well.column_additional and \
+                self.data_well.head_column_additional.get_value < self.data_well.current_bottom:
             self.template_depth_addition = self.tab_widget.currentWidget().template_depth_addition
         if self.kot_question_qcombo == 'Нет':
             mes = QMessageBox.question(self, 'КОТ', 'Согласно мероприятий по сокращению продолжительности '
@@ -1298,7 +1299,8 @@ class TemplateKrs(WindowUnion):
 
             if self.template_depth > self.data_well.template_depth:
                 self.data_well.template_depth = self.template_depth
-            if self.data_well.column_additional:
+            if self.data_well.column_additional and \
+                    self.data_well.head_column_additional.get_value < self.data_well.current_bottom:
                 if self.template_depth_addition > self.data_well.template_depth_addition:
                     self.data_well.template_depth_addition = self.template_depth_addition
                     self.data_well.template_length_addition = self.template_length_addition
