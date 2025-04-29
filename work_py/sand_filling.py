@@ -429,6 +429,9 @@ class SandWindow(WindowUnion):
 
         self.calculate_chemistry('песок', sand_volume)
 
+        if "Ойл" in data_list.contractor:
+            filling_list = filling_list[1:]
+
         return filling_list
 
     def sandWashing(self):
