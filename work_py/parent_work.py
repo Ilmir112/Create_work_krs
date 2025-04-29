@@ -162,46 +162,15 @@ class TabPageUnion(QWidget):
         else:
             return 0
 
+    def check_combobox_in_layout(self, layout, combo_name):
+        for i in range(layout.count()):
+            widget_item = layout.itemAt(i).widget()
+            if widget_item and widget_item.objectName() == combo_name:
+                return True
+        return False
+
     def update_sko_true(self, index):
-        if index == 'Нет':
-            self.Qplast_labelType.setParent(None)
-            self.QplastEdit.setParent(None)
-            self.acid_label_type.setParent(None)
-            self.acid_edit.setParent(None)
-
-            self.acid_volume_label.setParent(None)
-            self.acid_volume_edit.setParent(None)
-
-            self.acid_proc_label.setParent(None)
-            self.acid_proc_edit.setParent(None)
-
-            self.acid_oil_proc_label.setParent(None)
-            self.acid_oil_proc_edit.setParent(None)
-
-            self.iron_volume_label.setParent(None)
-            self.iron_volume_edit.setParent(None)
-            self.plast_combo.setParent(None)
-            self.expected_pressure_label.setParent(None)
-            self.expected_pressure_edit.setParent(None)
-            self.expected_pickup_label.setParent(None)
-
-            self.expected_pickup_edit.setParent(None)
-
-            self.pressure_three_label.setParent(None)
-            self.pressure_three_edit.setParent(None)
-
-            self.pressure_Label.setParent(None)
-            self.pressure_edit.setParent(None)
-
-            self.Qplast_after_labelType.setParent(None)
-            self.Qplast_after_edit.setParent(None)
-
-            self.calculate_sko_label.setParent(None)
-            self.calculate_sko_line.setParent(None)
-
-            self.iron_label_type.setParent(None)
-            self.iron_true_combo.setParent(None)
-        else:
+        if self.check_combobox_in_layout(self.grid, "acid_edit") is False:
             self.Qplast_labelType = QLabel("Нужно ли определять приемистость до СКО", self)
             self.QplastEdit = QComboBox(self)
             self.QplastEdit.addItems(['ДА', 'НЕТ'])
@@ -210,6 +179,7 @@ class TabPageUnion(QWidget):
 
             self.acid_label_type = QLabel("Вид кислотной обработки", self)
             self.acid_edit = QComboBox(self)
+            self.acid_edit.setObjectName("acid_edit")
             self.acid_edit.addItems(['HCl', 'HF', 'ВТ', 'Нефтекислотка', 'Противогипсовая обработка'])
             self.acid_edit.setCurrentIndex(0)
 
@@ -315,13 +285,78 @@ class TabPageUnion(QWidget):
             self.Qplast_after_edit.setCurrentIndex(1)
             self.Qplast_after_edit.setCurrentIndex(0)
 
-            if self.data_well:
+        if index == 'Нет':
+            self.Qplast_labelType.setVisible(False)
+            self.QplastEdit.setVisible(False)
+            self.acid_label_type.setVisible(False)
+            self.acid_edit.setVisible(False)
 
-                if self.data_well.curator == 'ОР':
-                    self.Qplast_after_edit.setCurrentIndex(1)
-                else:
-                    self.Qplast_after_edit.setCurrentIndex(0)
-            self.calculate_sko_line.editingFinished.connect(self.update_calculate_sko)
+            self.acid_volume_label.setVisible(False)
+            self.acid_volume_edit.setVisible(False)
+
+            self.acid_proc_label.setVisible(False)
+            self.acid_proc_edit.setVisible(False)
+
+            self.acid_oil_proc_label.setVisible(False)
+            self.acid_oil_proc_edit.setVisible(False)
+
+            self.iron_volume_label.setVisible(False)
+            self.iron_volume_edit.setVisible(False)
+
+
+
+            self.calculate_sko_label.setVisible(False)
+            self.calculate_sko_line.setVisible(False)
+
+            self.iron_label_type.setVisible(False)
+            self.iron_true_combo.setVisible(False)
+        else:
+            self.Qplast_labelType.setVisible(True)
+            self.QplastEdit.setVisible(True)
+            self.acid_label_type.setVisible(True)
+            self.acid_edit.setVisible(True)
+
+            self.acid_volume_label.setVisible(True)
+            self.acid_volume_edit.setVisible(True)
+
+            self.acid_proc_label.setVisible(True)
+            self.acid_proc_edit.setVisible(True)
+
+            self.acid_oil_proc_label.setVisible(True)
+            self.acid_oil_proc_edit.setVisible(True)
+
+            self.iron_volume_label.setVisible(True)
+            self.iron_volume_edit.setVisible(True)
+            self.plast_combo.setVisible(True)
+            self.expected_pressure_label.setVisible(True)
+            self.expected_pressure_edit.setVisible(True)
+            self.expected_pickup_label.setVisible(True)
+
+            self.expected_pickup_edit.setVisible(True)
+
+            self.pressure_three_label.setVisible(True)
+            self.pressure_three_edit.setVisible(True)
+
+            self.pressure_Label.setVisible(True)
+            self.pressure_edit.setVisible(True)
+
+            self.Qplast_after_labelType.setVisible(True)
+            self.Qplast_after_edit.setVisible(True)
+
+            self.calculate_sko_label.setVisible(True)
+            self.calculate_sko_line.setVisible(True)
+
+            self.iron_label_type.setVisible(True)
+            self.iron_true_combo.setVisible(True)
+
+        if self.data_well:
+            if self.data_well.curator == 'ОР':
+                self.Qplast_after_edit.setCurrentIndex(1)
+                self.Qplast_after_edit.setCurrentIndex(0)
+            else:
+                self.Qplast_after_edit.setCurrentIndex(1)
+                self.Qplast_after_edit.setCurrentIndex(0)
+        self.calculate_sko_line.editingFinished.connect(self.update_calculate_sko)
 
     def update_calculate_sko(self):
         plasts = data_list.texts
@@ -355,36 +390,40 @@ class TabPageUnion(QWidget):
 
     def update_q_plast_after(self, index):
         if self.data_well:
-            if index == 'НЕТ':
-                self.expected_pickup_label.setParent(None)
-                self.expected_pickup_edit.setParent(None)
-                self.expected_pressure_label.setParent(None)
-                self.expected_pressure_label.setParent(None)
-                self.expected_pressure_edit.setParent(None)
-                self.pressure_three_label.setParent(None)
-                self.pressure_three_edit.setParent(None)
+            if self.data_well.expected_pickup != 0:
+                self.expected_pickup_edit.setText(f'{self.data_well.expected_pickup}')
 
-            else:
-                try:
-                    self.expected_pickup_edit.setText(f'{self.data_well.expected_pickup}')
-                    # print(f'ожидаемая приемистисть{self.data_well.expected_pickup}')
-                except Exception:
-                    pass
+            if self.data_well.expected_pressure != 0:
+                self.expected_pressure_edit.setText(f'{self.data_well.expected_pressure}')
 
-                try:
-                    self.expected_pressure_edit.setText(f'{self.data_well.expected_pressure}')
-                except Exception:
-                    pass
+            self.expected_pickup_edit.setText(str(self.data_well.expected_pickup))
+            self.expected_pressure_edit.setText(str(self.data_well.expected_pressure))
 
-                self.expected_pickup_edit.setText(str(self.data_well.expected_pickup))
-                self.expected_pressure_edit.setText(str(self.data_well.expected_pressure))
+            self.grid.addWidget(self.expected_pickup_label, 10, 2)
+            self.grid.addWidget(self.expected_pickup_edit, 11, 2)
+            self.grid.addWidget(self.expected_pressure_label, 10, 3)
+            self.grid.addWidget(self.expected_pressure_edit, 11, 3)
+            self.grid.addWidget(self.pressure_three_label, 10, 4)
+            self.grid.addWidget(self.pressure_three_edit, 11, 4)
 
-                self.grid.addWidget(self.expected_pickup_label, 10, 2)
-                self.grid.addWidget(self.expected_pickup_edit, 11, 2)
-                self.grid.addWidget(self.expected_pressure_label, 10, 3)
-                self.grid.addWidget(self.expected_pressure_edit, 11, 3)
-                self.grid.addWidget(self.pressure_three_label, 10, 4)
-                self.grid.addWidget(self.pressure_three_edit, 11, 4)
+        if index == 'НЕТ':
+            self.expected_pickup_label.setVisible(False)
+            self.expected_pickup_edit.setVisible(False)
+            self.expected_pressure_label.setVisible(False)
+            self.expected_pressure_label.setVisible(False)
+            self.expected_pressure_edit.setVisible(False)
+            self.pressure_three_label.setVisible(False)
+            self.pressure_three_edit.setVisible(False)
+
+        else:
+            self.expected_pickup_label.setVisible(True)
+            self.expected_pickup_edit.setVisible(True)
+            self.expected_pressure_label.setVisible(True)
+            self.expected_pressure_label.setVisible(True)
+            self.expected_pressure_edit.setVisible(True)
+            self.pressure_three_label.setVisible(True)
+            self.pressure_three_edit.setVisible(True)
+
 
     def pressure_mode(self, mode, plast):
         if self.data_well:

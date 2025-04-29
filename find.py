@@ -240,8 +240,7 @@ class FindIndexPZ(MyMainWindow):
         else:
             self.read_pz_prs()
 
-        if self.end_index:
-            self.read_work_data()
+
 
     def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
         boundaries_dict = {}
@@ -701,11 +700,14 @@ class FindIndexPZ(MyMainWindow):
                     text = list(filter(lambda x: "до гл" in x or "до забо" in x, col.split('.')))
                     if text:
                         need_depth = self.check_once_isdigit(text[0][text[0].index("до"):])
-            if need_depth:
+
+            if need_depth or row_ind > 6:
                 break
-        '3. Произвести промывку НКТ, ЭК и забоя тех. жидкостью с растворителем - 2 т. до глубины 1283,1 м.'
-        if need_depth:
+
+        if need_depth and need_depth > self.current_bottom:
             self.need_depth = need_depth
+        if self.current_bottom > self.perforation_sole:
+            self.need_depth = self.bottom_hole_artificial.get_value
 
     def check_str_none(self, string):
 
@@ -1727,7 +1729,7 @@ class WellData(FindIndexPZ):
                 self.konte_true = True
 
             if '0' != str(self.dict_pump_ecn['before']):
-                if abs(sum(list((self.dict_nkt_before.values()))) - self.dict_pump_ecn_depth['before']) > 10 and \
+                if sum(list((self.dict_nkt_before.values()))) - self.dict_pump_ecn_depth['before'] < 10 and \
                         '48' not in list(self.dict_nkt_before.keys()):
                     QMessageBox.warning(self, 'Ошибка',
                                         f'Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
@@ -1738,7 +1740,7 @@ class WellData(FindIndexPZ):
                         f'до ремонта меньше глубины насоса'
                         f'{self.dict_pump_ecn_depth["before"]}м')
             if '0' != str(self.dict_pump_ecn['after']):
-                if abs(sum(list((self.dict_nkt_after.values()))) - self.dict_pump_ecn_depth['after']) > 10 and \
+                if sum(list((self.dict_nkt_after.values()))) - self.dict_pump_ecn_depth['after'] < 10 and \
                         '48' not in list(self.dict_nkt_before.keys()):
                     QMessageBox.warning(self, 'Ошибка',
                                         f'Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
@@ -2114,6 +2116,9 @@ class WellPerforation(FindIndexPZ):
 class WellCategory(FindIndexPZ):
 
     def read_well(self, begin_index, cancel_index):
+
+        if self.end_index:
+            self.read_work_data()
 
         if data_list.data_in_base is False:
             try:

@@ -691,12 +691,12 @@ class AcidPakerWindow(WindowUnion):
                 read_sko = self.read_sko_need(self.current_widget)
                 if read_sko is False:
                     return
-            if self.Qplast_after_edit == "Да":
-                self.expected_pickup = self.current_widget.expected_pickup_edit.text()
-                self.expected_pressure = self.current_widget.expected_pressure_edit.text().strip()
-                if self.expected_pressure not in [None, 'None', '', '-', 'атм']:
-                    self.expected_pressure = int(float(self.expected_pressure.replace(',', '.')))
-                self.pressure_three = self.current_widget.pressure_three_edit.text()
+                if self.Qplast_after_edit == "Да":
+                    self.expected_pickup = self.current_widget.expected_pickup_edit.text()
+                    self.expected_pressure = self.current_widget.expected_pressure_edit.text().strip()
+                    if self.expected_pressure not in [None, 'None', '', '-', 'атм']:
+                        self.expected_pressure = int(float(self.expected_pressure.replace(',', '.')))
+                    self.pressure_three = self.current_widget.pressure_three_edit.text()
 
             self.pressure_zumph_combo = self.current_widget.pressure_zumpf_question_combo.currentText()
 
