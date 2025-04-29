@@ -249,12 +249,6 @@ class CreatePZ(MyMainWindow):
                 work_podpisant_list[7] = [None, f'"____"_____________________{current_datetime.year}г.', None,
                                           None, '', None, None, None, None, None, None, None]
 
-        podp_grp = [[None, 'Представитель подрядчика по ГРП', None, None, None, None, None, None, None, None, None,
-                     None],
-                    [None, '_____________', None, None, None, None, None, None, None, None, None, None],
-                    [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None, None,
-                     None, None, None,
-                     None]]
         podp_bvo = [
             [None, 'Районный инженер Башкирского ', None, None, None, None, None, None, None, None, None, None],
             [None, 'военизированного отряда ', None, None, None, None, None, None, None, None, None, None],
@@ -299,10 +293,7 @@ class CreatePZ(MyMainWindow):
                     for col in range(len(podp_bvo[row])):
                         work_podpisant_list[row + 9][col] = podp_bvo[row][col]
 
-            if self.data_well.grp_plan is True and 'gnkt' not in self.data_well.work_plan:
-                for row in range(len(podp_grp)):
-                    for col in range(len(podp_grp[row])):
-                        work_podpisant_list[row + 13][col] = podp_grp[row][col]
+
 
         return work_podpisant_list
 

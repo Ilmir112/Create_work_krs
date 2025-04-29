@@ -822,14 +822,22 @@ class MyMainWindow(QMainWindow):
         row_max = table_widget.rowCount()
         # print(f'ДОП {work_plan}')
 
-        if self.__class__.__name__ == 'GppWindow':
-            podp_grp = [[None, 'Представитель подрядчика по ГРП', None, None, None, None, None,
-                         'Представитель OOO НТЦ ЗЭРС', None, None, None,
-                     None],
-                    [None, '_____________', None, None, None, None, None, '_____________', None, None, None, None],
-                    [None, f'"____"_____________________г.', None, None, None, None, None, None,
-                     f'"____"_____________________г.', None, None,
-                     None]]
+        if self.__class__.__name__ in ['GppWindow', 'GrpWindow']:
+            if self.__class__.__name__ in ['GppWindow']:
+                podp_grp = [[None, 'Представитель подрядчика по ГРП', None, None, None, None, None,
+                             'Представитель OOO НТЦ ЗЭРС', None, None, None,
+                         None],
+                        [None, '_____________', None, None, None, None, None, '_____________', None, None, None, None],
+                        [None, f'"____"_____________________г.', None, None, None, None, None, None,
+                         f'"____"_____________________г.', None, None,
+                         None]]
+            else:
+                podp_grp = [[None, 'Представитель подрядчика по ГРП', None, None, None, None, None,
+                             None, None, None, None,  None],
+                            [None, '_____________', None, None, None, None, None, None, None, None, None,
+                             None],
+                            [None, f'"____"_____________________г.', None, None, None, None, None, None,
+                             None, None, None, None]]
             if self.data_well.bvo:
                 podp_grp.extend([
             [None, 'Районный инженер Башкирского ', None, None, None, None, None, None, None, None, None, None],
@@ -2910,8 +2918,12 @@ class SaveInExcel(MyWindow):
                 boundaries_dict_index = i + 1
 
             if 'код площади' in work_list[i - 1] or 'код площади :' in work_list[i - 1]:
+
+
                 for j in range(1, 13):
+
                     cell = ws2.cell(row=i, column=j)
+
                     # cell.number_format = 'General'
                     cell.value = str(work_list[i - 1][j - 1])
                     if 'инв. №' in str(work_list[i - 1][j - 1]).lower():
@@ -2931,6 +2943,10 @@ class SaveInExcel(MyWindow):
 
             for j in range(1, len(work_list[i - 1]) + 1):
                 cell = ws2.cell(row=i, column=j)
+
+                if i < 15:
+                    cell.font = Font(name=font_type, size=size_font, bold=True)
+
                 if 'Наименование работ' in work_list[i - 1][2]:
                     work_list[i - 1][1] = 'п/п'
                 if cell and str(cell) != str(work_list[i - 1][j - 1]):
