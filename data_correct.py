@@ -855,7 +855,13 @@ class DataWindow(WindowUnion):
                 QMessageBox.warning(self, 'Ошибка', 'Ошибка в пробуренном забое')
                 return
             bottomhole_artificial = self.current_widget.bottomhole_artificial_edit_type.text().replace(',', '.')
+            if bottomhole_artificial == 'отсут':
+                QMessageBox.warning(self, 'Ошибка', 'Ошибка в исскуственном забое')
+                return
             current_bottom = self.current_widget.current_bottom_edit_type.text().replace(',', '.')
+            if current_bottom == 'отсут':
+                QMessageBox.warning(self, 'Ошибка', 'Ошибка в исскуственном забое')
+                return
             max_angle_depth = self.current_widget.max_angle_depth_edit_type.text().replace(',', '.')
             max_angle = self.current_widget.max_angle_edit_type.text().replace(',', '.')
             max_expected_pressure = self.current_widget.max_expected_pressure_edit_type.text().replace(',', '.')

@@ -126,7 +126,7 @@ class CreatePZ(MyMainWindow):
 
             ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=7)
             ws.merge_cells(start_row=i, start_column=8, end_row=i, end_column=12)
-            if len(str(razdel[i][1])) > 50:
+            if len(str(razdel[i][1])) > 50 or len(str(razdel[i][7])):
                 ws.row_dimensions[i+1].height = 33
             else:
                 ws.row_dimensions[i+1].height = 20
@@ -179,6 +179,7 @@ class CreatePZ(MyMainWindow):
                             ws.row_dimensions[row_index + max_row + 1].height = int(key) * 1.1
 
         elif 'РН' in data_list.contractor:
+            self.data_well.insert_index = max_row + 1
             # Устанавливаем красный цвет для текста
             red_font = Font(name='Arial Cyr', size=13, color='FF0000', bold=True)
             for i in range(self.data_well.insert_index,
@@ -186,6 +187,7 @@ class CreatePZ(MyMainWindow):
                 for col in range(12):
                     data = ws.cell(row=i, column=col + 1)
                     data.border = thin_border
+
                     data.value = dict_events_gnvp[self.data_well.work_plan][i - self.data_well.insert_index][col]
 
                     data_2 = ws.cell(row=i, column=3).value

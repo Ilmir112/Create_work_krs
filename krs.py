@@ -352,12 +352,19 @@ class GnoParent(ABC):
                                                           f"(объем колонны от пакера до устья уд.весом"
                                                           f" {self.data_well.fluid_work}. Техостой 2ч."])
 
-        if self.data_well.work_plan == 'krs':
+        if self.data_well.work_plan == 'krs' or self.data_well.curator == 'ВНС':
             if any([str(cater) == '1' for cater in self.data_well.category_pressure_list]):
                 self.data_well.category_pvo = 1
                 self.data_well.category_pvo, _ = QInputDialog.getInt(
                     None, 'Категория скважины', f'Категория скважины № {self.data_well.category_pvo}, корректно?',
                     self.data_well.category_pvo, 1, 2)
+        self.text_pvo = f'{self.data_well.max_admissible_pressure.get_value}атм  на ' \
+                        f'максимально ожидаемое давление с ' \
+                        f'выдержкой в течении 30 минут'
+        if self.data_well.curator == 'ВНС':
+            self.text_pvo = f'{self.data_well.max_admissible_pressure.get_value * 1.1:.1f}атм  на ' \
+                        f'максимально ожидаемое давление с ' \
+                        f'выдержкой в течении 30 минут (+10% на скважинах освоения)'
 
     def lifting_unit(self):
         aprs_40 = 'Установить подъёмный агрегат на устье не менее 40т.\n' \
@@ -410,10 +417,7 @@ class GnoParent(ABC):
             [None, None,
              f'Опрессовать глухие плашки превентора (после подъема инструмента, согласно ТИ № И2-05.01 '
              f'И-01447 ЮЛ-111.13 версия 1.00  п. 5.34) на  '
-             f'{self.data_well.max_admissible_pressure.get_value}атм на '
-             f'максимально допустимое давление опрессовки эксплуатационной колонны с'
-             f' выдержкой в течении 30 '
-             f'минут,в случае невозможности '
+             f'{self.text_pvo},в случае невозможности '
              f'опрессовки по результатам определения приемистости и по согласованию с '
              f'заказчиком  опрессовать '
              f'глухие плашки ПВО на давление поглощения, (согласно ТИ № П2-05.01 ТИ-0001 версия 3.00 п. '
@@ -812,7 +816,7 @@ class LiftPaker(GnoParent):
              f'Произвести определение приемистости скважины', None,
              f'При наличии Избыточного давления не позволяющее сорвать пакера:\n '
              f'Произвести определение приемистости скважины при давлении не более '
-             f'{self.data_well.max_admissible_pressure.get_value}атм. '
+             f'{self.text_pvo}'
              f'{self.well_jamming_str_in_nkt}',
              None, None, None, None, None, None, None,
              'Мастер КРС, Представ заказчика', 1.2],
@@ -931,7 +935,7 @@ class LiftOrz(GnoParent):
                  f'пространства в объеме {round(1.3 * self.data_well.dict_nkt_before["48"] / 1000, 1)}м3 '
                  f'жидкостью уд.веса '
                  f'{self.data_well.fluid_work}на давление поглощения до'
-                 f' {self.data_well.max_admissible_pressure.get_value}атм. '
+                 f' {self.text_pvo}'
                  f'Произвести глушение скважины в '
                  f'НКТ89мм тех.жидкостью на поглощение в объеме обеспечивающим заполнение '
                  f'межтрубного и подпакерного пространства '
@@ -1081,7 +1085,7 @@ class LiftOrd(GnoParent):
              f' Обвязать устье скважины согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
-             f'{self.data_well.max_admissible_pressure.get_value}атм. '
+             f'{self.text_pvo} '
              f'{self.sucker_pod_jamming}'
              f'Поднять на штангах насос с гл. {self.data_well.dict_pump_shgn_depth["before"]}м с доливом тех жидкости '
              f'уд.весом {self.data_well.fluid_work} '
@@ -1328,7 +1332,7 @@ class LiftPumpNnWithPaker(GnoParent):
              f'схемы №3 утвержденной главным '
              f'инженером {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
-             f'{self.data_well.max_admissible_pressure.get_value}атм. Спуском одной штанги заловить конус. '
+             f'{self.text_pvo} Спуском одной штанги заловить конус. '
              f'{sucker_jamming}м3. Техостой 2ч. '
              f'Поднять на штангах плунжер с гл. {int(self.data_well.dict_pump_shgn_depth["before"])}м с доливом тех '
              f'жидкости уд.весом {self.data_well.fluid_work} '
@@ -1469,7 +1473,7 @@ class LiftPumpNvWithPaker(GnoParent):
              f'согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). '
-             f'Опрессовать ПВО на {self.data_well.max_admissible_pressure.get_value}атм. '
+             f'Опрессовать ПВО на {self.text_pvo} '
              f'{"".join([" " if self.without_damping_true is True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_nkt(self)}м3. Техостой 2ч."])}'
              f' Поднять на штангах насос с гл. {float(self.data_well.dict_pump_shgn_depth["before"])}м с '
              f'доливом тех жидкости уд.весом {self.data_well.fluid_work} '
@@ -1847,7 +1851,7 @@ class LiftPumpNv(GnoParent):
              f'согласно схемы №3 утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
-             f'{self.data_well.max_admissible_pressure.get_value}атм. Поднять на штангах насос '
+             f'{self.text_pvo} Поднять на штангах насос '
              f'с гл. {int(self.data_well.dict_pump_shgn_depth["before"])}м с доливом тех жидкости уд.весом '
              f'{self.data_well.fluid_work} '
              f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  насосов (не более 8 тн), '
@@ -1976,7 +1980,7 @@ class LiftPumpNn(GnoParent):
              f'утвержденной главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
-             f'{self.data_well.max_admissible_pressure.get_value}атм. Заловить конус спуском одной '
+             f'{self.text_pvo} Заловить конус спуском одной '
              f'штанги. Поднять на штангах плунжер с гл. '
              f'{float(self.data_well.dict_pump_shgn_depth["before"])}м с доливом тех '
              f'жидкости уд.весом {self.data_well.fluid_work} '

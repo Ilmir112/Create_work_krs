@@ -900,9 +900,9 @@ class GnktModel(WindowUnion):
 
         nkt = list(self.data_well.dict_nkt_before.keys())
         voronka = sum(list(self.data_well.dict_nkt_before.values()))
-        if self.data_well.curator == 'ОР' and self.data_well.region == 'ТГМ':
-            length_paker = round(
-                float(self.data_well.depth_fond_paker_second_before["before"]) - float(
+        if self.data_well.curator == 'ОР' and self.data_well.region == 'ТГМ' and \
+                self.data_well.depth_fond_paker_second_before["before"] != 0:
+            length_paker = round(float(self.data_well.depth_fond_paker_second_before["before"]) - float(
                     self.data_well.depth_fond_paker_before["before"]), 1)
             voronka = round(nkt_length + length_paker, 1)
         voronka_str = ''
@@ -931,8 +931,9 @@ class GnktModel(WindowUnion):
                 f'{self.data_well.dict_perforation[plast_ind]["подошва"]}',
                 None,
                 None, None, None, f'Тек. забой: \n{self.data_well.current_bottom}м ', None]
-        length_paker = 2
-        if self.data_well.curator == 'ОР' and self.data_well.region == 'ТГМ':
+        length_paker = 2.6
+        if self.data_well.curator == 'ОР' and self.data_well.region == 'ТГМ' and \
+                self.data_well.depth_fond_paker_second_before["before"] != 0:
             length_paker = self.data_well.depth_fond_paker_second_before["before"] - self.data_well.depth_fond_paker_before["before"]
             if length_paker > 4:
                 QMessageBox.warning(self, 'Длина пакера', 'Длина пакера больше 4м')
