@@ -22,6 +22,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction,
     QLineEdit, QFileDialog, QToolBar, QPushButton, QMessageBox, QInputDialog, QTabWidget, QTableWidgetItem, \
     QSplashScreen, QDialog, QVBoxLayout
 from PyQt5 import QtCore, QtWidgets
+from block_name import curator_sel, pop_down, current_datetime
 
 from datetime import datetime
 from decrypt import decrypt
@@ -125,6 +126,277 @@ class MyMainWindow(QMainWindow):
         self.perforation_correct_window2 = None
         self.work_plan = None
         self.gnkt_data = None
+
+
+    def work_podpisant_list(self, region, contractor):
+        with open(f'{data_list.path_image}podpisant.json', 'r', encoding='utf-8') as file:
+            podpis_dict = json.load(file)
+        work_podpisant_list = ''
+        power_of_attorney = None
+        expedition = ''
+        if 'Ойл' in contractor:
+            сhief_engineer_post = podpis_dict[data_list.contractor]["Руководство"]["сhief_engineer"]["post"]
+            сhief_engineer_surname = podpis_dict[data_list.contractor]["Руководство"]["сhief_engineer"]["surname"]
+            chief_geologist_post = podpis_dict[data_list.contractor]["Руководство"]["chief_geologist"]["post"]
+            chief_geologist_surname = podpis_dict[data_list.contractor]["Руководство"]["chief_geologist"]["surname"]
+        elif 'РН' in contractor:
+            number_expedition = [number for number in data_list.user[0] if number.isdigit()][0]
+            if self.data_well.region == 'ТГМ':
+                expedition = f'Экспедиция № 3'
+            elif self.data_well.region == 'ЧГМ':
+                expedition = f'Экспедиция № 2'
+            elif self.data_well.region == 'АГМ':
+                expedition = f'Экспедиция № 5'
+            elif self.data_well.region == 'ИГМ':
+                expedition = f'Экспедиция № 1'
+            elif self.data_well.region == 'КГМ':
+                expedition = f'Экспедиция № 4'
+
+            сhief_engineer_post = podpis_dict[data_list.contractor]['Экспедиция'][expedition]["сhief_engineer"][
+                "post"]
+            сhief_engineer_surname = podpis_dict[data_list.contractor]['Экспедиция'][expedition]["сhief_engineer"][
+                "surname"]
+            power_of_attorney = podpis_dict[data_list.contractor]['Экспедиция'][expedition]["сhief_engineer"][
+                "power_of_attorney"]
+            chief_geologist_post = podpis_dict[data_list.contractor]['Экспедиция'][expedition]["chief_geologist"][
+                "post"]
+            chief_geologist_surname = \
+                podpis_dict[data_list.contractor]['Экспедиция'][expedition]["chief_geologist"]["surname"]
+
+            work_podpisant_list = [
+                [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
+                [None, podpis_dict[data_list.costumer][region]['gi']['post'], None, None, None, None, None,
+                 сhief_engineer_post, None, None, None, None],
+                [None, f'____________{podpis_dict[data_list.costumer][region]["gi"]["surname"]}', None, None, None,
+                 None, None,
+                 f'_____________{сhief_engineer_surname}', None, None, None,
+                 None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
+                 f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
+                [None, None, None, None, None, None, None, power_of_attorney, None, None, None, None],
+                [None, podpis_dict[data_list.costumer][region]['gg']['post'], None, None, None,
+                 None, None, f'{chief_geologist_post}', None, None, None, None],
+                [None, f'_____________{podpis_dict[data_list.costumer][region]["gg"]["surname"]}', None, None, None,
+                 None,
+                 None,
+                 f'_____________{chief_geologist_surname}', None, None, '',
+                 None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, '', None, None,
+                 f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None, None, None, None, None]]
+
+            if '3' in expedition or "2" in expedition:
+                work_podpisant_list[5] = [None, podpis_dict[data_list.costumer][region]['gg']['post'], None, None, None,
+                                          None, None, None, None, None, None, None]
+                work_podpisant_list[6] = [None,
+                                          f'_____________{podpis_dict[data_list.costumer][region]["gg"]["surname"]}',
+                                          None, None, None, None, None, None, None, None, '', None]
+                work_podpisant_list[7] = [None, f'"____"_____________________{current_datetime.year}г.', None,
+                                          None, '', None, None, None, None, None, None, None]
+
+        if 'prs' in self.data_well.work_plan:
+            if 'Ойл' in contractor:
+                if region == 'ЧГМ' or region == 'ТГМ' or 'gnkt' in self.data_well.work_plan:
+                    data_list.ctkrs = "ЦТКРС №1"
+                elif region == 'КГМ' or region == 'АГМ':
+                    data_list.ctkrs = "ЦТКРС №2"
+                elif region == 'ИГМ':
+                    data_list.ctkrs = 'ЦТКРС №4'
+
+            nach_cdng_post = \
+                podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value][
+                    'Начальник'][
+                    'post'] + ' ' + self.data_well.cdng.get_value
+            nach_cdng_name = \
+                podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value][
+                    'Начальник'][
+                    "surname"]
+            nach_cdng_name = nach_cdng_name.split(' ')
+            nach_cdng_name = f'{nach_cdng_name[0]} {nach_cdng_name[1][0]}.{nach_cdng_name[1][0]}.'
+            technol_cdng_post = \
+                podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value][
+                    'Ведущий инженер-технолог']['post'] + ' ' + self.data_well.cdng.get_value
+            technol_cdng_name = \
+                podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value][
+                    'Ведущий инженер-технолог']["surname"]
+            technol_cdng_name = technol_cdng_name.split(' ')
+            technol_cdng_name = f'{technol_cdng_name[0]} {technol_cdng_name[1][0]}.{technol_cdng_name[1][0]}.'
+            geolog_cdng_post = \
+                podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value][
+                    'Ведущий геолог']['post'] + ' ' + self.data_well.cdng.get_value
+            geolog_cdng_name = \
+                podpis_dict[data_list.costumer][self.data_well.region]["ЦДНГ"][self.data_well.cdng.get_value][
+                    'Ведущий геолог']["surname"]
+            geolog_cdng_name = geolog_cdng_name.split(' ')
+            geolog_cdng_name = f'{geolog_cdng_name[0]} {geolog_cdng_name[1][0]}.{geolog_cdng_name[1][0]}.'
+            nach_ctkrs_post = podpis_dict[data_list.contractor]["Экспедиция"][data_list.ctkrs]["сhief_engineer"]['post']
+            nach_ctkrs_name = podpis_dict[data_list.contractor]["Экспедиция"][data_list.ctkrs]["сhief_engineer"][
+                "surname"]
+
+            work_podpisant_list = [
+                [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
+                [None, nach_cdng_post, None, None, None, None, None, nach_ctkrs_post, None, None, None, None],
+                [None, f'____________{nach_cdng_name}',
+                 None, None, None, None, None,
+                 f'_____________{nach_ctkrs_name}', None, None, None, None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
+                 f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
+                [None, None, None, None, " ", None, None, None, None, None, None, None],
+                [None,
+                 technol_cdng_post,
+                 None, None, None, None, None, None, None, None, None, None],
+                [None,
+                 f'____________{technol_cdng_name}',
+                 None, None, None, None, None, None, None, None, None, None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
+                 None, None, None, None, None],
+                [None,
+                 geolog_cdng_post,
+                 None, None, None, None, None, None, None, None, None, None],
+                [None,
+                 f'____________{geolog_cdng_name}',
+                 None, None, None, None, None, None, None, None, None, None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
+                 None, None, None, None, None]]
+
+        elif 'krs' in self.data_well.work_plan and self.data_well.curator == 'ВНС':
+            work_podpisant_list = [
+                [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
+                [None, "Первый заместитель генерального директора -\n главный инженер ООО 'Башнефть-Добыча'  ",
+                 None, None, None, None, None,
+                 сhief_engineer_post, None, None, None, None],
+                [None, f'_________________________Д.А.Чувакин', None, None, None,
+                 None, None,
+                 f'_____________{сhief_engineer_surname}', None, None, None,
+                 None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
+                 f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
+                [None, None, None, None, " ", None, None, None, None, None, None, None],
+                [None, 'Заместитель генерального директора - \nглавный геолог  ООО "Башнефть-Добыча"  ', None, None,
+                 None,
+                 None, None, f'{chief_geologist_post}', None, None, None, None],
+                [None, f'__________________________И.Р. Баширов ', None, None, None, None, None,
+                 f'_____________{chief_geologist_surname}', None, None, '',
+                 None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, '', None, None,
+                 f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
+                [None, None, None, None, " ", None, None, None, None, None, None, None],
+                [None, 'Начальник управления добычи нефти и газа ООО "Башнефть-Добыча" ', None, None, None,
+                 None, None, None, None,
+                 None, None, None],
+                [None, f'__________________________М.А.Тенюнин', None, None, None,
+                 None, None, None, None, None, None, None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, '', None, None,
+                 None, None, None, None, None],
+                [None, None, None, None, " ", None, None, None, None, None, None, None],
+                [None, 'Начальник отдела-заместитель начальника Управления супервайзинга \nремонта скважин и '
+                       'скважинных технологий ООО "Башнефть-Добыча"', None, None, None, None, None, None, None,
+                 None, None, None],
+                [None, f'__________________________А.Ю.Пензин', None, None, None,
+                 None, None, None, None, None, None, None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, '', None, None,
+                 None, None, None, None, None],
+                [None, None, None, None, " ", None, None, None, None, None, None, None],
+                [None, podpis_dict[data_list.costumer][region]['gi']['post'], None, None, None, None, None,
+                 None, None, None, None, None],
+                [None, f'____________{podpis_dict[data_list.costumer][region]["gi"]["surname"]}', None, None, None,
+                 None, None, None, None, None, None, None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
+                 None, None, None, None, None],
+                [None, None, None, None, None, None, None, power_of_attorney, None, None, None, None],
+                [None, podpis_dict[data_list.costumer][region]['gg']['post'], None, None, None,
+                 None, None, None, None, None, None, None],
+                [None, f'_____________{podpis_dict[data_list.costumer][region]["gg"]["surname"]}', None, None, None,
+                 None, None, None, None, None, None, None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, '', None, None,
+                 None, None, None, None, None],
+            ]
+
+        else:
+            work_podpisant_list = [
+                [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
+                [None, podpis_dict[data_list.costumer][region]['gi']['post'], None, None, None, None, None,
+                 сhief_engineer_post, None, None, None, None],
+                [None, f'____________{podpis_dict[data_list.costumer][region]["gi"]["surname"]}', None, None, None,
+                 None, None,
+                 f'__________________________{сhief_engineer_surname}', None, None, None,
+                 None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
+                 f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
+                [None, None, None, None, None, None, None, power_of_attorney, None, None, None, None],
+                [None, podpis_dict[data_list.costumer][region]['gg']['post'], None, None, None,
+                 None, None, f'{chief_geologist_post}', None, None, None, None],
+                [None, f'_____________{podpis_dict[data_list.costumer][region]["gg"]["surname"]}', None, None, None,
+                 None,
+                 None,
+                 f'__________________________{chief_geologist_surname}', None, None, '',
+                 None],
+                [None, f'"____"_____________________{current_datetime.year}г.', None, None, '', None, None,
+                 f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
+            ]
+
+        podp_bvo = [
+            [None, None, None, None, " ", None, None, None, None, None, None, None],
+            [None, 'Районный инженер Башкирского ', None, None, None, None, None, None, None, None, None, None],
+            [None, 'военизированного отряда ', None, None, None, None, None, None, None, None, None, None],
+            [None, '__________________________', None, None, None, None, None, None, None, None, None, None],
+            [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None, None,
+             None, None, None,
+             None],
+            [None, None, None, None, " ", None, None, None, None, None, None, None]]
+
+        if data_list.data_in_base is False:
+            if len(self.data_well.plast_work) != 0:
+
+                try:
+                    cat_P_1 = self.data_well.dict_category[self.data_well.plast_work[0]]['по давлению'].category
+                    category_h2s_list = self.data_well.dict_category[self.data_well.plast_work[0]][
+                        'по сероводороду'].category
+                    cat_gaz = self.data_well.dict_category[self.data_well.plast_work[0]]['по газовому фактору'].category
+                except:
+                    cat_P_1 = self.data_well.category_pressure_well[0]
+                    category_h2s_list = self.data_well.category_h2s_list[0]
+                    cat_gaz = self.data_well.category_gaz_factor_percent[0]
+            else:
+                cat_P_1 = self.data_well.category_pressure_well[0]
+                category_h2s_list = self.data_well.category_h2s_list[0]
+                cat_gaz = self.data_well.category_gaz_factor_percent[0]
+            try:
+                cat_P_1_plan = self.data_well.dict_category[self.data_well.plast_project[0]]['по давлению'].category
+                category_h2s_list_plan = self.data_well.dict_category[self.data_well.plast_project[0]][
+                    'по сероводороду'].category
+                cat_gaz_plan = self.data_well.dict_category[self.data_well.plast_project[0]][
+                    'по газовому фактору'].category
+            except:
+                cat_P_1_plan = 3
+                category_h2s_list_plan = 3
+                cat_gaz_plan = 3
+
+            if 1 in [cat_P_1, cat_P_1_plan, category_h2s_list, cat_gaz, category_h2s_list_plan, cat_gaz_plan,
+                     self.data_well.category_pressure] or '1' in [cat_P_1, cat_P_1_plan, category_h2s_list, cat_gaz,
+                                                                  category_h2s_list_plan, cat_gaz_plan,
+                                                                  self.data_well.category_pressure] or \
+                    self.data_well.curator == 'ВНС':
+                work_podpisant_list.extend(podp_bvo)
+
+        work_podpisant_list.extend([
+            [None, None, None, None, " ", None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, None, None, None]])
+
+        return work_podpisant_list
 
     @staticmethod
     def close_process():
@@ -531,8 +803,11 @@ class MyMainWindow(QMainWindow):
                     QMessageBox.warning(self, 'Ошибка', f'Ошибка при прочтении файла {f}')
                     return
 
+                self.wb2_prs = Workbook()
+                self.ws2_prs = self.wb2_prs.active
+
                 if self.work_plan in ['krs', 'dop_plan']:
-                    self.ws = read_pz.open_excel_file(self.ws, self.work_plan)
+                    self.ws = read_pz.open_excel_file(self.ws, self.work_plan, self.ws2_prs)
                     self.copy_pz(self.ws, self.table_widget, self.work_plan)
                     if self.work_plan == 'dop_plan':
                         self.rir_window = DopPlanWindow(self.data_well, self.table_widget)
@@ -549,8 +824,6 @@ class MyMainWindow(QMainWindow):
                     self.gnkt_data = WorkWithGnkt(self.ws, self.table_title, self.table_schema, self.table_widget,
                                                   self.data_well)
                 elif self.work_plan in ['prs']:
-                    self.wb2_prs = Workbook()
-                    self.ws2_prs = self.wb2_prs.active
 
                     self.ws = read_pz.open_excel_file(self.ws, self.work_plan, self.ws2_prs)
                     self.copy_pz(self.ws, self.table_widget, self.work_plan, 15)
@@ -824,36 +1097,45 @@ class MyMainWindow(QMainWindow):
 
         if self.__class__.__name__ in ['GppWindow', 'GrpWindow']:
             if self.__class__.__name__ in ['GppWindow']:
-                podp_grp = [[None, 'Представитель подрядчика по ГРП', None, None, None, None, None,
+                podp_grp = [[None, " ", None, None, None, None, None,
                              'Представитель OOO НТЦ ЗЭРС', None, None, None,
                          None],
                         [None, '_____________', None, None, None, None, None, '_____________', None, None, None, None],
                         [None, f'"____"_____________________г.', None, None, None, None, None, None,
                          f'"____"_____________________г.', None, None,
-                         None]]
+                         None],
+                            [None, " ", None, None, None, None, None,
+                             None, None, None, None, None]
+                            ]
             else:
-                podp_grp = [[None, 'Представитель подрядчика по ГРП', None, None, None, None, None,
+                podp_grp = [[None, " ", None, None, None, None, None,
+                             None, None, None, None,  None],
+                    [None, 'Представитель подрядчика по ГРП', None, None, None, None, None,
                              None, None, None, None,  None],
                             [None, '_____________', None, None, None, None, None, None, None, None, None,
                              None],
                             [None, f'"____"_____________________г.', None, None, None, None, None, None,
-                             None, None, None, None]]
-            if self.data_well.bvo:
-                podp_grp.extend([
-            [None, 'Районный инженер Башкирского ', None, None, None, None, None, None, None, None, None, None],
-            [None, 'военизированного отряда ', None, None, None, None, None, None, None, None, None, None],
-            [None, '_____________', None, None, None, None, None, None, None, None, None, None],
-            [None, f'"____"_____________________г.', None, None, None, None, None, None,
-             None, None, None,
-             None]])
+                             None, None, None, None],
+                             [None, " ", None, None, None, None, None,
+                             None, None, None, None,  None]]
+
+            for row in range(self.table_widget.rowCount()):
+                for column in range(self.table_widget.columnCount()):
+                    value = self.table_widget.item(row, column)
+                    if value is not None:
+                        value = value.text()
+                        if 'Категория скважины' in str(value):
+                            self.data_well.cat_well_min = data_list.ProtectedIsDigit(row)
+                            print(f'катео {self.data_well.cat_well_min.get_value}')
+
             for index_row, row in enumerate(podp_grp):
                 for column, data in enumerate(row):
                     if not data is None:
                         item = QtWidgets.QTableWidgetItem(str(data))
                         item.setFlags(item.flags() | Qt.ItemIsEditable)
-                        table_widget.setItem(9 + index_row, column, item)
+                        table_widget.setItem(self.data_well.cat_well_min.get_value - len(podp_grp) + index_row, column, item)
                     else:
-                        table_widget.setItem(9 + index_row, column, QtWidgets.QTableWidgetItem(str('')))
+                        table_widget.setItem(self.data_well.cat_well_min.get_value - len(podp_grp), column, QtWidgets.QTableWidgetItem(str('')))
 
 
         for i, row_data in enumerate(work_list):

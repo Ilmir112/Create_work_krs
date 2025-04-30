@@ -231,8 +231,8 @@ class FindIndexPZ(MyMainWindow):
         self.cat_well_min = ProtectedIsDigit(0)
         self.cat_well_max = ProtectedIsDigit(0)
         self.data_well_min = ProtectedIsDigit(0)
-        self.data_x_min = ProtectedIsDigit(0)
-        self.data_fond_min = ProtectedIsDigit(0)
+
+
         self.data_pvr_min = ProtectedIsDigit(0)
 
         if self.work_plan not in ['prs']:
@@ -310,7 +310,7 @@ class FindIndexPZ(MyMainWindow):
                 self.stabilizator_need = True
 
             elif any(['Ожидаемые показатели после' in str(col) for col in row]):
-                self.data_x_min = ProtectedIsDigit(row_ind)
+                self.data_x_min = ProtectedIsDigit(row_ind + 1)
                 # print(f' индекс Ожидаемые показатели {self.data_x_min}')
             elif any(['эксплуатационные горизонты и интервалы перфорации' in str(col).lower() for col in row]):
                 self.data_pvr_min = ProtectedIsDigit(row_ind)
@@ -329,7 +329,7 @@ class FindIndexPZ(MyMainWindow):
                     any(['IX. Мероприятия по предотвращению аварий, инцидентов и осложнений::' in str(col) for col in
                          row]):
 
-                self.data_well_max = ProtectedIsDigit(row_ind - 1)
+                self.data_well_max = ProtectedIsDigit(row_ind)
 
             elif 'НКТ' == str(row[1]).upper():
                 self.pipes_ind = ProtectedIsDigit(row_ind + 1)
@@ -445,14 +445,14 @@ class FindIndexPZ(MyMainWindow):
         if self.type_kr in ['', None]:
             self.check_data_in_pz.append('Не указан Вид и категория ремонта, его шифр\n')
 
-        if self.work_plan != 'plan_change':
-            self.row_expected = []
-            for j in range(self.data_x_min.get_value,
-                           self.data_x_max.get_value):  # Ожидаемые показатели после ремонта
-                lst = []
-                for i in range(0, 12):
-                    lst.append(self.ws.cell(row=j + 1, column=i + 1).value)
-                self.row_expected.append(lst)
+        # if self.work_plan != 'plan_change':
+        #     self.row_expected = []
+        #     for j in range(self.data_x_min.get_value,
+        #                    self.data_x_max.get_value):  # Ожидаемые показатели после ремонта
+        #         lst = []
+        #         for i in range(0, 12):
+        #             lst.append(self.ws.cell(row=j + 1, column=i + 1).value)
+        #         self.row_expected.append(lst)
 
         if self.bcu_level is False:
             QMessageBox.warning(self, 'безопасный статический уровень',
@@ -651,14 +651,14 @@ class FindIndexPZ(MyMainWindow):
         if self.type_kr in ['', None]:
             self.check_data_in_pz.append('Не указан Вид и категория ремонта, его шифр\n')
 
-        if self.work_plan != 'plan_change':
-            self.row_expected = []
-            for j in range(self.data_x_min.get_value,
-                           self.data_x_max.get_value):  # Ожидаемые показатели после ремонта
-                lst = []
-                for i in range(0, 12):
-                    lst.append(self.ws.cell(row=j + 1, column=i + 1))
-                self.row_expected.append(lst)
+        # if self.work_plan != 'plan_change':
+        #     self.row_expected = []
+        #     for j in range(self.data_x_min.get_value,
+        #                    self.data_x_max.get_value):  # Ожидаемые показатели после ремонта
+        #         lst = []
+        #         for i in range(0, 12):
+        #             lst.append(self.ws.cell(row=j + 1, column=i + 1))
+        #         self.row_expected.append(lst)
 
     def work_with_img(self, image_loader, row):
         for col in range(1, 12):
@@ -2331,8 +2331,8 @@ class WellCategory(FindIndexPZ):
             # if self.work_plan == 'prs':
             #     self.data_well_max = self.data_x_max_prs
 
-            self.delete_rows_pz(self.ws, self.cat_well_min, self.data_well_max, self.data_x_max)
-
-            self.insert_index = self.data_well_max.get_value - self.cat_well_min.get_value + 19
+            # self.delete_rows_pz(self.ws, self.cat_well_min, self.data_well_max, self.data_x_max)
+            #
+            self.insert_index = self.data_well_max.get_value
 
         return self

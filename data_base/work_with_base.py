@@ -802,6 +802,9 @@ def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_di
             index_delete = index_row + 2
             data_list.gns_ind2 = index_row + 2
 
+        elif any(['КАТЕГОРИЯ СКВАЖИНЫ' in str(col.value).upper() for col in row[:4]]):
+            self.data_well.cat_well_min = data_list.ProtectedIsDigit(index_row)
+
         elif all([col is None for col in row[:13]]):
             sheet_new.row_dimensions[index_row].hidden = True
         try:
@@ -811,6 +814,21 @@ def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_di
 
     if self.data_well.work_plan not in ['plan_change']:
         sheet_new.delete_rows(index_delete, sheet_new.max_row - index_delete + 1)
+
+        razdel = self.work_podpisant_list(self.data_well.region, data_list.contractor)
+        for index_row, row in enumerate(sheet_new.iter_rows(max_row=self.data_well.cat_well_min.get_value, max_col=12)):
+            if len(razdel) > index_row:
+                for index_col, column in enumerate(row):
+                    if sheet_new.cell(row=index_row+1, column=index_col+1).value:
+                        print(value)
+                        sheet_new.cell(row=index_row+1, column=index_col+1).value = razdel[index_row][index_col]
+            else:
+                for index_col, column in enumerate(row):
+                    if sheet_new.cell(row=index_row + 1, column=index_col + 1).value:
+                        sheet_new.cell(row=index_row+1, column=index_col+1).value = None
+
+
+
 
     return sheet_new
 
