@@ -1095,17 +1095,27 @@ class MyMainWindow(QMainWindow):
         row_max = table_widget.rowCount()
         # print(f'ДОП {work_plan}')
 
+        for row in range(self.table_widget.rowCount()):
+            for column in range(self.table_widget.columnCount()):
+                value = self.table_widget.item(row, column)
+                if value is not None:
+                    value = value.text()
+                    if 'Категория скважины' in str(value):
+                        self.data_well.cat_well_min = data_list.ProtectedIsDigit(row)
+                        print(f'катео {self.data_well.cat_well_min.get_value}')
+                    elif 'Наименование работ' in str(value):
+                        self.data_well.insert_index2 = row - 1
+
         if self.__class__.__name__ in ['GppWindow', 'GrpWindow']:
             if self.__class__.__name__ in ['GppWindow']:
-                podp_grp = [[None, " ", None, None, None, None, None,
-                             'Представитель OOO НТЦ ЗЭРС', None, None, None,
-                         None],
-                        [None, '_____________', None, None, None, None, None, '_____________', None, None, None, None],
-                        [None, f'"____"_____________________г.', None, None, None, None, None, None,
-                         f'"____"_____________________г.', None, None,
-                         None],
-                            [None, " ", None, None, None, None, None,
-                             None, None, None, None, None]
+                podp_grp = [
+                    [None, " ", None, None, None, None, None, 'Представитель OOO НТЦ ЗЭРС', None, None, None, None],
+                    [None, '_____________', None, None, None, None, None, '_____________', None, None, None, None],
+                    [None, f'"____"_____________________г.', None, None, None, None, None, None,
+                     f'"____"_____________________г.', None, None,
+                     None],
+                    [None, " ", None, None, None, None, None,
+                     None, None, None, None, None]
                             ]
             else:
                 podp_grp = [[None, " ", None, None, None, None, None,
@@ -1119,14 +1129,7 @@ class MyMainWindow(QMainWindow):
                              [None, " ", None, None, None, None, None,
                              None, None, None, None,  None]]
 
-            for row in range(self.table_widget.rowCount()):
-                for column in range(self.table_widget.columnCount()):
-                    value = self.table_widget.item(row, column)
-                    if value is not None:
-                        value = value.text()
-                        if 'Категория скважины' in str(value):
-                            self.data_well.cat_well_min = data_list.ProtectedIsDigit(row)
-                            print(f'катео {self.data_well.cat_well_min.get_value}')
+
 
             for index_row, row in enumerate(podp_grp):
                 for column, data in enumerate(row):
@@ -1135,7 +1138,8 @@ class MyMainWindow(QMainWindow):
                         item.setFlags(item.flags() | Qt.ItemIsEditable)
                         table_widget.setItem(self.data_well.cat_well_min.get_value - len(podp_grp) + index_row, column, item)
                     else:
-                        table_widget.setItem(self.data_well.cat_well_min.get_value - len(podp_grp), column, QtWidgets.QTableWidgetItem(str('')))
+                        table_widget.setItem(
+                            self.data_well.cat_well_min.get_value - len(podp_grp), column, QtWidgets.QTableWidgetItem(str('')))
 
 
         for i, row_data in enumerate(work_list):
@@ -1179,12 +1183,12 @@ class MyMainWindow(QMainWindow):
                             if value[0] <= len(text) <= value[1]:
                                 text_width = key
                                 table_widget.setRowHeight(row, int(text_width))
-        if 'gnkt' not in work_plan:
+        if 'gnkt' not in work_plan and self.data_well.insert_index2:
             for row in range(table_widget.rowCount()):
                 if row >= self.data_well.insert_index2 + 2:
                     # Добавляем нумерацию в первую колонку
                     item_number = QtWidgets.QTableWidgetItem(
-                        str(row - self.data_well.insert_index2 - 1))  # Номер строки + 1
+                        str(row - self.data_well.insert_index2-1))  # Номер строки + 1
                     table_widget.setItem(row, 1, item_number)
 
     def check_true_depth_template(self, depth):
@@ -1228,7 +1232,7 @@ class MyMainWindow(QMainWindow):
         if sheet:
             rows = sheet.max_row
             if work_plan in ['krs', 'prs']:
-                self.data_well.insert_index2 = rows
+                self.data_well.insert_index2 = rows + 1
 
             merged_cells = sheet.merged_cells
             table_widget.setRowCount(rows)
@@ -1277,12 +1281,10 @@ class MyMainWindow(QMainWindow):
 
             if data_list.dop_work_list:
                 self.populate_row(table_widget.rowCount(), data_list.dop_work_list, self.table_widget, self.work_plan)
-            if 'gnkt' not in work_plan:
+            if 'gnkt' not in work_plan and self.data_well.insert_index2:
                 for row in range(table_widget.rowCount()):
                     if row >= self.data_well.insert_index2 + 2:
                         # Добавляем нумерацию в первую колонку
-                        ase = row - self.data_well.insert_index2 - 1
-                        asdawdaw = cell_value
                         item_number = QtWidgets.QTableWidgetItem(
                             str(row - self.data_well.insert_index2 - 1))  # Номер строки + 1
                         table_widget.setItem(row, 1, item_number)

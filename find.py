@@ -27,6 +27,7 @@ class FindIndexPZ(MyMainWindow):
         super().__init__()
 
         self.end_index = None
+
         self.insert_index2 = None
         self.need_depth = None
         self.count_row_well = None

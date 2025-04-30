@@ -294,7 +294,7 @@ class CreatePZ(MyMainWindow):
                     ws, ws2, self.data_well.data_x_min.get_value, self.data_well.data_x_max.get_value, 1, 16,
                     ws2.max_row + 1)
 
-                self.wb.save('123.xlsx')
+
 
                 self.data_well.insert_index = ws2.max_row
 

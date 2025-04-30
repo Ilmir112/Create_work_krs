@@ -1423,7 +1423,7 @@ class WindowUnion(MyMainWindow):
             return tuple_angle
 
     def calc_work_fluid(self, fluid_work_insert):
-        self.data_well.fluid = float(fluid_work_insert)
+
         self.data_well.fluid_short = fluid_work_insert
 
         category_h2s_list = [
