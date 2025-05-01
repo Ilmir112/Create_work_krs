@@ -476,13 +476,14 @@ class GnktModel(WindowUnion):
                         coordinate = f'{get_column_letter(col - 2)}{row_ind}'
                         self.insert_image(ws2, f'{data_list.path_image}imageFiles/Зуфаров.png', coordinate)
                     elif 'Закиев И.Э.' in str(value):
-                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind}'
                         self.insert_image(ws2, f'{data_list.path_image}imageFiles/Закиев.png', coordinate)
-
-                    elif 'И.А. Котиков' in str(value):
-                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
+                    elif 'Котиков' in str(value) and 'И.А.' in str(value):
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind}'
                         self.insert_image(ws2, f'{data_list.path_image}imageFiles/Котиков.png', coordinate)
-
+                    elif 'Рахимьянов' in str(value):
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind}'
+                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/рахимьянов.png', coordinate)
     def work_with_data_gnkt(self):
         if self.data_gnkt is None:
 
@@ -1321,7 +1322,7 @@ class GnktModel(WindowUnion):
         ws2.page_setup.paperSize = ws2.PAPERSIZE_A4
 
     def date_dmy(self, date_str):
-        print(date_str, type(date_str))
+
         if '-' in str(date_str):
             return date_str
         elif type(date_str) is datetime:

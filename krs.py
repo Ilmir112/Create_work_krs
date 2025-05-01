@@ -358,13 +358,13 @@ class GnoParent(ABC):
                 self.data_well.category_pvo, _ = QInputDialog.getInt(
                     None, 'Категория скважины', f'Категория скважины № {self.data_well.category_pvo}, корректно?',
                     self.data_well.category_pvo, 1, 2)
-        self.text_pvo = f'{self.data_well.max_admissible_pressure.get_value}атм  на ' \
-                        f'максимально ожидаемое давление с ' \
-                        f'выдержкой в течении 30 минут'
+        self.text_pvo = f'{self.data_well.max_admissible_pressure.get_value}атм не ниже ' \
+                        f'максимально ожидаемого давления с ' \
+                        f'выдержкой в течении 30 минут, но не менее 30атм  '
         if self.data_well.curator == 'ВНС':
             self.text_pvo = f'{self.data_well.max_admissible_pressure.get_value * 1.1:.1f}атм  на ' \
-                        f'максимально ожидаемое давление с ' \
-                        f'выдержкой в течении 30 минут (+10% на скважинах освоения)'
+                        f'максимально не ниже ожидаемого давления с выдержкой в течении 30 минут ' \
+                            f'(+10% на скважинах освоения), но не менее 30атм '
 
     def lifting_unit(self):
         aprs_40 = 'Установить подъёмный агрегат на устье не менее 40т.\n' \

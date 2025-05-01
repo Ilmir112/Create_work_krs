@@ -264,12 +264,12 @@ def pressure_gis(self):
 def pvo_cat1(self):
     self.text_pvo = f'{self.data_well.max_expected_pressure.get_value}атм  на ' \
                     f'максимально ожидаемое давление с ' \
-                    f'выдержкой в течении 30 минут'
+                    f'выдержкой в течении 30 минут, но не менее 30атм '
 
     if self.data_well.curator == 'ВНС':
         self.text_pvo = f'{self.data_well.max_expected_pressure.get_value * 1.1:.1f}атм  на ' \
                         f'максимально ожидаемое давление с ' \
-                        f'выдержкой в течении 30 минут (+10% на скважинах освоения)'
+                        f'выдержкой в течении 30 минут (+10% на скважинах освоения), но не менее 30атм '
 
     pvo_1 = f'Установить ПВО по схеме №2 утвержденной главным инженером {data_list.contractor} ' \
             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}' \

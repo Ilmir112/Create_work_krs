@@ -203,7 +203,7 @@ class GeophysicWindow(WindowUnion):
              'Мастер КРС', ' '],
             [' ', None,
              f'Долить скважину до устья тех жидкостью уд.весом {self.data_well.fluid_work} .Установить ПВО по'
-             f' схемесхема №11 утвержденной '
+             f' схеме  №11 утвержденной '
              f'главным инженером {data_list.contractor} '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. Опрессовать  плашки  ПВО '
              f'(на давление опрессовки ЭК, но '

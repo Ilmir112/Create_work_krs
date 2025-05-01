@@ -1059,11 +1059,15 @@ class RirWindow(WindowUnion):
 
         from work_py.opressovka import OpressovkaEK
 
-        try:
-            paker_depth_zumpf = int(float(self.tab_widget.currentWidget().paker_depth_zumpf_edit.text()))
-        except Exception:
-            paker_depth_zumpf = 0
+
         if paker_need_combo == 'Нужно СПО':
+            try:
+                paker_depth_zumpf = int(float(self.tab_widget.currentWidget().paker_depth_zumpf_edit.text()))
+                if paker_depth_zumpf + paker_khost > self.data_well.current_bottom:
+                    QMessageBox.warning(self, 'Ошибка', 'компоновка ниже текущего забоя')
+                    return
+            except Exception:
+                paker_depth_zumpf = 0
 
             rir_list = OpressovkaEK.paker_list(self, diameter_paker, paker_khost, paker_depth,
                                                pressure_zumpf_question, paker_depth_zumpf)
@@ -1246,6 +1250,7 @@ class RirWindow(WindowUnion):
                 if mes == QMessageBox.StandardButton.No:
                     return
 
+
             pressure_zumpf_question = current_widget.pressure_zumpf_question_combo.currentText()
             need_change_zgs_combo = current_widget.need_change_zgs_combo.currentText()
             volume_cement = current_widget.cement_volume_line.text().replace(',', '.')
@@ -1266,6 +1271,7 @@ class RirWindow(WindowUnion):
             diameter_paker = int(float(current_widget.diameter_paker_edit.text()))
             paker_khost = int(float(current_widget.paker_khost_edit.text()))
             paker_depth = int(float(current_widget.paker_depth_edit.text()))
+
             if self.check_true_depth_template(paker_depth) is False:
                 return
             if self.check_depth_paker_in_perforation(paker_depth) is False:
@@ -1274,6 +1280,9 @@ class RirWindow(WindowUnion):
                 return
             if pressure_zumpf_question == 'Да':
                 if paker_depth + paker_khost > self.data_well.current_bottom:
+                    mes = QMessageBox.critical(self, 'Ошибка', 'Компоновка ниже текущего забоя')
+                    return
+            if paker_depth + paker_khost > self.data_well.current_bottom:
                     mes = QMessageBox.critical(self, 'Ошибка', 'Компоновка ниже текущего забоя')
                     return
 

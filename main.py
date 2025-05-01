@@ -807,13 +807,14 @@ class MyMainWindow(QMainWindow):
                 self.ws2_prs = self.wb2_prs.active
 
                 if self.work_plan in ['krs', 'dop_plan']:
-                    self.ws = read_pz.open_excel_file(self.ws, self.work_plan, self.ws2_prs)
-                    self.copy_pz(self.ws, self.table_widget, self.work_plan)
-                    if self.work_plan == 'dop_plan':
-                        self.rir_window = DopPlanWindow(self.data_well, self.table_widget)
-                        self.set_modal_window(self.rir_window)
+                    if self.wb2_prs:
+                        self.ws = read_pz.open_excel_file(self.ws, self.work_plan, self.ws2_prs)
+                        self.copy_pz(self.ws, self.table_widget, self.work_plan)
+                        if self.work_plan == 'dop_plan':
+                            self.rir_window = DopPlanWindow(self.data_well, self.table_widget)
+                            self.set_modal_window(self.rir_window)
 
-                        data_list.pause = True
+                            data_list.pause = True
 
                 elif self.work_plan in ['gnkt_opz', 'gnkt_after_grp', 'gnkt_bopz']:
 
@@ -824,9 +825,9 @@ class MyMainWindow(QMainWindow):
                     self.gnkt_data = WorkWithGnkt(self.ws, self.table_title, self.table_schema, self.table_widget,
                                                   self.data_well)
                 elif self.work_plan in ['prs']:
-
-                    self.ws = read_pz.open_excel_file(self.ws, self.work_plan, self.ws2_prs)
-                    self.copy_pz(self.ws, self.table_widget, self.work_plan, 15)
+                    if self.wb2_prs:
+                        self.ws = read_pz.open_excel_file(self.ws, self.work_plan, self.ws2_prs)
+                        self.copy_pz(self.ws, self.table_widget, self.work_plan, 15)
 
         elif self.work_plan in ['plan_change', 'dop_plan_in_base']:
             data_list.data_in_base = True
@@ -2244,6 +2245,9 @@ class MyWindow(MyMainWindow):
 
         temp_folder = r'C:\Windows\Temp'
 
+        self.wb2_prs = None
+        self.ws2_prs = None
+
         try:
             adw = data_list.user
             if 'Зуфаров' in data_list.user[1]:
@@ -3014,6 +3018,9 @@ class SaveInExcel(MyWindow):
                     elif 'З.К. Алиев' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
                         self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Алиев Заур.png', coordinate)
+                    elif 'Рахимьянов' in str(value):
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind}'
+                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/рахимьянов.png', coordinate)
                         break
                     elif 'Расчет жидкости глушения производится согласно МУ' in str(value):
                         ind = 6
