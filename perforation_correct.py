@@ -317,6 +317,12 @@ class PerforationCorrect(WindowUnion):
                 self.data_well.check_data_in_pz.append(f'Проверка посадки показала фондовый пакер на спуск сажается '
                                                        f'в интервал перфорации, необходимо изменить глубину посадки!!!')
 
+        self.data_well.fluid = [max(data['рабочая жидкость']) for plast, data in self.dict_perforation.items()
+                      if 'рабочая жидкость' in list(data.keys())]
+
+        if self.data_well.fluid:
+            self.data_well.fluid = max(self.data_well.fluid)
+
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()

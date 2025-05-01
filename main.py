@@ -2,6 +2,9 @@
 import json
 import os
 import shutil
+
+import win32api
+
 import data_list
 import sys
 import socket
@@ -938,6 +941,7 @@ class MyMainWindow(QMainWindow):
         try:
             # Создаем объект Excel
             excel = win32com.client.Dispatch("Excel.Application")
+            # win32api.SetFileAttributes(file_name, win32con.FILE_ATTRIBUTE_NORMAL)
             # Открываем файл
             workbook = excel.Workbooks.Open(file_name)
             # Выбираем активный лист
@@ -3020,7 +3024,7 @@ class SaveInExcel(MyWindow):
                         self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Алиев Заур.png', coordinate)
                     elif 'Рахимьянов' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind}'
-                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/рахимьянов.png', coordinate)
+                        self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/рахимьянов.png', coordinate)
                         break
                     elif 'Расчет жидкости глушения производится согласно МУ' in str(value):
                         ind = 6
@@ -3125,8 +3129,8 @@ class SaveInExcel(MyWindow):
                                      f'файл под таким именем открыт, закройте его: {type(e).__name__}\n  {str(e)}')
 
         try:
-            # Создаем объект Excel
             excel = win32com.client.Dispatch("Excel.Application")
+            excel.Visible = True  # Сделать Excel видимым
             # Открываем файл
             workbook = excel.Workbooks.Open(file_name)
             # Выбираем активный лист
