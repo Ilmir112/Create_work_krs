@@ -430,13 +430,13 @@ class GnktModel(WindowUnion):
                     ws2.cell(row=i + 1, column=2).fill = PatternFill(start_color='C5D9F1', end_color='C5D9F1',
                                                                      fill_type='solid')
                     ws2.cell(row=i + 1, column=2).font = Font(name='Arial', size=13, bold=True)
-                elif i <= 31:
+                elif i <= 39:
                     ws2.merge_cells(start_column=3, start_row=i + 1, end_column=11, end_row=i + 1)
                     ws2.cell(row=i + 1, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                         vertical='center')
                     ws2.cell(row=i + 1, column=11).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                          vertical='center')
-                elif i > 31 and self.data_well.work_plan in ['gnkt_opz']:
+                elif i > 39 and self.data_well.work_plan in ['gnkt_opz']:
                     ws2.merge_cells(start_column=3, start_row=i + 1, end_column=10, end_row=i + 1)
                     ws2.cell(row=i + 1, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
                                                                         vertical='center')
