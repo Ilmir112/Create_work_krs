@@ -707,7 +707,8 @@ class FindIndexPZ(MyMainWindow):
 
         if need_depth and need_depth > self.current_bottom:
             self.need_depth = need_depth
-        if self.current_bottom > self.perforation_sole:
+        if self.current_bottom > self.perforation_sole and need_depth is None:
+
             self.need_depth = self.bottom_hole_artificial.get_value
 
     def check_str_none(self, string):
@@ -1730,7 +1731,7 @@ class WellData(FindIndexPZ):
                 self.konte_true = True
 
             if '0' != str(self.dict_pump_ecn['before']):
-                if sum(list((self.dict_nkt_before.values()))) - self.dict_pump_ecn_depth['before'] < 10 and \
+                if sum(list((self.dict_nkt_before.values()))) - self.dict_pump_ecn_depth['before'] < -10 and \
                         '48' not in list(self.dict_nkt_before.keys()):
                     QMessageBox.warning(self, 'Ошибка',
                                         f'Длина НКТ {sum(list(self.dict_nkt_before.values()))}м '
@@ -1741,7 +1742,7 @@ class WellData(FindIndexPZ):
                         f'до ремонта меньше глубины насоса'
                         f'{self.dict_pump_ecn_depth["before"]}м')
             if '0' != str(self.dict_pump_ecn['after']):
-                if sum(list((self.dict_nkt_after.values()))) - self.dict_pump_ecn_depth['after'] < 10 and \
+                if sum(list((self.dict_nkt_after.values()))) - self.dict_pump_ecn_depth['after'] < -10 and \
                         '48' not in list(self.dict_nkt_before.keys()):
                     QMessageBox.warning(self, 'Ошибка',
                                         f'Длина НКТ {sum(list(self.dict_nkt_after.values()))}м '
@@ -2093,7 +2094,6 @@ class WellPerforation(FindIndexPZ):
                 self.dict_perforation.setdefault(plast, {}).setdefault('БСУ', 89)
                 print('Ошибка БСУ')
 
-        self.fluid = max([max(data['рабочая жидкость']) for plast, data in self.dict_perforation.items() if data['отключение'] is False])
 
         if self.perforation_correct_window2 is None:
             from perforation_correct import PerforationCorrect

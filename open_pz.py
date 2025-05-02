@@ -146,7 +146,6 @@ class CreatePZ(MyMainWindow):
         max_row = ws.max_row
         if 'Ойл' in data_list.contractor:
             for row_index, row_gnvp in enumerate(dict_events_gnvp[self.data_well.work_plan]):
-
                 data = ws.cell(row=row_index + max_row + 1, column=2)
 
                 data.value = row_gnvp[1]
@@ -187,14 +186,12 @@ class CreatePZ(MyMainWindow):
                 for col in range(12):
                     data = ws.cell(row=i, column=col + 1)
                     data.border = thin_border
-
                     data.value = dict_events_gnvp[self.data_well.work_plan][i - self.data_well.insert_index][col]
 
-                    data_2 = ws.cell(row=i, column=3).value
-                    data_1 = ws.cell(row=i, column=2).value
                     ws.cell(row=i, column=col + 1).font = Font(name='Arial Cyr', size=13, bold=False)
-
-                if 'Мероприятия' in str(data.value):
+                data_2 = ws.cell(row=i, column=3).value
+                data_1 = ws.cell(row=i, column=2).value
+                if 'Мероприятия' in str(data_1):
                     ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
                     ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                    vertical='center')
@@ -233,17 +230,17 @@ class CreatePZ(MyMainWindow):
                 if 'ВЫ ДОЛЖНЫ ОТКАЗАТЬСЯ' in str(data_2):
                     ws.cell(row=i, column=3).font = red_font
 
-                if not data_2 is None:
-                    text = data_2
+                if data_2:
+                    text = ws.cell(row=i, column=3).value
+                    text1 = ws.cell(row=i, column=2).value
                     for key, value in text_width_dict.items():
                         text_length = len(text)
                         if value[0] <= text_length <= value[1]:
                             if '\n' in text:
                                 row_dimension_value = int(len(text) / 4 + text.count('\n') * 6)
-                                ws.row_dimensions[i + max_row + 1].height = row_dimension_value
                             else:
                                 row_dimension_value = int(len(text) / 4)
-                                ws.row_dimensions[i + max_row + 1].height = int(len(text) / 4)
+                            ws.row_dimensions[i].height = row_dimension_value
 
         self.data_well.insert_index += len(dict_events_gnvp[self.data_well.work_plan]) - 1
 
