@@ -21,15 +21,18 @@ from data_base.config_base import connect_to_database, connection_to_database, C
 from decrypt import decrypt
 
 from main import MyMainWindow, ExcelWorker
+from server_response import ResponseWork
 from work_py.alone_oreration import well_volume
 from work_py.progress_bar_save import ProgressBarWindow
 
 
 class ClassifierWell(MyMainWindow):
+
     number_well = None
 
     def __init__(self, costumer, region, parent=None):
         super().__init__()
+        self.api_address = ResponseWork
         self.classification_well = None
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -90,7 +93,6 @@ class ClassifierWell(MyMainWindow):
     def get_data_from_class_well_db(self, region):
         well_classification = CheckWellExistence(self.db)
         data = well_classification.get_data_from_class_well_db(region)
-
         return data
 
     def open_to_sqlite_class_well(self):
@@ -155,7 +157,6 @@ class ClassifierWell(MyMainWindow):
             except psycopg2.Error as e:
                 QMessageBox.warning(None, 'Ошибка', f'Ошибка подключения к базе данных: {type(e).__name__}\n\n{str(e)}')
 
-
         else:
             try:
                 db_path = self.connect_to_db('data_list.db', 'data_base_well')
@@ -207,7 +208,7 @@ class ClassifierWell(MyMainWindow):
         wb = load_workbook(fname)
         ws = wb.active
         check_param = ''
-        self.progress_bar_window = ProgressBarWindow(ws.max_row)
+        self.progress_bar_window = ProgressBarWindow(ws.max_row - 1)
         self.progress_bar_window.show()
         # Получение данных из Excel и запись их в базу данных
         for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
@@ -247,7 +248,10 @@ class ClassifierWell(MyMainWindow):
                         self.classification_well.create_table_without_juming(region_name)
                         QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                             f'регион выбран корректно  {region_name}')
+                        path = self.api_address.read_wells_silencing_response_for_delete_well()
+                        responce = self.api_address.delete_wells_by_region(region_name, path)
                         try:
+                            params_list = []
                             # Получение данных из Excel и запись их в базу данных
                             for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
                                 if 'ПЕРЕЧЕНЬ' in row:
@@ -266,11 +270,22 @@ class ClassifierWell(MyMainWindow):
                                 if index_row > area_row:
                                     well_number = row[well_column]
                                     area_well = row[area_column]
-
+                                    params = {}
                                     if well_number and len(str(well_number)) <= 5:
+                                        params['well_number'] = str(well_number)
+                                        params['deposit_area'] = str(area_well)
+                                        params['costumer'] = str(self.costumer)
+                                        params['today'] = str(version_year)
+                                        params['region'] = str(region_name)
+                                        if data_list.connect_in_base:
+                                            params_list.append(params)
+                                        else:
+                                            self.classification_well.insert_data_in_table_without_juming(
+                                                str(well_number), area_well, version_year, region_name, self.costumer)
+                                if data_list.connect_in_base:
+                                    self.api_address.add_well_in_database(self.api_address.read_wells_silencing_response_for_add_well(), params)
 
-                                        self.classification_well.insert_data_in_table_without_juming(
-                                            str(well_number), area_well, version_year, region_name, self.costumer)
+
 
                             QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
                         except Exception as e:
@@ -344,7 +359,8 @@ class ClassifierWell(MyMainWindow):
                         QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                             f'регион выбрано корректно  {region_name}')
                         self.classification_well.create_table_classification(region_name)
-
+                        # path = self.api_address.read_wells_silencing_response_for_delete_well()
+                        # responce = self.api_address.delete_wells_by_region(region_name, path)
                         try:
                             # Вставка данных в таблицу
 
@@ -360,6 +376,9 @@ class ClassifierWell(MyMainWindow):
                                                 if version_year[-1] == '.':
                                                     version_year = version_year[:-1]
                                 elif index_row > area_row and check_file:
+                                    params ={}
+                                    date_obj = datetime.strptime(version_year, "%d.%m.%Y")
+                                    formatted_date = date_obj.strftime("%Y-%m-%d")
                                     well_number = row[well_column]
                                     area_well = row[area_column]
                                     oilfield_str = row[oilfield]
@@ -374,15 +393,40 @@ class ClassifierWell(MyMainWindow):
                                                     version_year = version_year[:-1]
 
                                     if well_number and len(str(well_number)) < 6:
-                                        self.classification_well.insert_data_in_classification(
-                                            region_name, row[cdng], well_number, area_well, oilfield_str,
-                                            row[categoty_pressure],
-                                            row[pressure_Ppl], row[pressure_Gst], row[date_measurement],
-                                            row[categoty_h2s],
-                                            row[h2s_pr], row[h2s_mg_l], row[h2s_mg_m], row[categoty_gf],
-                                            row[gas_factor],
-                                            version_year, self.region, self.costumer
+                                        if data_list.connect_in_base:
+                                            params = {
+                                                "cdng": row[cdng],
+                                                "well_number": f"{well_number}",
+                                                "deposit_area": f"{area_well}",
+                                                "oilfield": f"{oilfield_str}",
+                                                "category_pressure": f"{row[categoty_pressure]}",
+                                                "pressure_ppl": f"{row[pressure_Ppl]}",
+                                                "pressure_gst": f"{row[pressure_Gst]}",
+                                                "date_measurement": f"{row[date_measurement]}",
+                                                "category_h2s": f"{row[categoty_h2s]}",
+                                                "h2s_pr": f"{row[h2s_pr]}",
+                                                "h2s_mg_l": f"{row[h2s_mg_l]}",
+                                                "h2s_mg_m": f"{row[h2s_mg_m]}",
+                                                "category_gf": f"{row[categoty_gf]}",
+                                                "gas_factor": f"{row[gas_factor]}",
+                                                "today": formatted_date,
+                                                "region": self.region,
+                                                "costumer": self.costumer
+                                            }
+                                        else:
+                                            self.classification_well.insert_data_in_classification(
+                                                region_name, row[cdng], well_number, area_well, oilfield_str,
+                                                row[categoty_pressure],
+                                                row[pressure_Ppl], row[pressure_Gst], row[date_measurement],
+                                                row[categoty_h2s],
+                                                row[h2s_pr], row[h2s_mg_l], row[h2s_mg_m], row[categoty_gf],
+                                                row[gas_factor],
+                                                version_year, self.region, self.costumer
                                         )
+                        # if data_list.connect_in_base:
+                        #     self.api_address.add_well_in_database(
+                        #         self.api_address.read_wells_silencing_response_for_add_well(), params)
+
                         except Exception as e:
                             QMessageBox.warning(self, 'ОШИБКА', f'Выбран файл с не корректными данными {e}')
 
