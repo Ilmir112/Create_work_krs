@@ -691,7 +691,7 @@ class AcidPakerWindow(WindowUnion):
                 read_sko = self.read_sko_need(self.current_widget)
                 if read_sko is False:
                     return
-                if self.Qplast_after_edit == "Да":
+                if self.Qplast_after_edit == "ДА":
                     self.expected_pickup = self.current_widget.expected_pickup_edit.text()
                     self.expected_pressure = self.current_widget.expected_pressure_edit.text().strip()
                     if self.expected_pressure not in [None, 'None', '', '-', 'атм']:

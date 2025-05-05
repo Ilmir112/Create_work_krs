@@ -157,7 +157,7 @@ class BlockPackWindow(WindowUnion):
             if oil_volume_edit != '':
                 oil_volume_edit = round(float(oil_volume_edit), 1)
 
-            fluid_new_edit = float(self.tab_widget.currentWidget().fluid_new_edit.text().replace(',', '.'))
+            fluid_new_edit = round(float(self.tab_widget.currentWidget().fluid_new_edit.text().replace(',', '.')), 2)
             block_type_edit = round(
                 float(self.tab_widget.currentWidget().block_type_volume_edit.text().replace(',', '.')), 1)
         except Exception as e:

@@ -778,7 +778,7 @@ class DescentOrz(DescentParent):
              descentNKT_norm(self.data_well.depth_fond_paker_before["after"], 1.2)],
             [f'Привязка', None,
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через РИТС {data_list.contractor}". '
-             f'Произвести  монтаж ПАРТИИ ГИС согласно схемы схема №11 утвержденной главным инженером '
+             f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №11 утвержденной главным инженером '
              f' {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины Отбить забой по ГК и ЛМ',
              None, None, None, None, None, None, None,

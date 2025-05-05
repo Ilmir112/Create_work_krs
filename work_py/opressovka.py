@@ -126,9 +126,9 @@ class OpressovkaEK(WindowUnion):
             if paker_khost + paker_depth_zumpf >= self.data_well.current_bottom:
                 QMessageBox.warning(self, 'ОШИБКА', 'Длина хвостовика и пакера ниже текущего забоя')
                 return
-
         else:
             paker_depth_zumpf = 0
+
         self.need_privyazka_q_combo = self.tab_widget.currentWidget().need_privyazka_q_combo.currentText()
 
         if rows == 0:
@@ -139,15 +139,29 @@ class OpressovkaEK(WindowUnion):
                 paker_depth = self.tableWidget.item(row, 0)
                 paker_depth = int(float(paker_depth.text()))
 
-            work_list = OpressovkaEK.paker_list(self, diameter_paker, paker_khost, paker_depth,
+            work_list = self.paker_list(diameter_paker, paker_khost, paker_depth,
                                                 pressure_zumpf_question_combo, paker_depth_zumpf)
         else:
             depth_paker_list = []
             for row in range(rows):
-                paker_depth = self.tableWidget.item(row, 0).text()
+
+                paker_depth = float(self.tableWidget.item(row, 0).text().replace(',', '.'))
                 depth_paker_list.append(int(float(paker_depth)))
 
-            work_list = OpressovkaEK.interval_pressure_testing(self, paker_khost, diameter_paker,
+                if int(paker_khost) + int(paker_depth) > self.data_well.current_bottom and pressure_zumpf_question_combo == 'Нет' \
+                        or int(paker_khost) + int(paker_depth_zumpf) > self.data_well.current_bottom and pressure_zumpf_question_combo == 'Да':
+                    QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '
+                                                                     f'ниже текущего забоя')
+                    return
+
+                if self.check_true_depth_template(paker_depth) is False:
+                    return
+                if self.check_depth_paker_in_perforation(paker_depth) is False:
+                    return
+                if self.check_depth_in_skm_interval(paker_depth) is False:
+                    return
+
+            work_list = self.interval_pressure_testing(paker_khost, diameter_paker,
                                                                depth_paker_list, pressure_zumpf_question_combo,
                                                                paker_depth_zumpf)
 
@@ -198,7 +212,7 @@ class OpressovkaEK(WindowUnion):
 
     def paker_list(self, paker_diameter, paker_khost, paker_depth, pressure_zumpf_question, paker_depth_zumpf=0):
 
-        paker_select, paker_short, nkt_opress_list = OpressovkaEK.select_combo_paker(self, paker_khost, paker_depth,
+        paker_select, paker_short, nkt_opress_list = self.select_combo_paker(paker_khost, paker_depth,
                                                                                      paker_diameter)
 
         if pressure_zumpf_question == 'Да':
@@ -309,6 +323,7 @@ class OpressovkaEK(WindowUnion):
                 leakness_list.append(paker_depth)
         else:
             leakness_list = [paker_depth]
+
         for plast in self.data_well.plast_all:
             leakness_list.append(self.data_well.dict_perforation[plast]['кровля'] - 10)
             leakness_list.append(self.data_well.dict_perforation[plast]['подошва'] + 10)
@@ -316,17 +331,16 @@ class OpressovkaEK(WindowUnion):
         current_bottom = self.data_well.current_bottom
         # print(drilling_interval)
         for sole in sorted(leakness_list):
-            if paker_depth >= sole:
+            if paker_depth >= sole and self.find_item_in_table(int(sole)) is None and current_bottom > sole:
                 self.tableWidget.insertRow(rows)
-                if self.find_item_in_table(int(sole)):
-                    self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(int(sole))))
-        self.tableWidget.setSortingEnabled(True)
-        self.tableWidget.sortItems(1)
+                self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(int(sole))))
+        self.tableWidget.setSortingEnabled(False)
+        # self.tableWidget.sortItems(1)
 
     def interval_pressure_testing(self, paker_khost, diameter_paker, depth_paker_list,
                                   pressure_zumpf_question, paker_depth_zumpf=0):
         paker_depth = sorted(depth_paker_list)[0]
-        paker_select, paker_short, nkt_opress_list = OpressovkaEK.select_combo_paker(self, paker_khost, paker_depth,
+        paker_select, paker_short, nkt_opress_list = self.select_combo_paker(paker_khost, paker_depth,
                                                                                      diameter_paker)
 
         paker_list = [
@@ -390,11 +404,8 @@ class OpressovkaEK(WindowUnion):
                      f'При герметичности колонны:  Допустить пакер до глубины {pakerNEK}м',
                      None, None, None, None, None, None, None,
                      'мастер КРС', descentNKT_norm(pakerNEK - paker_depth, 1.2)],
-                    [f'Опрессовать в инт 0-{pakerNEK}м на Р={self.data_well.max_admissible_pressure.get_value}атм',
-                     None,
-                     f'{nkt_opress_list[1]} Посадить пакер. Опрессовать эксплуатационную колонну в '
-                     f'интервале {pakerNEK}-0м на Р={self.data_well.max_admissible_pressure.get_value}атм'
-                     f' в течение 30 минут в присутствии представителя заказчика, составить акт.',
+                    [OpressovkaEK.testing_pressure(self, paker_depth)[1], None,
+                     OpressovkaEK.testing_pressure(self, paker_depth)[0],
                      None, None, None, None, None, None, None,
                      'мастер КРС', 0.77],
                     [f'Насыщение 5м3. Определение Q при Р-{self.data_well.max_admissible_pressure.get_value}', None,

@@ -770,7 +770,7 @@ class MyMainWindow(QMainWindow):
         priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
                       f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через РИТС '
                       f'{data_list.contractor}". '
-                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы схема №11 утвержденной главным инженером '
+                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №11 утвержденной главным инженером '
                       f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                       f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
                       None, None, None, None, None, None, None,
@@ -1107,32 +1107,26 @@ class MyMainWindow(QMainWindow):
                     value = value.text()
                     if 'Категория скважины' in str(value):
                         self.data_well.cat_well_min = data_list.ProtectedIsDigit(row)
-                        print(f'катео {self.data_well.cat_well_min.get_value}')
+
                     elif 'Наименование работ' in str(value):
                         self.data_well.insert_index2 = row - 1
 
         if self.__class__.__name__ in ['GppWindow', 'GrpWindow']:
             if self.__class__.__name__ in ['GppWindow']:
                 podp_grp = [
-                    [None, " ", None, None, None, None, None, 'Представитель OOO НТЦ ЗЭРС', None, None, None, None],
+                    [None, 'Представитель подрядчика по ГРП', None, None, None, None, None, 'Представитель OOO НТЦ ЗЭРС', None, None, None, None],
                     [None, '_____________', None, None, None, None, None, '_____________', None, None, None, None],
                     [None, f'"____"_____________________г.', None, None, None, None, None, None,
                      f'"____"_____________________г.', None, None,
-                     None],
-                    [None, " ", None, None, None, None, None,
-                     None, None, None, None, None]
-                            ]
+                     None]]
             else:
-                podp_grp = [[None, " ", None, None, None, None, None,
-                             None, None, None, None,  None],
+                podp_grp = [
                     [None, 'Представитель подрядчика по ГРП', None, None, None, None, None,
                              None, None, None, None,  None],
                             [None, '_____________', None, None, None, None, None, None, None, None, None,
                              None],
                             [None, f'"____"_____________________г.', None, None, None, None, None, None,
-                             None, None, None, None],
-                             [None, " ", None, None, None, None, None,
-                             None, None, None, None,  None]]
+                             None, None, None, None]]
 
 
 
@@ -1143,8 +1137,8 @@ class MyMainWindow(QMainWindow):
                         item.setFlags(item.flags() | Qt.ItemIsEditable)
                         table_widget.setItem(self.data_well.cat_well_min.get_value - len(podp_grp) + index_row, column, item)
                     else:
-                        table_widget.setItem(
-                            self.data_well.cat_well_min.get_value - len(podp_grp), column, QtWidgets.QTableWidgetItem(str('')))
+                        table_widget.setItem(self.data_well.cat_well_min.get_value - len(podp_grp) + index_row, column,
+                                             QtWidgets.QTableWidgetItem(str('')))
 
 
         for i, row_data in enumerate(work_list):
@@ -2433,7 +2427,7 @@ class MyWindow(MyMainWindow):
 
         priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
                       f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через РИТС {data_list.contractor}". '
-                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы схема №11 утвержденной главным инженером '
+                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №11 утвержденной главным инженером '
                       f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                       f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
                       None, None, None, None, None, None, None,

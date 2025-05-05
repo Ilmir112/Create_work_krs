@@ -351,8 +351,8 @@ class TabPageUnion(QWidget):
 
         if self.data_well:
             if self.data_well.curator == 'ОР':
-                self.Qplast_after_edit.setCurrentIndex(1)
                 self.Qplast_after_edit.setCurrentIndex(0)
+                self.Qplast_after_edit.setCurrentIndex(1)
             else:
                 self.Qplast_after_edit.setCurrentIndex(1)
                 self.Qplast_after_edit.setCurrentIndex(0)
@@ -1161,7 +1161,7 @@ class WindowUnion(MyMainWindow):
 
         priv_list = [[f'ГИС Привязка по ГК и ЛМ', None,
                       f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через РИТС {data_list.contractor}". '
-                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы схема №11 утвержденной главным инженером '
+                      f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №11 утвержденной главным инженером '
                       f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                       f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
                       None, None, None, None, None, None, None,
