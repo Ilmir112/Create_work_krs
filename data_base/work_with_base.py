@@ -27,7 +27,6 @@ from work_py.progress_bar_save import ProgressBarWindow
 
 
 class ClassifierWell(MyMainWindow):
-
     number_well = None
 
     def __init__(self, costumer, region, parent=None):
@@ -143,7 +142,6 @@ class ClassifierWell(MyMainWindow):
         self.table_class.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         # layout.addWidget(table)
         self.setLayout(layout)
-
 
     def insert_database(self, data_base, data_work, query):
         if data_list.connect_in_base:
@@ -283,9 +281,8 @@ class ClassifierWell(MyMainWindow):
                                             self.classification_well.insert_data_in_table_without_juming(
                                                 str(well_number), area_well, version_year, region_name, self.costumer)
                                 if data_list.connect_in_base:
-                                    self.api_address.add_well_in_database(self.api_address.read_wells_silencing_response_for_add_well(), params)
-
-
+                                    self.api_address.add_well_in_database(
+                                        self.api_address.read_wells_silencing_response_for_add_well(), params)
 
                             QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
                         except Exception as e:
@@ -376,7 +373,7 @@ class ClassifierWell(MyMainWindow):
                                                 if version_year[-1] == '.':
                                                     version_year = version_year[:-1]
                                 elif index_row > area_row and check_file:
-                                    params ={}
+                                    params = {}
                                     date_obj = datetime.strptime(version_year, "%d.%m.%Y")
                                     formatted_date = date_obj.strftime("%Y-%m-%d")
                                     well_number = row[well_column]
@@ -422,7 +419,7 @@ class ClassifierWell(MyMainWindow):
                                                 row[h2s_pr], row[h2s_mg_l], row[h2s_mg_m], row[categoty_gf],
                                                 row[gas_factor],
                                                 version_year, self.region, self.costumer
-                                        )
+                                            )
                         # if data_list.connect_in_base:
                         #     self.api_address.add_well_in_database(
                         #         self.api_address.read_wells_silencing_response_for_add_well(), params)
@@ -863,16 +860,13 @@ def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_di
         for index_row, row in enumerate(sheet_new.iter_rows(max_row=self.data_well.cat_well_min.get_value, max_col=12)):
             if len(razdel) > index_row:
                 for index_col, column in enumerate(row):
-                    if sheet_new.cell(row=index_row+1, column=index_col+1).value:
+                    if sheet_new.cell(row=index_row + 1, column=index_col + 1).value:
                         print(value)
-                        sheet_new.cell(row=index_row+1, column=index_col+1).value = razdel[index_row][index_col]
+                        sheet_new.cell(row=index_row + 1, column=index_col + 1).value = razdel[index_row][index_col]
             else:
                 for index_col, column in enumerate(row):
                     if sheet_new.cell(row=index_row + 1, column=index_col + 1).value:
-                        sheet_new.cell(row=index_row+1, column=index_col+1).value = None
-
-
-
+                        sheet_new.cell(row=index_row + 1, column=index_col + 1).value = None
 
     return sheet_new
 
