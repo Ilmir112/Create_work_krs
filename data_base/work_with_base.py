@@ -31,7 +31,7 @@ class ClassifierWell(MyMainWindow):
 
     def __init__(self, costumer, region, parent=None):
         super().__init__()
-        self.api_address = ResponseWork
+
         self.classification_well = None
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -281,8 +281,8 @@ class ClassifierWell(MyMainWindow):
                                             self.classification_well.insert_data_in_table_without_juming(
                                                 str(well_number), area_well, version_year, region_name, self.costumer)
                                 if data_list.connect_in_base:
-                                    self.api_address.add_well_in_database(
-                                        self.api_address.read_wells_silencing_response_for_add_well(), params)
+                                    self.api_address.add_well_in_database(params,
+                                        self.api_address.read_wells_silencing_response_for_add_well())
 
                             QMessageBox.information(self, 'данные обновлены', 'Данные обновлены')
                         except Exception as e:
