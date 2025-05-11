@@ -799,7 +799,7 @@ class DataWindow(WindowUnion):
     def __init__(self, data_well: FindIndexPZ):
         super(DataWindow, self).__init__(data_well)
 
-        self.api_address = ResponseWork
+
 
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
@@ -1422,10 +1422,7 @@ class DataWindow(WindowUnion):
                     "date_create": data_list.current_date,
                 }
 
-                response = self.api_address.add_wells_data_in_database(self, params,
-                    self.api_address.read_wells_data_response_for_add())
-                if response is None:
-                    return
+
 
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Ошибка в обработке {e}')

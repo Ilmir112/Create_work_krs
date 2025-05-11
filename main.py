@@ -2,9 +2,6 @@
 import json
 import os
 import shutil
-
-import win32api
-
 import data_list
 import sys
 import socket
@@ -19,6 +16,7 @@ import win32gui
 import base64
 from io import BytesIO
 
+from server_response import ResponseWork, ApiClient
 from work_py.progress_bar_save import ProgressBarWindow
 from openpyxl.reader.excel import load_workbook
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QMenuBar, QAction, QTableWidget, \
@@ -129,6 +127,8 @@ class MyMainWindow(QMainWindow):
         self.perforation_correct_window2 = None
         self.work_plan = None
         self.gnkt_data = None
+
+
 
 
     def work_podpisant_list(self, region, contractor):
@@ -693,10 +693,6 @@ class MyMainWindow(QMainWindow):
                 WellCategory.read_well(self.data_well, self.data_well.cat_well_min.get_value,
                                        self.data_well.data_well_min.get_value)
 
-            # self.set_modal_window(self.data_list.pdata_window)
-
-            # data_list.pause = True
-
             if self.data_well.leakiness is True:
                 if WellCondition.leakage_window is None:
                     WellCondition.leakage_window = LeakageWindow(self.data_well)
@@ -710,6 +706,84 @@ class MyMainWindow(QMainWindow):
                     # print(f'словарь нарушений {self.data_well.dict_leakiness}')
                     data_list.pause = True
                     WellCondition.leakage_window = None  # Discard reference.
+
+            if data_list.connect_in_base:
+                params = {
+                    "id": 0,
+                    "well_number": self.data_well.well_number.get_value,
+                    "area_well": self.data_well.well_area.get_value,
+                    "well_oilfield": self.data_well.well_oilfield.get_value,
+                    "costumer": data_list.costumer,
+                    "cdng": self.data_well.cdng.get_value,
+                    "inventory_number": self.data_well.inventory_number.get_value,
+                    "wellhead_fittings": self.data_well.wellhead_fittings,
+                    "appointment": self.data_well.appointment_well.get_value,
+                    "angle_data": {"инклинометрия":self.data_well.angle_data},
+                    "column_direction": {
+                        "diameter": self.data_well.column_direction_diameter.get_value,
+                        "wall_thickness": self.data_well.column_direction_wall_thickness.get_value,
+                        "head": 0,
+                        "shoe": self.data_well.column_direction_length.get_value,
+                        "level_cement": self.data_well.level_cement_direction.get_value
+                    },
+                    "column_conductor": {
+                        "diameter": self.data_well.column_conductor_diameter.get_value,
+                        "wall_thickness": self.data_well.column_conductor_wall_thickness.get_value,
+                        "head": 0,
+                        "shoe": self.data_well.column_conductor_length.get_value,
+                        "level_cement": self.data_well.level_cement_conductor.get_value
+                    },
+                    "column_production": {
+                        "diameter": self.data_well.column_diameter.get_value,
+                        "wall_thickness": self.data_well.column_wall_thickness.get_value,
+                        "head": self.data_well.head_column.get_value,
+                        "shoe": self.data_well.shoe_column.get_value,
+                        "level_cement": self.data_well.level_cement_column.get_value
+                    },
+                    "column_additional": {
+                        "diameter": self.data_well.column_additional_diameter.get_value,
+                        "wall_thickness": self.data_well.column_additional_wall_thickness.get_value,
+                        "head": self.data_well.head_column_additional.get_value,
+                        "shoe": self.data_well.shoe_column_additional.get_value,
+                        "level_cement": 0
+                    },
+                    "bottom_hole_drill": float(self.data_well.bottom_hole_drill.get_value),
+                    "bottom_hole_artificial": float(self.data_well.bottom_hole_artificial.get_value),
+                    "max_angle": float(self.data_well.max_angle.get_value),
+                    "distance_from_rotor_table": float(self.data_well.distance_from_well_to_sampling_point),
+                    "max_angle_depth": float(self.data_well.max_angle_depth.get_value),
+                    "max_expected_pressure": float(self.data_well.max_expected_pressure.get_value),
+                    "max_admissible_pressure": float(self.data_well.max_admissible_pressure.get_value),
+                    "rotor_altitude": 0.0,
+                    "perforation": self.data_well.dict_perforation,
+                    "equipment": self.data_well.data_well_dict["оборудование"],
+                    "nkt_data": self.data_well.data_well_dict["НКТ"],
+                    "sucker_pod": self.data_well.data_well_dict["штанги"],
+                    "diameter_doloto_ek": float(self.data_well.diameter_doloto_ek.get_value),
+                    "last_pressure_date": datetime.strptime(self.data_well.result_pressure_date.get_value, "%d.%m.%Y"),
+                    "date_commissioning": datetime.strptime(self.data_well.date_commissioning.get_value, "%d.%m.%Y"),
+                    "date_drilling_run": self.data_well.date_drilling_run,
+                    "date_drilling_finish": self.data_well.date_drilling_cancel,
+                    "leakiness": self.data_well.dict_leakiness,
+                    "geolog": data_list.user[1],
+                    "date_create": data_list.current_date,
+                }
+
+            self.api_client = ApiClient
+            response = None
+            response_find_data = self.api_client.find_wells(
+                self.data_well.well_number.get_value, self.data_well.well_area.get_value,
+                self.api_client.find_wells_data_response_filter_well_number_well_area())
+            if response_find_data != params:
+                mes = QMessageBox.question(self, 'данные по скважине', "Данные есть в базе данных")
+                if mes == QMessageBox.StandardButton.Yes:
+                    response = self.api_client.add_wells_data_in_database(params,
+                                                                           self.api_client.read_wells_data_response_for_add())
+                    if response is None:
+                        return
+            # self.set_modal_window(self.data_list.pdata_window)
+
+            # data_list.pause = True
 
             if self.data_well.emergency_well is True:
                 emergency_quest = QMessageBox.question(self, 'Аварийные работы ',

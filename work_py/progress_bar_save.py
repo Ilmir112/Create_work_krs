@@ -39,7 +39,7 @@ class ProgressBarWindow(QMainWindow):
         self.progress.setValue(row)
         QApplication.processEvents()  # Обновление интерфейса
 
-        if self.max_row == row:
+        if self.max_row <= row:
             self.close()
         # self.button.setEnabled(True)
 

@@ -162,12 +162,12 @@ class FindIndexPZ(MyMainWindow):
         self.dict_pump_ecn = {"before": 0, "after": 0}
         self.dict_pump_shgn_depth = {"before": 0, "after": 0}
         self.dict_pump_ecn_depth = {"before": 0, "after": 0}
-        self.dict_sucker_rod = {}
+        self.dict_sucker_rod = {19: 0, 22: 0, 25: 0}
 
         self.pvr_row_list = []
         self.dict_nkt_before = {}
         self.dict_nkt_after = {}
-        self.dict_sucker_rod_after = {}
+        self.dict_sucker_rod_after = {19: 0, 22: 0, 25: 0}
         self.column_direction_mine_true = False
         self.dict_pump = {"before": 0, "after": 0}
         self.column_head_m = ''
@@ -780,8 +780,8 @@ def insert_column_direction(text):
         try:
             diameter = ProtectedIsDigit(
                 column_direction_data[0].replace(' ', ''))
-        except Exception:
-            diameter = ProtectedIsNonNone('не корректно')
+        except Exception as e:
+            diameter = ProtectedIsNonNone(f'не корректно {e}')
 
         try:
             wall_thickness = ProtectedIsDigit(
