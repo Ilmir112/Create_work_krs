@@ -4,6 +4,7 @@ from datetime import datetime
 import requests
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 
+
 class ApiClient:
     SERVER_API = 'http://localhost:8000/zimaApp'
 
@@ -20,8 +21,31 @@ class ApiClient:
     @staticmethod
     def request_post(path, json_data):
         url = ApiClient.get_endpoint(path)
+
         try:
-            response = requests.post(url, json=json_data)
+            response = requests.post(url, json=ApiClient.serialize_datetime(json_data))
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Запрос не удался: {e}")
+            return response.status_code
+
+    @staticmethod
+    def request_params_get(path, json_data):
+        url = ApiClient.get_endpoint(path)
+        try:
+            response = requests.get(url, params=json_data)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Запрос не удался: {e}")
+            return response.status_code
+
+    @staticmethod
+    def request_post_param(path, json_data):
+        url = ApiClient.get_endpoint(path)
+        try:
+            response = requests.post(url, json=ApiClient.serialize_datetime(json_data))
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
@@ -29,10 +53,10 @@ class ApiClient:
             return None
 
     @staticmethod
-    def request_post_param(path, json_data):
+    def request_get_all(path):
         url = ApiClient.get_endpoint(path)
         try:
-            response = requests.get(url, params=json_data)
+            response = requests.get(url)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
@@ -61,12 +85,40 @@ class ApiClient:
         return '/wells_silencing_router/add_data_well_silencing'
 
     @classmethod
+    def get_all_users(cls):
+        return '/auth/all'
+
+    @classmethod
+    def login_path(cls):
+        return '/auth/login'
+
+    @classmethod
+    def me_info(cls):
+        return '/auth/me'
+
+    @classmethod
+    def register_auth(cls):
+        return '/auth/register'
+
+    @classmethod
     def find_wells_data_response_filter_well_number_well_area(cls):
         return '/wells_data_router/find_wells_data'
 
     @classmethod
     def read_wells_classifier_response_for_add_well(cls):
         return '/wells_classifier/add_data_well_classifier'
+
+    @classmethod
+    def read_wells_classifier_response_all(cls):
+        return '/wells_classifier/find_well_classifier_all'
+
+    @classmethod
+    def read_wells_classifier_by_well_number_and_well_area(cls):
+        return '/wells_classifier/find_well_classifier'
+
+    @classmethod
+    def read_wells_silencing_response_all(cls):
+        return '/wells_silencing_router/find_well_silencing_all'
 
     @classmethod
     def read_wells_silencing_response_for_delete_well(cls):
@@ -95,6 +147,21 @@ class ApiClient:
         return thread
 
     @classmethod
+    def add_new_user(cls, params_dict, api_url):
+        serializable_params = cls.serialize_datetime(params_dict)
+        return cls.request_post(api_url, serializable_params)
+
+    @classmethod
+    def find_all(cls, api_url):
+        return cls.request_post(api_url)
+
+    @classmethod
+    def get_info_data(cls, params_dict, api_url):
+        serializable_params = cls.serialize_datetime(params_dict)
+        return cls.request_post(api_url, serializable_params)
+
+
+    @classmethod
     def add_wells_data_in_database(cls, params_dict, api_url):
         serializable_params = cls.serialize_datetime(params_dict)
         thread = cls.run_in_thread(cls.request_post, api_url, serializable_params)
@@ -103,7 +170,7 @@ class ApiClient:
     @classmethod
     def find_wells(cls, well_number, well_area, api_url):
         params = {"well_number": well_number, "well_area": well_area}
-        return cls.request_post_param(api_url, params)
+        return cls.request_params_get(api_url, params)
 
 
 class ResponseWork(QMainWindow):

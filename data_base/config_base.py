@@ -130,8 +130,8 @@ class UserService:
                                       'first_name': password_base[1],
                                       'second_name': password_base[2],
                                       'password': password_base[3],
-                                      'pozition': password_base[4],
-                                      'organization': password_base[5]}
+                                      'pozition_id': password_base[4],
+                                      'contractor': password_base[5]}
 
             return password_base_dict
 

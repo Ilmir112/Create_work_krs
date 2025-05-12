@@ -51,9 +51,21 @@ class ClassifierWell(MyMainWindow):
             self.open_to_sqlite_without_juming(costumer, region)
 
     def get_data_from_db(self, region):
+        if data_list.connect_in_base:
+            region_json = {"region": region}
+            data_response = ApiClient.request_post(ApiClient.read_wells_silencing_response_all(), region_json)
+            data = []
 
-        well_classification = CheckWellExistence(self.db)
-        data = well_classification.get_data_from_db(region)
+            for num in data_response:
+                wells_data = []
+                for key, value in num.items():
+                    if key in ["well_number", "deposit_area", "today"]:
+                        wells_data.append(value)
+                data.append(wells_data)
+
+        else:
+            well_classification = CheckWellExistence(self.db)
+            data = well_classification.get_data_from_db(region)
 
         return data
 
@@ -90,8 +102,23 @@ class ClassifierWell(MyMainWindow):
             event.accept()  # Принимаем событие закрытия
 
     def get_data_from_class_well_db(self, region):
-        well_classification = CheckWellExistence(self.db)
-        data = well_classification.get_data_from_class_well_db(region)
+        if data_list.connect_in_base:
+            region_json = {"region": region[:3]}
+            data_response = ApiClient.request_post(ApiClient.read_wells_classifier_response_all(), region_json)
+            data = []
+            # ['ЦДНГ', 'номер скважины', 'площадь', 'Месторождение', 'Категория \n по Рпл',
+            #  'Ргд', 'Рпл', 'Дата замера', 'категория \nH2S', 'H2S-%', "H2S-мг/л",
+            #  "H2S-мг/м3", 'Категория по газу', "Газовый фактор", "версия от"]
+            for num in data_response:
+                wells_data = [num["cdng"], num["well_number"], num["deposit_area"], num["oilfield"],
+                              num['category_pressure'], num['pressure_gst'], num["pressure_ppl"],
+                              num['date_measurement'], num['category_h2s'], num['h2s_pr'], num['h2s_mg_l'],
+                              num['h2s_mg_m'], num['category_gf'], num['gas_factor'], num["today"]]
+
+                data.append(wells_data)
+        else:
+            well_classification = CheckWellExistence(self.db)
+            data = well_classification.get_data_from_class_well_db(region)
         return data
 
     def open_to_sqlite_class_well(self):

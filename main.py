@@ -80,7 +80,13 @@ class ExcelWorker(QThread):
             return check_true
 
     def check_category(self, well_number, deposit_area, region):
-        result = self.check_correct_well.check_category(well_number, deposit_area, region)
+        if data_list.connect_in_base:
+            params = {"well_number": well_number.get_value, "well_area": deposit_area.get_value}
+            result = ApiClient.request_params_get(ApiClient.read_wells_classifier_by_well_number_and_well_area(), params)
+
+            result = result['category_pressure'], result['category_h2s'], result['category_gf'], result['today']
+        else:
+            result = self.check_correct_well.check_category(well_number, deposit_area, region)
         if result:
             return result
 
@@ -769,21 +775,18 @@ class MyMainWindow(QMainWindow):
                     "date_create": data_list.current_date,
                 }
 
-            self.api_client = ApiClient
+
             response = None
-            response_find_data = self.api_client.find_wells(
+            response_find_data = ApiClient.find_wells(
                 self.data_well.well_number.get_value, self.data_well.well_area.get_value,
-                self.api_client.find_wells_data_response_filter_well_number_well_area())
-            if response_find_data != params:
-                mes = QMessageBox.question(self, 'данные по скважине', "Данные есть в базе данных")
-                if mes == QMessageBox.StandardButton.Yes:
-                    response = self.api_client.add_wells_data_in_database(params,
-                                                                           self.api_client.read_wells_data_response_for_add())
+                ApiClient.find_wells_data_response_filter_well_number_well_area())
+            if response_find_data:
+                mes = QMessageBox.question(self, 'данные по скважине', "Данные есть в базе данных, обновить?")
+                if mes == QMessageBox.StandardButton.No:
                     if response is None:
                         return
-            # self.set_modal_window(self.data_list.pdata_window)
 
-            # data_list.pause = True
+            response = ApiClient.request_post_param(ApiClient.read_wells_data_response_for_add(), params)
 
             if self.data_well.emergency_well is True:
                 emergency_quest = QMessageBox.question(self, 'Аварийные работы ',
@@ -1482,16 +1485,16 @@ class MyWindow(MyMainWindow):
 
             print(f"Путь к изображению: {data_list.path_image}")
 
-            # Загружаем изображение для заставки
-            splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima.png")  # путь к  изображению
-
+            # # Загружаем изображение для заставки
             # splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima.png")  # путь к  изображению
-            splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
-            splash.setMask(splash_pix.mask())
-            splash.show()
+            #
+            # # splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima.png")  # путь к  изображению
+            # splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+            # splash.setMask(splash_pix.mask())
+            # splash.show()
 
-            # Задержка на 5 секунд
-            QTimer.singleShot(1000, splash.close)
+            # # Задержка на 5 секунд
+            # QTimer.singleShot(1000, splash.close)
 
             data_list.connect_in_base, self.db = connect_to_database(decrypt("DB_NAME_USER"))
 

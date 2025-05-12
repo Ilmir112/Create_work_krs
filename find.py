@@ -2278,7 +2278,7 @@ class WellCategory(FindIndexPZ):
                 QMessageBox.warning(self, 'Ошибка',
                                     f'Скважина {self.well_number.get_value} '
                                     f'{self.well_area.get_value} не найдена в классификаторе. '
-                                    f'Необходимо проверить соответствие данных с классификатором')
+                                    f'Необходимо проверить соответствие данных с классификатором {e}')
 
         for plast in self.dict_perforation:
             if self.dict_perforation[plast]['отключение'] is False:

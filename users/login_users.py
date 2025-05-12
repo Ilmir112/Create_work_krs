@@ -1,4 +1,5 @@
 import psutil
+from PyQt5.QtCore import QSettings
 
 import data_list
 
@@ -7,6 +8,7 @@ from PyQt5.QtCore import Qt
 
 from data_base.config_base import UserService, connection_to_database, \
     RegistrationService
+from data_base.work_with_base import ApiClient
 from decrypt import decrypt
 
 
@@ -19,7 +21,7 @@ class LoginWindow(QDialog):
 
         self.label_username = QLabel("Пользователь:", self)
         self.username = QComboBox(self)
-        users_list = list(map(lambda x: x[1], self.get_list_users()))
+        users_list = self.get_list_users()
 
         self.username.addItems(users_list)
         self.label_password = QLabel("Пароль:", self)
@@ -70,36 +72,64 @@ class LoginWindow(QDialog):
 
         username = self.username.currentText()
         password = self.password.text()
-        last_name, first_name, second_name, _ = username.split(' ')
-        if self.user_dict is None:
-            self.user_dict = self.user_service.get_user(last_name, first_name, second_name)
 
-        if self.user_dict['last_name'] == last_name and self.user_dict['first_name'] == first_name \
-                and self.user_dict['second_name'] and self.user_dict['password'] == str(password):
-            # mes = QMessageBox.information(self, 'Пароль', 'вход произведен')
+        if data_list.connect_in_base:
+            params ={
+                  "login_user": username,
+                  "password": password
+                }
 
-            data_list.user = (self.user_dict["pozition"] + ' ' + self.user_dict["organization"],
-                              f'{self.user_dict["last_name"]} '
-                              f'{self.user_dict["first_name"][0]}.{self.user_dict["second_name"][0]}.')
+            user_access = ApiClient.get_info_data(params, ApiClient.login_path())
+            if user_access:
+                settings = QSettings('Zima', 'ZimaApp')
+                settings.setValue('auth_token', user_access["access_token"])
 
-            data_list.contractor = self.user_dict["organization"]
+                self.user_dict = user_access
 
-            data_list.pause = False
-            self.close()
+
+                data_list.user = ( self.user_dict["position_id"] + ' ' + self.user_dict["contractor"],  self.user_dict["login_user"])
+                data_list.contractor = self.user_dict["contractor"]
+
+                data_list.pause = False
+                self.close()
 
         else:
-            QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
-            data_list.pause = True
-            self.user_dict = None
+
+            last_name, first_name, second_name, _ = username.split(' ')
+            if self.user_dict is None:
+                self.user_dict = self.user_service.get_user(last_name, first_name, second_name)
+
+            if self.user_dict["last_name"] == last_name and self.user_dict["first_name"] == first_name \
+                    and self.user_dict["second_name"] and self.user_dict["password"] == str(password):
+                # mes = QMessageBox.information(self, 'Пароль', 'вход произведен')
+
+                data_list.user = (self.user_dict["pozition_id"] + ' ' + self.user_dict["organization"],
+                                  f'{self.user_dict["last_name"]} '
+                                  f'{self.user_dict["first_name"][0]}.{self.user_dict["second_name"][0]}.')
+
+                data_list.contractor = self.user_dict["organization"]
+
+                data_list.pause = False
+                self.close()
+
+            else:
+                QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
+                data_list.pause = True
+                self.user_dict = None
 
         # if 'РН' in data_list.contractor:
         #     data_list.connect_in_base = False
 
     @staticmethod
     def get_list_users():
-        db = connection_to_database(decrypt("DB_NAME_USER"))
-        user_service = UserService(db)
-        users_list = user_service.get_users_list()
+        if data_list.connect_in_base is False:
+            db = connection_to_database(decrypt("DB_NAME_USER"))
+            user_service = UserService(db)
+            users_list = user_service.get_users_list()
+        else:
+            users_list = ApiClient.request_get_all(ApiClient.get_all_users())
+
+            users_list = list(map(lambda x: x["login_user"], users_list))
         return users_list
 
     def show_register_window(self):
@@ -112,6 +142,7 @@ class RegisterWindow(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Окно регистрация')
+        self.api_client = ApiClient
 
         self.label_last_name = QLabel("Фамилия:", self)
         self.last_name = QLineEdit(self)
@@ -197,23 +228,49 @@ class RegisterWindow(QDialog):
         region = self.region.currentText().strip()
         password = self.password.text().strip()
         password2 = self.password2.text().strip()
+        if password == password2:
+            if data_list.connect_in_base is False:
 
+                db = connection_to_database(decrypt("DB_NAME_USER"))
 
-        db = connection_to_database(decrypt("DB_NAME_USER"))
+                registration = RegistrationService(db)
 
-        registration = RegistrationService(db)
+                existing_user = registration.check_user_in_database(last_name, first_name, second_name)
 
-        existing_user = registration.check_user_in_database(last_name, first_name, second_name)
+                if existing_user:  # Если пользователь уже существует
+                    QMessageBox.critical(self, 'Данный пользовать существует', 'Данный пользовать существует')
+                else:  # Если пользователя с таким именем еще нет
+                    position_in = position_in + " " + region
+                    if password == password2:
+                        registration.registration_user(last_name, first_name, second_name, position_in,
+                                                       organization, password, region)
 
-        if existing_user:  # Если пользователь уже существует
-            QMessageBox.critical(self, 'Данный пользовать существует', 'Данный пользовать существует')
-        else:  # Если пользователя с таким именем еще нет
-            position_in = position_in + " " + region
-            if password == password2:
-                registration.registration_user(last_name, first_name, second_name, position_in,
-                                               organization, password, region)
+                        QMessageBox.information(self, 'Регистрация', 'пользователь успешно создан')
+                        self.close()
 
-                QMessageBox.information(self, 'Регистрация', 'пользователь успешно создан')
-                self.close()
             else:
-                QMessageBox.information(self, 'пароль', 'Пароли не совпадают')
+
+                params = {
+                        "login_user": f"{last_name} {first_name[0]}.{second_name[0]}.",
+                        "name_user": first_name,
+                        "surname_user": last_name,
+                        "second_name": second_name,
+                        "position_id": position_in,
+                        "costumer": data_list.costumer,
+                        "contractor": organization,
+                        "ctcrs": region,
+                        "password": password,
+                        "access_level": "user"
+                    }
+                user = ApiClient.add_new_user(params, self.api_client.register_auth())
+
+                if user == 409:
+                    QMessageBox.critical(self, 'Данный пользовать существует', 'Данный пользовать существует')
+                elif user == 200:
+                    QMessageBox.information(self, 'Регистрация', 'пользователь успешно создан')
+                    self.close()
+                else:
+                    QMessageBox.critical(self, 'Не известная ошибка', 'Не известная ошибка')
+        else:
+            QMessageBox.information(self, 'пароль', 'Пароли не совпадают')
+
