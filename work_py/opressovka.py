@@ -171,44 +171,7 @@ class OpressovkaEK(WindowUnion):
         self.close_modal_forcefully()
 
     # Добавление строк с опрессовкой ЭК
-    def select_combo_paker(self, paker_khost, paker_depth, paker_diameter):
-        if self.data_well.column_additional is False or self.data_well.column_additional is True \
-                and paker_depth < self.data_well.head_column_additional.get_value:
 
-            paker_select = f'воронку + НКТ{self.data_well.nkt_diam}мм {paker_khost}м +' \
-                           f' пакер ПРО-ЯМО-{paker_diameter}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_diameter.get_value}мм х {self.data_well.column_wall_thickness.get_value}мм +' \
-                           f' {OpressovkaEK.nkt_opress(self)[0]}'
-            paker_short = f'в-у + НКТ{self.data_well.nkt_diam}мм {paker_khost}м +' \
-                          f' пакер ПРО-ЯМО-{paker_diameter}мм  +' \
-                          f' {OpressovkaEK.nkt_opress(self)[0]}'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
-                paker_depth > self.data_well.head_column_additional.get_value:
-            paker_select = f'воронку + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
-                           f'{paker_diameter}мм ' \
-                           f'(либо аналог)  ' \
-                           f'для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
-                           f'{self.data_well.column_additional_wall_thickness.get_value}мм  + {OpressovkaEK.nkt_opress(self)[0]} ' \
-                           f'+ НКТ60мм L- {round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
-            paker_short = f'в-у + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
-                          f'{paker_diameter}мм ' \
-                          f' + {OpressovkaEK.nkt_opress(self)[0]} ' \
-                          f'+ НКТ60мм L- {round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110 and \
-                paker_depth > self.data_well.head_column_additional.get_value:
-            paker_select = f'воронку + НКТ{self.data_well.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
-                           f'пакер ПРО-ЯМО-{paker_diameter}мм (либо аналог) ' \
-                           f'для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
-                           f'{self.data_well.column_additional_wall_thickness.get_value}мм  + {OpressovkaEK.nkt_opress(self)[0]}' \
-                           f'+ НКТ{self.data_well.nkt_diam}мм со снятыми фасками L- ' \
-                           f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
-            paker_short = f'в-у + НКТ{self.data_well.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
-                          f'пакер ПРО-ЯМО-{paker_diameter}мм + {OpressovkaEK.nkt_opress(self)[0]}' \
-                          f'+ НКТ{self.data_well.nkt_diam}мм со снятыми фасками L- ' \
-                          f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
-
-        nkt_opress_list = OpressovkaEK.nkt_opress(self)
-        return paker_select, paker_short, nkt_opress_list
 
     def paker_list(self, paker_diameter, paker_khost, paker_depth, pressure_zumpf_question, paker_depth_zumpf=0):
 

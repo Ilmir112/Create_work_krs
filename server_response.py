@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QMainWindow, QMessageBox
 
 class ApiClient:
     SERVER_API = 'http://localhost:8000/zimaApp'
+    SETTINGS_TOKEN = None
 
     @classmethod
     def run_in_thread(cls, target_method, *args, **kwargs):
@@ -20,6 +21,7 @@ class ApiClient:
 
     @staticmethod
     def request_post(path, json_data):
+
         url = ApiClient.get_endpoint(path)
 
         try:
@@ -32,9 +34,13 @@ class ApiClient:
 
     @staticmethod
     def request_params_get(path, json_data):
+        headers = {}
+        if ApiClient.SETTINGS_TOKEN:
+            token = ApiClient.SETTINGS_TOKEN.value('auth_token', '')
+            headers['Authorization'] = f'Bearer {token}'
         url = ApiClient.get_endpoint(path)
         try:
-            response = requests.get(url, params=json_data)
+            response = requests.get(url, params=json_data, headers=headers)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
@@ -45,7 +51,15 @@ class ApiClient:
     def request_post_param(path, json_data):
         url = ApiClient.get_endpoint(path)
         try:
-            response = requests.post(url, json=ApiClient.serialize_datetime(json_data))
+            from PyQt5.QtCore import QSettings
+
+            token = ApiClient.SETTINGS_TOKEN.value('auth_token', '')
+
+            headers = {
+                'Authorization': f'Bearer {token}'
+            }
+
+            response = requests.post(url, json=ApiClient.serialize_datetime(json_data), headers=headers)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:

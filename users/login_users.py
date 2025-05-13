@@ -74,16 +74,20 @@ class LoginWindow(QDialog):
         password = self.password.text()
 
         if data_list.connect_in_base:
-            params ={
+            params = {
                   "login_user": username,
                   "password": password
                 }
 
             user_access = ApiClient.get_info_data(params, ApiClient.login_path())
             if user_access:
-                settings = QSettings('Zima', 'ZimaApp')
-                settings.setValue('auth_token', user_access["access_token"])
+                ApiClient.SETTINGS_TOKEN = QSettings('Zima', 'ZimaApp')
 
+                ApiClient.SETTINGS_TOKEN.setValue('auth_token', user_access["access_token"])
+
+                aswadw = ApiClient.SETTINGS_TOKEN
+
+                anshwer = ApiClient.request_params_get(ApiClient.me_info(), params)
                 self.user_dict = user_access
 
 

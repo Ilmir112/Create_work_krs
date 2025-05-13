@@ -770,9 +770,9 @@ class MyMainWindow(QMainWindow):
                     "date_commissioning": datetime.strptime(self.data_well.date_commissioning.get_value, "%d.%m.%Y"),
                     "date_drilling_run": self.data_well.date_drilling_run,
                     "date_drilling_finish": self.data_well.date_drilling_cancel,
-                    "leakiness": self.data_well.dict_leakiness,
                     "geolog": data_list.user[1],
                     "date_create": data_list.current_date,
+                    "leakiness": self.data_well.dict_leakiness,
                 }
 
 
@@ -783,10 +783,9 @@ class MyMainWindow(QMainWindow):
             if response_find_data:
                 mes = QMessageBox.question(self, 'данные по скважине', "Данные есть в базе данных, обновить?")
                 if mes == QMessageBox.StandardButton.No:
-                    if response is None:
-                        return
-
-            response = ApiClient.request_post_param(ApiClient.read_wells_data_response_for_add(), params)
+                    pass
+            else:
+                response = ApiClient.request_post_param(ApiClient.read_wells_data_response_for_add(), params)
 
             if self.data_well.emergency_well is True:
                 emergency_quest = QMessageBox.question(self, 'Аварийные работы ',
