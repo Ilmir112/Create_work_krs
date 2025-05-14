@@ -11,6 +11,7 @@ from datetime import datetime
 
 from data_base.config_base import connection_to_database, WorkDatabaseWell
 from decrypt import decrypt
+from server_response import ApiClient
 
 from work_py.advanted_file import merge_overlapping_intervals
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
@@ -33,6 +34,7 @@ class TabPageDp(TabPageUnion):
 
         self.well_area_label = QLabel('площадь скважины')
         self.well_area_edit = QLineEdit(self)
+        self.well_area_edit.textChanged.connect(self.update_well_area)
 
         self.number_DP_label = QLabel('номер \nдополнительного плана')
         self.number_DP_Combo = QComboBox(self)
@@ -184,7 +186,7 @@ class TabPageDp(TabPageUnion):
             # self.table_in_base_combo = QComboBox()
             # self.table_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
 
-            self.well_data_label = QLabel('файл excel сохранный в базе')
+            self.well_data_label = QLabel('файл excel в базе')
             self.well_data_in_base_combo = QComboBox()
             self.well_data_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
             self.well_data_in_base_combo.currentTextChanged.connect(self.update_well_data_in_base_combo)
@@ -206,13 +208,26 @@ class TabPageDp(TabPageUnion):
                 number_dp_in_base = [num for num in index.split(' ')[3] if num.isdigit()][0]
                 self.number_DP_Combo.setCurrentIndex(int(number_dp_in_base))
 
-    def check_in_database_well_data2(self, number_well):
-        db = connection_to_database(decrypt("DB_WELL_DATA"))
-        data_well_base = WorkDatabaseWell(db, self.data_well)
+    def update_well_area(self, well_area):
+        if self.well_number_edit.text() != '' and data_list.connect_in_base:
+            params = {"well_number":  self.well_number_edit.text(), "well_area": well_area}
+            response = ApiClient.request_params_get(ApiClient.find_wells_data_response_find_id_by_wells_data(), params)
 
-        # Получение всех результатов
-        wells_with_data = data_well_base.check_well_in_database_well_data(number_well)
-        # Проверка, есть ли данные
+            self.insert_response_data(response)
+
+    def check_in_database_well_data2(self, number_well):
+        if data_list.connect_in_base:
+            params = {"well_number": number_well}
+            response = ApiClient.request_params_get(ApiClient.response_find_well_filter_by_number(), params)
+            if response:
+                return response['ремонты']
+        else:
+            db = connection_to_database(decrypt("DB_WELL_DATA"))
+            data_well_base = WorkDatabaseWell(db, self.data_well)
+
+            # Получение всех результатов
+            wells_with_data = data_well_base.check_well_in_database_well_data(number_well)
+            # Проверка, есть ли данные
         if wells_with_data:
             well_list = []
             for well in wells_with_data:

@@ -294,10 +294,11 @@ class FindIndexPZ(MyMainWindow):
         for row_ind, row in enumerate(self.ws.iter_rows(values_only=True, max_row=300, max_col=20)):
             self.ws.row_dimensions[row_ind].hidden = False
             if self.cat_well_min.get_value != 0:
-                coord_image = list(map(
-                    lambda x: int("".join([y for y in x if y.isdigit()])), list(self.image_loader._images.keys())))
-                if self.data_x_max.get_value == 0 and row_ind in coord_image:
-                    self.work_with_img(self.image_loader, row_ind)
+                if self.image_loader:
+                    coord_image = list(map(
+                        lambda x: int("".join([y for y in x if y.isdigit()])), list(self.image_loader._images.keys())))
+                    if self.data_x_max.get_value == 0 and row_ind in coord_image:
+                        self.work_with_img(self.image_loader, row_ind)
 
             if 'Категория скважины' in row:
                 cat_well_min.append(row_ind + 1)

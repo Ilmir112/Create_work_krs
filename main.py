@@ -81,8 +81,8 @@ class ExcelWorker(QThread):
 
     def check_category(self, well_number, deposit_area, region):
         if data_list.connect_in_base:
-            params = {"well_number": well_number.get_value, "well_area": deposit_area.get_value}
-            result = ApiClient.request_params_get(ApiClient.read_wells_classifier_by_well_number_and_well_area(), params)
+            self.params = {"well_number": well_number.get_value, "well_area": deposit_area.get_value}
+            result = ApiClient.request_params_get(ApiClient.read_wells_classifier_by_well_number_and_well_area(), self.params)
 
             result = result['category_pressure'], result['category_h2s'], result['category_gf'], result['today']
         else:
@@ -92,20 +92,63 @@ class ExcelWorker(QThread):
 
     def insert_data_in_database(self, excel_data_dict, data_well):
         from data_base.config_base import connection_to_database, WorkDatabaseWell
-        try:
-            db = connection_to_database(decrypt("DB_WELL_DATA"))
-            data_well_base = WorkDatabaseWell(db)
-            data_well_base.insert_in_database_well_data(self.data_well,
-                                                        data_list.contractor, data_list.costumer, excel_data_dict)
-        except Exception as e:
-            QMessageBox.warning(None, 'Ошибка', f"Ошибка при вставке данных в базу: {type(e).__name__}\n\n{str(e)}")
 
-        if self.data_well.work_plan == 'krs':
+        if data_list.connect_in_base:
+            self.params = {
+                "well_number": self.data_well.well_number.get_value,
+                "well_area": self.data_well.well_area.get_value
+            }
+            #
+            # self.wells_data_by_id = ApiClient.request_params_get(ApiClient.find_wells_data_response_find_id_by_wells_data(),
+            #                                              self.params)
+            if self.data_well.work_plan in ['dop_plan', 'dop_plan_in_base']:
+                string_work = f' ДП№ {self.data_well.number_dp}'
+            elif self.data_well.work_plan == 'krs':
+                string_work = 'ПР'
+            elif self.data_well.work_plan == 'plan_change':
+                if self.data_well.work_plan_change == 'krs':
+                    string_work = 'ПР изм'
+                else:
+                    string_work = f'ДП№{self.data_well.number_dp} изм '
+            elif self.data_well.work_plan == 'gnkt_bopz':
+                string_work = 'ГНКТ БОПЗ ВНС'
+            elif self.data_well.work_plan == 'gnkt_opz':
+                string_work = 'ГНКТ ОПЗ'
+            elif self.data_well.work_plan == 'gnkt_after_grp':
+                string_work = 'ГНКТ ОСВ ГРП'
+            elif self.data_well.work_plan == 'prs':
+                string_work = 'ПРС'
+            else:
+                string_work = 'ГНКТ'
+
+            params = {
+                    "id": 2,
+                  "category_dict": {"данные по категории": json.dumps(self.data_well.dict_category)},
+                  "type_kr": self.data_well.type_kr.split(" ")[0],
+                  "work_plan": string_work,
+                  "excel_json": {"excel": json.dumps(excel_data_dict)},
+                  "data_change_paragraph": {"данные": json.dumps(self.data_well.data_list)},
+                  "norms_time": self.data_well.norm_of_time,
+                  "chemistry_need": data_list.DICT_VOLUME_CHEMISTRY,
+                  "geolog_id": data_list.user[1],
+                  "date_create": data_list.current_date
+                }
+            response = ApiClient.request_post_json(ApiClient.read_wells_repair_response_for_add(), params, self.params, 'json')
+        else:
             try:
-                data_well_base.insert_data_in_chemistry(data_well)
+                db = connection_to_database(decrypt("DB_WELL_DATA"))
+                data_well_base = WorkDatabaseWell(db)
+                data_well_base.insert_in_database_well_data(self.data_well,
+                                                            data_list.contractor, data_list.costumer, excel_data_dict)
             except Exception as e:
-                QMessageBox.warning(None, 'Ошибка', f"Ошибка при вставке данных химии в базу"
-                                                    f": {type(e).__name__}\n\n{str(e)}")
+                QMessageBox.warning(None, 'Ошибка', f"Ошибка при вставке данных в базу: {type(e).__name__}\n\n{str(e)}")
+
+            if self.data_well.work_plan == 'krs':
+                try:
+                    data_well_base.insert_data_in_chemistry(data_well)
+                except Exception as e:
+                    QMessageBox.warning(None, 'Ошибка', f"Ошибка при вставке данных химии в базу"
+                                                        f": {type(e).__name__}\n\n{str(e)}")
 
         # Завершение работы потока
         self.finished.emit()
@@ -184,14 +227,19 @@ class MyMainWindow(QMainWindow):
                  f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
                 [None, None, None, None, None, None, None, power_of_attorney, None, None, None, None],
                 [None, podpis_dict[data_list.costumer][region]['gg']['post'], None, None, None,
-                 None, None, f'{chief_geologist_post}', None, None, None, None],
+                 None, None, None, None, None, None, None],
+                # [None, podpis_dict[data_list.costumer][region]['gg']['post'], None, None, None,
+                #  None, None, f'{chief_geologist_post}', None, None, None, None],
+                # [None, f'_____________{podpis_dict[data_list.costumer][region]["gg"]["surname"]}', None, None, None,
+                #  None, None, f'_____________{chief_geologist_surname}', None, None, '',
+                #  None],
                 [None, f'_____________{podpis_dict[data_list.costumer][region]["gg"]["surname"]}', None, None, None,
-                 None,
-                 None,
-                 f'_____________{chief_geologist_surname}', None, None, '',
+                 None, None, None, None, None, '',
                  None],
+                # [None, f'"____"_____________________{current_datetime.year}г.', None, None, '', None, None,
+                #  f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
                 [None, f'"____"_____________________{current_datetime.year}г.', None, None, '', None, None,
-                 f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
+                 None, None, None, None, None],
                 [None, None, None, None, None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None, None, None, None, None],
@@ -782,10 +830,10 @@ class MyMainWindow(QMainWindow):
                 ApiClient.find_wells_data_response_filter_well_number_well_area())
             if response_find_data:
                 mes = QMessageBox.question(self, 'данные по скважине', "Данные есть в базе данных, обновить?")
-                if mes == QMessageBox.StandardButton.No:
-                    pass
+                if mes == QMessageBox.StandardButton.Yes:
+                    passresponse = ApiClient.request_post_json(ApiClient.read_wells_data_response_for_add(), params, None, 'json')
             else:
-                response = ApiClient.request_post_param(ApiClient.read_wells_data_response_for_add(), params)
+                response = ApiClient.request_post_json(ApiClient.read_wells_data_response_for_add(), params, None, 'json')
 
             if self.data_well.emergency_well is True:
                 emergency_quest = QMessageBox.question(self, 'Аварийные работы ',
@@ -1083,8 +1131,8 @@ class MyMainWindow(QMainWindow):
 
     def insert_data_in_database(self, row_number, row_max):
 
-        dict_perforation_json = json.dumps(self.data_well.dict_perforation, default=str, ensure_ascii=False,
-                                           indent=4)
+        dict_perforation_json = json.dumps(ApiClient.serialize_datetime(self.data_well.dict_perforation),
+                                           default=str, ensure_ascii=False, indent=4)
         # print(self.data_well.dict_leakiness)
         leakage_json = json.dumps(self.data_well.dict_leakiness, default=str, ensure_ascii=False, indent=4)
         plast_all_json = json.dumps(self.data_well.plast_all)
@@ -1484,16 +1532,16 @@ class MyWindow(MyMainWindow):
 
             print(f"Путь к изображению: {data_list.path_image}")
 
-            # # Загружаем изображение для заставки
-            # splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima.png")  # путь к  изображению
-            #
-            # # splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima.png")  # путь к  изображению
-            # splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
-            # splash.setMask(splash_pix.mask())
-            # splash.show()
+            # Загружаем изображение для заставки
+            splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima.png")  # путь к  изображению
 
-            # # Задержка на 5 секунд
-            # QTimer.singleShot(1000, splash.close)
+            # splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima.png")  # путь к  изображению
+            splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+            splash.setMask(splash_pix.mask())
+            splash.show()
+
+            # Задержка на 5 секунд
+            QTimer.singleShot(1000, splash.close)
 
             data_list.connect_in_base, self.db = connect_to_database(decrypt("DB_NAME_USER"))
 

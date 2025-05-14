@@ -276,10 +276,21 @@ def events_gnvp_frez(self, distance, fluid):
                       f'более 2м/мин;\n' \
                       f'в интервале {self.data_well.perforation_roof - 10}-{self.data_well.current_bottom}м не более 2-5 м/мин;'
 
-        down_gntk_str = f'Скорость подъёма по интервалам:\n'
-        f'в интервале забой-{self.data_well.perforation_roof - 10}м не более 10 м/мин;\n'
-        f'в интервале {niz_nkt - 20}-2м не более 15-20 м/мин;\n'
-        f'в устьевом оборудовании не более 0.5 м/мин.'
+        down_gntk_str = f'Скорость подъёма по интервалам:\n' \
+                    f'в интервале забой-{self.data_well.perforation_roof - 10}м не более 10 м/мин;\n' \
+                    f'в интервале {niz_nkt - 20}-2м не более 15-20 м/мин;\n' \
+                    f'в устьевом оборудовании не более 0.5 м/мин.'
+    else:
+        up_gnkt_str = f'Скорость спуска по интервалам:\n' \
+                      f'в устьевом оборудовании не более 0.5м/мин;\n' \
+                      f'в интервале 2 -{self.data_well.perforation_roof - 10}м не ' \
+                      f'более 2м/мин;\n' \
+                      f'в интервале {self.data_well.perforation_roof - 10}-{self.data_well.current_bottom}м не более 2-5 м/мин;'
+
+        down_gntk_str = f'Скорость подъёма по интервалам:\n' \
+                        f'в интервале забой-{self.data_well.perforation_roof - 10}м не более 10 м/мин;\n' \
+                        f'в интервале {self.data_well.perforation_roof - 20}-2м не более 15-20 м/мин;\n'\
+                        f'в устьевом оборудовании не более 0.5 м/мин.'
 
     spo_list = [[None,  f'Ограничения веса и скоростей при СПО:',
                      None, None, None, None, None, None, None, None, None,

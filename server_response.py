@@ -48,18 +48,18 @@ class ApiClient:
             return response.status_code
 
     @staticmethod
-    def request_post_param(path, json_data):
+    def request_post_json(path, json_data, param=None, answer='param'):
         url = ApiClient.get_endpoint(path)
         try:
-            from PyQt5.QtCore import QSettings
-
             token = ApiClient.SETTINGS_TOKEN.value('auth_token', '')
-
+            json_data = ApiClient.serialize_datetime(json_data)
             headers = {
-                'Authorization': f'Bearer {token}'
-            }
+                'Authorization': f'Bearer {token}'}
 
-            response = requests.post(url, json=ApiClient.serialize_datetime(json_data), headers=headers)
+            if answer == 'param':
+                response = requests.post(url, params=json_data, headers=headers)
+            else:
+                response = requests.post(url, params=param, json=json_data, headers=headers)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
@@ -84,6 +84,8 @@ class ApiClient:
             return {k: ApiClient.serialize_datetime(v) for k, v in obj.items()}
         elif isinstance(obj, list):
             return [ApiClient.serialize_datetime(item) for item in obj]
+        elif 'excel' == obj:
+            return obj
         elif isinstance(obj, str):
             matches = re.findall(r"\b\d{2}\.\d{2}\.\d{4}\b", obj)
             if matches:
@@ -115,6 +117,9 @@ class ApiClient:
         return '/auth/register'
 
     @classmethod
+    def find_wells_data_response_find_id_by_wells_data(cls):
+        return '/wells_data_router/find_id_by_wells_data'
+    @classmethod
     def find_wells_data_response_filter_well_number_well_area(cls):
         return '/wells_data_router/find_wells_data'
 
@@ -145,6 +150,14 @@ class ApiClient:
     @classmethod
     def read_wells_data_response_for_add(cls):
         return '/wells_data_router/add_wells_data'
+
+    @classmethod
+    def read_wells_repair_response_for_add(cls):
+        return '/wells_repair_router/add_wells_data'
+
+    @classmethod
+    def response_find_well_filter_by_number(cls):
+        return '/wells_repair_router/find_well_filter_by_number'
 
     @classmethod
     def delete_wells_by_region(cls, region, path):
