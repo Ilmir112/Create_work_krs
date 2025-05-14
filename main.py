@@ -121,9 +121,8 @@ class ExcelWorker(QThread):
             else:
                 string_work = 'ГНКТ'
 
-            params = {
-                    "id": 2,
-                  "category_dict": {"данные по категории": json.dumps(self.data_well.dict_category)},
+            params = {"id": 2,
+                  "category_dict": ApiClient.serialize_datetime(self.data_well.dict_category),
                   "type_kr": self.data_well.type_kr.split(" ")[0],
                   "work_plan": string_work,
                   "excel_json": {"excel": json.dumps(excel_data_dict)},
@@ -131,7 +130,20 @@ class ExcelWorker(QThread):
                   "norms_time": self.data_well.norm_of_time,
                   "chemistry_need": data_list.DICT_VOLUME_CHEMISTRY,
                   "geolog_id": data_list.user[1],
-                  "date_create": data_list.current_date
+                  "date_create": data_list.current_date,
+                  "perforation_project": ApiClient.serialize_datetime(self.data_well.dict_perforation_project),
+                  "type_absorbent": self.data_well.type_absorbent,
+                  "static_level": self.data_well.static_level,
+                  "dinamic_level": self.data_well.dinamic_level,
+                  "expected_data": {
+                      "oil": self.data_well.expected_oil,
+                      "expected_pickup": self.data_well.expected_pickup,
+                      "expected_pressure": self.data_well.expected_pressure,
+                      "percent_water": self.data_well.percent_water,
+                      "water_cut": self.data_well.water_cut
+                  },
+                  "curator": self.data_well.curator,
+                      "region": self.data_well.region
                 }
             response = ApiClient.request_post_json(ApiClient.read_wells_repair_response_for_add(), params, self.params, 'json')
         else:

@@ -80,7 +80,6 @@ class ClassifierWell(MyMainWindow):
 
         data = self.get_data_from_db(self.region)
         if data:
-
             self.table_class.setColumnCount(len(data[0]))
             self.table_class.setRowCount(len(data))
             self.table_class.setCellWidget(0, 0, self.edit_well_number)
@@ -106,9 +105,6 @@ class ClassifierWell(MyMainWindow):
             region_json = {"region": region[:3]}
             data_response = ApiClient.request_post(ApiClient.read_wells_classifier_response_all(), region_json)
             data = []
-            # ['ЦДНГ', 'номер скважины', 'площадь', 'Месторождение', 'Категория \n по Рпл',
-            #  'Ргд', 'Рпл', 'Дата замера', 'категория \nH2S', 'H2S-%', "H2S-мг/л",
-            #  "H2S-мг/м3", 'Категория по газу', "Газовый фактор", "версия от"]
             for num in data_response:
                 wells_data = [num["cdng"], num["well_number"], num["deposit_area"], num["oilfield"],
                               num['category_pressure'], num['pressure_gst'], num["pressure_ppl"],
