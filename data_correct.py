@@ -917,7 +917,6 @@ class DataWindow(WindowUnion):
                 else:
                     self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(
                         self.data_well.date_drilling_cancel)
-
             if self.check_date_format(date_commissioning_line) is False:
                 if curator != 'ВНС':
                     QMessageBox.warning(self, 'Ошибка', 'Не корректна дата ввода в эскплуатацию, '
@@ -927,13 +926,8 @@ class DataWindow(WindowUnion):
                     self.data_well.date_commissioning = data_list.ProtectedIsNonNone(
                         self.data_well.date_drilling_cancel)
 
-                # try:
-                #     # Попытка распарсить строку в формате 'ДД.ММ.ГГГГ'
-                #     datetime.strptime(self.data_well.date_commissioning, '%d.%m.%Y')
-                #
-                # except:
-                #     QMessageBox.warning(self, 'Ошибка', 'Не корректна дата ввода в эскплуатацию')
-                #     return
+            date_commissioning_line = datetime.strptime(date_commissioning_line, '%d.%m.%Y')
+            result_pressure_date = datetime.strptime(result_pressure_date, '%d.%m.%Y')
 
             if curator == 'ОР':
                 expected_pickup_edit = self.current_widget.expected_pickup_edit.text()
@@ -942,8 +936,6 @@ class DataWindow(WindowUnion):
                 water_cut_edit = self.current_widget.water_cut_edit.text()
                 expected_oil_edit = self.current_widget.expected_oil_edit.text()
                 proc_water_edit = self.current_widget.proc_water_edit.text()
-
-            a = self.current_widget.labels_nkt
 
             # Пересохранение данных по НКТ и штангам
             self.data_well.dict_sucker_rod = {}

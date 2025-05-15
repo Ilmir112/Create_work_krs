@@ -10,7 +10,7 @@ from main import ExcelWorker
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
 
-class TabPageDp(TabPageUnion):
+class TabPageCorrect(TabPageUnion):
     def __init__(self, data_well, tableWidget, old_index):
         super().__init__(data_well)
 
@@ -39,6 +39,13 @@ class TabPageDp(TabPageUnion):
         self.grid.addWidget(self.well_area_label, 2, 3)
         self.grid.addWidget(self.well_area_edit, 3, 3)
 
+        self.index_change_line = QLineEdit(self)
+        self.index_change_line.setValidator(self.validator_int)
+
+        self.grid.addWidget(self.index_change_line, 3, 7)
+
+        self.index_change_line.setVisible(False)
+
         # self.well_area_edit.setText(f'{self.data_well.well_area.value}')
         # self.well_area_edit.textChanged.connect(self.update_well)
         self.well_number_edit.editingFinished.connect(self.update_well)
@@ -55,32 +62,17 @@ class TabPageDp(TabPageUnion):
 
             self.grid.addWidget(self.well_data_label, 2, 6)
             self.grid.addWidget(self.well_data_in_base_combo, 3, 6)
+            self.well_area_edit.textEdited.connect(self.update_well_area)
+            self.well_data_in_base_combo.editTextChanged.connect(self.update_table_in_base_combo)
 
-            self.well_data_in_base_combo.currentIndexChanged.connect(self.update_area)
-
-    def update_area(self):
-
-        table_in_base_combo = self.well_data_in_base_combo.currentText()
-        well_area = table_in_base_combo.split(" ")[1]
-        self.well_area_edit.setText(well_area)
-        self.well_number_edit.setText(table_in_base_combo.split(" ")[0])
-
-    def update_well(self):
-        from work_py.dop_plan_py import TabPageDp
-
-        if data_list.data_in_base:
-
-            well_list = TabPageDp.check_in_database_well_data2(self, self.well_number_edit.text())
-
-            if well_list:
-                self.well_data_in_base_combo.clear()
-                self.well_data_in_base_combo.addItems(well_list)
+            # self.index_change_line.editingFinished.connect(self.update_table_in_base_combo)
+            # self.index_change_line.setText('0')
 
 
 class TabWidget(TabWidgetUnion):
     def __init__(self, work_plan, tableWidget=0, old_index=0):
         super().__init__()
-        self.addTab(TabPageDp(work_plan, tableWidget, old_index), 'Корректировка плана работ')
+        self.addTab(TabPageCorrect(work_plan, tableWidget, old_index), 'Корректировка плана работ')
 
 
 class CorrectPlanWindow(WindowUnion):
@@ -144,7 +136,6 @@ class CorrectPlanWindow(WindowUnion):
             if data_well:
                 self.data_well.type_kr = data_well[2]
                 if data_well[3]:
-
                     self.data_well.well_oilfield = ProtectedIsNonNone(data_well[4])
                     self.data_well.appointment_well = ProtectedIsNonNone(data_well[5])
                     self.data_well.inventory_number = ProtectedIsNonNone(data_well[6])
@@ -215,10 +206,11 @@ class CorrectPlanWindow(WindowUnion):
                             ws2.cell(row=i, column=j).font = Font(name='Arial', size=13, bold=True)
                             ws2.cell(row=i, column=j).alignment = Alignment(wrap_text=True, horizontal='center',
                                                                             vertical='center')
+
     @staticmethod
     def work_list(work_earlier):
         krs_begin = [
             [None, None, f' Ранее проведенные работы: \n {work_earlier}', None, None, None, None, None, None, None,
-                      'Мастер КРС', None]]
+             'Мастер КРС', None]]
 
         return krs_begin

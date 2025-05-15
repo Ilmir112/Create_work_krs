@@ -11,12 +11,14 @@ from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QWidget, QTabWidget, QInputDialog, QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayout
 
 from main import MyMainWindow
+from server_response import ApiClient
 from work_py.calculate_work_parametrs import volume_work, volume_well_pod_nkt_calculate
 from data_list import contractor, ProtectedIsDigit
 
 from work_py.advanted_file import definition_plast_work
 from work_py.alone_oreration import volume_vn_nkt, well_volume
 from work_py.calc_fond_nkt import CalcFond
+
 from work_py.rationingKRS import well_volume_norm
 
 
@@ -83,6 +85,145 @@ class TabPageUnion(QWidget):
         self.grid.addWidget(self.need_privyazka_Label, 1, 6)
         self.grid.addWidget(self.need_privyazka_q_combo, 2, 6)
 
+    def update_well_area(self, well_area):
+        if self.well_number_edit.text() != '' and data_list.connect_in_base and well_area != '':
+            params = {"well_number": self.well_number_edit.text(), "well_area": well_area}
+            response = ApiClient.request_params_get(ApiClient.find_wells_data_response_find_id_by_wells_data(), params)
+            if response:
+                self.insert_response_data(response)
+
+    def update_table_in_base_combo(self):
+        from work_py.dop_plan_py import DopPlanWindow
+
+        number_dp = ''
+        index_change_line = 0
+        if self.__class__.__name__ == 'TabPageDp':
+            number_dp = self.number_DP_Combo.currentText()
+            index_change_line = self.index_change_line.text()
+        well_data_in_base_combo = self.well_data_in_base_combo.currentText()
+        if ' ' in well_data_in_base_combo:
+            well_number, well_area = well_data_in_base_combo.split(" ")[:2]
+            # self.well_number_edit.setText(well_number)
+            self.well_area_edit.setText(well_area)
+        if index_change_line != '':
+            index_change_line = int(float(index_change_line))
+
+            data = DopPlanWindow.extraction_data(self, well_data_in_base_combo, index_change_line)
+            if data is None:
+                return
+
+        if number_dp != '':
+            self.data_well.number_dp = int(float(number_dp))
+
+            self.template_depth_edit.setText(str(self.data_well.template_depth))
+            self.template_length_edit.setText(str(self.data_well.template_length))
+            skm_interval = ''
+
+            try:
+                if not self.data_well.skm_interval:
+                    for roof, sole in self.data_well.skm_interval:
+                        if f'{roof}-{sole}' not in skm_interval:
+                            skm_interval += f'{roof}-{sole}, '
+            except Exception as e:
+                QMessageBox.warning(self, 'Ошибка', f'Не получилось сохранить данные скреперования '
+                                                    f'{type(e).__name__}\n\n{str(e)}')
+
+            raiding_interval = ''
+
+            try:
+
+                if len(self.data_well.ribbing_interval) != 0:
+
+                    for roof, sole in self.data_well.ribbing_interval:
+                        if f'{roof}-{sole}' not in raiding_interval:
+                            raiding_interval += f'{roof}-{sole}, '
+            except Exception as e:
+                QMessageBox.warning(self, 'Ошибка', f'Не получилось сохранить данные Райбирования '
+                                                    f'{type(e).__name__}\n\n{str(e)}')
+
+            self.skm_interval_edit.setText(skm_interval[:-2])
+            self.raiding_interval_edit.setText(raiding_interval[:-2])
+            self.current_bottom_edit.setText(str(self.data_well.current_bottom))
+            self.fluid_edit.setText(str(self.data_well.fluid_work))
+            if self.data_well.column_additional:
+                self.template_depth_addition_label = QLabel('Глубина спуска шаблона в доп колонне')
+                self.template_depth_addition_edit = QLineEdit(self)
+                self.template_depth_addition_edit.setValidator(self.validator_float)
+                self.template_depth_addition_edit.setText(str(self.data_well.template_depth_addition))
+
+                self.template_length_addition_label = QLabel('Длина шаблона в доп колонне')
+                self.template_length_addition_edit = QLineEdit(self)
+                self.template_length_addition_edit.setValidator(self.validator_float)
+                self.template_length_addition_edit.setText(str(self.data_well.template_length_addition))
+                self.grid.addWidget(self.template_depth_addition_label, 6, 4)
+                self.grid.addWidget(self.template_depth_addition_edit, 7, 4)
+                self.grid.addWidget(self.template_length_addition_label, 6, 5)
+                self.grid.addWidget(self.template_length_addition_edit, 7, 5)
+
+    def check_in_database_well_data2(self, number_well):
+        if data_list.connect_in_base:
+            params = {"well_number": number_well}
+            response = ApiClient.request_params_get(ApiClient.response_find_well_filter_by_number(), params)
+            if response:
+                return response['ремонты']
+        else:
+            db = connection_to_database(decrypt("DB_WELL_DATA"))
+            data_well_base = WorkDatabaseWell(db, self.data_well)
+
+            # Получение всех результатов
+            wells_with_data = data_well_base.check_well_in_database_well_data(number_well)
+            # Проверка, есть ли данные
+            if wells_with_data:
+                well_list = []
+                for well in wells_with_data:
+
+                    date_string = well[3]
+                    try:
+                        # Преобразуем строку в объект datetime
+                        datetime_object = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S.%f")
+
+                        # Форматируем объект datetime в нужный формат
+                        formatted_date = datetime_object.strftime("%d.%m.%Y")
+                    except Exception:
+                        formatted_date = well[3]
+
+                    # Формируем список скважин
+                    well_list.append(f'{well[0]} {well[1]} {well[2]} {well[4]} от {formatted_date}')
+
+                    self.grid.setColumnMinimumWidth(6, self.well_data_in_base_combo.sizeHint().width())
+
+                return well_list[::-1]
+            else:
+                return False
+
+    def update_well(self):
+
+        self.table_name = str(self.well_number_edit.text()) + self.well_area_edit.text()
+        if data_list.data_in_base:
+            well_list = self.check_in_database_well_data2(self.well_number_edit.text())
+
+            self.well_data_in_base_combo.clear()
+            if well_list:
+                self.well_area_edit.textChanged.connect(self.update_well_area)
+                self.well_area_edit.setText(well_list[0].split(' ')[1])
+                self.well_data_in_base_combo.addItems(well_list)
+
+    def insert_repairs_data(self, response):
+        self.data_well.type_absorbent = response["type_absorbent"]
+        self.data_well.static_level = data_list.ProtectedIsDigit(response["static_level"])
+        self.data_well.dinamic_level = data_list.ProtectedIsDigit(response["dinamic_level"])
+        self.data_well.dict_perforation_project = response["perforation_project"]
+        self.data_well.expected_oil = response["expected_data"]["expected_oil"]
+        self.data_well.water_cut = response["expected_data"]["water_cut"]
+        self.data_well.percent_water = response["expected_data"]["percent_water"]
+        self.data_well.expected_pressure = response["expected_data"]["expected_pressure"]
+        self.data_well.expected_pickup = response["expected_data"]["expected_pickup"]
+        self.data_well.curator = response["curator"]
+        self.data_well.region = response["region"]
+        self.data_well.type_kr = response["type_kr"]
+        return json.loads(response["data_change_paragraph"]["данные"]), \
+               response["category_dict"]["данные по категории"], \
+               response['excel_json']["excel"]
 
     def insert_response_data(self, response):
 
@@ -104,7 +245,6 @@ class TabPageUnion(QWidget):
             self.data_well.column_direction_true = True
 
         self.data_well.level_cement_column = ProtectedIsDigit(response["column_production"]["level_cement"])
-
 
         self.data_well.column_diameter = ProtectedIsDigit(response["column_production"]["diameter"])
         self.data_well.column_wall_thickness = ProtectedIsDigit(response["column_production"]["wall_thickness"])
@@ -154,22 +294,16 @@ class TabPageUnion(QWidget):
 
         self.data_well.depth_fond_paker_second_before = response["equipment"]["пакер2"]["глубина "]
 
-        self.data_well.depth_fond_paker_second_before['before'] = self.data_well.depth_fond_paker_second_before['before']
+        self.data_well.depth_fond_paker_second_before['before'] = self.data_well.depth_fond_paker_second_before[
+            'before']
         self.data_well.depth_fond_paker_second_before['after'] = self.data_well.depth_fond_paker_second_before[
             'after']
 
+        self.data_well.dict_nkt_after = response["nkt_data"]["После"]
+        self.data_well.dict_nkt_before = response["nkt_data"]["До"]
+        self.data_well.dict_sucker_rod_after = response["sucker_pod"]["После"]
+        self.data_well.dict_sucker_rod = response["sucker_pod"]["До"]
 
-        self.data_well.dict_nkt_after = response["nkt_data"]
-        self.data_well.dict_nkt_before = response["nkt_data"]
-        self.data_well.dict_sucker_rod_after = response["sucker_pod"]
-        self.data_well.dict_sucker_rod = response["sucker_pod"]
-        # self.data_well.static_level = ProtectedIsDigit(response["статика"])
-        # self.data_well.dinamic_level = ProtectedIsDigit(response["динамика"])
-        # self.data_well.expected_oil = response['ожидаемые']['нефть']
-        # self.data_well.water_cut = response['ожидаемые']['вода']
-        # self.data_well.percent_water = response['ожидаемые']['обводненность']
-        # self.data_well.expected_pressure = response['ожидаемые']['давление']
-        # self.data_well.expected_pickup = response['ожидаемые']['приемистость']
         self.data_well.inventory_number = response["inventory_number"]
         self.data_well.bottom_hole_drill = ProtectedIsDigit(response["bottom_hole_drill"])
         self.data_well.bottom_hole_artificial = ProtectedIsDigit(response["bottom_hole_artificial"])
@@ -195,6 +329,7 @@ class TabPageUnion(QWidget):
         self.data_well.check_data_in_pz = []
         self.data_well.without_damping = False
         return
+
     def calculate_h2s(self, type_absorbent, category_h2s, h2s_mg, h2s_pr):
         if '2' in str(category_h2s) or '1' in str(category_h2s):
             if type_absorbent == 'EVASORB марки 121':
@@ -415,8 +550,6 @@ class TabPageUnion(QWidget):
             self.iron_volume_label.setVisible(False)
             self.iron_volume_edit.setVisible(False)
 
-
-
             self.calculate_sko_label.setVisible(False)
             self.calculate_sko_line.setVisible(False)
 
@@ -536,7 +669,6 @@ class TabPageUnion(QWidget):
             self.pressure_three_label.setVisible(True)
             self.pressure_three_edit.setVisible(True)
 
-
     def pressure_mode(self, mode, plast):
         if self.data_well:
             mode = int(mode / 10) * 10
@@ -625,8 +757,9 @@ class TabPageUnion(QWidget):
 
     @staticmethod
     def difference_date_days(date1, today=data_list.current_date):
-        # Задание дат
-        date1 = datetime.strptime(date1, "%d.%m.%Y")
+        if type(date1) == str:
+            # Задание дат
+            date1 = datetime.strptime(date1, "%Y-%m-%d")
 
         # Вычисление разницы в днях
         difference = (today - date1).days
@@ -816,7 +949,6 @@ class WindowUnion(MyMainWindow):
         if self.data_well.column_additional is False or self.data_well.column_additional is True \
                 and paker_depth < self.data_well.head_column_additional.get_value:
 
-
             paker_select = f'воронку + НКТ{self.data_well.nkt_diam}мм {paker_khost}м +' \
                            f' пакер ПРО-ЯМО-{paker_diameter}мм (либо аналог) ' \
                            f'для ЭК {self.data_well.column_diameter.get_value}мм х {self.data_well.column_wall_thickness.get_value}мм +' \
@@ -979,7 +1111,6 @@ class WindowUnion(MyMainWindow):
             paker_list.append(row)
 
         if self.Qplast_after_edit == 'ДА':
-
             paker_list.append([f'{layout_select}. насыщение 5м3', None,
                                f'{layout_select}. Произвести насыщение скважины до стабилизации '
                                f'давления закачки не менее 5м3. Опробовать  '
@@ -1369,7 +1500,7 @@ class WindowUnion(MyMainWindow):
     @staticmethod
     def difference_date_days(date1, today=data_list.current_date):
         # Задание дат
-        date1 = datetime.strptime(date1, "%d.%m.%Y")
+        date1 = datetime.strptime(date1, "%Y-%m-%d")
 
         # Вычисление разницы в днях
         difference = (today - date1).days
@@ -1377,15 +1508,11 @@ class WindowUnion(MyMainWindow):
         return difference
 
     @staticmethod
-    def read_excel_in_base(number_well, area_well, work_plan, type_kr):
-        db = connection_to_database(decrypt("DB_WELL_DATA"))
-        data_well_base = WorkDatabaseWell(db)
-
-        data_well = data_well_base.read_excel_in_base(number_well, area_well, work_plan, type_kr)
+    def read_excel_in_base(data_well):
 
         try:
             col_width = []
-            dict_well = json.loads(data_well[len(data_well) - 1][0])
+            dict_well = json.loads(data_well)
             data = dict_well['data']
             row_heights = dict_well['rowHeights']
             if 'colWidth' in list(dict_well.keys()):
@@ -1401,78 +1528,99 @@ class WindowUnion(MyMainWindow):
         return data, row_heights, col_width, boundaries_dict
 
     def extraction_data(self, table_name, paragraph_row=0):
+        from data_base.work_with_base import insert_data_well_dop_plan
         date_table = table_name.split(' ')[-1]
         well_number = table_name.split(' ')[0]
         well_area = table_name.split(' ')[1]
         type_kr = table_name.split(' ')[-4].replace('None', 'null')
         contractor_select = data_list.contractor
         work_plan = table_name.split(' ')[-3]
+        if data_list.connect_in_base:
+            params = {
+                "well_number": well_number,
+                "well_area": well_area,
+                "type_kr": type_kr,
+                "work_plan": work_plan,
+                "date_create": date_table
+            }
+            response = ApiClient.request_params_get(ApiClient.find_wells_repair_well_by_id(), params)
+            if response:
+                data_change_paragraph, dict_category, self.excel_json = TabPageUnion.insert_repairs_data(self, response)
+                self.tab_widget.currentWidget().excel_json = self.excel_json
 
-        db = connection_to_database(decrypt("DB_WELL_DATA"))
-        data_well_base = WorkDatabaseWell(db, self.data_well)
-
-        result_table = data_well_base.extraction_data(str(well_number), well_area, type_kr,
-                                                      work_plan, date_table, contractor_select)
-
-        if result_table is None:
-            QMessageBox.warning(self, 'Ошибка',
-                                f'В базе данных скв {well_number} {well_area} отсутствует данные, '
-                                f'используйте excel вариант плана работ')
-            return None
-
-        if result_table[0]:
-            result = json.loads(result_table[0])
-
-            self.data_well.type_absorbent = 'EVASORB марки 121'
-            if 'ХИМТЕХНО 101' in str(result[paragraph_row][7]):
-                self.data_well.type_absorbent = 'ХИМТЕХНО 101 Марка А'
-            elif 'СНПХ-1200' in str(result[paragraph_row][7]):
-                self.data_well.type_absorbent = 'СНПХ-1200'
-            elif 'ПСВ-3401' in str(result[paragraph_row][7]):
-                self.data_well.type_absorbent = 'ПСВ-3401'
-            elif 'Гастрит-К131М' in str(result[paragraph_row][7]):
-                self.data_well.type_absorbent = 'Гастрит-К131М'
-
-
-            from data_base.work_with_base import insert_data_well_dop_plan
-            insert_data_well_dop_plan(self, result_table[1])
-
-            self.data_well.type_kr = result_table[2]
-            if result_table[3]:
-                dict_data_well = json.loads(result_table[3])
-                # self.data_well.dict_category
-                pressure = namedtuple("pressure", "category data_pressure")
-                Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
-                Data_gaz = namedtuple("Data_gaz", "category data")
-                self.data_well.dict_category = {}
-                self.data_well.category_pressure_list = []
-                self.data_well.category_h2s_list = []
-                self.data_well.category_gaz_factor_percent = []
-                for plast, plast_data in dict_data_well.items():
-                    self.data_well.dict_category.setdefault(plast, {}).setdefault(
-                        'по давлению',
-                        pressure(*dict_data_well[plast]['по давлению']))
-                    self.data_well.dict_category.setdefault(plast, {}).setdefault(
-                        'по сероводороду', Data_h2s(*dict_data_well[plast]['по сероводороду']))
-                    self.data_well.dict_category.setdefault(plast, {}).setdefault(
-                        'по газовому фактору', Data_gaz(*dict_data_well[plast]['по газовому фактору']))
-
-                    self.data_well.dict_category.setdefault(plast, {}).setdefault(
-                        'отключение', dict_data_well[plast]['отключение'])
-
-                    self.data_well.category_pressure_list.append(plast_data['по давлению'][0])
-                    self.data_well.category_h2s_list.append(plast_data['по сероводороду'][0])
-                    self.data_well.category_gaz_factor_percent.append(plast_data['по газовому фактору'][0])
-
-            if self.data_well.work_plan in ['dop_plan', 'dop_plan_in_base']:
-                data = self.insert_data_dop_plan(result, paragraph_row)
+                data = TabPageUnion.insert_data_dop_plan(self, data_change_paragraph, paragraph_row)
                 if data is None:
                     return None
-            elif self.data_well.work_plan == 'plan_change':
-                data = self.insert_data_plan(result)
-                if data is None:
-                    return None
-            data_list.data_well_is_True = True
+                elif self.data_well.work_plan == 'plan_change':
+                    data = self.insert_data_plan(data_change_paragraph)
+                    if data is None:
+                        return None
+
+        else:
+            db = connection_to_database(decrypt("DB_WELL_DATA"))
+            data_well_base = WorkDatabaseWell(db, self.data_well)
+
+            result_table = data_well_base.extraction_data(str(well_number), well_area, type_kr,
+                                                          work_plan, date_table, contractor_select)
+
+            if result_table is None:
+                QMessageBox.warning(self, 'Ошибка',
+                                    f'В базе данных скв {well_number} {well_area} отсутствует данные, '
+                                    f'используйте excel вариант плана работ')
+                return None
+
+            if result_table[0]:
+                result = json.loads(result_table[0])
+
+                self.data_well.type_absorbent = 'EVASORB марки 121'
+                if 'ХИМТЕХНО 101' in str(result[paragraph_row][7]):
+                    self.data_well.type_absorbent = 'ХИМТЕХНО 101 Марка А'
+                elif 'СНПХ-1200' in str(result[paragraph_row][7]):
+                    self.data_well.type_absorbent = 'СНПХ-1200'
+                elif 'ПСВ-3401' in str(result[paragraph_row][7]):
+                    self.data_well.type_absorbent = 'ПСВ-3401'
+                elif 'Гастрит-К131М' in str(result[paragraph_row][7]):
+                    self.data_well.type_absorbent = 'Гастрит-К131М'
+
+                insert_data_well_dop_plan(self, result_table[1])
+
+                self.data_well.type_kr = result_table[2]
+                if self.data_well.work_plan in ['dop_plan', 'dop_plan_in_base']:
+                    data = self.insert_data_dop_plan(result, paragraph_row)
+                    if data is None:
+                        return None
+                elif self.data_well.work_plan == 'plan_change':
+                    data = self.insert_data_plan(result)
+                    if data is None:
+                        return None
+                data_list.data_well_is_True = True
+                dict_category = result_table[3]
+
+        if dict_category:
+            dict_data_well = json.loads(dict_category)
+            # self.data_well.dict_category
+            pressure = namedtuple("pressure", "category data_pressure")
+            Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
+            Data_gaz = namedtuple("Data_gaz", "category data")
+            self.data_well.dict_category = {}
+            self.data_well.category_pressure_list = []
+            self.data_well.category_h2s_list = []
+            self.data_well.category_gaz_factor_percent = []
+            for plast, plast_data in dict_data_well.items():
+                self.data_well.dict_category.setdefault(plast, {}).setdefault(
+                    'по давлению',
+                    pressure(*dict_data_well[plast]['по давлению']))
+                self.data_well.dict_category.setdefault(plast, {}).setdefault(
+                    'по сероводороду', Data_h2s(*dict_data_well[plast]['по сероводороду']))
+                self.data_well.dict_category.setdefault(plast, {}).setdefault(
+                    'по газовому фактору', Data_gaz(*dict_data_well[plast]['по газовому фактору']))
+
+                self.data_well.dict_category.setdefault(plast, {}).setdefault(
+                    'отключение', dict_data_well[plast]['отключение'])
+
+                self.data_well.category_pressure_list.append(plast_data['по давлению'][0])
+                self.data_well.category_h2s_list.append(plast_data['по сероводороду'][0])
+                self.data_well.category_gaz_factor_percent.append(plast_data['по газовому фактору'][0])
 
         else:
             data_list.data_in_base = False
@@ -1529,7 +1677,6 @@ class WindowUnion(MyMainWindow):
         if self.data_well.dict_leakiness:
             self.data_well.leakiness = True
             self.data_well.leakiness_interval = list(self.data_well.dict_leakiness['НЭК']['интервал'].keys())
-
 
         self.data_well.category_pressure = result[ind][8]
         self.data_well.category_pvo = 2

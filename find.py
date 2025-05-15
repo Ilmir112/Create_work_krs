@@ -1264,7 +1264,8 @@ class WellCondition(FindIndexPZ):
                                 self, self.percent_water, row_index,
                                 col + 1, 1)
                         elif 'расстояние от скважин' in str(value).lower():
-                            self.distance_from_well_to_sampling_point = str(row[col + 2]).replace(',', '.')
+                            if row[col + 2]:
+                                self.distance_from_well_to_sampling_point = str(row[col + 2]).replace(',', '.')
 
                         elif 'плотность жидкости ' in str(value).lower():
 

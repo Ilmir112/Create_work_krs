@@ -63,7 +63,7 @@ class ApiClient:
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
-            print(f"Запрос не удался: {e}")
+            QMessageBox.warning(None, 'Запрос', f"Запрос не удался: {e}")
             return None
 
     @staticmethod
@@ -88,8 +88,9 @@ class ApiClient:
             return obj
         elif isinstance(obj, str):
             matches = re.findall(r"\b\d{2}\.\d{2}\.\d{4}\b", obj)
-            if matches:
+            if matches and len(matches) == 1:
                 obj = datetime.strptime(matches[0], '%d.%m.%Y')
+
         if isinstance(obj, datetime):
             return obj.strftime('%Y-%m-%d')
         else:
@@ -150,6 +151,10 @@ class ApiClient:
     @classmethod
     def read_wells_data_response_for_add(cls):
         return '/wells_data_router/add_wells_data'
+
+    @classmethod
+    def find_wells_repair_well_by_id(cls):
+        return '/wells_repair_router/find_well_id'
 
     @classmethod
     def read_wells_repair_response_for_add(cls):

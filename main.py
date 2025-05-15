@@ -107,7 +107,7 @@ class ExcelWorker(QThread):
                 string_work = 'ПР'
             elif self.data_well.work_plan == 'plan_change':
                 if self.data_well.work_plan_change == 'krs':
-                    string_work = 'ПР изм'
+                    string_work = 'ПР'
                 else:
                     string_work = f'ДП№{self.data_well.number_dp} изм '
             elif self.data_well.work_plan == 'gnkt_bopz':
@@ -123,17 +123,31 @@ class ExcelWorker(QThread):
 
             params = {
                     "id": 2,
-                  "category_dict": {"данные по категории": json.dumps(self.data_well.dict_category)},
+                  "category_dict": {"данные по категории": json.dumps(self.data_well.dict_category, ensure_ascii=False)},
                   "type_kr": self.data_well.type_kr.split(" ")[0],
                   "work_plan": string_work,
-                  "excel_json": {"excel": json.dumps(excel_data_dict)},
+                  "excel_json": {"excel": json.dumps(excel_data_dict, ensure_ascii=False)},
                   "data_change_paragraph": {"данные": json.dumps(self.data_well.data_list)},
                   "norms_time": self.data_well.norm_of_time,
                   "chemistry_need": data_list.DICT_VOLUME_CHEMISTRY,
                   "geolog_id": data_list.user[1],
-                  "date_create": data_list.current_date
+                  "date_create": data_list.current_date,
+                "static_level": self.data_well.static_level.get_value,
+                "perforation_project": self.data_well.dict_perforation_project,
+                "dinamic_level": self.data_well.dinamic_level.get_value,
+                "type_absorbent": self.data_well.type_absorbent,
+                "expected_data": {
+                    "expected_oil": self.data_well.expected_oil,
+                    "water_cut": self.data_well.water_cut,
+                    "percent_water": self.data_well.percent_water,
+                    "expected_pressure": self.data_well.expected_pressure,
+                    "expected_pickup": self.data_well.expected_pickup
+                },
+                "curator": self.data_well.curator,
+                "region": self.data_well.region
                 }
-            response = ApiClient.request_post_json(ApiClient.read_wells_repair_response_for_add(), params, self.params, 'json')
+            response = ApiClient.request_post_json(ApiClient.read_wells_repair_response_for_add(),
+                                                   params, self.params, 'json')
         else:
             try:
                 db = connection_to_database(decrypt("DB_WELL_DATA"))
@@ -804,7 +818,7 @@ class MyMainWindow(QMainWindow):
                     "bottom_hole_drill": float(self.data_well.bottom_hole_drill.get_value),
                     "bottom_hole_artificial": float(self.data_well.bottom_hole_artificial.get_value),
                     "max_angle": float(self.data_well.max_angle.get_value),
-                    "distance_from_rotor_table": float(self.data_well.distance_from_well_to_sampling_point),
+                    "distance_from_rotor_table": self.data_well.distance_from_well_to_sampling_point,
                     "max_angle_depth": float(self.data_well.max_angle_depth.get_value),
                     "max_expected_pressure": float(self.data_well.max_expected_pressure.get_value),
                     "max_admissible_pressure": float(self.data_well.max_admissible_pressure.get_value),
@@ -814,8 +828,8 @@ class MyMainWindow(QMainWindow):
                     "nkt_data": self.data_well.data_well_dict["НКТ"],
                     "sucker_pod": self.data_well.data_well_dict["штанги"],
                     "diameter_doloto_ek": float(self.data_well.diameter_doloto_ek.get_value),
-                    "last_pressure_date": datetime.strptime(self.data_well.result_pressure_date.get_value, "%d.%m.%Y"),
-                    "date_commissioning": datetime.strptime(self.data_well.date_commissioning.get_value, "%d.%m.%Y"),
+                    "last_pressure_date": self.data_well.result_pressure_date.get_value,
+                    "date_commissioning": self.data_well.date_commissioning.get_value,
                     "date_drilling_run": self.data_well.date_drilling_run,
                     "date_drilling_finish": self.data_well.date_drilling_cancel,
                     "geolog": data_list.user[1],
@@ -831,7 +845,7 @@ class MyMainWindow(QMainWindow):
             if response_find_data:
                 mes = QMessageBox.question(self, 'данные по скважине', "Данные есть в базе данных, обновить?")
                 if mes == QMessageBox.StandardButton.Yes:
-                    passresponse = ApiClient.request_post_json(ApiClient.read_wells_data_response_for_add(), params, None, 'json')
+                    response = ApiClient.request_post_json(ApiClient.read_wells_data_response_for_add(), params, None, 'json')
             else:
                 response = ApiClient.request_post_json(ApiClient.read_wells_data_response_for_add(), params, None, 'json')
 
@@ -2448,7 +2462,7 @@ class MyWindow(MyMainWindow):
     def read_clicked_mouse_data(self, row):
         from work_py.advanted_file import definition_plast_work
         from data_correct import DataWindow
-
+        aswa = self.data_well.count_row_well
         row = row - self.data_well.count_row_well
         # print(self.data_well.column_diameter.get_value)
         data = self.data_well.data_list
@@ -2458,7 +2472,7 @@ class MyWindow(MyMainWindow):
         self.data_well.plast_all = json.loads(data[row][3])
         self.data_well.plast_work = json.loads(data[row][4])
         self.data_well.dict_leakiness = json.loads(data[row][5])
-        aaaaaaa = self.data_well.dict_leakiness
+
         self.data_well.column_additional = data[row][6]
 
         self.data_well.fluid_work = data[row][7]
@@ -3160,7 +3174,7 @@ class SaveInExcel(MyWindow):
             #
             if 'Ойл' in data_list.contractor and 'prs' not in self.data_well.work_plan:
                 self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Хасаншин.png', 'H1')
-                self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Шамигулов.png', 'H4')
+                # self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Шамигулов.png', 'H4')
 
             excel_data_dict = excel_in_json(self, self.ws2)
             self.thread_excel_insert = ExcelWorker(self.data_well)

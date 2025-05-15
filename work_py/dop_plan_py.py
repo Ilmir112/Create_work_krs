@@ -208,48 +208,9 @@ class TabPageDp(TabPageUnion):
                 number_dp_in_base = [num for num in index.split(' ')[3] if num.isdigit()][0]
                 self.number_DP_Combo.setCurrentIndex(int(number_dp_in_base))
 
-    def update_well_area(self, well_area):
-        if self.well_number_edit.text() != '' and data_list.connect_in_base:
-            params = {"well_number":  self.well_number_edit.text(), "well_area": well_area}
-            response = ApiClient.request_params_get(ApiClient.find_wells_data_response_find_id_by_wells_data(), params)
 
-            self.insert_response_data(response)
 
-    def check_in_database_well_data2(self, number_well):
-        if data_list.connect_in_base:
-            params = {"well_number": number_well}
-            response = ApiClient.request_params_get(ApiClient.response_find_well_filter_by_number(), params)
-            if response:
-                return response['ремонты']
-        else:
-            db = connection_to_database(decrypt("DB_WELL_DATA"))
-            data_well_base = WorkDatabaseWell(db, self.data_well)
 
-            # Получение всех результатов
-            wells_with_data = data_well_base.check_well_in_database_well_data(number_well)
-            # Проверка, есть ли данные
-        if wells_with_data:
-            well_list = []
-            for well in wells_with_data:
-
-                date_string = well[3]
-                try:
-                    # Преобразуем строку в объект datetime
-                    datetime_object = datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S.%f")
-
-                    # Форматируем объект datetime в нужный формат
-                    formatted_date = datetime_object.strftime("%d.%m.%Y")
-                except Exception:
-                    formatted_date = well[3]
-
-                # Формируем список скважин
-                well_list.append(f'{well[0]} {well[1]} {well[2]} {well[4]} от {formatted_date}')
-
-                self.grid.setColumnMinimumWidth(6, self.well_data_in_base_combo.sizeHint().width())
-
-            return well_list[::-1]
-        else:
-            return False
 
     def update_change_pvr(self, index):
         if self.old_index == 0:
@@ -309,84 +270,14 @@ class TabPageDp(TabPageUnion):
             self.type_pvr_edit.setParent(None)
             self.tableWidget.hide()
 
-    def update_well(self):
 
-        self.table_name = str(self.well_number_edit.text()) + self.well_area_edit.text()
-        if data_list.data_in_base:
-
-            well_list = self.check_in_database_well_data2(self.well_number_edit.text())
-            if well_list:
-                self.well_data_in_base_combo.clear()
-                self.well_data_in_base_combo.addItems(well_list)
-
-            self.index_change_line.editingFinished.connect(self.update_table_in_base_combo)
 
             # self.table_in_base_combo.currentTextChanged.connect(self.update_table_in_base_combo)
 
     def update_table_name(self):
         self.index_change_line.setText('0')
 
-    def update_table_in_base_combo(self):
 
-        number_dp = self.number_DP_Combo.currentText()
-        index_change_line = self.index_change_line.text()
-        well_data_in_base_combo = self.well_data_in_base_combo.currentText()
-        if ' ' in well_data_in_base_combo:
-            well_number, well_area = well_data_in_base_combo.split(" ")[:2]
-            # self.well_number_edit.setText(well_number)
-            self.well_area_edit.setText(well_area)
-        if number_dp != '':
-            self.data_well.number_dp = int(float(number_dp))
-
-        if index_change_line != '':
-            index_change_line = int(float(index_change_line))
-            data = DopPlanWindow.extraction_data(self, well_data_in_base_combo, index_change_line)
-            if data is None:
-                return
-            self.template_depth_edit.setText(str(self.data_well.template_depth))
-            self.template_length_edit.setText(str(self.data_well.template_length))
-            skm_interval = ''
-
-            try:
-                if not self.data_well.skm_interval:
-                    for roof, sole in self.data_well.skm_interval:
-                        if f'{roof}-{sole}' not in skm_interval:
-                            skm_interval += f'{roof}-{sole}, '
-            except Exception as e:
-                QMessageBox.warning(self, 'Ошибка', f'Не получилось сохранить данные скреперования '
-                                                    f'{type(e).__name__}\n\n{str(e)}')
-
-            raiding_interval = ''
-
-            try:
-
-                if len(self.data_well.ribbing_interval) != 0:
-
-                    for roof, sole in self.data_well.ribbing_interval:
-                        if f'{roof}-{sole}' not in raiding_interval:
-                            raiding_interval += f'{roof}-{sole}, '
-            except Exception as e:
-                QMessageBox.warning(self, 'Ошибка', f'Не получилось сохранить данные Райбирования '
-                                                    f'{type(e).__name__}\n\n{str(e)}')
-
-            self.skm_interval_edit.setText(skm_interval[:-2])
-            self.raiding_interval_edit.setText(raiding_interval[:-2])
-            self.current_bottom_edit.setText(str(self.data_well.current_bottom))
-            self.fluid_edit.setText(str(self.data_well.fluid_work))
-            if self.data_well.column_additional:
-                self.template_depth_addition_label = QLabel('Глубина спуска шаблона в доп колонне')
-                self.template_depth_addition_edit = QLineEdit(self)
-                self.template_depth_addition_edit.setValidator(self.validator_float)
-                self.template_depth_addition_edit.setText(str(self.data_well.template_depth_addition))
-
-                self.template_length_addition_label = QLabel('Длина шаблона в доп колонне')
-                self.template_length_addition_edit = QLineEdit(self)
-                self.template_length_addition_edit.setValidator(self.validator_float)
-                self.template_length_addition_edit.setText(str(self.data_well.template_length_addition))
-                self.grid.addWidget(self.template_depth_addition_label, 6, 4)
-                self.grid.addWidget(self.template_depth_addition_edit, 7, 4)
-                self.grid.addWidget(self.template_length_addition_label, 6, 5)
-                self.grid.addWidget(self.template_length_addition_edit, 7, 5)
 
 
 class TabWidget(TabWidgetUnion):
@@ -510,8 +401,16 @@ class DopPlanWindow(WindowUnion):
     def work_with_excel(self, well_number, well_area, work_plan, type_kr):
 
         self.data_well.gips_in_well = False
+
+        if data_list.connect_in_base:
+            data_well = self.tab_widget.currentWidget().excel_json
+        else:
+            db = connection_to_database(decrypt("DB_WELL_DATA"))
+            data_well_base = WorkDatabaseWell(db)
+
+            data_well = data_well_base.read_excel_in_base(well_number, well_area, work_plan, type_kr)
         self.data, self.row_heights, self.col_width, self.boundaries_dict = \
-            self.read_excel_in_base(well_number, well_area, work_plan, type_kr)
+            self.read_excel_in_base(data_well)
 
         self.target_row_index = 5000
         self.target_row_index_cancel = 5000

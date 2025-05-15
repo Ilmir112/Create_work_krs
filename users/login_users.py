@@ -85,9 +85,8 @@ class LoginWindow(QDialog):
 
                 ApiClient.SETTINGS_TOKEN.setValue('auth_token', user_access["access_token"])
 
-                aswadw = ApiClient.SETTINGS_TOKEN
-
-                anshwer = ApiClient.request_params_get(ApiClient.me_info(), params)
+                # aswadw = ApiClient.SETTINGS_TOKEN
+                # anshwer = ApiClient.request_params_get(ApiClient.me_info(), params)
                 self.user_dict = user_access
 
 
