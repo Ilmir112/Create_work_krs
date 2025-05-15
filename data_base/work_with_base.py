@@ -295,8 +295,8 @@ class ClassifierWell(MyMainWindow):
                                     params = {}
                                     if well_number and len(str(well_number)) <= 5:
 
-                                        params['well_number'] = str(well_number)
-                                        params['deposit_area'] = str(area_well)
+                                        params['well_number'] = str(well_number).lstrip().rstrip()
+                                        params['deposit_area'] = str(area_well).lstrip().rstrip().replace(" ", "_")
                                         params['costumer'] = str(self.costumer)
                                         params['today'] = str(version_year)
                                         params['region'] = str(region_name)
@@ -411,8 +411,8 @@ class ClassifierWell(MyMainWindow):
                                         self.progress_bar_window.start_loading(index_row + 1)
                                         params = {
                                                 "cdng": str(row[cdng]),
-                                                "well_number": f"{well_number}",
-                                                "deposit_area": f"{area_well}",
+                                                "well_number": str(well_number).lstrip().rstrip(),
+                                                "deposit_area": str(area_well).lstrip().rstrip().replace(" ", "_"),
                                                 "oilfield": f"{oilfield_str}",
                                                 "category_pressure": f"{row[categoty_pressure]}",
                                                 "pressure_ppl": f"{row[pressure_Ppl]}",

@@ -814,8 +814,8 @@ class MyMainWindow(QMainWindow):
                     "nkt_data": self.data_well.data_well_dict["НКТ"],
                     "sucker_pod": self.data_well.data_well_dict["штанги"],
                     "diameter_doloto_ek": float(self.data_well.diameter_doloto_ek.get_value),
-                    "last_pressure_date": datetime.strptime(self.data_well.result_pressure_date.get_value, "%d.%m.%Y"),
-                    "date_commissioning": datetime.strptime(self.data_well.date_commissioning.get_value, "%d.%m.%Y"),
+                    "last_pressure_date": self.data_well.result_pressure_date.get_value,
+                    "date_commissioning": self.data_well.date_commissioning.get_value,
                     "date_drilling_run": self.data_well.date_drilling_run,
                     "date_drilling_finish": self.data_well.date_drilling_cancel,
                     "geolog": data_list.user[1],
@@ -831,7 +831,8 @@ class MyMainWindow(QMainWindow):
             if response_find_data:
                 mes = QMessageBox.question(self, 'данные по скважине', "Данные есть в базе данных, обновить?")
                 if mes == QMessageBox.StandardButton.Yes:
-                    passresponse = ApiClient.request_post_json(ApiClient.read_wells_data_response_for_add(), params, None, 'json')
+                    while response == None:
+                        response = ApiClient.request_post_json(ApiClient.read_wells_data_response_for_add(), params, None, 'json')
             else:
                 response = ApiClient.request_post_json(ApiClient.read_wells_data_response_for_add(), params, None, 'json')
 
