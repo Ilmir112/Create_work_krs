@@ -59,7 +59,7 @@ class ClassifierWell(MyMainWindow):
             for num in data_response:
                 wells_data = []
                 for key, value in num.items():
-                    if key in ["well_number", "deposit_area", "today"]:
+                    if key in ["well_number", "well_area", "today"]:
                         wells_data.append(value)
                 data.append(wells_data)
 
@@ -106,7 +106,7 @@ class ClassifierWell(MyMainWindow):
             data_response = ApiClient.request_post(ApiClient.read_wells_classifier_response_all(), region_json)
             data = []
             for num in data_response:
-                wells_data = [num["cdng"], num["well_number"], num["deposit_area"], num["oilfield"],
+                wells_data = [num["cdng"], num["well_number"], num["well_area"], num["oilfield"],
                               num['category_pressure'], num['pressure_gst'], num["pressure_ppl"],
                               num['date_measurement'], num['category_h2s'], num['h2s_pr'], num['h2s_mg_l'],
                               num['h2s_mg_m'], num['category_gf'], num['gas_factor'], num["today"]]
@@ -296,7 +296,7 @@ class ClassifierWell(MyMainWindow):
                                     if well_number and len(str(well_number)) <= 5:
 
                                         params['well_number'] = str(well_number).lstrip().rstrip()
-                                        params['deposit_area'] = str(area_well).lstrip().rstrip().replace(" ", "_")
+                                        params['well_area'] = str(area_well).lstrip().rstrip().replace(" ", "_")
                                         params['costumer'] = str(self.costumer)
                                         params['today'] = str(version_year)
                                         params['region'] = str(region_name)
@@ -412,7 +412,7 @@ class ClassifierWell(MyMainWindow):
                                         params = {
                                                 "cdng": str(row[cdng]),
                                                 "well_number": str(well_number).lstrip().rstrip(),
-                                                "deposit_area": str(area_well).lstrip().rstrip().replace(" ", "_"),
+                                                "well_area": str(area_well).lstrip().rstrip().replace(" ", "_"),
                                                 "oilfield": f"{oilfield_str}",
                                                 "category_pressure": f"{row[categoty_pressure]}",
                                                 "pressure_ppl": f"{row[pressure_Ppl]}",

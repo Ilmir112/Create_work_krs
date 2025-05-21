@@ -1264,7 +1264,7 @@ class WellCondition(FindIndexPZ):
                                 self, self.percent_water, row_index,
                                 col + 1, 1)
                         elif 'расстояние от скважин' in str(value).lower():
-                            if row[col + 2]:
+                            if self.check_once_isdigit(row[col + 2]):
                                 self.distance_from_well_to_sampling_point = str(row[col + 2]).replace(',', '.')
 
                         elif 'плотность жидкости ' in str(value).lower():
@@ -2130,15 +2130,13 @@ class WellCategory(FindIndexPZ):
                         cell = self.ws.cell(row=row, column=col).value
                         if cell:
                             if str(cell).strip() in ['атм'] and self.ws.cell(row=row, column=col - 2).value:
-
                                 self.category_pressure_list.append(self.ws.cell(row=row, column=col - 2).value)
                                 self.category_pressure_well.append(self.ws.cell(row=row, column=col - 1).value)
 
                             elif str(cell).strip() in ['%', 'мг/л', 'мг/дм3', 'мг/м3', 'мг/дм', 'мгдм3']:
                                 if str(cell).strip() == '%':
                                     if self.ws.cell(row=row, column=col - 2).value is None:
-                                        self.category_h2s_list.append(
-                                            self.ws.cell(row=row - 1, column=col - 2).value)
+                                        self.category_h2s_list.append(3)
                                     else:
                                         self.category_h2s_list.append(
                                             self.ws.cell(row=row, column=col - 2).value)

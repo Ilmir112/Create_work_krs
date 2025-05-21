@@ -135,15 +135,15 @@ class GonsWindow(WindowUnion):
         plast_combo = str(self.tab_widget.currentWidget().plast_combo.combo_box.currentText())
         acid_edit = self.tab_widget.currentWidget().acid_edit.currentText()
         acid_volume_edit = float(self.tab_widget.currentWidget().acid_volume_edit.text().replace(',', '.'))
-        acid_proc_edit = int(self.tab_widget.currentWidget().acid_proc_edit.text().replace(',', '.'))
-        bottom_point = self.tab_widget.currentWidget().point_bottom_edit.text()
+        acid_proc_edit = int(float(self.tab_widget.currentWidget().acid_proc_edit.text().replace(',', '.')))
+        bottom_point = self.tab_widget.currentWidget().point_bottom_edit.text().replace(',', '.')
         acid_calcul_edit = self.tab_widget.currentWidget().acid_calcul_edit.text()
         points_sko_edit = self.tab_widget.currentWidget().points_sko_edit.text()
-        pressure_edit = int(self.tab_widget.currentWidget().pressure_edit.text())
+        pressure_edit = int(float(self.tab_widget.currentWidget().pressure_edit.text().replace(',', '.')))
         iron_true_combo = self.tab_widget.currentWidget().iron_true_combo.currentText()
         iron_volume_edit = self.tab_widget.currentWidget().iron_volume_edit.text()
 
-        if int(bottom_point) >= self.data_well.current_bottom:
+        if int(float(bottom_point)) >= self.data_well.current_bottom:
             QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
             return
         if not acid_edit or not acid_volume_edit or not acid_proc_edit or not bottom_point or not acid_calcul_edit \

@@ -472,17 +472,20 @@ class GnktModel(WindowUnion):
                     # elif 'Д.Д. Шамигулов' in str(value):
                     #     coordinate = f'{get_column_letter(col + 1)}{row_ind - 2}'
                     #     self.insert_image(ws2, f'{data_list.path_image}imageFiles/Шамигулов.png', coordinate)
+                    elif 'Зуфаров И.М.' in str(value):
+                        coordinate = f'{get_column_letter(col + 1)}{row_ind - 2}'
+                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/Зуфаров.png', coordinate)
                     elif 'Зуфаров' in str(value):
-                        coordinate = f'{get_column_letter(col - 2)}{row_ind}'
+                        coordinate = f'{get_column_letter(col + 1)}{row_ind - 1}'
                         self.insert_image(ws2, f'{data_list.path_image}imageFiles/Зуфаров.png', coordinate)
                     elif 'Закиев И.Э.' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind}'
                         self.insert_image(ws2, f'{data_list.path_image}imageFiles/Закиев.png', coordinate)
                     elif 'Котиков' in str(value) and 'И.А.' in str(value):
-                        coordinate = f'{get_column_letter(col - 1)}{row_ind}'
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind-1}'
                         self.insert_image(ws2, f'{data_list.path_image}imageFiles/Котиков.png', coordinate)
                     elif 'Рахимьянов' in str(value):
-                        coordinate = f'{get_column_letter(col - 1)}{row_ind}'
+                        coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
                         self.insert_image(ws2, f'{data_list.path_image}imageFiles/рахимьянов.png', coordinate)
     def work_with_data_gnkt(self):
         if self.data_gnkt is None:

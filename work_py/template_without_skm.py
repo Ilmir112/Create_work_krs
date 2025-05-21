@@ -354,10 +354,11 @@ class TabPageSo(TabPageUnion):
         template_str = ''
         skm_teml_str = ''
         kot_str = ''
+        valve = ''
         if self.kot_question_qcombo.currentText() == 'Да':
             kot_str = '+ КОТ-50'
-        else:
-            kot_str = ''
+            valve = '+ СК'
+
         nkt_diam = self.data_well.nkt_diam
         if self.data_well.column_additional is False or (self.data_well.column_additional and
                                                          self.data_well.head_column_additional.get_value >=
@@ -419,7 +420,7 @@ class TabPageSo(TabPageUnion):
             self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
             self.grid.addWidget(self.dictance_template_first_edit, 5, 4)
 
-            template_str = f'перо {kot_str} + шаблон-{first_template}мм L-2м + НКТ{nkt_diam}мм ' \
+            template_str = f'перо {kot_str} + шаблон-{first_template}мм L-2м {valve}+ НКТ{nkt_diam}мм ' \
                            f'{dictance_template_first:.0f}м ' \
                            f'+  НКТ{nkt_diam}мм + шаблон-{template_second}мм' \
                            f' L-{length_template_second}м '
@@ -455,7 +456,7 @@ class TabPageSo(TabPageUnion):
             dictance_template_first = int(self.dictance_template_first_edit.text())
             dictance_template_second = int(self.dictance_template_second_edit.text())
 
-            template_str = f'фильтр-направление L-2 {kot_str}+ НКТ{nkt_diam}м {dictance_template_first:.0f}м +' \
+            template_str = f'фильтр-направление L-2 {kot_str}+ НКТ{nkt_diam}м {dictance_template_first:.0f}м {valve}+' \
                            f'шаблон-{template_second}мм L-{length_template_second}м '
             self.template_depth = int(roof_plast - 5)
 
@@ -482,7 +483,7 @@ class TabPageSo(TabPageUnion):
             self.dictance_template_second_edit.setText(str(dictance_template_second))
 
             template_str = f'обточная муфта {kot_str} + НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
-                           f' + шаблон-{first_template}мм ' \
+                           f' {valve}+ шаблон-{first_template}мм ' \
                            f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_template_second:.0f}м + ' \
                            f'шаблон-{template_second}мм L-{length_template_second}м '
             self.template_depth = math.ceil(
@@ -512,7 +513,7 @@ class TabPageSo(TabPageUnion):
             self.dictance_template_second_edit.setText(str(dictance_template_second))
             dictance_template_second = int(self.dictance_template_second_edit.text())
 
-            template_str = f'обточная муфта {kot_str} + шаблон-{first_template}мм L-{length_template_first}м + ' \
+            template_str = f'обточная муфта {kot_str} + шаблон-{first_template}мм L-{length_template_first}м {valve}+ ' \
                            f'НКТ{nkt_pod} {dictance_template_second:.0f}м + шаблон-{template_second}мм ' \
                            f'L-{length_template_second}м '
 
@@ -524,10 +525,7 @@ class TabPageSo(TabPageUnion):
             skm_teml_str = f'шаблон-{first_template}мм до гл.{self.template_depth_addition}м, ' \
                            f'шаблон-{template_second}мм до гл.{self.template_depth}м'
 
-
-
         elif index == 'шаблон ДП открытый ствол':
-
             self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
             self.grid.addWidget(self.dictance_template_first_edit, 5, 2)
             self.grid.addWidget(self.template_first_Label, 4, 3)
@@ -549,7 +547,7 @@ class TabPageSo(TabPageUnion):
             self.dictance_template_second_edit.setText(str(dictance_template_second))
 
             template_str = f'фильтр направление {kot_str}+ НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
-                           f' + шаблон-{first_template}мм L-{length_template_first}м' \
+                           f' {valve}+ шаблон-{first_template}мм L-{length_template_first}м' \
                            f' + НКТ{nkt_pod} {dictance_template_second:.0f}м + шаблон-{template_second}мм ' \
                            f'L-{length_template_second}м '
             self.template_depth = math.ceil(

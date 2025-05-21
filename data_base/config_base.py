@@ -230,11 +230,12 @@ class WorkDatabaseWell:
         return row_exists
 
     def insert_in_database_well_data(self, data_well: FindIndexPZ, contractor: str, costumer: str, excel: str) -> None:
+        from server_response import ApiClient
         work_plan = data_well.work_plan
         well_number = data_well.well_number.get_value
         well_area = data_well.well_area.get_value
 
-        data_well_dict = json.dumps(data_well.data_well_dict, ensure_ascii=False)
+        data_well_dict = json.dumps(ApiClient.serialize_datetime(data_well.data_well_dict), ensure_ascii=False)
         excel_json = json.dumps(excel, ensure_ascii=False)
         date_today = datetime.now().strftime('%Y-%m-%d')
 

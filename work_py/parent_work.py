@@ -88,7 +88,8 @@ class TabPageUnion(QWidget):
     def update_well_area(self, well_area):
         if self.well_number_edit.text() != '' and data_list.connect_in_base and well_area != '':
             params = {"well_number": self.well_number_edit.text(), "well_area": well_area}
-            response = ApiClient.request_params_get(ApiClient.find_wells_data_response_find_id_by_wells_data(), params)
+            response = ApiClient.request_params_get(ApiClient.find_wells_data_response_filter_well_number_well_area(),
+                                                    params)
             if response:
                 self.insert_response_data(response)
 
@@ -1499,8 +1500,9 @@ class WindowUnion(MyMainWindow):
 
     @staticmethod
     def difference_date_days(date1, today=data_list.current_date):
-        # Задание дат
-        date1 = datetime.strptime(date1, "%Y-%m-%d")
+        if type(date1) is str:
+            # Задание дат
+            date1 = datetime.strptime(date1, "%Y-%m-%d")
 
         # Вычисление разницы в днях
         difference = (today - date1).days
@@ -1545,7 +1547,8 @@ class WindowUnion(MyMainWindow):
             }
             response = ApiClient.request_params_get(ApiClient.find_wells_repair_well_by_id(), params)
             if response:
-                data_change_paragraph, dict_category, self.excel_json = TabPageUnion.insert_repairs_data(self, response)
+                data_change_paragraph, dict_category, self.excel_json = TabPageUnion.insert_repairs_data(
+                    self, response)
                 self.tab_widget.currentWidget().excel_json = self.excel_json
 
                 data = TabPageUnion.insert_data_dop_plan(self, data_change_paragraph, paragraph_row)

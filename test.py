@@ -41,7 +41,7 @@ class MyApp(QWidget):
         try:
             data = {
                 "well_number": f'{well_number}',
-                "deposit_area": deposit_area,
+                "well_area": deposit_area,
                 "today": "2025-05-04",
                 "region": "ТГМ",
                 "costumer": "БНД"
