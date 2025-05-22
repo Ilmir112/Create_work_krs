@@ -245,7 +245,10 @@ class TabPageSoRir(TabPageUnion):
         if self.roof_rir_edit.text() != '' and self.sole_rir_edit.text() != '':
             volume_cement = round(volume_vn_ek(self, float(self.roof_rir_edit.text())) * (
                     float(self.sole_rir_edit.text()) - float(self.roof_rir_edit.text())) / 1000, 1)
-            self.cement_volume_line.setText(f'{min([2, volume_cement])}')
+            if volume_cement >= 2:
+                self.cement_volume_line.setText(f'{volume_cement}')
+            else:
+                self.cement_volume_line.setText(f'{2}')
 
     def update_paker_need_ek(self, index):
         if index == 'Нужно СПО':
@@ -727,7 +730,7 @@ class RirWindow(WindowUnion):
             dict_nkt = {73: sole_rir_edit}
 
         volume_in_nkt, volume_in_ek = RirWindow.calc_buffer(self, roof_rir_edit, sole_rir_edit, dict_nkt)
-        self.ozc_str_short, self.ozc_str, self.time_ozc = self.calculate_time_ozc(roof_rir_edit)
+        self.ozc_str_short, self.ozc_str, self.time_ozc = WindowUnion.calculate_time_ozc(roof_rir_edit)
         uzm_pero_list = [
             [f' СПО пера до глубины {sole_rir_edit}м Опрессовать НКТ на 200атм', None,
              f'Спустить {RirWindow.pero_select(self, sole_rir_edit)}  на тНКТ{nkt_diam}м до глубины {sole_rir_edit}м с '
@@ -1265,7 +1268,7 @@ class RirWindow(WindowUnion):
         except Exception as e :
             QMessageBox.warning(self, 'ОШИБКА', f'Введены не все данные {e}')
 
-        self.ozc_str_short, self.ozc_str, self.time_ozc = self.calculate_time_ozc(roof_rir_edit)
+        self.ozc_str_short, self.ozc_str, self.time_ozc = WindowUnion.calculate_time_ozc(roof_rir_edit)
 
         if paker_need_combo == 'Нужно СПО':
             diameter_paker = int(float(current_widget.diameter_paker_edit.text()))

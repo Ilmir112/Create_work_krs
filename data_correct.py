@@ -393,6 +393,10 @@ class TabPageSoCorrect(TabPageUnion):
 
         self.date_commissioning_Label = QLabel("Дата ввода в эксплуатацию")
         self.date_commissioning_line = QLineEdit(self)
+
+        if isinstance(self.data_well.date_commissioning.get_value, datetime):
+            self.data_well.date_commissioning = data_list.ProtectedIsNonNone(
+                datetime.strptime(self.data_well.date_commissioning.get_value, "%d.%m.%Y"))
         if self.data_well.date_commissioning:
             self.date_commissioning_line.setText(
                 self.data_well.date_commissioning.get_value
@@ -400,6 +404,9 @@ class TabPageSoCorrect(TabPageUnion):
 
         self.result_pressure_date_label = QLabel("Дата последней опрессовки")
         self.result_pressure_date = QLineEdit(self)
+        if isinstance(self.data_well.result_pressure_date.get_value, datetime):
+            self.data_well.result_pressure_date.get_value = data_list.ProtectedIsNonNone(
+                datetime.strptime(self.data_well.result_pressure_date.get_value, "%d.%m.%Y"))
         if self.data_well.result_pressure_date.get_value != "01.01.2000":
             self.result_pressure_date.setText(
                 self.data_well.result_pressure_date.get_value

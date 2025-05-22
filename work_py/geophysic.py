@@ -98,6 +98,16 @@ class GeophysicWindow(WindowUnion):
         edit_type2 = self.tab_widget.currentWidget().lineedit_type2.text().replace(',', '.')
         researchGis = self.geophysicalSelect(str(self.tab_widget.currentWidget().ComboBoxGeophygist.currentText()))
 
+        if self.data_well.column_additional is False or \
+            (self.data_well.column_additional and self.data_well.current_bottom > self.data_well.head_column_additional.get_value):
+            if float(edit_type) > self.data_well.shoe_column.get_value:
+                QMessageBox.information(self, 'Внимание', 'глубина исследований ниже башмака колонны')
+                return
+        else:
+            if float(edit_type) > self.data_well.shoe_column_additional.get_value:
+                QMessageBox.information(self, 'Внимание', 'глубина исследований ниже башмака колонны')
+                return
+
         dop_information = self.tab_widget.currentWidget().lineEditdop_information.text()
         if not edit_type or not edit_type2 or not researchGis:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')

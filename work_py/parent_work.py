@@ -166,7 +166,7 @@ class TabPageUnion(QWidget):
             params = {"well_number": number_well}
             response = ApiClient.request_params_get(ApiClient.response_find_well_filter_by_number(), params)
             if response:
-                return response['ремонты']
+                return response["ремонты"]
         else:
             db = connection_to_database(decrypt("DB_WELL_DATA"))
             data_well_base = WorkDatabaseWell(db, self.data_well)
@@ -1363,8 +1363,8 @@ class WindowUnion(MyMainWindow):
 
         return flushing_downhole_list, flushing_downhole_short
 
-    @staticmethod
-    def calculate_time_ozc(roof_rir_edit):
+    @classmethod
+    def calculate_time_ozc(cls, roof_rir_edit):
         if roof_rir_edit >= 1300:
             string = f'ОЗЦ 24 часа: (по качеству пробы) с момента срезки В случае не получения ' \
                      f'технологического "СТОП" ОЗЦ без давления.'
@@ -1531,19 +1531,21 @@ class WindowUnion(MyMainWindow):
 
     def extraction_data(self, table_name, paragraph_row=0):
         from data_base.work_with_base import insert_data_well_dop_plan
-        date_table = table_name.split(' ')[-1]
+        date_table = table_name.split(' ')[-2]
+        wells_id =table_name.split(' ')[-1]
         well_number = table_name.split(' ')[0]
         well_area = table_name.split(' ')[1]
-        type_kr = table_name.split(' ')[-4].replace('None', 'null')
+        type_kr = table_name.split(' ')[2].replace('None', 'null')
         contractor_select = data_list.contractor
-        work_plan = table_name.split(' ')[-3]
+        work_plan = table_name.split(' ')[-4]
         if data_list.connect_in_base:
             params = {
                 "well_number": well_number,
                 "well_area": well_area,
                 "type_kr": type_kr,
                 "work_plan": work_plan,
-                "date_create": date_table
+                "date_create": date_table,
+                "wells_id": int(wells_id)
             }
             response = ApiClient.request_params_get(ApiClient.find_wells_repair_well_by_id(), params)
             if response:
@@ -1790,6 +1792,10 @@ class WindowUnion(MyMainWindow):
 
         date_str = data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]
 
+        number_schema = 2
+
+        if self.data_well.category_h2s == "1" or self.data_well.category_gas_factor == "1":
+            number_schema = 1
         # print(f' ПВО {kat_pvo}')
         pvo_2 = f'Установить ПВО по схеме №2 утвержденной главным инженером {contractor} {date_str} (тип плашечный ' \
                 f'сдвоенный ПШП-2ФТ-152х21) и посадить пакер. ' \
@@ -1800,7 +1806,7 @@ class WindowUnion(MyMainWindow):
                 f'опрессовки эксплуатационной колонны в течении ' \
                 f'30мин), сорвать пакер. '
 
-        pvo_1 = f'Установить ПВО по схеме №2 утвержденной главным инженером {contractor} {date_str} ' \
+        pvo_1 = f'Установить ПВО по схеме №{number_schema} утвержденной главным инженером {contractor} {date_str} ' \
                 f'(тип плашечный сдвоенный ПШП-2ФТ-160х21Г Крестовина КР160х21Г, ' \
                 f'задвижка ЗМС 65х21 (3шт), Шарового крана 1КШ-73х21, авар. трубы (патрубок НКТ73х7-7-Е, ' \
                 f' (при необходимости произвести монтаж переводника' \

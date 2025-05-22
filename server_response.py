@@ -81,7 +81,7 @@ class ApiClient:
             return response.json()
         except requests.exceptions.RequestException as e:
             print(f"Запрос не удался: {e}")
-            return response.status_code
+            return None
 
     @staticmethod
     def request_post_json(path, json_data, param=None, answer="param"):

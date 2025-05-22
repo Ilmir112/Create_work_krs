@@ -1,7 +1,5 @@
-
-from openpyxl.styles import Border, Side, Font,  Alignment
+from openpyxl.styles import Border, Side, Font, Alignment
 from work_py.calculate_work_parametrs import volume_work, volume_well_pod_nkt_calculate
-
 
 from find import FindIndexPZ
 
@@ -12,9 +10,11 @@ class CalculateH2s:
 
     def calc_h2s(self, ws3, plast):
         # print(self.data_well.dict_nkt_before)
-        nkt_1 = list(self.data_well.dict_nkt_before.keys())[0]
-        nkt_1_l = self.data_well.dict_nkt_before[nkt_1]
-
+        nkt_1 = 0
+        nkt_1_l = 0
+        if list(self.data_well.dict_nkt_before.keys()):
+            nkt_1 = list(self.data_well.dict_nkt_before.keys())[0]
+            nkt_1_l = self.data_well.dict_nkt_before[nkt_1]
         try:
             nkt_2 = list(self.data_well.dict_nkt_before.keys())[1]
             nkt_2_l = self.data_well.dict_nkt_before[nkt_2]
@@ -45,7 +45,6 @@ class CalculateH2s:
             self.data_well.type_absorbent = 'ХИМТЕХНО 101 Марка А'
         elif 'СНПХ-1200' in self.data_well.fluid_work:
             self.data_well.type_absorbent = 'СНПХ-1200'
-
 
         if self.data_well.type_absorbent == 'EVASORB марки 121':
             koeff_zapas = 1.05
@@ -80,7 +79,8 @@ class CalculateH2s:
              float(self.data_well.column_additional_wall_thickness.get_value),
              'ввод'],
             [None, '1.3.5.', 'Длина подвески ЭК (ступень 2 хвостовик)', 'м',
-             abs(int(self.data_well.head_column_additional.get_value) - int(self.data_well.shoe_column_additional.get_value)), 'ввод'],
+             abs(int(self.data_well.head_column_additional.get_value) - int(
+                 self.data_well.shoe_column_additional.get_value)), 'ввод'],
             [None, '1.3.6.',
              'Глубина "головы" (ступень 2 хвостовик)', 'м', int(self.data_well.head_column_additional.get_value),
              'ввод',
@@ -167,11 +167,13 @@ class CalculateH2s:
             [None, 9.3, 'Масса реагента с запасом', 'кг', '=E67*E68', 'формула', None, None, None],
             [None, None, None, None, None, None],
             [None, 10, 'Удельный расход нейтрализатора сероводорода в растворе глушения', None, None, None],
-            [None, 10.1, 'Удельный массовый расход нейтрализатора сероводорода ', 'кг/м3', '=ROUND(E69/E34,3)', 'формула'],
-            [None, 10.2, 'Удельный объемный расход нейтрализатора сероводорода ', 'л/м3', '=ROUND(E72/E64,3)', 'формула'],
+            [None, 10.1, 'Удельный массовый расход нейтрализатора сероводорода ', 'кг/м3', '=ROUND(E69/E34,3)',
+             'формула'],
+            [None, 10.2, 'Удельный объемный расход нейтрализатора сероводорода ', 'л/м3', '=ROUND(E72/E64,3)',
+             'формула'],
             ['Примечание: * - расчет приблизительный, поскольку нет информации по содержанию H2S в каждой фазе '
-                '(вода, нефть, газ) в одинаковых условиях',
-                None, None, None, None, None, ],
+             '(вода, нефть, газ) в одинаковых условиях',
+             None, None, None, None, None, ],
             [None, None, None, None, None, None],
             [None, 'Ячейки для заполнения данными параметров скважины', None, None, None, None],
             [None, 'По данным конструкции скважины', None, None, None, None],
@@ -209,6 +211,8 @@ class CalculateH2s:
 
         ws3.page_setup.fitToWidth = True
         ws3.print_area = 'A1:F77'
+
+
 def calv_h2s(self, category_h2s, h2s_mg, h2s_pr):
     if '2' in str(category_h2s) or '1' in str(category_h2s):
         if self.data_well.type_absorbent == 'EVASORB марки 121':
@@ -236,7 +240,7 @@ def calv_h2s(self, category_h2s, h2s_mg, h2s_pr):
                 nkt_width = 6.5
 
             vodoiz_nkt = round(10 * 3.14 * ((nkt_1 * 0.01) ** 2 - (nkt_1 * 0.01 - nkt_width * 2 * 0.01) ** 2) / 4, 2)
-            udel_vodoiz_nkt += vodoiz_nkt*nkt_values/1000
+            udel_vodoiz_nkt += vodoiz_nkt * nkt_values / 1000
 
         sucker_rod_l_25 = 0
         sucker_rod_l_22 = 0
@@ -251,8 +255,8 @@ def calv_h2s(self, category_h2s, h2s_mg, h2s_pr):
                 sucker_rod_l_19 = sucker_value
 
         vodoiz_sucker = (10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_25 / 1000) + (
-                    10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_22 / 1000) + (
-                                    10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_19 / 1000)
+                10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_22 / 1000) + (
+                                10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_19 / 1000)
 
         oil_mass = round(float(udel_vodoiz_nkt * (100 - self.data_well.percent_water) * 0.9 / 100), 2)
 

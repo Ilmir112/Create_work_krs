@@ -22,7 +22,7 @@ class TabPageSoRaid(TabPageUnion):
 
         self.raid_type_label = QLabel("Тип райбера", self)
         self.raid_type_combo = QComboBox(self)
-        raid_type_list = ['ФКК', 'арбузный ФА', 'ФКК+фрезер Ф32']
+        raid_type_list = ["ФКК", "фрезер Ф32", 'ФКК+фрезер Ф32']
         self.raid_type_combo.addItems(raid_type_list)
 
         self.raid_select_label = QLabel("компоновка НКТ", self)
@@ -328,7 +328,7 @@ class Raid(WindowUnion):
         # Закрываем основное окно при закрытии окна входа
         data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
-    def raidingColumn(self, raiding_interval_tuple, ryber_key):        
+    def raidingColumn(self, raiding_interval_tuple):
         from .advanted_file import raid       
 
         ryber_diam = self.tab_widget.currentWidget().raid_diameter_line.text()
@@ -345,12 +345,16 @@ class Raid(WindowUnion):
 
         nkt_diam = self.data_well.nkt_diam
         nkt_template = self.data_well.nkt_template
+        if raid_type_combo == 'ФКК+фрезер Ф32':
+            raid_type_combo = f'ФКК-{ryber_diam} + фрезер Ф32-{int(float(ryber_diam)+1)}'
+        else:
+            raid_type_combo = f'{raid_type_combo}-{ryber_diam}'
 
-        ryber_str_EK = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {self.data_well.column_diameter.get_value}мм х ' \
+        ryber_str_EK = f'райбер {raid_type_combo} для ЭК {self.data_well.column_diameter.get_value}мм х ' \
                        f'{self.data_well.column_wall_thickness.get_value}мм +' \
                        f' забойный двигатель {downhole_motor} + НКТ{self.data_well.nkt_diam} 20м + репер '
 
-        ryber_str_DP = f'райбер {raid_type_combo}-{ryber_diam} для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
+        ryber_str_DP = f'райбер {raid_type_combo} для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
                        f'{self.data_well.column_additional_wall_thickness.get_value}мм + забойный двигатель ' \
                        f'{downhole_motor} + НКТ{nkt_pod} 20м + репер + ' \
                        f'НКТ{nkt_pod} {round(self.data_well.current_bottom - float(self.data_well.head_column_additional.get_value))}м'
@@ -368,7 +372,7 @@ class Raid(WindowUnion):
         change_true_raid(self, raiding_interval_tuple)
         ryber_list = [
             [f'СПО {ryber_str} на НКТ{nkt_diam} до Н={krovly_raiding}м', None,
-             f'Спустить {ryber_str}  на НКТ{nkt_diam} до Н={krovly_raiding}м с замером, '
+             f'Спустить {ryber_str} на НКТ{nkt_diam} до Н={krovly_raiding}м с замером, '
              f'шаблонированием шаблоном {nkt_template}мм (При СПО первых десяти НКТ на спайдере дополнительно '
              f'устанавливать элеватор ЭХЛ). '
              f'В случае разгрузки инструмента  при спуске, проработать место посадки с промывкой скв., составить акт.'
