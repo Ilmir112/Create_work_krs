@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QWidget, QTabWidget, QInputDialog, QMessageBox, QLab
 from main import MyMainWindow
 from server_response import ApiClient
 from work_py.calculate_work_parametrs import volume_work, volume_well_pod_nkt_calculate
-from data_list import contractor, ProtectedIsDigit
+from data_list import contractor, ProtectedIsDigit, ProtectedIsNonNone
 
 from work_py.advanted_file import definition_plast_work
 from work_py.alone_oreration import volume_vn_nkt, well_volume
@@ -163,7 +163,7 @@ class TabPageUnion(QWidget):
 
     def check_in_database_well_data2(self, number_well):
         if data_list.connect_in_base:
-            params = {"well_number": number_well}
+            params = {"well_number": number_well, "contractor": data_list.contractor}
             response = ApiClient.request_params_get(ApiClient.response_find_well_filter_by_number(), params)
             if response:
                 return response["ремонты"]
@@ -210,6 +210,7 @@ class TabPageUnion(QWidget):
                 self.well_data_in_base_combo.addItems(well_list)
 
     def insert_repairs_data(self, response):
+        self.data_well.distance_from_well_to_sampling_point = 20
         self.data_well.type_absorbent = response["type_absorbent"]
         self.data_well.static_level = data_list.ProtectedIsDigit(response["static_level"])
         self.data_well.dinamic_level = data_list.ProtectedIsDigit(response["dinamic_level"])
@@ -244,9 +245,9 @@ class TabPageUnion(QWidget):
         self.data_well.level_cement_conductor = ProtectedIsDigit(response["column_conductor"]["level_cement"])
         if self.data_well.column_conductor_diameter.get_value not in ['0', None, 0, '']:
             self.data_well.column_direction_true = True
-
+        self.data_well.well_oilfield = ProtectedIsDigit(response["well_oilfield"])
         self.data_well.level_cement_column = ProtectedIsDigit(response["column_production"]["level_cement"])
-
+        self.data_well.appointment_well = ProtectedIsNonNone(response["appointment"])
         self.data_well.column_diameter = ProtectedIsDigit(response["column_production"]["diameter"])
         self.data_well.column_wall_thickness = ProtectedIsDigit(response["column_production"]["wall_thickness"])
         self.data_well.shoe_column = ProtectedIsDigit(response["column_production"]["shoe"])
@@ -313,11 +314,9 @@ class TabPageUnion(QWidget):
         self.data_well.max_expected_pressure = ProtectedIsDigit(response["max_expected_pressure"])
         self.data_well.max_admissible_pressure = ProtectedIsDigit(response["max_admissible_pressure"])
 
-        # self.data_well.curator = response['куратор']
-        # self.data_well.region = response['регион']
         self.data_well.cdng = data_list.ProtectedIsNonNone(response["cdng"])
-        self.data_well.date_commissioning = data_list.ProtectedIsNonNone(response["date_commissioning"])
-        self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(response["last_pressure_date"])
+        self.data_well.date_commissioning = data_list.ProtectedIsNonNone(datetime.strptime(response["date_commissioning"], "%Y-%m-%d"))
+        self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(datetime.strptime(response["last_pressure_date"], "%Y-%m-%d"))
 
         # if 'ПВР план' in list(response.keys()):
         #     self.data_well.dict_perforation_project = response['ПВР план']
@@ -1532,7 +1531,7 @@ class WindowUnion(MyMainWindow):
     def extraction_data(self, table_name, paragraph_row=0):
         from data_base.work_with_base import insert_data_well_dop_plan
         date_table = table_name.split(' ')[-2]
-        wells_id =table_name.split(' ')[-1]
+        wells_id = table_name.split(' ')[-1]
         well_number = table_name.split(' ')[0]
         well_area = table_name.split(' ')[1]
         type_kr = table_name.split(' ')[2].replace('None', 'null')
@@ -1545,7 +1544,8 @@ class WindowUnion(MyMainWindow):
                 "type_kr": type_kr,
                 "work_plan": work_plan,
                 "date_create": date_table,
-                "wells_id": int(wells_id)
+                "wells_id": int(wells_id),
+                "contractor": data_list.contractor
             }
             response = ApiClient.request_params_get(ApiClient.find_wells_repair_well_by_id(), params)
             if response:

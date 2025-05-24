@@ -2309,7 +2309,7 @@ class WellData(FindIndexPZ):
                             self,
                             "Ошибка",
                             f"Длина НКТ {sum(list(self.dict_nkt_after.values()))}м "
-                            f"после ремонта меньше глубины насоса"
+                            f"после ремонта меньше глубины насоса "
                             f'{self.dict_pump_shgn_depth["after"]}м',
                         )
                         self.check_data_in_pz.append(

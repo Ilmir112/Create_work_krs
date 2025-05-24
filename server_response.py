@@ -1,14 +1,22 @@
+import json
 import re
 import threading
 from datetime import datetime
-from typing import Dict
+
 
 import requests
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 
+import data_list
+
 
 class ApiClient:
-    SERVER_API = "http://localhost:8000/api/v1"
+
+    with open(f'{data_list.path_image}users/server.json', 'r', encoding='utf-8') as file:
+        server_dict = json.load(file)
+
+    SERVER_API = server_dict["host"]
+
     SETTINGS_TOKEN = None
 
     @classmethod

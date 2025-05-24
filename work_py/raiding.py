@@ -328,8 +328,9 @@ class Raid(WindowUnion):
         # Закрываем основное окно при закрытии окна входа
         data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
-    def raidingColumn(self, raiding_interval_tuple):
-        from .advanted_file import raid       
+
+    def raidingColumn(self, raiding_interval_tuple, ryber_key):
+        from work_py.advanted_file import raid
 
         ryber_diam = self.tab_widget.currentWidget().raid_diameter_line.text()
         ryber_key = self.tab_widget.currentWidget().raid_select_combo.currentText()

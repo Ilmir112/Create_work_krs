@@ -21,12 +21,12 @@ class TabPageSoSand(TabPageUnion):
         self.current_edit.setText(str(self.data_well.current_bottom))
 
         self.pero_combo_Label = QLabel("выбор пера", self)
-        self.pero_combo_combo = QComboBox(self)
-        self.pero_combo_combo.addItems(
+        self.pero_combo = QComboBox(self)
+        self.pero_combo.addItems(
             ['перо + КОТ', 'Перо', 'обточную муфту + КОТ', 'обточную муфту', 'перо-110мм', 'пило-муфту'])
 
         if self.data_well.column_additional or self.data_well.column_diameter.get_value < 120:
-            self.pero_combo_combo.setCurrentIndex(2)
+            self.pero_combo.setCurrentIndex(2)
 
         self.solvent_question_label = QLabel("необходимость растворителя", self)
         self.solvent_question_combo = QComboBox(self)
@@ -63,7 +63,7 @@ class TabPageSoSand(TabPageUnion):
         self.grid.addWidget(self.current_edit, 5, 3)
 
         self.grid.addWidget(self.pero_combo_Label, 4, 4)
-        self.grid.addWidget(self.pero_combo_combo, 5, 4)
+        self.grid.addWidget(self.pero_combo, 5, 4)
         self.grid.addWidget(self.solvent_question_label, 4, 5)
         self.grid.addWidget(self.solvent_question_combo, 5, 5)
 
@@ -151,7 +151,7 @@ class PeroWindow(WindowUnion):
 
     def add_work(self):
         try:
-            pero_combo_combo = self.tab_widget.currentWidget().pero_combo_combo.currentText()
+            pero_combo = self.tab_widget.currentWidget().pero_combo.currentText()
             current_edit = int(float(self.tab_widget.currentWidget().current_edit.text().replace(',', '.')))
             if current_edit >= self.data_well.bottom_hole_artificial.get_value:
                 QMessageBox.warning(self, 'Ошибка',
@@ -166,7 +166,7 @@ class PeroWindow(WindowUnion):
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
 
-        work_list = self.pero(current_edit, pero_combo_combo, solvent_question_combo, solvent_volume_edit)
+        work_list = self.pero(current_edit, pero_combo, solvent_question_combo, solvent_volume_edit)
 
         self.data_well.current_bottom = current_edit
         self.populate_row(self.insert_index, work_list, self.table_widget)
@@ -174,11 +174,11 @@ class PeroWindow(WindowUnion):
         self.close()
         self.close_modal_forcefully()
 
-    def pero(self, current_edit, pero_combo_combo, solvent_question_combo, solvent_volume_edit):
+    def pero(self, current_edit, pero_combo, solvent_question_combo, solvent_volume_edit):
         from work_py.rir import RirWindow
         from work_py.template_work import TemplateKrs
 
-        pero_list = RirWindow.pero_select(self, current_edit, pero_combo_combo)
+        pero_list = RirWindow.pero_select(self, current_edit, pero_combo)
 
         gips_pero_list = [
             [f'Спустить {pero_list} на тНКТ{self.data_well.nkt_diam}мм', None,

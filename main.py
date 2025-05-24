@@ -137,7 +137,7 @@ class ExcelWorker(QThread):
         if data_list.connect_in_base:
             self.params = {
                 "well_number": self.data_well.well_number.get_value,
-                "well_area": self.data_well.well_area.get_value,
+                "well_area": self.data_well.well_area.get_value
             }
             #
             # self.wells_data_by_id = ApiClient.request_params_get(ApiClient.find_wells_data_response_find_id_by_wells_data(),
@@ -194,6 +194,7 @@ class ExcelWorker(QThread):
                 },
                 "curator": self.data_well.curator,
                 "region": self.data_well.region,
+                "contractor": data_list.contractor
             }
             response = ApiClient.request_post_json(
                 ApiClient.read_wells_repair_response_for_add(),
@@ -1164,6 +1165,7 @@ class MyMainWindow(QMainWindow):
                     "geolog": data_list.user[1],
                     "date_create": data_list.current_date,
                     "leakiness": self.data_well.dict_leakiness,
+                    "contractor": data_list.contractor
                 }
 
                 response = None
@@ -3642,9 +3644,9 @@ class MyWindow(MyMainWindow):
     def correct_perforation(self):
         from perforation_correct import PerforationCorrect
 
-        self.data_well.current_bottom, ok = QInputDialog.getDouble(
-            self, "Необходимый забой", "Введите забой до которого нужно нормализовать"
-        )
+        # self.data_well.current_bottom, ok = QInputDialog.getDouble(
+        #     self, "Необходимый забой", "Введите забой до которого нужно нормализовать"
+        # )
 
         self.perforation_correct_window2 = PerforationCorrect(self.data_well)
         self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
