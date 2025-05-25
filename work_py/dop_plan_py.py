@@ -4,13 +4,14 @@ import data_list
 
 from PyQt5.Qt import *
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
-from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout,  \
+from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
     QPushButton, QTextEdit, QDateEdit
 from PyQt5.QtCore import Qt, pyqtSignal
 from datetime import datetime
 
 from data_base.config_base import connection_to_database, WorkDatabaseWell
 from decrypt import decrypt
+from find import FindIndexPZ
 from server_response import ApiClient
 
 from work_py.advanted_file import merge_overlapping_intervals
@@ -208,10 +209,6 @@ class TabPageDp(TabPageUnion):
                 number_dp_in_base = [num for num in index.split(' ')[3] if num.isdigit()][0]
                 self.number_DP_Combo.setCurrentIndex(int(number_dp_in_base))
 
-
-
-
-
     def update_change_pvr(self, index):
         if self.old_index == 0:
             self.tableWidget.setHorizontalHeaderLabels(
@@ -270,14 +267,10 @@ class TabPageDp(TabPageUnion):
             self.type_pvr_edit.setParent(None)
             self.tableWidget.hide()
 
-
-
             # self.table_in_base_combo.currentTextChanged.connect(self.update_table_in_base_combo)
 
     def update_table_name(self):
         self.index_change_line.setText('0')
-
-
 
 
 class TabWidget(TabWidgetUnion):
@@ -367,7 +360,7 @@ class DopPlanWindow(WindowUnion):
         self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(self.roof_edit)))
         self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(self.sole_edit)))
         self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(self.date_pvr_edit)))
-        aaaa = self.old_index
+
         if self.old_index == 0:
             self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(self.count_pvr_edit)))
             self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(self.type_pvr_edit)))
@@ -403,7 +396,7 @@ class DopPlanWindow(WindowUnion):
         self.data_well.gips_in_well = False
 
         if data_list.connect_in_base:
-            data_well = self.tab_widget.currentWidget().excel_json
+            data_well = FindIndexPZ.excel_json
         else:
             db = connection_to_database(decrypt("DB_WELL_DATA"))
             data_well_base = WorkDatabaseWell(db)
@@ -429,7 +422,7 @@ class DopPlanWindow(WindowUnion):
                     elif 'II. История эксплуатации скважины' in str(row[1]['value']) and \
                             self.data_well.work_plan not in ['plan_change']:
                         self.data_well.data_pvr_max = data_list.ProtectedIsDigit(int(i) - 1)
-                        self.target_row_index_cancel = int(i)-1
+                        self.target_row_index_cancel = int(i) - 1
                         break
                     elif 'внутренний диаметр ( d шарошечного долота) не обсаженной части ствола' in str(
                             row[col]['value']) and \
@@ -443,7 +436,7 @@ class DopPlanWindow(WindowUnion):
                     elif 'Оборудование скважины' in str(row[1]['value']):
                         self.data_well.data_fond_min = data_list.ProtectedIsDigit(int(i) - 1)
                         break
-                    elif ('Ранее проведенные' in str(row[1]['value']) or 'Ранее проведенные' in str(row[2]['value']) ) \
+                    elif ('Ранее проведенные' in str(row[1]['value']) or 'Ранее проведенные' in str(row[2]['value'])) \
                             and self.data_well.work_plan != "plan_change":
                         row[1]['value'] = None
                         row[2]['value'] = None
@@ -457,7 +450,6 @@ class DopPlanWindow(WindowUnion):
                         break
                     elif 'Текущий забой ' == str(row[col]['value']):
                         self.bottom_row_index = int(i)
-
 
                     if int(i) > self.target_row_index:
                         list_row.append(row[col]['value'])
@@ -830,7 +822,7 @@ class DopPlanWindow(WindowUnion):
                 return
 
             if ' от' in well_data_in_base_combo:
-                data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-1]
+                data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-2]
                 work_plan_in_base = well_data_in_base_combo.split(' ')[3]
 
             db = connection_to_database(decrypt("DB_WELL_DATA"))
@@ -849,7 +841,7 @@ class DopPlanWindow(WindowUnion):
                     self.data_well.inventory_number = ProtectedIsNonNone(data_well[6])
                     self.data_well.wellhead_fittings = data_well[7]
                     self.data_well.emergency_well = False
-                    self.data_well.type_absorbent == 'EVASORB РјР°СЂРєРё 121'
+                    self.data_well.type_absorbent == "EVASORB марки 121"
                     if data_well[8]:
                         self.data_well.angle_data = json.loads(data_well[8])
                     else:
@@ -898,7 +890,7 @@ class DopPlanWindow(WindowUnion):
 
                 if len(self.data_well.dict_perforation) != 0:
                     for plast, vertical_line, roof_int, sole_int, date_pvr_edit, count_pvr_edit, \
-                        type_pvr_edit, pressure_pvr_edit, date_pressure_edit in self.data_well.dict_perforation:
+                            type_pvr_edit, pressure_pvr_edit, date_pressure_edit in self.data_well.dict_perforation:
                         self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
                         self.data_well.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
 
@@ -1016,7 +1008,7 @@ class DopPlanWindow(WindowUnion):
                       f'Ранее проведенные работы: \n {work_earlier}',
                       None, None, None, None, None, None, None,
                       None, None, None],
-                     [None,  'Порядок работы', None, None, None, None, None, None, None, None, None, None],
+                     [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None],
                      [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
                       'Ответственный',
                       'Нормы времени \n мин/час.']

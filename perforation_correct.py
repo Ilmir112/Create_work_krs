@@ -1,6 +1,6 @@
 import data_list
 
-from PyQt5 import QtCore,  QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.Qt import *
 from PyQt5.QtGui import QRegExpValidator, QColor, QPalette
 
@@ -34,7 +34,7 @@ class FloatLineEdit(QLineEdit):
 
 class TabPageSo(QWidget):
     def __init__(self, parent: FindIndexPZ):
-        super().__init__(parent)
+        super().__init__()
         self.data_well = parent
         self.labels_plast = {}
         self.dict_perforation = parent.dict_perforation
@@ -161,12 +161,13 @@ class TabPageSo(QWidget):
             return 0 if self.dict_perforation[plast]['отрайбировано'] else 1
         else:
             max_sole = max(list(map(lambda x: x[1], self.dict_perforation[plast]['интервал'])))
-            if (self.data_well.depth_fond_paker_before["before"] >= max_sole or\
+            if (self.data_well.depth_fond_paker_before["before"] >= max_sole or \
                 self.data_well.depth_fond_paker_second_before["before"] >= max_sole) and \
                     self.data_well.current_bottom > max_sole:
                 return 0
             else:
                 return 1
+
 
 class TabWidget(TabWidgetUnion):
     def __init__(self, data_well):
@@ -196,9 +197,7 @@ class PerforationCorrect(WindowUnion):
 
     def add_row_table(self):
 
-
         plast_all = self.tab_widget.currentWidget().labels_plast
-        
 
         plast_list = []
         plast_oktl = []
@@ -276,7 +275,8 @@ class PerforationCorrect(WindowUnion):
             self.data_well.dict_perforation[plast]['интервал'] = dict_perforation[plast]["интервал"]
             self.data_well.dict_perforation_short[plast]['интервал'] = dict_perforation_short[plast]["интервал"]
             self.data_well.dict_perforation[plast]['Прошаблонировано'] = dict_perforation[plast]["Прошаблонировано"]
-            self.data_well.dict_perforation_short[plast]['Прошаблонировано'] = dict_perforation_short[plast]["Прошаблонировано"]
+            self.data_well.dict_perforation_short[plast]['Прошаблонировано'] = dict_perforation_short[plast][
+                "Прошаблонировано"]
             self.data_well.dict_perforation[plast]['отрайбировано'] = dict_perforation[plast]["отрайбировано"]
             # self.data_well.dict_perforation_short[plast]['отрайбировано'] = dict_perforation_short[plast]["отрайбировано"]
 
@@ -284,7 +284,6 @@ class PerforationCorrect(WindowUnion):
             for plast in list(self.data_well.dict_perforation.keys()):
                 if plast in plast_del:
                     self.data_well.dict_perforation.pop(plast)
-
 
         definition_plast_work(self)
         self.data_well.plast_work_short = self.data_well.plast_work
@@ -308,7 +307,7 @@ class PerforationCorrect(WindowUnion):
             check_true = self.check_depth_paker_in_perforation(self.data_well.depth_fond_paker_before["after"])
             if check_true is False:
                 self.data_well.check_data_in_pz.append(f'Проверка посадки показала фондовый пакер на спуск сажается '
-                                                   f'в интервал перфорации, необходимо изменить глубину посадки!!!')
+                                                       f'в интервал перфорации, необходимо изменить глубину посадки!!!')
 
         if self.data_well.paker_before["after"] not in [None, 0, '0', '-'] and \
                 'отсут' not in str(self.data_well.paker_before["after"]).lower():
@@ -318,7 +317,7 @@ class PerforationCorrect(WindowUnion):
                                                        f'в интервал перфорации, необходимо изменить глубину посадки!!!')
 
         self.data_well.fluid = [max(data['рабочая жидкость']) for plast, data in self.dict_perforation.items()
-                      if 'рабочая жидкость' in list(data.keys())]
+                                if 'рабочая жидкость' in list(data.keys())]
 
         if self.data_well.fluid:
             self.data_well.fluid = max(self.data_well.fluid)

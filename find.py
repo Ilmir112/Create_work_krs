@@ -21,6 +21,7 @@ from data_list import ProtectedIsDigit, ProtectedIsNonNone
 
 
 class FindIndexPZ(MyMainWindow):
+    excel_json=None
     wb_pvr = Workbook()
 
     def __init__(self, ws, work_plan, parent=None):
@@ -3425,16 +3426,7 @@ class WellCategory(FindIndexPZ):
             "plan_change",
             "prs",
         ]:
-            ase = (
-                self.cat_well_min.get_value,
-                self.data_well_max.get_value,
-                self.data_x_max.get_value,
-            )
-            # if self.work_plan == 'prs':
-            #     self.data_well_max = self.data_x_max_prs
 
-            # self.delete_rows_pz(self.ws, self.cat_well_min, self.data_well_max, self.data_x_max)
-            #
             self.insert_index = self.data_well_max.get_value
 
         return self

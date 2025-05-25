@@ -932,7 +932,7 @@ class DataWindow(WindowUnion):
 
         region_combo = self.current_widget.region_combo.currentText()
         type_kr_combo = self.current_widget.type_kr_combo.currentText()
-        self.distance_from_well_to_sampling_point_line = (
+        self.distance_from_well_to_sampling_point_line = float(
             self.current_widget.distance_from_well_to_sampling_point_line.text()
         )
         if self.distance_from_well_to_sampling_point_line == 0:

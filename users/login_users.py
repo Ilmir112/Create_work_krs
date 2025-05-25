@@ -23,7 +23,11 @@ class LoginWindow(QDialog):
         self.username = QComboBox(self)
         users_list = self.get_list_users()
 
-        self.username.addItems(users_list)
+        if users_list:
+            self.username.addItems(users_list)
+        else:
+            QMessageBox.warning(self, 'Сервер', "Связь с сервером отсутствует")
+            self.close()
         self.label_password = QLabel("Пароль:", self)
 
         self.password = QLineEdit(self)
@@ -75,9 +79,9 @@ class LoginWindow(QDialog):
 
         if data_list.connect_in_base:
             params = {
-                  "login_user": username,
-                  "password": password
-                }
+                "login_user": username,
+                "password": password
+            }
 
             user_access = ApiClient.get_info_data(params, ApiClient.login_path())
             if user_access:
@@ -85,19 +89,16 @@ class LoginWindow(QDialog):
 
                 ApiClient.SETTINGS_TOKEN.setValue('auth_token', user_access["access_token"])
 
-                # aswadw = ApiClient.SETTINGS_TOKEN
-                # anshwer = ApiClient.request_params_get(ApiClient.me_info(), params)
                 self.user_dict = user_access
 
-
-                data_list.user = ( self.user_dict["position_id"] + ' ' + self.user_dict["contractor"],  self.user_dict["login_user"])
+                data_list.user = (
+                self.user_dict["position_id"] + ' ' + self.user_dict["contractor"], self.user_dict["login_user"])
                 data_list.contractor = self.user_dict["contractor"]
 
                 data_list.pause = False
                 self.close()
 
         else:
-
             last_name, first_name, second_name, _ = username.split(' ')
             if self.user_dict is None:
                 self.user_dict = self.user_service.get_user(last_name, first_name, second_name)
@@ -131,8 +132,8 @@ class LoginWindow(QDialog):
             users_list = user_service.get_users_list()
         else:
             users_list = ApiClient.request_get_all(ApiClient.get_all_users())
-
-            users_list = list(map(lambda x: x["login_user"], users_list))
+            if users_list:
+                users_list = list(map(lambda x: x["login_user"], users_list))
         return users_list
 
     def show_register_window(self):
@@ -254,17 +255,17 @@ class RegisterWindow(QDialog):
             else:
 
                 params = {
-                        "login_user": f"{last_name} {first_name[0]}.{second_name[0]}.",
-                        "name_user": first_name,
-                        "surname_user": last_name,
-                        "second_name": second_name,
-                        "position_id": position_in,
-                        "costumer": data_list.costumer,
-                        "contractor": organization,
-                        "ctcrs": region,
-                        "password": password,
-                        "access_level": "user"
-                    }
+                    "login_user": f"{last_name} {first_name[0]}.{second_name[0]}.",
+                    "name_user": first_name,
+                    "surname_user": last_name,
+                    "second_name": second_name,
+                    "position_id": position_in,
+                    "costumer": data_list.costumer,
+                    "contractor": organization,
+                    "ctcrs": region,
+                    "password": password,
+                    "access_level": "user"
+                }
                 user = ApiClient.add_new_user(params, self.api_client.register_auth())
 
                 if user == 409:
@@ -276,4 +277,3 @@ class RegisterWindow(QDialog):
                     QMessageBox.critical(self, 'Не известная ошибка', 'Не известная ошибка')
         else:
             QMessageBox.information(self, 'пароль', 'Пароли не совпадают')
-

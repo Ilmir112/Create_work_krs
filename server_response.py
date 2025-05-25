@@ -3,7 +3,6 @@ import re
 import threading
 from datetime import datetime
 
-
 import requests
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 
@@ -11,7 +10,6 @@ import data_list
 
 
 class ApiClient:
-
     with open(f'{data_list.path_image}users/server.json', 'r', encoding='utf-8') as file:
         server_dict = json.load(file)
 
@@ -35,13 +33,13 @@ class ApiClient:
             "work_plan": str,
             "excel_json": dict,
             "data_change_paragraph": dict,
-            "norms_time": (int, float),  # предполагается числовой тип
-            "chemistry_need": list,  # предполагается список
-            "geolog_id": (int, str),  # может быть числом или строкой
-            "date_create": str,  # дата в виде строки
+            "norms_time": (int, float),
+            "chemistry_need": list,
+            "geolog_id": (int, str),
+            "date_create": str,
             "static_level": (
                 type(None),
-            ),  # зависит от реализации, предполагаем None или другой тип
+            ),
             "perforation_project": dict,
             "dinamic_level": (type(None),),  # аналогично static_level
             "type_absorbent": str,
@@ -112,6 +110,26 @@ class ApiClient:
             return None
 
     @staticmethod
+    def request_put_json(path, json_data, param=None, answer="param"):
+        url = ApiClient.get_endpoint(path)
+        try:
+            token = ApiClient.SETTINGS_TOKEN.value("auth_token", "")
+            json_data = ApiClient.serialize_datetime(json_data)
+            headers = {"Authorization": f"Bearer {token}"}
+
+            if answer == "param":
+                response = requests.put(url, params=json_data, headers=headers)
+            else:
+                response = requests.put(
+                    url, params=param, json=json_data, headers=headers
+                )
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            QMessageBox.warning(None, "Запрос", f"Запрос не удался: {e}")
+            return None
+
+    @staticmethod
     def request_get_all(path):
         url = ApiClient.get_endpoint(path)
         try:
@@ -124,7 +142,6 @@ class ApiClient:
 
     @staticmethod
     def serialize_datetime(obj):
-
         if isinstance(obj, dict):
             return {k: ApiClient.serialize_datetime(v) for k, v in obj.items()}
         elif isinstance(obj, list):

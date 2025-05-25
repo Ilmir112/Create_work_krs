@@ -121,7 +121,7 @@ class TabPageUnion(QWidget):
             skm_interval = ''
 
             try:
-                if not self.data_well.skm_interval:
+                if self.data_well.skm_interval:
                     for roof, sole in self.data_well.skm_interval:
                         if f'{roof}-{sole}' not in skm_interval:
                             skm_interval += f'{roof}-{sole}, '
@@ -909,14 +909,14 @@ class TabPageUnion(QWidget):
         self.data_well.problem_with_ek_diameter = result[paragraph_row][14]
         try:
             self.data_well.head_column = ProtectedIsDigit(result[paragraph_row][16])
-        except Exception:
-            print('отсутствуют данные по голове хвостовика')
+        except Exception as e:
+            print(f'отсутствуют данные по голове хвостовика {e}')
         self.data_well.dict_perforation_short = json.loads(result[paragraph_row][2])
 
         try:
             self.data_well.ribbing_interval = json.loads(result[paragraph_row][15])
-        except Exception:
-            print('отсутствуют данные по интервалам райбирования')
+        except Exception as e:
+            print(f'отсутствуют данные по интервалам райбирования {e}')
 
         definition_plast_work(self)
         return True
@@ -1549,9 +1549,8 @@ class WindowUnion(MyMainWindow):
             }
             response = ApiClient.request_params_get(ApiClient.find_wells_repair_well_by_id(), params)
             if response:
-                data_change_paragraph, dict_category, self.excel_json = TabPageUnion.insert_repairs_data(
+                data_change_paragraph, dict_category, FindIndexPZ.excel_json = TabPageUnion.insert_repairs_data(
                     self, response)
-                self.tab_widget.currentWidget().excel_json = self.excel_json
 
                 data = TabPageUnion.insert_data_dop_plan(self, data_change_paragraph, paragraph_row)
                 if data is None:

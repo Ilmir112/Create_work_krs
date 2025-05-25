@@ -137,7 +137,7 @@ class ExcelWorker(QThread):
         if data_list.connect_in_base:
             self.params = {
                 "well_number": self.data_well.well_number.get_value,
-                "well_area": self.data_well.well_area.get_value
+                "well_area": self.data_well.well_area.get_value,
             }
             #
             # self.wells_data_by_id = ApiClient.request_params_get(ApiClient.find_wells_data_response_find_id_by_wells_data(),
@@ -194,7 +194,7 @@ class ExcelWorker(QThread):
                 },
                 "curator": self.data_well.curator,
                 "region": self.data_well.region,
-                "contractor": data_list.contractor
+                "contractor": data_list.contractor,
             }
             response = ApiClient.request_post_json(
                 ApiClient.read_wells_repair_response_for_add(),
@@ -202,7 +202,9 @@ class ExcelWorker(QThread):
                 self.params,
                 "json",
             )
-
+            if response is None:
+                QMessageBox.warning(None, "ошибка", "Ошибка добавления плана работ в базу данных")
+                return
         try:
             db = connection_to_database(decrypt("DB_WELL_DATA"))
             data_well_base = WorkDatabaseWell(db)
@@ -218,7 +220,6 @@ class ExcelWorker(QThread):
                 "Ошибка",
                 f"Ошибка при вставке данных в базу: {type(e).__name__}\n\n{str(e)}",
             )
-
 
         # Завершение работы потока
         self.finished.emit()
@@ -252,7 +253,7 @@ class MyMainWindow(QMainWindow):
                 f"{data_list.path_image}podpisant.json", "r", encoding="utf-8"
         ) as file:
             podpis_dict = json.load(file)
-        work_podpisant_list = ""
+
         power_of_attorney = None
         expedition = ""
         if "Ойл" in contractor:
@@ -375,8 +376,8 @@ class MyMainWindow(QMainWindow):
                 work_podpisant_list[6] = [
                     None,
                     f'_____________{podpis_dict[data_list.costumer][region]["gg"]["surname"]}',
-                    None ,None, None, None, None, None, None, None,
-                    "",None,
+                    None, None, None, None, None, None, None, None,
+                    "", None,
                 ]
                 work_podpisant_list[7] = [
                     None,
@@ -1168,7 +1169,6 @@ class MyMainWindow(QMainWindow):
                     "contractor": data_list.contractor
                 }
 
-                response = None
                 response_find_data = ApiClient.find_wells(
                     self.data_well.well_number.get_value,
                     self.data_well.well_area.get_value,
@@ -1181,9 +1181,11 @@ class MyMainWindow(QMainWindow):
                         "Данные есть в базе данных, обновить?",
                     )
                     if mes == QMessageBox.StandardButton.Yes:
-                        response = ApiClient.request_post_json(
+                        response = ApiClient.request_put_json(
                             ApiClient.update_wells_data_response(), params, None, "json"
                         )
+                    else:
+                        response = True
                 else:
                     response = ApiClient.request_post_json(
                         ApiClient.read_wells_data_response_for_add(),
@@ -1191,6 +1193,9 @@ class MyMainWindow(QMainWindow):
                         None,
                         "json",
                     )
+                if response is None:
+                    QMessageBox.warning(self, "ошибка", "скважина не добавлена в well_data")
+                    return
 
             if self.data_well.emergency_well is True:
                 emergency_quest = QMessageBox.question(
@@ -2222,13 +2227,13 @@ class MyWindow(MyMainWindow):
                 f"{data_list.path_image}imageFiles/icon/zima.png"
             )  # путь к  изображению
 
-            # splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima.png")  # путь к  изображению
-            splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
-            splash.setMask(splash_pix.mask())
-            splash.show()
+            # # splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima.png")  # путь к  изображению
+            # splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+            # splash.setMask(splash_pix.mask())
+            # splash.show()
 
-            # Задержка на 5 секунд
-            QTimer.singleShot(1000, splash.close)
+            # # Задержка на )5 секунд
+            # QTimer.singleShot(1000, splash.close
 
             data_list.connect_in_base, self.db = connect_to_database(
                 decrypt("DB_NAME_USER")
@@ -3306,7 +3311,7 @@ class MyWindow(MyMainWindow):
         from data_correct import DataWindow
 
         aswa = self.data_well.count_row_well
-        row = row - self.data_well.count_row_well
+        row = row - self.data_well.count_row_well + 1
         # print(self.data_well.column_diameter.get_value)
         data = self.data_well.data_list
 
@@ -3651,12 +3656,16 @@ class MyWindow(MyMainWindow):
         self.perforation_correct_window2 = PerforationCorrect(self.data_well)
         self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
         self.set_modal_window(self.perforation_correct_window2)
+        self.pause_app()
+        data_list.pause = True
+        if self.insert_index:
+            if self.insert_index > self.data_well.count_row_well:
+                assde = self.insert_index-self.data_well.count_row_well -1
+                self.data_well.data_list[self.insert_index-self.data_well.count_row_well][1] = self.data_well.current_bottom
 
-        self.data_well.data_list[-1][1] = self.data_well.current_bottom
-
-        self.data_well.data_list[-1][2] = json.dumps(
-            self.data_well.dict_perforation, default=str, ensure_ascii=False, indent=4
-        )
+                self.data_well.data_list[self.insert_index-self.data_well.count_row_well][2] = json.dumps(
+                    self.data_well.dict_perforation, default=str, ensure_ascii=False, indent=4
+                )
 
     def correct_curator(self):
         from work_py.curators import SelectCurator
@@ -4160,7 +4169,7 @@ class SaveInExcel(MyWindow):
                         self.ws2.row_dimensions[row_ind + 1].hidden = True
                 for col, value in enumerate(row):
                     if "И.М. Зуфаров" in str(value):
-                        coordinate = f"{get_column_letter(col+1)}{row_ind - 1}"
+                        coordinate = f"{get_column_letter(col + 1)}{row_ind - 1}"
                         self.insert_image(
                             self.ws2,
                             f"{data_list.path_image}imageFiles/Зуфаров.png",
@@ -4263,9 +4272,6 @@ class SaveInExcel(MyWindow):
             # содержимое по ширине страницы
             self.ws2.sheet_properties.pageSetUpPr.fitToPage = True
             self.ws2.page_setup.fitToHeight = False
-
-            # path = 'workiii'
-            # print(f'Пользоватль{data_list.puser}')
 
             path = self.load_last_save_path()
 
