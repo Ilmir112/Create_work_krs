@@ -133,7 +133,10 @@ class ApiClient:
     def request_get_all(path):
         url = ApiClient.get_endpoint(path)
         try:
-            response = requests.get(url)
+            print(url)
+            response = requests.get(url, proxies={})
+            print(response)
+
             response.raise_for_status()
 
             return response.json()
