@@ -134,7 +134,7 @@ class ApiClient:
         url = ApiClient.get_endpoint(path)
         try:
             print(url)
-            response = requests.get(url, proxies={})
+            response = requests.get(url, proxies={'http': ApiClient.SERVER_API,  'http': ApiClient.SERVER_API})
             print(response)
 
             response.raise_for_status()
