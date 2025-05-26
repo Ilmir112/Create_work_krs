@@ -138,7 +138,7 @@ class ApiClient:
         url = ApiClient.get_endpoint(path)
         try:
             print(url)
-            response = requests.get(url, verify=certifi.where(), proxies=ApiClient.proxies)
+            response = requests.get(url, verify=False)
 
             response.raise_for_status()
 
