@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime
 from openpyxl.styles import Border, Side, PatternFill
 
@@ -92,8 +93,14 @@ user = ['', '']
 operation_window = None
 
 data_in_base = False
-# path_image = '_internal/'
-path_image = ''
+
+if getattr(sys, "frozen", False):
+    # Скомпилированное приложение
+    path_image = "_internal/"
+else:
+    # Режим разработки
+    path_image = ""
+
 
 DICT_VOLUME_CHEMISTRY = {'пункт': [], 'цемент': 0.0, 'HCl': 0.0, 'HF': 0.0, 'NaOH': 0.0, 'ВТ СКО': 0.0,
                          'Глина': 0.0, 'растворитель': 0.0, 'уд.вес': 0.0,

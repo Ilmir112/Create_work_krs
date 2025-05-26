@@ -2216,12 +2216,6 @@ class MyWindow(MyMainWindow):
         self.thread.start()
 
         try:
-            if getattr(sys, "frozen", False):
-                # Скомпилированное приложение
-                data_list.path_image = "_internal/"
-            else:
-                # Режим разработки
-                data_list.path_image = ""
 
             print(f"Путь к изображению: {data_list.path_image}")
 
