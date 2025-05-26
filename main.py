@@ -205,21 +205,24 @@ class ExcelWorker(QThread):
             if response is None:
                 QMessageBox.warning(None, "ошибка", "Ошибка добавления плана работ в базу данных")
                 return
-        try:
-            db = connection_to_database(decrypt("DB_WELL_DATA"))
-            data_well_base = WorkDatabaseWell(db)
-            data_well_base.insert_in_database_well_data(
-                self.data_well,
-                data_list.contractor,
-                data_list.costumer,
-                excel_data_dict,
-            )
-        except Exception as e:
-            QMessageBox.warning(
-                None,
-                "Ошибка",
-                f"Ошибка при вставке данных в базу: {type(e).__name__}\n\n{str(e)}",
-            )
+            else:
+                return True
+        else:
+            try:
+                db = connection_to_database(decrypt("DB_WELL_DATA"))
+                data_well_base = WorkDatabaseWell(db)
+                data_well_base.insert_in_database_well_data(
+                    self.data_well,
+                    data_list.contractor,
+                    data_list.costumer,
+                    excel_data_dict,
+                )
+            except Exception as e:
+                QMessageBox.warning(
+                    None,
+                    "Ошибка",
+                    f"Ошибка при вставке данных в базу: {type(e).__name__}\n\n{str(e)}",
+                )
 
         # Завершение работы потока
         self.finished.emit()
@@ -1859,7 +1862,7 @@ class MyMainWindow(QMainWindow):
                 self.insert_data_in_database(row, row_max + i)
 
             table_widget.insertRow(row)
-            adefef = len([row_str for row_str in row_data if row_str not in ["", None]])
+
             if len(str(row_data)[1]) > 3 and work_plan in "gnkt_frez":
                 table_widget.setSpan(i + insert_index, 1, 1, 12)
             elif "prs" in self.data_well.work_plan:
@@ -3314,7 +3317,8 @@ class MyWindow(MyMainWindow):
         row = row - self.data_well.count_row_well + 1
         # print(self.data_well.column_diameter.get_value)
         data = self.data_well.data_list
-
+        if row <= len(data):
+            row = row - 1
         self.data_well.current_bottom = data[row][1]
         self.data_well.dict_perforation = json.loads(data[row][2])
         self.data_well.plast_all = json.loads(data[row][3])
@@ -4256,9 +4260,13 @@ class SaveInExcel(MyWindow):
 
             excel_data_dict = excel_in_json(self, self.ws2)
             self.thread_excel_insert = ExcelWorker(self.data_well)
-            self.thread_excel_insert.insert_data_in_database(
+            response_answer = self.thread_excel_insert.insert_data_in_database(
                 excel_data_dict, self.data_well
             )
+            if response_answer is None:
+                QMessageBox.warning(None, 'Ошибка', 'Ошибка связана с ограничением бесплатного сервера нужно '
+                                                    'повторить через 50 секунд')
+                return
             if "prs" in self.data_well.work_plan:
                 self.ws2.print_area = f"B1:O{self.ws2.max_row}"
             else:

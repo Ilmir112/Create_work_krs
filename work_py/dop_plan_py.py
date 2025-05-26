@@ -714,6 +714,7 @@ class DopPlanWindow(WindowUnion):
             if float(template_depth_edit) > float(self.data_well.bottom_hole_drill.get_value):
                 QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже искусственного забоя забоя')
                 return
+
             if number_dp != '':
                 self.data_well.number_dp = int(float(number_dp))
 
@@ -801,13 +802,12 @@ class DopPlanWindow(WindowUnion):
             if well_data_in_base_combo == '':
                 QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
                 return
-            list_dop_plan = well_data_in_base_combo.split(' ')
-            if list_dop_plan:
-                if any([f'ДП№{number_dp}' in dop_plan or f'ДП№{number_dp}' in dop_plan for dop_plan in list_dop_plan]):
-                    question = QMessageBox.question(self, 'Ошибка', f'дополнительный план работ № {number_dp} '
-                                                                    f'есть в базе, обновить доп план?')
-                    if question == QMessageBox.StandardButton.No:
-                        return
+            list_dop_plan = [current_widget.well_data_in_base_combo.itemText(i) for i in range(current_widget.well_data_in_base_combo.count())]
+            if any([f'ДП№{number_dp}' in dop_plan or f'ДП№ {number_dp}' in dop_plan for dop_plan in list_dop_plan]):
+                question = QMessageBox.question(self, 'Ошибка', f'дополнительный план работ № {number_dp} '
+                                                                f'есть в базе, обновить доп план?')
+                if question == QMessageBox.StandardButton.No:
+                    return
 
             index_change_line = current_widget.index_change_line.text()
             well_number = current_widget.well_number_edit.text()
@@ -825,27 +825,27 @@ class DopPlanWindow(WindowUnion):
                 data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-2]
                 work_plan_in_base = well_data_in_base_combo.split(' ')[3]
 
-            db = connection_to_database(decrypt("DB_WELL_DATA"))
-            data_well_base = WorkDatabaseWell(db, self.data_well)
-
-            data_well = data_well_base.check_in_database_well_data(well_number, well_area,
-                                                                   work_plan_in_base, data_well_data_in_base_combo)
-
-            if data_well:
-                self.data_well.type_kr = data_well[2]
-
-                if data_well[3]:
-                    # self.data_well.dict_category = json.loads(data_well[3])
-                    self.data_well.well_oilfield = ProtectedIsNonNone(data_well[4])
-                    self.data_well.appointment_well = ProtectedIsNonNone(data_well[5])
-                    self.data_well.inventory_number = ProtectedIsNonNone(data_well[6])
-                    self.data_well.wellhead_fittings = data_well[7]
-                    self.data_well.emergency_well = False
-                    self.data_well.type_absorbent == "EVASORB марки 121"
-                    if data_well[8]:
-                        self.data_well.angle_data = json.loads(data_well[8])
-                    else:
-                        self.data_well.angle_data = []
+            # db = connection_to_database(decrypt("DB_WELL_DATA"))
+            # data_well_base = WorkDatabaseWell(db, self.data_well)
+            #
+            # data_well = data_well_base.check_in_database_well_data(well_number, well_area,
+            #                                                        work_plan_in_base, data_well_data_in_base_combo)
+            #
+            # if data_well:
+            #     self.data_well.type_kr = data_well[2]
+            #
+            #     if data_well[3]:
+            #         # self.data_well.dict_category = json.loads(data_well[3])
+            #         self.data_well.well_oilfield = ProtectedIsNonNone(data_well[4])
+            #         self.data_well.appointment_well = ProtectedIsNonNone(data_well[5])
+            #         self.data_well.inventory_number = ProtectedIsNonNone(data_well[6])
+            #         self.data_well.wellhead_fittings = data_well[7]
+            #         self.data_well.emergency_well = False
+            #         self.data_well.type_absorbent == "EVASORB марки 121"
+            #         if data_well[8]:
+            #             self.data_well.angle_data = json.loads(data_well[8])
+            #         else:
+            #             self.data_well.angle_data = []
 
             self.data_well.current_bottom = current_bottom
 

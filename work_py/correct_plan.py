@@ -114,20 +114,21 @@ class CorrectPlanWindow(WindowUnion):
         well_number = self.current_widget.well_number_edit.text()
         well_area = self.current_widget.well_area_edit.text()
 
+        data_well_data_in_base_combo, data_table_in_base_combo = '', ''
+        well_data_in_base_combo = self.current_widget.well_data_in_base_combo.currentText()
+        if ' от' in well_data_in_base_combo:
+            data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-2]
+            well_data_in_base = well_data_in_base_combo.split(' ')[3]
+
+            if 'ДП' in well_data_in_base:
+                self.data_well.number_dp = ''.join(filter(str.isdigit, well_data_in_base))
+                self.data_well.work_plan_change = 'dop_plan'
+            else:
+                self.data_well.work_plan_change = 'krs'
+
         if data_list.data_in_base:
-            data_well_data_in_base_combo, data_table_in_base_combo = '', ''
-            well_data_in_base_combo = self.current_widget.well_data_in_base_combo.currentText()
-
-            if ' от' in well_data_in_base_combo:
-                data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-2]
-                well_data_in_base = well_data_in_base_combo.split(' ')[3]
-
-                if 'ДП' in well_data_in_base:
-                    self.data_well.number_dp = ''.join(filter(str.isdigit, well_data_in_base))
-                    self.data_well.work_plan_change = 'dop_plan'
-                else:
-                    self.data_well.work_plan_change = 'krs'
-
+            self.extraction_data(well_data_in_base_combo)
+        else:
             db = connection_to_database(decrypt("DB_WELL_DATA"))
             data_well_base = WorkDatabaseWell(db, self.data_well)
 
@@ -149,28 +150,26 @@ class CorrectPlanWindow(WindowUnion):
 
                 insert_data_well_dop_plan(self, data_well[0])
 
-            self.extraction_data(well_data_in_base_combo)
+        self.work_with_excel(well_number, well_area, well_data_in_base, self.data_well.type_kr)
 
-            DopPlanWindow.work_with_excel(self, well_number, well_area, well_data_in_base, self.data_well.type_kr)
+        data_list.data, data_list.row_heights, data_list.col_width, data_list.boundaries_dict = \
+            self.change_pvr_in_bottom(self.data, self.row_heights, self.col_width,
+                                               self.boundaries_dict)
 
-            data_list.data, data_list.row_heights, data_list.col_width, data_list.boundaries_dict = \
-                DopPlanWindow.change_pvr_in_bottom(self, self.data, self.row_heights, self.col_width,
-                                                   self.boundaries_dict)
+        if well_number != '' and well_area != '':
+            self.data_well.well_number, self.data_well.well_area = \
+                ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
 
-            if well_number != '' and well_area != '':
-                self.data_well.well_number, self.data_well.well_area = \
-                    ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
+        self.thread_excel = ExcelWorker(self)
 
-            self.thread_excel = ExcelWorker(self)
+        self.without_damping, stop_app = self.thread_excel.check_well_existence(
+            self.data_well.well_number.get_value, self.data_well.well_area.get_value,
+            self.data_well.region)
 
-            self.without_damping, stop_app = self.thread_excel.check_well_existence(
-                self.data_well.well_number.get_value, self.data_well.well_area.get_value,
-                self.data_well.region)
-
-            data_list.pause = False
-            if well_number != '' and well_area != '':
-                self.close()
-                self.close_modal_forcefully()
+        data_list.pause = False
+        if well_number != '' and well_area != '':
+            self.close()
+            self.close_modal_forcefully()
 
     def add_work_excel(self, ws2, work_list, ind_ins):
         from data_list import ProtectedIsDigit

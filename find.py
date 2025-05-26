@@ -21,7 +21,7 @@ from data_list import ProtectedIsDigit, ProtectedIsNonNone
 
 
 class FindIndexPZ(MyMainWindow):
-    excel_json=None
+    excel_json = None
     wb_pvr = Workbook()
 
     def __init__(self, ws, work_plan, parent=None):

@@ -114,7 +114,7 @@ class TabPageUnion(QWidget):
                 return
 
         if number_dp != '':
-            self.data_well.number_dp = int(float(number_dp))
+
 
             self.template_depth_edit.setText(str(self.data_well.template_depth))
             self.template_length_edit.setText(str(self.data_well.template_length))
@@ -198,11 +198,10 @@ class TabPageUnion(QWidget):
                 return False
 
     def update_well(self):
-
         self.table_name = str(self.well_number_edit.text()) + self.well_area_edit.text()
         if data_list.data_in_base:
             well_list = self.check_in_database_well_data2(self.well_number_edit.text())
-
+            well_list = sorted(well_list, key=lambda x: x.split(' ')[-2], reverse=True)
             self.well_data_in_base_combo.clear()
             if well_list:
                 self.well_area_edit.textChanged.connect(self.update_well_area)
@@ -1146,6 +1145,115 @@ class WindowUnion(MyMainWindow):
             QMessageBox.warning(self, 'Ошибка', f'Ошибка сохранения данных сваба {e}')
             return False
 
+    def change_pvr_in_bottom(self, data, row_heights, col_width, boundaries_dict, current_bottom=0,
+                             current_bottom_date_edit=0, method_bottom_combo=0):
+
+        for i, row in data.items():
+            if i != 'image':
+                for col in range(len(row)):
+                    if 'Текущий забой ' == str(row[col]['value']):
+                        self.bottom_row_index = int(i)
+                        break
+        if 0 not in [current_bottom, current_bottom_date_edit, method_bottom_combo]:
+            data[str(self.bottom_row_index)][3]['value'] = current_bottom
+            data[str(self.bottom_row_index)][5]['value'] = current_bottom_date_edit
+            data[str(self.bottom_row_index)][-1]['value'] = method_bottom_combo
+
+        return data, row_heights, col_width, boundaries_dict
+
+    def work_with_excel(self, well_number, well_area, work_plan, type_kr):
+
+        self.data_well.gips_in_well = False
+
+        if data_list.connect_in_base:
+            data_well = FindIndexPZ.excel_json
+        else:
+            db = connection_to_database(decrypt("DB_WELL_DATA"))
+            data_well_base = WorkDatabaseWell(db)
+
+            data_well = data_well_base.read_excel_in_base(well_number, well_area, work_plan, type_kr)
+        self.data, self.row_heights, self.col_width, self.boundaries_dict = \
+            self.read_excel_in_base(data_well)
+
+        self.target_row_index = 5000
+        self.target_row_index_cancel = 5000
+        self.bottom_row_index = 5000
+        self.perforation_list = []
+        self.insert_index2 = None
+
+        for i, row in self.data.items():
+            if i != 'image':
+                list_row = []
+                for col in range(len(row)):
+                    if 'оризонт' in str(row[1]['value']) or 'пласт/' in str(row[col]['value']).lower():
+                        self.target_row_index = int(i) + 1
+                    elif 'вскрытия/отключения' in str(row[col]['value']):
+                        self.old_index = 1
+                    elif 'II. История эксплуатации скважины' in str(row[1]['value']) and \
+                            self.data_well.work_plan not in ['plan_change']:
+                        self.data_well.data_pvr_max = data_list.ProtectedIsDigit(int(i) - 1)
+                        self.target_row_index_cancel = int(i) - 1
+                        break
+                    elif 'внутренний диаметр ( d шарошечного долота) не обсаженной части ствола' in str(
+                            row[col]['value']) and \
+                            self.data_well.work_plan not in ['plan_change']:
+                        self.target_row_index_cancel = int(i)
+                        break
+                    elif 'II. История эксплуатации скважины' in str(
+                            row[1]['value']):
+                        self.data_well.data_pvr_max = data_list.ProtectedIsDigit(int(i) - 1)
+                        break
+                    elif 'Оборудование скважины' in str(row[1]['value']):
+                        self.data_well.data_fond_min = data_list.ProtectedIsDigit(int(i) - 1)
+                        break
+                    elif ('Ранее проведенные' in str(row[1]['value']) or 'Ранее проведенные' in str(row[2]['value'])) \
+                            and self.data_well.work_plan != "plan_change":
+                        row[1]['value'] = None
+                        row[2]['value'] = None
+                    elif 'Наименование работ' in str(row[2]['value']):
+                        self.data_well.data_x_max = data_list.ProtectedIsDigit(int(i) - 1)
+                        self.data_well.insert_index2 = int(i) + 1
+                        break
+
+                    elif 'ИТОГО:' in str(row[col]['value']) and self.data_well.work_plan in ['plan_change']:
+                        self.target_row_index_cancel = int(i) + 1
+                        break
+                    elif 'Текущий забой ' == str(row[col]['value']):
+                        self.bottom_row_index = int(i)
+
+                    if int(i) > self.target_row_index:
+                        list_row.append(row[col]['value'])
+
+                    if int(i) > self.target_row_index_cancel:
+                        break
+            else:
+
+                self.data_well.image_list = row
+            self.count_diam = 0
+
+            if len(list_row) > 4:
+
+                if list_row:
+                    if 'внутренний диаметр' not in str(list_row[1]):
+                        if all([col is None or col == '' for col in list_row]) is False:
+                            if list_row not in self.perforation_list:
+                                self.perforation_list.append(list_row)
+                    else:
+                        self.count_diam = 1
+        # self.data_well.insert_index2 = self.data_well.data_x_max.get_value -1
+        self.data_well.count_template = 1
+
+        if self.data_well.work_plan != 'plan_change':
+            self.tableWidget.setSortingEnabled(False)
+            rows = self.tableWidget.rowCount()
+            for row_pvr in self.perforation_list[::-1]:
+                self.tableWidget.insertRow(rows)
+                for index_col, col_pvr in enumerate(row_pvr):
+                    if col_pvr is not None:
+                        self.tableWidget.setItem(rows, index_col - 1, QTableWidgetItem(str(col_pvr)))
+
+        self.definition_open_trunk_well()
+
     def select_diameter_nkt(self, paker_depth, swab_true_edit_type):
         nkt_diam = 73
         nkt_pod = '73мм'
@@ -1537,6 +1645,7 @@ class WindowUnion(MyMainWindow):
         type_kr = table_name.split(' ')[2].replace('None', 'null')
         contractor_select = data_list.contractor
         work_plan = table_name.split(' ')[-4]
+        self.data_well.emergency_well = False
         if data_list.connect_in_base:
             params = {
                 "well_number": well_number,
