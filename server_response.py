@@ -3,6 +3,7 @@ import re
 import threading
 from datetime import datetime
 
+import certifi
 import requests
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 
@@ -134,8 +135,7 @@ class ApiClient:
         url = ApiClient.get_endpoint(path)
         try:
             print(url)
-            response = requests.get(url, proxies={'http': ApiClient.SERVER_API,  'http': ApiClient.SERVER_API})
-            print(response)
+            response = requests.get(url, verify=certifi.where())
 
             response.raise_for_status()
 
