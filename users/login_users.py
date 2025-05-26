@@ -92,7 +92,7 @@ class LoginWindow(QDialog):
                 self.user_dict = user_access
 
                 data_list.user = (
-                self.user_dict["position_id"] + ' ' + self.user_dict["contractor"], self.user_dict["login_user"])
+                    self.user_dict["position_id"] + ' ' + self.user_dict["contractor"], self.user_dict["login_user"])
                 data_list.contractor = self.user_dict["contractor"]
 
                 data_list.pause = False
@@ -132,9 +132,11 @@ class LoginWindow(QDialog):
             users_list = user_service.get_users_list()
         else:
             users_list = ApiClient.request_get_all(ApiClient.get_all_users())
-            if users_list:
-                users_list = list(map(lambda x: x["login_user"], users_list))
-        return users_list
+
+        if users_list:
+            users_list = list(map(lambda x: x["login_user"], users_list))
+
+            return users_list
 
     def show_register_window(self):
         self.register_window = RegisterWindow()
