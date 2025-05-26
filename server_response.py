@@ -15,8 +15,11 @@ class ApiClient:
         server_dict = json.load(file)
 
     SERVER_API = server_dict["host"]
-
     SETTINGS_TOKEN = None
+    proxies = {
+        'http': SERVER_API,  # Обязательно http
+        'https': SERVER_API,  # Обязательно http
+    }
 
     @classmethod
     def run_in_thread(cls, target_method, *args, **kwargs):
@@ -135,7 +138,7 @@ class ApiClient:
         url = ApiClient.get_endpoint(path)
         try:
             print(url)
-            response = requests.get(url, verify=certifi.where())
+            response = requests.get(url, verify=certifi.where(), proxies=ApiClient.proxies)
 
             response.raise_for_status()
 
