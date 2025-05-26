@@ -6,7 +6,6 @@ a = Analysis(['main.py'],
              pathex=['.'],
              binaries=[],
              datas=[
-
                  ('work_py', 'work_py'),
                  ('users', 'users'),
                  ('tests', 'tests'),
@@ -39,7 +38,7 @@ a = Analysis(['main.py'],
                  ('block_name.py', '.'),
                  ('application_pvr.py', '.'),
                  ('application_gis.py', '.'),
-                 ('.env', '.'),
+                 ('.env', '.'),  # убедитесь, что .env тоже включен
              ],
              hiddenimports=[],
              hookspath=[],
@@ -49,18 +48,21 @@ a = Analysis(['main.py'],
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
+
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
 exe = EXE(pyz,
-           a.scripts,
-           [],
-           exclude_binaries=True,
-           name='ZIMA',
-           debug=False,
-           bootloader_ignore_signals=False,
-           strip=False,
-           upx=True,
-           console=True,
-           icon='imageFiles/icon/zima_ico.ico')
+          a.scripts,
+          [],
+          exclude_binaries=True,
+          name='ZIMA',
+          debug=False,
+          bootloader_ignore_signals=False,
+          strip=False,
+          upx=True,
+          console=True,
+          icon='imageFiles/icon/zima_ico.ico')
+
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
