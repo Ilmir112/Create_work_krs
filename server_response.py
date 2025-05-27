@@ -9,7 +9,6 @@ from PyQt5.QtWidgets import QMainWindow, QMessageBox
 
 import data_list
 
-print(certifi.where())
 
 class ApiClient:
     with open(f'{data_list.path_image}users/server.json', 'r', encoding='utf-8') as file:
@@ -138,8 +137,7 @@ class ApiClient:
     def request_get_all(path):
         url = ApiClient.get_endpoint(path)
         try:
-            print(url)
-            response = requests.get(url, verify=certifi.where())
+            response = requests.get(url)
 
             response.raise_for_status()
 
