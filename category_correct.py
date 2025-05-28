@@ -82,7 +82,8 @@ class TabPageSo(TabPageUnion):
                         any([plast not in self.data_well.plast_work for plast in self.data_well.plast_project]):
 
                     if abs(self.cat_P_P[num] - list([self.data_well.dict_perforation_project[
-                                                         plast]['давление'] for plast in self.data_well.plast_project][
+                                                         plast]["давление"] for plast in self.data_well.plast_project
+                                                     if "давление" in list(self.data_well.dict_perforation_project[plast].keys())][
                                                         0])[
                         0]) < 1:
                         work_plast = self.data_well.plast_project[0]

@@ -705,54 +705,54 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(sucker_rod_po_line_edit, 38, 5)
             self.grid.addWidget(length_sucker_po_line_edit, 38, 6)
 
-        if self.curator_сombo.currentText() == "ОР":
-
-            self.expected_pickup_label = QLabel("Ожидаемая приемистость")
-            self.expected_pickup_edit = FloatLineEdit()
-            try:
-                self.expected_pickup_edit.setText(f"{self.data_well.expected_pickup}")
-                # print(f'ожидаемая приемистисть{self.data_well.expected_pickup}')
-            except:
-                pass
-            self.grid.addWidget(self.expected_pickup_label, 25, 2)
-            self.grid.addWidget(self.expected_pickup_edit, 26, 2)
-
-            self.expected_pressure_label = QLabel("Ожидаемое давление закачки")
-            self.expected_pressure_edit = FloatLineEdit()
-            try:
-                self.expected_pressure_edit.setText(
-                    f"{self.data_well.expected_pressure}"
-                )
-            except:
-                pass
-            self.grid.addWidget(self.expected_pressure_label, 25, 3)
-            self.grid.addWidget(self.expected_pressure_edit, 26, 3)
-        else:
-            self.water_cut_Label = QLabel("Дебит по жидкости")
-            self.water_cut_edit = FloatLineEdit()
-            try:
-                self.water_cut_edit.setText(f"{self.data_well.water_cut}")
-            except:
-                pass
-            self.grid.addWidget(self.water_cut_Label, 25, 1)
-            self.grid.addWidget(self.water_cut_edit, 26, 1)
-            self.expected_oil_Label = QLabel("Дебит по нефти")
-            self.expected_oil_edit = FloatLineEdit()
-            try:
-                self.expected_oil_edit.setText(f"{self.data_well.expected_oil}")
-            except:
-                pass
-            self.grid.addWidget(self.expected_oil_Label, 25, 2)
-            self.grid.addWidget(self.expected_oil_edit, 26, 2)
-            self.proc_water_Label = QLabel("Обводненность")
-
-            self.proc_water_edit = FloatLineEdit()
-            try:
-                self.proc_water_edit.setText(f"{self.data_well.percent_water}")
-            except:
-                pass
-            self.grid.addWidget(self.proc_water_Label, 25, 3)
-            self.grid.addWidget(self.proc_water_edit, 26, 3)
+        # if self.curator_сombo.currentText() == "ОР":
+        #
+        #     self.expected_pickup_label = QLabel("Ожидаемая приемистость")
+        #     self.expected_pickup_edit = FloatLineEdit()
+        #     try:
+        #         self.expected_pickup_edit.setText(f"{self.data_well.expected_pickup}")
+        #         # print(f'ожидаемая приемистисть{self.data_well.expected_pickup}')
+        #     except:
+        #         pass
+        #     self.grid.addWidget(self.expected_pickup_label, 25, 2)
+        #     self.grid.addWidget(self.expected_pickup_edit, 26, 2)
+        #
+        #     self.expected_pressure_label = QLabel("Ожидаемое давление закачки")
+        #     self.expected_pressure_edit = FloatLineEdit()
+        #     try:
+        #         self.expected_pressure_edit.setText(
+        #             f"{self.data_well.expected_pressure}"
+        #         )
+        #     except:
+        #         pass
+        #     self.grid.addWidget(self.expected_pressure_label, 25, 3)
+        #     self.grid.addWidget(self.expected_pressure_edit, 26, 3)
+        # else:
+        #     self.water_cut_Label = QLabel("Дебит по жидкости")
+        #     self.water_cut_edit = FloatLineEdit()
+        #     try:
+        #         self.water_cut_edit.setText(f"{self.data_well.water_cut}")
+        #     except:
+        #         pass
+        #     self.grid.addWidget(self.water_cut_Label, 25, 1)
+        #     self.grid.addWidget(self.water_cut_edit, 26, 1)
+        #     self.expected_oil_Label = QLabel("Дебит по нефти")
+        #     self.expected_oil_edit = FloatLineEdit()
+        #     try:
+        #         self.expected_oil_edit.setText(f"{self.data_well.expected_oil}")
+        #     except:
+        #         pass
+        #     self.grid.addWidget(self.expected_oil_Label, 25, 2)
+        #     self.grid.addWidget(self.expected_oil_edit, 26, 2)
+        #     self.proc_water_Label = QLabel("Обводненность")
+        #
+        #     self.proc_water_edit = FloatLineEdit()
+        #     try:
+        #         self.proc_water_edit.setText(f"{self.data_well.percent_water}")
+        #     except:
+        #         pass
+        #     self.grid.addWidget(self.proc_water_Label, 25, 3)
+        #     self.grid.addWidget(self.proc_water_edit, 26, 3)
 
         curator_list = ["", "ГРР", "ОР", "ГТМ", "ГО", "ВНС"]
         self.curator_сombo.addItems(curator_list)
@@ -761,46 +761,14 @@ class TabPageSoCorrect(TabPageUnion):
         curator = (
             "ОР"
             if (
-                self.pump_SHGN_posle_edit_type.text() == "отсут"
-                and self.pump_ECN_posle_edit_type.text() == "отсут"
+                    self.pump_SHGN_posle_edit_type.text() == "отсут"
+                    and self.pump_ECN_posle_edit_type.text() == "отсут"
             )
             else "ГТМ"
         )
         if self.data_well.work_plan in ["gnkt_frez", "gnkt_bopz"]:
             curator = "ВНС"
 
-        self.curator_сombo.currentTextChanged.connect(self.update_curator)
-        # print(f'куратор индекс {curator, curator_list.index(curator)}')
-        self.curator_сombo.setCurrentIndex(curator_list.index(curator))
-        self.region_combo.addItems(data_list.REGION_LIST)
-        self.region_combo.setCurrentIndex(
-            data_list.REGION_LIST.index(self.data_well.region)
-        )
-
-        self.type_kr_combo.view().setWordWrap(True)
-        self.type_kr_combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
-        if self.data_well.work_plan in ["prs"]:
-            self.type_kr_combo.addItems(data_list.TYPE_TR_LIST)
-        else:
-            self.type_kr_combo.addItems(data_list.TYPE_KR_LIST)
-
-        self.type_kr_combo.setCurrentIndex(self.select_type_kr())
-
-    def select_type_kr(self):
-        kr = self.data_well.type_kr
-        if "prs" in self.data_well.work_plan:
-            TYPE_KR_LIST = data_list.TYPE_TR_LIST
-        else:
-            TYPE_KR_LIST = data_list.TYPE_KR_LIST
-        index_sel = 0
-        if kr:
-            kr = kr.split(" ")[0] + " "
-            for index, type_kr in enumerate(TYPE_KR_LIST):
-                if kr in type_kr and kr != " ":
-                    index_sel = index
-        return index_sel
-
-    def update_curator(self, index):
         self.expected_pickup_label = QLabel("Ожидаемая приемистость")
         self.expected_pickup_edit = FloatLineEdit()
         if self.data_well.expected_pickup:
@@ -834,6 +802,40 @@ class TabPageSoCorrect(TabPageUnion):
             self.proc_water_edit.setText(f"{self.data_well.percent_water}")
         self.grid.addWidget(self.proc_water_Label, 25, 3)
         self.grid.addWidget(self.proc_water_edit, 26, 3)
+
+        self.curator_сombo.currentTextChanged.connect(self.update_curator)
+        # print(f'куратор индекс {curator, curator_list.index(curator)}')
+        self.curator_сombo.setCurrentIndex(curator_list.index(curator))
+        self.region_combo.addItems(data_list.REGION_LIST)
+        self.region_combo.setCurrentIndex(
+            data_list.REGION_LIST.index(self.data_well.region)
+        )
+
+        self.type_kr_combo.view().setWordWrap(True)
+        self.type_kr_combo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
+        if self.data_well.work_plan in ["prs"]:
+            self.type_kr_combo.addItems(data_list.TYPE_TR_LIST)
+        else:
+            self.type_kr_combo.addItems(data_list.TYPE_KR_LIST)
+
+        self.type_kr_combo.setCurrentIndex(self.select_type_kr())
+
+    def select_type_kr(self):
+        kr = self.data_well.type_kr
+        if "prs" in self.data_well.work_plan:
+            TYPE_KR_LIST = data_list.TYPE_TR_LIST
+        else:
+            TYPE_KR_LIST = data_list.TYPE_KR_LIST
+        index_sel = 0
+        if kr:
+            kr = kr.split(" ")[0] + " "
+            for index, type_kr in enumerate(TYPE_KR_LIST):
+                if kr in type_kr and kr != " ":
+                    index_sel = index
+        return index_sel
+
+    def update_curator(self, index):
+
         if index == "ОР":
             self.expected_pressure_label.setVisible(True)
             self.expected_pressure_edit.setVisible(True)
@@ -856,10 +858,6 @@ class TabPageSoCorrect(TabPageUnion):
             self.expected_oil_edit.setVisible(True)
             self.proc_water_Label.setVisible(True)
             self.proc_water_edit.setVisible(True)
-
-
-
-
 
     def ifNone(self, string):
         try:
@@ -1159,15 +1157,15 @@ class DataWindow(WindowUnion):
                         )
 
             if all(
-                [
-                    pump
-                    for pump in [
+                    [
+                        pump
+                        for pump in [
                         self.if_none(dict_pump_ecn_posle),
                         self.if_none(paker2_posle),
                         self.if_none(dict_pump_shgn_posle),
                         self.if_none(paker_posle),
                     ]
-                ]
+                    ]
             ):
 
                 voronka_question = QMessageBox.question(
@@ -1216,11 +1214,11 @@ class DataWindow(WindowUnion):
             close_file = True
 
             if any(
-                [
-                    self.if_none(data_well) is False
-                    or data_well in ["не корректно", 0, "отсут"]
-                    for data_well in [column_type, column_wall_thickness, shoe_column]
-                ]
+                    [
+                        self.if_none(data_well) is False
+                        or data_well in ["не корректно", 0, "отсут"]
+                        for data_well in [column_type, column_wall_thickness, shoe_column]
+                    ]
             ):
                 QMessageBox.information(
                     self,
@@ -1234,18 +1232,18 @@ class DataWindow(WindowUnion):
                 close_file = False
 
             if (
-                any(
-                    [
-                        self.if_none(data_well) is False
-                        for data_well in [
+                    any(
+                        [
+                            self.if_none(data_well) is False
+                            for data_well in [
                             column_additional_diameter,
                             column_additional_wall_thickness,
                             shoe_column_additional,
                             head_column_additional,
                         ]
-                    ]
-                )
-                and self.data_well.column_additional
+                        ]
+                    )
+                    and self.data_well.column_additional
             ):
                 QMessageBox.information(
                     self,
@@ -1255,21 +1253,21 @@ class DataWindow(WindowUnion):
                 close_file = False
 
             if (
-                self.if_none(bottomhole_artificial) is False
-                or self.if_none(bottomhole_drill) is False
-                or self.if_none(current_bottom) is False
-                or self.if_none(max_angle_depth) is False
-                or self.if_none(max_angle) is False
-                or self.if_none(max_admissible_pressure) is False
-                or self.if_none(max_expected_pressure) is False
+                    self.if_none(bottomhole_artificial) is False
+                    or self.if_none(bottomhole_drill) is False
+                    or self.if_none(current_bottom) is False
+                    or self.if_none(max_angle_depth) is False
+                    or self.if_none(max_angle) is False
+                    or self.if_none(max_admissible_pressure) is False
+                    or self.if_none(max_expected_pressure) is False
             ):
                 QMessageBox.information(
                     self, "Внимание", "Не все поля в забое соответствуют значениям"
                 )
                 close_file = False
             if (
-                self.if_none(static_level) is False
-                or self.if_none(dinamic_level) is False
+                    self.if_none(static_level) is False
+                    or self.if_none(dinamic_level) is False
             ):
                 QMessageBox.information(
                     self, "Внимание", "Не все поля в уровнях соответствуют значениям"
@@ -1277,14 +1275,14 @@ class DataWindow(WindowUnion):
                 close_file = False
 
             if (
-                self.if_none(dict_pump_ecn_h_do) is False
-                or self.if_none(dict_pump_ecn_h_posle) is False
-                or self.if_none(dict_pump_shgn_h_do) is False
-                or self.if_none(dict_pump_shgn_h_posle) is False
-                or self.if_none(depth_fond_paker_do) is False
-                or self.if_none(depth_fond_paker_posle) is False
-                or self.if_none(depth_fond_paker2_do) is False
-                or self.if_none(depth_fond_paker2_posle) is False
+                    self.if_none(dict_pump_ecn_h_do) is False
+                    or self.if_none(dict_pump_ecn_h_posle) is False
+                    or self.if_none(dict_pump_shgn_h_do) is False
+                    or self.if_none(dict_pump_shgn_h_posle) is False
+                    or self.if_none(depth_fond_paker_do) is False
+                    or self.if_none(depth_fond_paker_posle) is False
+                    or self.if_none(depth_fond_paker2_do) is False
+                    or self.if_none(depth_fond_paker2_posle) is False
             ):
                 QMessageBox.information(
                     self,
@@ -1298,10 +1296,10 @@ class DataWindow(WindowUnion):
                 )
                 close_file = False
             if (
-                self.if_none(column_direction_diameter) is False
-                or self.if_none(column_direction_wall_thickness) is False
-                or self.if_none(column_direction_length) is False
-                or self.if_none(level_cement_direction) is False
+                    self.if_none(column_direction_diameter) is False
+                    or self.if_none(column_direction_wall_thickness) is False
+                    or self.if_none(column_direction_length) is False
+                    or self.if_none(level_cement_direction) is False
             ):
                 QMessageBox.information(
                     self,
@@ -1310,11 +1308,11 @@ class DataWindow(WindowUnion):
                 )
                 close_file = False
             if (
-                self.if_none(column_conductor_diameter) is False
-                or self.if_none(column_conductor_wall_thickness) is False
-                or self.if_none(column_conductor_length) is False
-                or self.if_none(column_direction_length) is False
-                or self.if_none(level_cement_conductor) is False
+                    self.if_none(column_conductor_diameter) is False
+                    or self.if_none(column_conductor_wall_thickness) is False
+                    or self.if_none(column_conductor_length) is False
+                    or self.if_none(column_direction_length) is False
+                    or self.if_none(level_cement_conductor) is False
             ):
                 QMessageBox.information(
                     self, "Внимание", "Не все поля в кондукторе соответствуют значениям"
@@ -1322,53 +1320,53 @@ class DataWindow(WindowUnion):
                 close_file = False
 
             if (
-                any(
-                    [
-                        "НВ" in dict_pump_shgn_do.upper(),
-                        "ШГН" in dict_pump_shgn_do.upper(),
-                        "НН" in dict_pump_shgn_do.upper(),
-                        dict_pump_shgn_do == "отсут",
-                        "RH" in dict_pump_shgn_do.upper(),
-                    ]
-                )
-                is False
-                or any(
-                    [
-                        "НВ" in dict_pump_shgn_posle.upper(),
-                        "ШГН" in dict_pump_shgn_posle.upper(),
-                        "НН" in dict_pump_shgn_posle.upper(),
-                        dict_pump_shgn_posle == "отсут",
-                        "RHAM" in dict_pump_shgn_do,
-                    ]
-                )
-                is False
-                or any(
-                    [
-                        "ЭЦН" in dict_pump_ecn_posle.upper(),
-                        "ВНН" in dict_pump_ecn_posle.upper(),
-                        dict_pump_ecn_posle == "отсут",
-                    ]
-                )
-                is False
-                or (dict_pump_ecn_do != "отсут" and dict_pump_ecn_h_do == "отсут")
-                or (dict_pump_ecn_posle != "отсут" and dict_pump_ecn_h_posle == "отсут")
-                or (dict_pump_shgn_do != "отсут" and dict_pump_shgn_h_do == "отсут")
-                or (
+                    any(
+                        [
+                            "НВ" in dict_pump_shgn_do.upper(),
+                            "ШГН" in dict_pump_shgn_do.upper(),
+                            "НН" in dict_pump_shgn_do.upper(),
+                            dict_pump_shgn_do == "отсут",
+                            "RH" in dict_pump_shgn_do.upper(),
+                        ]
+                    )
+                    is False
+                    or any(
+                [
+                    "НВ" in dict_pump_shgn_posle.upper(),
+                    "ШГН" in dict_pump_shgn_posle.upper(),
+                    "НН" in dict_pump_shgn_posle.upper(),
+                    dict_pump_shgn_posle == "отсут",
+                    "RHAM" in dict_pump_shgn_do,
+                ]
+            )
+                    is False
+                    or any(
+                [
+                    "ЭЦН" in dict_pump_ecn_posle.upper(),
+                    "ВНН" in dict_pump_ecn_posle.upper(),
+                    dict_pump_ecn_posle == "отсут",
+                ]
+            )
+                    is False
+                    or (dict_pump_ecn_do != "отсут" and dict_pump_ecn_h_do == "отсут")
+                    or (dict_pump_ecn_posle != "отсут" and dict_pump_ecn_h_posle == "отсут")
+                    or (dict_pump_shgn_do != "отсут" and dict_pump_shgn_h_do == "отсут")
+                    or (
                     dict_pump_shgn_posle != "отсут"
                     and dict_pump_shgn_h_posle == "отсут"
-                )
-                or (paker_do != "отсут" and depth_fond_paker_do == "отсут")
-                or (paker_posle != "отсут" and depth_fond_paker_posle == "отсут")
-                or (paker2_do != "отсут" and depth_fond_paker2_do == "отсут")
-                or (paker2_posle != "отсут" and depth_fond_paker2_posle == "отсут")
-                or any(
-                    [
-                        "ЭЦН" in dict_pump_ecn_do.upper(),
-                        "ВНН" in dict_pump_ecn_do.upper(),
-                        dict_pump_ecn_do == "отсут",
-                    ]
-                )
-                is False
+            )
+                    or (paker_do != "отсут" and depth_fond_paker_do == "отсут")
+                    or (paker_posle != "отсут" and depth_fond_paker_posle == "отсут")
+                    or (paker2_do != "отсут" and depth_fond_paker2_do == "отсут")
+                    or (paker2_posle != "отсут" and depth_fond_paker2_posle == "отсут")
+                    or any(
+                [
+                    "ЭЦН" in dict_pump_ecn_do.upper(),
+                    "ВНН" in dict_pump_ecn_do.upper(),
+                    dict_pump_ecn_do == "отсут",
+                ]
+            )
+                    is False
             ):
                 QMessageBox.information(
                     self,
@@ -1379,12 +1377,12 @@ class DataWindow(WindowUnion):
             if isinstance(self.if_none(head_column_additional), str):
                 # print(self.check_if_none(head_column_additional), isinstance(self.if_none(head_column_additional), str))
                 if (
-                    self.check_if_none(
-                        20
-                        if self.if_none(head_column_additional)
-                        else head_column_additional
-                    )
-                    < 5
+                        self.check_if_none(
+                            20
+                            if self.if_none(head_column_additional)
+                            else head_column_additional
+                        )
+                        < 5
                 ):
                     # print(self.check_if_none(head_column_additional))
                     QMessageBox.information(
@@ -1398,8 +1396,8 @@ class DataWindow(WindowUnion):
                     close_file = False
 
             if (
-                data_list.nkt_mistake is True
-                and len(self.data_well.dict_nkt_before) == 0
+                    data_list.nkt_mistake is True
+                    and len(self.data_well.dict_nkt_before) == 0
             ):
                 QMessageBox.information(
                     self,
@@ -1408,8 +1406,8 @@ class DataWindow(WindowUnion):
                 )
                 close_file = False
             if (
-                data_list.nkt_mistake is True
-                and len(self.data_well.dict_nkt_after) == 0
+                    data_list.nkt_mistake is True
+                    and len(self.data_well.dict_nkt_after) == 0
             ):
                 QMessageBox.information(
                     self,
@@ -1426,12 +1424,12 @@ class DataWindow(WindowUnion):
                     self.check_str_isdigit(column_additional_wall_thickness),
                 ]
                 if all(
-                    [
-                        self.check_str_isdigit(column_additional_diameter),
-                        self.check_str_isdigit(head_column_additional),
-                        self.check_str_isdigit(shoe_column_additional),
-                        self.check_str_isdigit(column_additional_wall_thickness),
-                    ]
+                        [
+                            self.check_str_isdigit(column_additional_diameter),
+                            self.check_str_isdigit(head_column_additional),
+                            self.check_str_isdigit(shoe_column_additional),
+                            self.check_str_isdigit(column_additional_wall_thickness),
+                        ]
                 ):
 
                     if int(float(column_additional_diameter)) >= float(column_type):
@@ -1441,16 +1439,16 @@ class DataWindow(WindowUnion):
                         close_file = False
 
                     if any(
-                        [
-                            70 > float(column_additional_diameter),
-                            float(column_additional_diameter) > 150,
-                            5 > float(column_additional_wall_thickness),
-                            float(column_additional_wall_thickness) > 13,
-                            5 > float(column_conductor_wall_thickness),
-                            float(column_conductor_wall_thickness) > 13,
-                            5 > float(column_wall_thickness),
-                            float(column_wall_thickness) > 13,
-                        ]
+                            [
+                                70 > float(column_additional_diameter),
+                                float(column_additional_diameter) > 150,
+                                5 > float(column_additional_wall_thickness),
+                                float(column_additional_wall_thickness) > 13,
+                                5 > float(column_conductor_wall_thickness),
+                                float(column_conductor_wall_thickness) > 13,
+                                5 > float(column_wall_thickness),
+                                float(column_wall_thickness) > 13,
+                            ]
                     ):
                         QMessageBox.information(
                             self, "Внимание", "Проверьте толщину колонны"
@@ -1495,8 +1493,8 @@ class DataWindow(WindowUnion):
 
             if curator == "ОР":
                 if (
-                    self.if_none(expected_pickup_edit) is False
-                    or self.if_none(expected_pressure_edit) is False
+                        self.if_none(expected_pickup_edit) is False
+                        or self.if_none(expected_pressure_edit) is False
                 ):
                     QMessageBox.information(
                         self,
@@ -1506,9 +1504,9 @@ class DataWindow(WindowUnion):
                     close_file = False
             else:
                 if (
-                    self.if_none(water_cut_edit) is False
-                    or self.if_none(expected_oil_edit) is False
-                    or self.if_none(proc_water_edit) is False
+                        self.if_none(water_cut_edit) is False
+                        or self.if_none(expected_oil_edit) is False
+                        or self.if_none(proc_water_edit) is False
                 ):
                     QMessageBox.information(
                         self,
@@ -1689,8 +1687,8 @@ class DataWindow(WindowUnion):
                     )
 
                 if (
-                    str(self.data_well.dict_pump_shgn["before"]) != "0"
-                    and len(self.data_well.dict_sucker_rod) == 0
+                        str(self.data_well.dict_pump_shgn["before"]) != "0"
+                        and len(self.data_well.dict_sucker_rod) == 0
                 ):
                     assdf = (
                         str(self.data_well.dict_pump_shgn["before"]),
@@ -1707,8 +1705,8 @@ class DataWindow(WindowUnion):
 
                     return
                 if (
-                    str(self.data_well.dict_pump_shgn["after"]) != "0"
-                    and len(self.data_well.dict_sucker_rod_after) == 0
+                        str(self.data_well.dict_pump_shgn["after"]) != "0"
+                        and len(self.data_well.dict_sucker_rod_after) == 0
                 ):
                     QMessageBox.warning(
                         self,
@@ -1720,9 +1718,9 @@ class DataWindow(WindowUnion):
 
                     return
                 if self.data_well.column_additional is False or (
-                    self.data_well.column_additional
-                    and self.data_well.current_bottom
-                    > self.data_well.head_column_additional.get_value
+                        self.data_well.column_additional
+                        and self.data_well.current_bottom
+                        > self.data_well.head_column_additional.get_value
                 ):
                     if self.data_well.dict_pump_ecn != "0":
                         self.data_well.template_depth = (
@@ -1732,8 +1730,8 @@ class DataWindow(WindowUnion):
                 else:
                     if self.data_well.dict_pump_ecn != 0:
                         if (
-                            self.data_well.dict_pump_ecn_depth["before"]
-                            > self.data_well.head_column_additional.get_value
+                                self.data_well.dict_pump_ecn_depth["before"]
+                                > self.data_well.head_column_additional.get_value
                         ):
                             self.data_well.template_depth_addition = (
                                 self.data_well.dict_pump_ecn_depth
@@ -1887,10 +1885,10 @@ class DataWindow(WindowUnion):
 
     def check_if_none(self, value):
         if (
-            value is None
-            or "отс" in str(value).lower()
-            or value == "-"
-            or str(value) == "0"
+                value is None
+                or "отс" in str(value).lower()
+                or value == "-"
+                or str(value) == "0"
         ):
             return 0
         elif isinstance(value, int):

@@ -1,41 +1,76 @@
-import re
+import subprocess
 
-# Путь к вашему файлу с кодом
-input_file_path = 'data_correct.py'  # замените на путь к вашему файлу
-output_file_path = 'data_correct2.py'  # результат сохраните сюда
+# Настройки подключения
+HOST = '176.109.106.199'
+USER = 'postgres'  # или ваш пользователь
+PASSWORD = '195375AsD+'  # если требуется
+DB_NAME = 'zima_data'
+PORT_SOURCE = 5432
+PORT_TARGET = 5433
 
-# Смещение номера строки (например, +1)
-line_offset = 2
+# Пути к утилитам (если не в PATH, укажите полный путь)
+PG_DUMP = r"C:\Program Files\PostgreSQL\15\bin\pg_dump.exe"
+CREATE_DB = r"C:\Program Files\PostgreSQL\15\bin\createdb.exe"
+PG_RESTORE = r"C:\Program Files\PostgreSQL\15\bin\pg_restore.exe"
 
-# Регулярное выражение для поиска вызовов addWidget
-# Оно ищет строки вида: self.grid.addWidget(..., ..., ...)
-pattern = re.compile(
-    r'(self\.grid\.addWidget$)\s*'          # начало вызова
-    r'([^)]+?)\s*,'                         # аргументы до номера строки
-    r'\s*(\d+)\s*,'                         # номер строки
-    r'\s*([^)]+?)$'                        # оставшиеся аргументы
-)
+# Файл дампа
+DUMP_FILE = f'D:/Documents/Create_work_krs/users/{DB_NAME}_backup.dump'
 
+def run_command(command, env=None):
+    """Выполняет команду и выводит результат."""
+    print(f"Выполняется: {' '.join(command)}")
+    result = subprocess.run(command, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if result.returncode != 0:
+        print(f"Ошибка: {result.stderr}")
+        raise Exception(f"Команда {' '.join(command)} завершилась с ошибкой.")
+    return result.stdout
 
-with open(input_file_path, 'r', encoding='utf-8') as file:
-    code = file.read()
+def dump_database():
+    """Делает дамп базы данных."""
+    command = [
+        PG_DUMP,
+        '-U', USER,
+        '-h', HOST,
+        '-p', str(PORT_SOURCE),
+        '-Fc',
+        '-f', DUMP_FILE,
+        DB_NAME
+    ]
+    run_command(command)
+    print(f"Дамп базы {DB_NAME} сохранен в {DUMP_FILE}")
 
-def replace_line_number(match):
-    prefix = match.group(1)  # 'self.grid.addWidget('
-    args_before_line = match.group(2)  # аргументы перед номером строки
-    line_number_str = match.group(3)   # номер строки как строка
-    args_after_line = match.group(4)   # остальные аргументы
+def create_database():
+    """Создает новую базу данных на целевом порту."""
+    command = [
+        CREATE_DB,
+        '-U', USER,
+        '-h', HOST,
+        '-p', str(PORT_TARGET),
+        DB_NAME
+    ]
+    run_command(command)
+    print(f"База {DB_NAME} создана на порту {PORT_TARGET}")
 
-    line_number = int(line_number_str)
-    new_line_number = line_number + line_offset
+def restore_database():
+    """Восстанавливает базу из дампа."""
+    command = [
+        PG_RESTORE,
+        '-U', USER,
+        '-h', HOST,
+        '-p', str(PORT_TARGET),
+        '-d', DB_NAME,
+        DUMP_FILE
+    ]
+    run_command(command)
+    print(f"База {DB_NAME} восстановлена из {DUMP_FILE}")
 
-    return f"{prefix}{args_before_line}, {new_line_number}, {args_after_line})"
+def main():
+    # Установка переменной окружения для пароля (если нужно)
+    env = {'PGPASSWORD': PASSWORD}
 
-# Заменяем все совпадения
-new_code = pattern.sub(replace_line_number, code)
+    dump_database()
+    create_database()
+    restore_database()
 
-# Сохраняем результат
-with open(output_file_path, 'w', encoding='utf-8') as file:
-    file.write(new_code)
-
-print(f"Обработка завершена. Результат сохранен в {output_file_path}")
+if __name__ == "__main__":
+    main()
