@@ -1,14 +1,12 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
-from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout,  QPushButton, \
+from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QPushButton, \
     QMessageBox, QTableWidget, QTableWidgetItem, QHeaderView
 import openpyxl
 
 import data_list
 
-
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
-
 
 
 class TabPageSoPvr(TabPageUnion):
@@ -23,10 +21,8 @@ class TabPageSoPvr(TabPageUnion):
         brigada_list = data_list.DICT_TELEPHONE
         self.number_brigada_combo.addItems(list(brigada_list.keys()))
 
-
         self.number_telephone_label = QLabel('номер телефона, self')
         self.number_telephone_edit = QLineEdit(self)
-
 
         self.date_new_label = QLabel('Дата заявки', self)
         self.date_new_edit = QLineEdit(self)
@@ -43,7 +39,6 @@ class TabPageSoPvr(TabPageUnion):
         self.nkt_edit = QLineEdit(self)
         self.nkt_edit.setText('62')
 
-
         self.nkt_shoe_label = QLabel("Башмак НКТ:", self)
         self.nkt_shoe_edit = QLineEdit(self)
 
@@ -51,14 +46,13 @@ class TabPageSoPvr(TabPageUnion):
         self.nkt_com_edit = QLineEdit(self)
 
         self.paker_type_label = QLabel("Тип пакера", self)
-        self.paker_type= QLineEdit(self)
+        self.paker_type = QLineEdit(self)
 
         self.pakerLabel = QLabel("глубина пакера", self)
         self.paker_depth = QLineEdit(self)
 
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
         self.fluid_edit = QLineEdit(self)
-
 
         self.labelType = QLabel("Кровля  перфорации", self)
         self.lineedit_type = QLineEdit(self)
@@ -115,7 +109,6 @@ class TabPageSoPvr(TabPageUnion):
         self.grid.addWidget(self.nkt_com_label, 15, 4)
         self.grid.addWidget(self.nkt_com_edit, 16, 4)
 
-
         self.grid.addWidget(self.paker_type_label, 17, 2)
         self.grid.addWidget(self.paker_type, 18, 2)
 
@@ -165,14 +158,12 @@ class PvrApplication(WindowUnion):
         # self.table_pvr.setRowCount(113)
         self.tab_widget = TabWidget(parent)
 
-
         self.tableWidget = QTableWidget(0, 7)
         self.tableWidget.setHorizontalHeaderLabels(
             ["Кровля перфорации", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.",
              "Количество отверстий", "Вскрываемые пласты", "доп информация"])
         for i in range(7):
             self.tableWidget.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
-
 
         # self.tableWidget.setSortingEnabled(True)
         # self.tableWidget.setAlternatingRowColors(True)
@@ -185,7 +176,6 @@ class PvrApplication(WindowUnion):
         self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
         self.buttonAddProject = QPushButton('Добавить интервалы перфорации из плана')
         self.buttonAddProject.clicked.connect(self.add_perforation_project)
-
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
@@ -215,7 +205,6 @@ class PvrApplication(WindowUnion):
                     row_list.append(str(self.data_well.ws.cell(row=row + 1, column=col + 1).value))
                 self.data_well.pvr_row_list.append(row_list)
         if not self.data_well.pvr_row_list:
-
             QMessageBox.warning(self, 'Ошибка', 'Перфорация в плане работ не найдены')
             return
         rows = self.tableWidget.rowCount()
@@ -227,7 +216,6 @@ class PvrApplication(WindowUnion):
             self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(pvr[4])))
             self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(pvr[5])))
             self.tableWidget.setItem(rows, 5, QTableWidgetItem(str(pvr[6])))
-
 
     def add_row_table(self):
 
@@ -266,17 +254,14 @@ class PvrApplication(WindowUnion):
         for row in range(len(work_list)):
             for col in range(42):
                 if work_list[row][col]:
-
                     ws.cell(row=row + 1, column=col + 1).value = work_list[row][col]
 
         # Перебираем строки и скрываем те, у которых все значения равны None
         for row_ind, row in enumerate(ws.iter_rows(values_only=True)):
             if all(value is None for value in row[:42]):
-
-                ws.row_dimensions[row_ind+1].hidden = True
+                ws.row_dimensions[row_ind + 1].hidden = True
 
     def add_work(self):
-        
 
         wb = openpyxl.load_workbook(f'{data_list.path_image}property_excel/template_pvr.xlsx')
         # Выбираем активный лист
@@ -313,13 +298,14 @@ class PvrApplication(WindowUnion):
                  None,
                  None, None, count_otv, None, None, None, None, None, count_charge, None, None,
                  None, None, plast,
-                 None, None, None, None, None,  roof, None,  None, None, sole, None,  None,
+                 None, None, None, None, None, roof, None, None, None, sole, None, None,
                  None,
                  None,
                  None])
 
-        work_list = self.application_pvr_def(number_brigada, number_telephone, date_new_edit, time_new_edit, work_edit, nkt_edit,
-                                             nkt_shoe_edit,  nkt_com_edit, paker_type, paker_depth, fluid)
+        work_list = self.application_pvr_def(number_brigada, number_telephone, date_new_edit, time_new_edit, work_edit,
+                                             nkt_edit,
+                                             nkt_shoe_edit, nkt_com_edit, paker_type, paker_depth, fluid)
 
         for index, row in enumerate(perf_list):
             work_list[15 + index] = row
@@ -344,7 +330,6 @@ class PvrApplication(WindowUnion):
         if wb:
             wb.close()
 
-
     def del_row_table(self):
         row = self.tableWidget.currentRow()
         if row == -1:
@@ -352,8 +337,8 @@ class PvrApplication(WindowUnion):
             return
         self.tableWidget.removeRow(row)
 
-
-    def application_pvr_def(self, number_brigada, number_telephone, date_new_edit, time_new_edit, work_edit, nkt_edit, nkt_shoe_edit,
+    def application_pvr_def(self, number_brigada, number_telephone, date_new_edit, time_new_edit, work_edit, nkt_edit,
+                            nkt_shoe_edit,
                             nkt_com_edit, paker_type, paker_depth, fluid):
 
         column_data = f'{self.data_well.column_diameter.get_value}мм x {self.data_well.column_wall_thickness.get_value} в инт ' \
@@ -361,10 +346,11 @@ class PvrApplication(WindowUnion):
         if self.data_well.column_additional:
             column_data_add = f'{self.data_well.column_additional_diameter.get_value}мм x ' \
                               f'{self.data_well.column_additional_wall_thickness.get_value} в инт ' \
-                          f'{self.data_well.head_column_additional.get_value}-{self.data_well.shoe_column_additional.get_value}м'
+                              f'{self.data_well.head_column_additional.get_value}-{self.data_well.shoe_column_additional.get_value}м'
         else:
             column_data_add = ''
-        pressure = self.data_well.dict_category[list(self.data_well.dict_category.keys())[0]]['по давлению'].data_pressure
+        pressure = self.data_well.dict_category[list(self.data_well.dict_category.keys())[0]][
+            'по давлению'].data_pressure
 
         value_list = [
             ['З А Я В К А', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -394,9 +380,11 @@ class PvrApplication(WindowUnion):
              None, 'по договору №', None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None, None],
-            [None, 'Заказчик', None, None, None, f'{data_list.contractor}', None, None, None, None, None, None, None, None, None,
+            [None, 'Заказчик', None, None, None, f'{data_list.contractor}', None, None, None, None, None, None, None,
+             None, None,
              None,
-             None, None, None, 'Цех', None, None, self.data_well.cdng.get_value, None, None, None, None, None, None, None, None,
+             None, None, None, 'Цех', None, None, self.data_well.cdng.get_value, None, None, None, None, None, None,
+             None, None,
              None,
              None,
              None, None, None, None, None, None, None, None, None, None],
@@ -405,14 +393,16 @@ class PvrApplication(WindowUnion):
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None, None],
-            [None, '№ скважины', None, None, None, None, self.data_well.well_number.get_value, None, None, None, None, None, None,
+            [None, '№ скважины', None, None, None, None, self.data_well.well_number.get_value, None, None, None, None,
+             None, None,
              'куст', None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None,
              None, None, None, None, None, None, None, None, None],
             [None, 'Регион', None, None, None, self.data_well.region, None, None, None, None, None, None, None,
              'Месторождение',
-             None, None, None, None, None, self.data_well.well_area.get_value, None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None, self.data_well.well_area.get_value, None, None, None, None, None, None, None,
+             None, None,
              None,
              None,
              None, None, None, None, None, None, None, None, None, None, None, None],
@@ -421,8 +411,8 @@ class PvrApplication(WindowUnion):
              None, None, None, None, None, None, None, '(по регламенту за 16 часов)', None, None, None, None, None,
              None, None,
              None, None, None, None, None, None, None, None, None, None],
-            [None, 'Дата', None, None, date_new_edit, None,  None, None, None, None,
-             'Время', None, None, time_new_edit, None,  None, None,
+            [None, 'Дата', None, None, date_new_edit, None, None, None, None, None,
+             'Время', None, None, time_new_edit, None, None, None,
              None,
              None, None, None, None, None, None, None, '(готовности по факту)', None, None, None, None, None, None,
              None, None,
@@ -526,20 +516,28 @@ class PvrApplication(WindowUnion):
              None, None, None, None, None, None, None, None, None, None],
             [None, 'Категория скважины по ГНВП', None, None, None, None, None, None, None, None, None, 'Рпл:', None,
              self.data_well.category_pressure,
-             None, None, None, None, None, 'H2S:', None, self.data_well.category_h2s, None, None, None, None, None, None,
+             None, None, None, None, None, 'H2S:', None, self.data_well.category_h2s, None, None, None, None, None,
+             None,
              'Газовый фактор:',
-             None, None, None, None, None, None,self.data_well.category_gas_factor, None, None, None, None, None, None, None],
-            [None, 'Пробуренный забой', None, None, None, None, None, None, self.data_well.bottom_hole_drill.get_value, None, None, None,
+             None, None, None, None, None, None, self.data_well.category_gas_factor, None, None, None, None, None, None,
+             None],
+            [None, 'Пробуренный забой', None, None, None, None, None, None, self.data_well.bottom_hole_drill.get_value,
+             None, None, None,
              None,
-             'м.', None, 'Искусственный забой', None, None, None, None, None, None, None, self.data_well.bottom_hole_artificial.get_value, None,
+             'м.', None, 'Искусственный забой', None, None, None, None, None, None, None,
+             self.data_well.bottom_hole_artificial.get_value, None,
              None,
-             'м.', None, 'Текущий забой', None, None, None, None, None, self.data_well.current_bottom, None, None, None, 'м.',
+             'м.', None, 'Текущий забой', None, None, None, None, None, self.data_well.current_bottom, None, None, None,
+             'м.',
              None,
              None, None, None],
-            [None, 'Максимальный угол', None, None, None, None, None, None, self.data_well.max_angle.get_value, None, None, None, None,
-             None, None, 'гр.', None, 'на глубине', None, None, None, self.data_well.max_angle_depth.get_value, None, None, None, None, 'м.',
+            [None, 'Максимальный угол', None, None, None, None, None, None, self.data_well.max_angle.get_value, None,
+             None, None, None,
+             None, None, 'гр.', None, 'на глубине', None, None, None, self.data_well.max_angle_depth.get_value, None,
+             None, None, None, 'м.',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, 'Расстояние муфта-ротор', None, None, None, None, None, None, None, None, self.data_well.stol_rotor.get_value, None,
+            [None, 'Расстояние муфта-ротор', None, None, None, None, None, None, None, None,
+             self.data_well.stol_rotor.get_value, None,
              None, None, 'м.', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'диаметр обсадной колонны, мм.', None, None, None, None, None, None, None, None, None, None, None,
@@ -553,23 +551,28 @@ class PvrApplication(WindowUnion):
              None, None, None, None, None, None, None, None],
             [None, 'Внутр. диаметр насосно-компрессорных труб, мм', None, None, None, None, None, None, None, None,
              None, None,
-             None, None, None, None, None, None, nkt_edit, None, None, None, None, 'Башмак НКТ, м.', None, None, None, None,
+             None, None, None, None, None, None, nkt_edit, None, None, None, None, 'Башмак НКТ, м.', None, None, None,
+             None,
              None,
              None, f'{nkt_shoe_edit}м', None, None, None, None, None, None, None, None, None, None, None, None],
-            [None, 'Компоновка НКТ', None, None, None, None, None, nkt_com_edit, None, None, None, None, None, None, None, None,
+            [None, 'Компоновка НКТ', None, None, None, None, None, nkt_com_edit, None, None, None, None, None, None,
+             None, None,
              None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None],
-            [None, 'Пакер', None, None, paker_type, None, None, None, None, None, None, None, None, None, None, None, None,
-             'Глубина спуска пакера', None, None, None, None, None, None, None, paker_depth, None, None, None, None, None,
+            [None, 'Пакер', None, None, paker_type, None, None, None, None, None, None, None, None, None, None, None,
+             None,
+             'Глубина спуска пакера', None, None, None, None, None, None, None, paker_depth, None, None, None, None,
+             None,
              None, 'м.',
              None, None, None, None, None, None, None, None, None, None],
             [None, 'Качество цементирования', None, None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, 'Высота подъема цемента за колонной, м.', None, None, None, None, None, None,
              None,
-             None, None, None, None, None, None, self.data_well.level_cement_column.get_value, None, None, None, None, None, None, None, None],
+             None, None, None, None, None, None, self.data_well.level_cement_column.get_value, None, None, None, None,
+             None, None, None, None],
             [None, 'Устьевое оборудование скважины', None, None, None, None, None, None, None, None, None, None, None,
              f'ПШП-{self.data_well.column_diameter.get_value}',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -593,7 +596,8 @@ class PvrApplication(WindowUnion):
              None, None,
              f'{pressure}атм', None, None, None, None, None, None, None, 'Газовый фактор, м3/т', None, None, None,
              None, None,
-             None, None, self.data_well.gaz_factor_percent[0], None, None, None, None, None, None, None, None, None, None, None, None],
+             None, None, self.data_well.gaz_factor_percent[0], None, None, None, None, None, None, None, None, None,
+             None, None, None],
             [None, 'Температура в интервале ПВР, С', None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -834,7 +838,8 @@ class PvrApplication(WindowUnion):
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None, None],
-            [None, 'Способ эксплуатации', None, None, None, None, None, None, None, f'{self.data_well.dict_pump_ecn["before"]}', None, None,
+            [None, 'Способ эксплуатации', None, None, None, None, None, None, None,
+             f'{self.data_well.dict_pump_ecn["before"]}', None, None,
              None, None,
              None, None, None, None, None, None, None, None, None, 'глубина спуска, м', None, None, None, None, None,
              f'{self.data_well.dict_pump_ecn_depth["before"]}',
@@ -867,7 +872,8 @@ class PvrApplication(WindowUnion):
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
              None, None, None],
-            [None, work_edit, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+            [None, work_edit, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+             None,
              None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
@@ -884,7 +890,8 @@ class PvrApplication(WindowUnion):
              None, None, None, None, None],
             [None, 'Максимально ожидаемое давление на устье скважины', None, None, None, None, None, None, None, None,
              None,
-             None, None, None, None, None, None, None, None, f'{self.data_well.max_admissible_pressure.get_value}', None, None, None, None, None, None,
+             None, None, None, None, None, None, None, None, f'{self.data_well.max_admissible_pressure.get_value}',
+             None, None, None, None, None, None,
              'атм.',
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None],
             [None, 'Расстояние до скважины', None, None, None, None, None, None, None, None, None, None, None, None,
@@ -912,7 +919,8 @@ class PvrApplication(WindowUnion):
              None, None, None, None, None, None, None, None, None, 'телефон', None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None],
-            [None, f'{data_list.user[0]} {data_list.user[1]}', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+            [None, f'{data_list.user[0]} {data_list.user[1]}', None, None, None, None, None, None, None, None, None,
+             None, None, None, None, None, None, None,
              None,
              None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None,
@@ -944,12 +952,12 @@ class PvrApplication(WindowUnion):
              None, None, None, None, None],
 
         ]
-        pvr_list = [[None, 'интервал', None, None, None, None, None, 'тип перфоратора', None, None, None, None, None, None,
+        pvr_list = [
+            [None, 'интервал', None, None, None, None, None, 'тип перфоратора', None, None, None, None, None, None,
              'плотность',
              None, None, None, None, 'дата', None, None, None, None, None, 'индекс пласта', None, None, None, None,
              None, None,
              'примечание', None, None, None, None, None, None, None, None, None, None]]
-
 
         for plast in self.data_well.plast_all:
             for interval in self.data_well.dict_perforation[plast]['интервал']:
@@ -966,14 +974,10 @@ class PvrApplication(WindowUnion):
                      None, None, None, None])
         col = 0
         for pvr in pvr_list:
-
             value_list[47 + col] = pvr
             col += 1
 
-
         return value_list
-
-
 
 # app = QApplication(sys.argv)
 # login_window = PvrApplication()

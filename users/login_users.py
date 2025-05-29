@@ -60,7 +60,7 @@ class LoginWindow(QDialog):
         self.user_service = UserService(self.db)
 
     def update_users(self):
-        self.users_list = list(map(lambda x: x[1], self.get_list_users()))
+        self.users_list = list(map(lambda x: x, self.get_list_users()))
         self.username.clear()
         self.username.addItems(self.users_list)
 
@@ -105,7 +105,6 @@ class LoginWindow(QDialog):
 
             if self.user_dict["last_name"] == last_name and self.user_dict["first_name"] == first_name \
                     and self.user_dict["second_name"] and self.user_dict["password"] == str(password):
-                # mes = QMessageBox.information(self, 'Пароль', 'вход произведен')
 
                 data_list.user = (self.user_dict["pozition_id"] + ' ' + self.user_dict["organization"],
                                   f'{self.user_dict["last_name"]} '
@@ -272,10 +271,11 @@ class RegisterWindow(QDialog):
 
                 if user == 409:
                     QMessageBox.critical(self, 'Данный пользовать существует', 'Данный пользовать существует')
-                elif user == 200:
+                elif type(user) is int:
+                    QMessageBox.critical(self, 'Не известная ошибка', 'Не известная ошибка')
+                else:
                     QMessageBox.information(self, 'Регистрация', 'пользователь успешно создан')
                     self.close()
-                else:
-                    QMessageBox.critical(self, 'Не известная ошибка', 'Не известная ошибка')
+
         else:
             QMessageBox.information(self, 'пароль', 'Пароли не совпадают')

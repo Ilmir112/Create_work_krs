@@ -469,9 +469,9 @@ class GnktModel(WindowUnion):
                     if 'А.Р. Хасаншин' in str(value):
                         coordinate = f'{get_column_letter(col + 1)}{row_ind - 1}'
                         self.insert_image(ws2, f'{data_list.path_image}imageFiles/Хасаншин.png', coordinate)
-                    # elif 'Д.Д. Шамигулов' in str(value):
-                    #     coordinate = f'{get_column_letter(col + 1)}{row_ind - 2}'
-                    #     self.insert_image(ws2, f'{data_list.path_image}imageFiles/Шамигулов.png', coordinate)
+                    elif 'И.А. Котиков' in str(value):
+                        coordinate = f'{get_column_letter(col + 1)}{row_ind - 2}'
+                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/Котиков.png', coordinate)
                     elif 'Зуфаров И.М.' in str(value):
                         coordinate = f'{get_column_letter(col + 1)}{row_ind - 2}'
                         self.insert_image(ws2, f'{data_list.path_image}imageFiles/Зуфаров.png', coordinate)
@@ -481,9 +481,9 @@ class GnktModel(WindowUnion):
                     elif 'Закиев И.Э.' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind}'
                         self.insert_image(ws2, f'{data_list.path_image}imageFiles/Закиев.png', coordinate)
-                    elif 'Котиков' in str(value) and 'И.А.' in str(value):
-                        coordinate = f'{get_column_letter(col - 1)}{row_ind-1}'
-                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/Котиков.png', coordinate)
+                    # elif 'Котиков' in str(value) and 'И.А.' in str(value):
+                    #     coordinate = f'{get_column_letter(col - 1)}{row_ind-1}'
+                    #     self.insert_image(ws2, f'{data_list.path_image}imageFiles/Котиков.png', coordinate)
                     elif 'Рахимьянов' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
                         self.insert_image(ws2, f'{data_list.path_image}imageFiles/рахимьянов.png', coordinate)
