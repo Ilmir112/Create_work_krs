@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, pyqtSignal
+
 from PyQt5.QtWidgets import (
     QComboBox,
     QLabel,
@@ -22,6 +23,8 @@ from server_response import ResponseWork
 
 
 class TabPageSoCorrect(TabPageUnion):
+    dataChangedSignal = pyqtSignal()
+
     def __init__(self, data_well: FindIndexPZ):
         super().__init__(data_well)
 
@@ -42,9 +45,10 @@ class TabPageSoCorrect(TabPageUnion):
 
         self.column_direction_wall_thickness_Label = QLabel("Толщина \nстенки", self)
         self.column_direction_wall_thickness_edit = FloatLineEdit()
+        self.column_direction_wall_thickness_edit.setValidator(self.validator_float_wall_thickness)
         if self.data_well.column_direction_true:
             self.column_direction_wall_thickness_edit.setText(
-                f"{str(self.data_well.column_direction_wall_thickness.get_value).strip()}"
+                f"{str(self.data_well.column_direction_wall_thickness.get_value).strip().replace('.', ',')}"
             )
         else:
             self.column_direction_wall_thickness_edit.setText(f"отсут")
@@ -69,13 +73,14 @@ class TabPageSoCorrect(TabPageUnion):
         self.column_conductor_diameter_Label = QLabel("диаметр \nкондуктора", self)
         self.column_conductor_diameter_edit = FloatLineEdit()
         self.column_conductor_diameter_edit.setText(
-            f"{str(self.data_well.column_conductor_diameter.get_value).strip()}"
+            f"{str(self.data_well.column_conductor_diameter.get_value).strip().replace('.', ',')}"
         )
 
         self.column_conductor_wall_thickness_Label = QLabel("Толщина \nстенки ", self)
         self.column_conductor_wall_thickness_edit = FloatLineEdit()
+        self.column_conductor_wall_thickness_edit.setValidator(self.validator_float_wall_thickness)
         self.column_conductor_wall_thickness_edit.setText(
-            f"{str(self.data_well.column_conductor_wall_thickness.get_value).strip()}"
+            f"{str(self.data_well.column_conductor_wall_thickness.get_value).strip().replace('.', ',')}"
         )
 
         self.distance_from_well_to_sampling_point_label = QLabel("Расстояние до ПНТЖ")
@@ -122,8 +127,9 @@ class TabPageSoCorrect(TabPageUnion):
 
         self.column_wall_thickness_label = QLabel("Толщина \nстенки ЭК", self)
         self.column_wall_thickness_edit_type2 = FloatLineEdit()
+        self.column_wall_thickness_edit_type2.setValidator(self.validator_float_wall_thickness)
         self.column_wall_thickness_edit_type2.setText(
-            f"{self.ifNone(self.data_well.column_wall_thickness.get_value)}"
+            f"{self.ifNone(self.data_well.column_wall_thickness.get_value.strip().replace('.', ','))}"
         )
         # self.column_wall_thickness_edit_type2.setClearButtonEnabled(True)
 
@@ -151,14 +157,10 @@ class TabPageSoCorrect(TabPageUnion):
             )
         # self.shoe_column_edit_type2.setClearButtonEnabled(True)
 
-        self.column_add_trueLabel = QLabel("наличие \nдоп. колонны", self)
+        self.column_add_true_label = QLabel("наличие \nдоп. колонны", self)
         self.column_add_true_comboBox = QComboBox(self)
         self.column_add_true_comboBox.addItems(["в наличии", "отсутствует"])
-        if self.data_well.column_additional is True:
-            column_add = 0
-        else:
-            column_add = 1
-        self.column_add_true_comboBox.setCurrentIndex(column_add)
+
 
         self.column_add_label = QLabel("диаметр \nдоп. колонны", self)
         self.column_add_edit_type = FloatLineEdit()
@@ -169,8 +171,9 @@ class TabPageSoCorrect(TabPageUnion):
 
         self.column_add_wall_thicknessLabel = QLabel("Толщина стенки ", self)
         self.column_add_wall_thicknessedit_type2 = FloatLineEdit()
+        self.column_add_wall_thicknessedit_type2.setValidator(self.validator_float_wall_thickness)
         self.column_add_wall_thicknessedit_type2.setText(
-            f"{self.ifNone(self.data_well.column_additional_wall_thickness.get_value)}"
+            f"{self.ifNone(self.data_well.column_additional_wall_thickness.get_value.strip().replace('.', ','))}"
         )
         # self.column_add_wall_thicknessedit_type2.setClearButtonEnabled(True)
 
@@ -478,7 +481,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.grid.addWidget(self.level_cement_label, 8, 4)
         self.grid.addWidget(self.level_cement_edit, 9, 4)
 
-        self.grid.addWidget(self.column_add_trueLabel, 8, 5)
+        self.grid.addWidget(self.column_add_true_label, 8, 5)
         self.grid.addWidget(self.column_add_true_comboBox, 9, 5)
         self.grid.addWidget(self.column_add_label, 8, 6)
         self.grid.addWidget(self.column_add_edit_type, 9, 6)
@@ -705,54 +708,7 @@ class TabPageSoCorrect(TabPageUnion):
             self.grid.addWidget(sucker_rod_po_line_edit, 38, 5)
             self.grid.addWidget(length_sucker_po_line_edit, 38, 6)
 
-        # if self.curator_сombo.currentText() == "ОР":
-        #
-        #     self.expected_pickup_label = QLabel("Ожидаемая приемистость")
-        #     self.expected_pickup_edit = FloatLineEdit()
-        #     try:
-        #         self.expected_pickup_edit.setText(f"{self.data_well.expected_pickup}")
-        #         # print(f'ожидаемая приемистисть{self.data_well.expected_pickup}')
-        #     except:
-        #         pass
-        #     self.grid.addWidget(self.expected_pickup_label, 25, 2)
-        #     self.grid.addWidget(self.expected_pickup_edit, 26, 2)
-        #
-        #     self.expected_pressure_label = QLabel("Ожидаемое давление закачки")
-        #     self.expected_pressure_edit = FloatLineEdit()
-        #     try:
-        #         self.expected_pressure_edit.setText(
-        #             f"{self.data_well.expected_pressure}"
-        #         )
-        #     except:
-        #         pass
-        #     self.grid.addWidget(self.expected_pressure_label, 25, 3)
-        #     self.grid.addWidget(self.expected_pressure_edit, 26, 3)
-        # else:
-        #     self.water_cut_Label = QLabel("Дебит по жидкости")
-        #     self.water_cut_edit = FloatLineEdit()
-        #     try:
-        #         self.water_cut_edit.setText(f"{self.data_well.water_cut}")
-        #     except:
-        #         pass
-        #     self.grid.addWidget(self.water_cut_Label, 25, 1)
-        #     self.grid.addWidget(self.water_cut_edit, 26, 1)
-        #     self.expected_oil_Label = QLabel("Дебит по нефти")
-        #     self.expected_oil_edit = FloatLineEdit()
-        #     try:
-        #         self.expected_oil_edit.setText(f"{self.data_well.expected_oil}")
-        #     except:
-        #         pass
-        #     self.grid.addWidget(self.expected_oil_Label, 25, 2)
-        #     self.grid.addWidget(self.expected_oil_edit, 26, 2)
-        #     self.proc_water_Label = QLabel("Обводненность")
-        #
-        #     self.proc_water_edit = FloatLineEdit()
-        #     try:
-        #         self.proc_water_edit.setText(f"{self.data_well.percent_water}")
-        #     except:
-        #         pass
-        #     self.grid.addWidget(self.proc_water_Label, 25, 3)
-        #     self.grid.addWidget(self.proc_water_edit, 26, 3)
+
 
         curator_list = ["", "ГРР", "ОР", "ГТМ", "ГО", "ВНС"]
         self.curator_сombo.addItems(curator_list)
@@ -819,6 +775,32 @@ class TabPageSoCorrect(TabPageUnion):
             self.type_kr_combo.addItems(data_list.TYPE_KR_LIST)
 
         self.type_kr_combo.setCurrentIndex(self.select_type_kr())
+        self.column_add_true_comboBox.currentTextChanged.connect(self.update_column_add)
+        self.column_add_true_comboBox.setCurrentIndex(1)
+        if self.data_well.column_additional:
+            self.column_add_true_comboBox.setCurrentIndex(0)
+
+
+
+    def update_column_add(self, index):
+        if index == "отсутствует":
+            self.column_add_label.setVisible(False)
+            self.column_add_edit_type.setVisible(False)
+            self.column_add_wall_thicknessLabel.setVisible(False)
+            self.column_add_wall_thicknessedit_type2.setVisible(False)
+            self.head_column_add_label.setVisible(False)
+            self.head_column_add_edit_type2.setVisible(False)
+            self.shoe_column_add_label.setVisible(False)
+            self.shoe_column_add_edit_type2.setVisible(False)
+        else:
+            self.column_add_label.setVisible(True)
+            self.column_add_edit_type.setVisible(True)
+            self.column_add_wall_thicknessLabel.setVisible(True)
+            self.column_add_wall_thicknessedit_type2.setVisible(True)
+            self.head_column_add_label.setVisible(True)
+            self.head_column_add_edit_type2.setVisible(True)
+            self.shoe_column_add_label.setVisible(True)
+            self.shoe_column_add_edit_type2.setVisible(True)
 
     def select_type_kr(self):
         kr = self.data_well.type_kr
@@ -1871,7 +1853,11 @@ class DataWindow(WindowUnion):
                     f"диаметра пакера \n {type(e).__name__}\n\n{str(e)}",
                 )
                 return
-        self.definition_open_trunk_well()
+        if self.data_well.open_trunk_well:
+            self.definition_open_trunk_well()
+            mes = QMessageBox.question(self, "открытый ствол", "в скважине открытый ствол?")
+            if mes == QMessageBox.No:
+                return
 
         data_list.pause = False
         self.close()

@@ -8,7 +8,8 @@ from data_base.config_base import connection_to_database, WorkDatabaseWell
 from decrypt import decrypt
 from find import FindIndexPZ
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
-from PyQt5.QtWidgets import QWidget, QTabWidget, QInputDialog, QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayout
+from PyQt5.QtWidgets import QWidget, QTabWidget, QInputDialog, QMessageBox, QLabel, QLineEdit, QComboBox, QGridLayout, \
+    QTableWidgetItem
 
 from main import MyMainWindow
 from server_response import ApiClient
@@ -32,6 +33,7 @@ class TabPageUnion(QWidget):
         self.grid = QGridLayout(self)
 
         self.validator_float = QDoubleValidator(0.0, 8000.0, 2)
+        self.validator_float_wall_thickness = QDoubleValidator(4.0, 14.0, 1)
         self.validator_int = QIntValidator(0, 8000)
         self.data_well = data_well
 

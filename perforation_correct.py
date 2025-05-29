@@ -10,26 +10,39 @@ from work_py.parent_work import TabWidgetUnion, WindowUnion
 
 
 class FloatLineEdit(QLineEdit):
+
     def __init__(self):
         super(FloatLineEdit, self).__init__()
 
         # Устанавливаем валидатор для проверки на float
-
-        reg = QRegExp("[0-9.]*")
+        reg = QRegExp("^(?:[0-9.,]*|отсут)$")
         p_validator = QRegExpValidator(self)
         p_validator.setRegExp(reg)
         self.setValidator(p_validator)
 
+        # Можно связать изменение текста с проверкой
+        self.textChanged.connect(self.check_text)
+
     def focusOutEvent(self, event):
-        # При потере фокуса проверяем, является ли текст float
-        if self.validator().validate(self.text(), 0)[0] != QValidator.Acceptable:
-            # Если текст не является числом, меняем цвет фона на красный
+        super().focusOutEvent(event)
+        self.check_text()
+
+    def check_text(self):
+        # Проверяем статус валидатора
+        state, _, _ = self.validator().validate(self.text(), 0)
+        if state != QValidator.Acceptable:
+            # Текст не валиден — цвет фона красный
             palette = self.palette()
             palette.setColor(QPalette.Base, QColor(Qt.red))
             self.setPalette(palette)
         else:
-            # Если текст является числом, возвращаем цвет фона по умолчанию
-            self.setPalette(self.parentWidget().palette())
+            if self.parentWidget():
+                # Валидный текст — возвращаем стандартный цвет
+                self.setPalette(self.parentWidget().palette())
+
+    def setText(self, text):
+        super().setText(text)
+        self.check_text()
 
 
 class TabPageSo(QWidget):
