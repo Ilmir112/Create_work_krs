@@ -4204,13 +4204,13 @@ class SaveInExcel(MyWindow):
                             f"{data_list.path_image}imageFiles/Алиев махир.png",
                             coordinate,
                         )
-                    elif "И.А. Котиков" in str(value):
-                        coordinate = f"{get_column_letter(col - 3)}{row_ind - 2}"
-                        self.insert_image(
-                            self.ws2,
-                            f"{data_list.path_image}imageFiles/Котиков.png",
-                            coordinate,
-                        )
+                    # elif "И.А. Котиков" in str(value):
+                    #     coordinate = f"{get_column_letter(col - 3)}{row_ind - 2}"
+                    #     self.insert_image(
+                    #         self.ws2,
+                    #         f"{data_list.path_image}imageFiles/Котиков.png",
+                    #         coordinate,
+                    #     )
                     elif "З.К. Алиев" in str(value):
                         coordinate = f"{get_column_letter(col - 2)}{row_ind - 2}"
                         self.insert_image(
@@ -4250,7 +4250,7 @@ class SaveInExcel(MyWindow):
                 self.insert_image(
                     self.ws2, f"{data_list.path_image}imageFiles/Хасаншин.png", "H1"
                 )
-                # self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Шамигулов.png', 'H4')
+                self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Котиков.png', 'H4')
 
             excel_data_dict = excel_in_json(self, self.ws2)
             self.thread_excel_insert = ExcelWorker(self.data_well)
