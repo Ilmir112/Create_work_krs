@@ -88,7 +88,9 @@ class ExcelWorker(QThread):
         from data_base.config_base import CheckWellExistence, connection_to_database
 
         check_true = True
-        stop_app = None
+
+
+
         try:
             db = connection_to_database(decrypt("DB_NAME_USER"))
             self.check_correct_well = CheckWellExistence(db)
@@ -107,6 +109,9 @@ class ExcelWorker(QThread):
                 f"Ошибка при проверке записи: {type(e).__name__}\n\n{str(e)}",
             )
             return check_true
+
+
+
 
     # Функция для поиска и удаления файлов по условию
     @staticmethod

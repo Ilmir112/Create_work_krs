@@ -202,6 +202,10 @@ class ApiClient:
         return "/wells_classifier/find_well_classifier"
 
     @classmethod
+    def read_wells_silencing_by_well_number_and_well_area(cls):
+        return "/wells_silencing_router/find_well_silencing"
+
+    @classmethod
     def read_wells_silencing_response_all(cls):
         return "/wells_silencing_router/find_well_silencing_all"
 

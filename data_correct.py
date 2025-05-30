@@ -173,7 +173,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.column_add_wall_thicknessedit_type2 = FloatLineEdit()
         self.column_add_wall_thicknessedit_type2.setValidator(self.validator_float_wall_thickness)
         self.column_add_wall_thicknessedit_type2.setText(
-            f"{self.ifNone(self.data_well.column_additional_wall_thickness.get_value.strip().replace('.', ','))}"
+            f"{self.ifNone(self.data_well.column_additional_wall_thickness.get_value)}"
         )
         # self.column_add_wall_thicknessedit_type2.setClearButtonEnabled(True)
 

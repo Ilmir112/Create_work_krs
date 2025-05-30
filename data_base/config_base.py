@@ -13,6 +13,7 @@ from typing import Dict, List
 from abc import ABC, abstractmethod
 
 from decrypt import decrypt
+from server_response import ApiClient
 
 
 class DatabaseConnection(ABC):
@@ -674,16 +675,31 @@ class CheckWellExistence:
 
     def checking_well_database_month(self, region: str):
         date_string = self.check_correct_month()
-        if not self.db_connection:
-            return None
-        cursor = self.db_connection.cursor()
-        query = f"SELECT *  FROM {region} WHERE today=({self.path_index})"
-        cursor.execute(query, (date_string,))
+        result = None
+        if data_list.connect_in_base is False:
 
-        result = cursor.fetchone()
+            if not self.db_connection:
+                return None
+            cursor = self.db_connection.cursor()
+            query = f"SELECT *  FROM {region} WHERE today=({self.path_index})"
+            cursor.execute(query, (date_string,))
 
-        if cursor:
-            cursor.close()
+            result = cursor.fetchone()
+
+            if cursor:
+                cursor.close()
+        else:
+            from data_base.work_with_base import ClassifierWell
+            data = ClassifierWell.get_data_from_db(self, region)
+            if data:
+                for index, date in enumerate(data[0]):
+                    if '2025' in date:
+                        break
+                asaw = data[0][index]
+                date_in_base = datetime.strptime(data[0][index], "%Y-%m-%d").strftime('%d.%m.%Y')
+                if date_in_base == date_string:
+                    result = True
+
         # if self.db_connection:
         #     self.db_connection.close()
 
@@ -698,24 +714,35 @@ class CheckWellExistence:
 
     def checking_well_database_without_juming(self, well_number, deposit_area, region):
         stop_app = self.checking_well_database_month(region)
-        if not self.db_connection:
-            return None
-        with CursorContext(self.db_connection.cursor()) as cursor:
-            # Проверка наличия записи в базе данных
-            cursor.execute(f"SELECT * "
-                           f"FROM {region} "
-                           f"WHERE well_number=({self.path_index}) AND deposit_area=({self.path_index})",
-                           (str(well_number), deposit_area.replace('_', ' ')))
-            result = cursor.fetchone()
+        if data_list.connect_in_base is False:
+            if not self.db_connection:
+                return None
+            with CursorContext(self.db_connection.cursor()) as cursor:
+                # Проверка наличия записи в базе данных
+                cursor.execute(f"SELECT * "
+                               f"FROM {region} "
+                               f"WHERE well_number=({self.path_index}) AND deposit_area=({self.path_index})",
+                               (str(well_number), deposit_area.replace('_', ' ')))
+                result = cursor.fetchone()
 
-            # Если запись найдена, возвращается True, в противном случае возвращается False
-            if result:
-                QMessageBox.information(None, 'перечень без глушения',
-                                        f'Скважина {well_number} {deposit_area} состоит в перечне скважин без'
-                                        f' глушения на текущий квартал, '
-                                        f'в перечне от  {region}')
-                return True, stop_app
-            return False, stop_app
+
+        else:
+            self.params = {
+                "well_number": well_number,
+                "well_area": deposit_area,
+            }
+            result = ApiClient.request_params_get(
+                ApiClient.read_wells_silencing_by_well_number_and_well_area(),
+                self.params,
+            )
+        # Если запись найдена, возвращается True, в противном случае возвращается False
+        if result:
+            QMessageBox.information(None, 'перечень без глушения',
+                                    f'Скважина {well_number} {deposit_area} состоит в перечне скважин без'
+                                    f' глушения на текущий квартал, '
+                                    f'в перечне от  {region}')
+            return True, stop_app
+        return False, stop_app
 
     def check_category(self, well_number: str, deposit_area: str, region: str) -> List:
         try:

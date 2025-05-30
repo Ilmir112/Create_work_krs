@@ -12,6 +12,8 @@ from openpyxl.utils import column_index_from_string
 from openpyxl.utils.cell import range_boundaries, get_column_letter
 from openpyxl.workbook import Workbook
 from openpyxl_image_loader import SheetImageLoader
+
+from server_response import ApiClient
 from work_py.data_informations import dict_data_cdng
 
 from decrypt import decrypt
@@ -2232,7 +2234,7 @@ class WellData(FindIndexPZ):
                                         ).value
                                     )
                                     self.column_additional_wall_thickness = (
-                                        ProtectedIsDigit(data_add_column[1])
+                                        ProtectedIsDigit(data_add_column[1].strip().replace('.', ','))
                                     )
                                 except Exception:
 
@@ -2246,7 +2248,7 @@ class WellData(FindIndexPZ):
                                         )
                                     )
 
-                            except Exception:
+                            except Exception as e:
                                 self.column_additional_wall_thickness = (
                                     ProtectedIsNonNone("не корректно")
                                 )
@@ -2484,25 +2486,26 @@ class WellData(FindIndexPZ):
         if self.work_plan in ["krs", "prs"]:
             from data_base.config_base import connection_to_database
             from data_base.config_base import WorkDatabaseWell
+            if data_list.connect_in_base is False:
 
-            db = connection_to_database(decrypt("DB_WELL_DATA"))
-            check_in_base = WorkDatabaseWell(db, self)
-            tables_filter = check_in_base.get_tables_starting_with(
-                self.well_number.get_value,
-                self.well_area.get_value,
-                "ПР",
-                self.type_kr.split(" ")[0],
-            )
-            if tables_filter:
-                mes = QMessageBox.question(
-                    None,
-                    "Наличие в базе",
-                    f'В базе имеется план работ по скважине:\n {" ".join(tables_filter)}. '
-                    f"При продолжении план пересохранится, продолжить?",
+                db = connection_to_database(decrypt("DB_WELL_DATA"))
+                check_in_base = WorkDatabaseWell(db, self)
+                tables_filter = check_in_base.get_tables_starting_with(
+                    self.well_number.get_value,
+                    self.well_area.get_value,
+                    "ПР",
+                    self.type_kr.split(" ")[0],
                 )
-                if mes == QMessageBox.StandardButton.No:
-                    # self.pause_app()
-                    return
+                if tables_filter:
+                    mes = QMessageBox.question(
+                        None,
+                        "Наличие в базе",
+                        f'В базе имеется план работ по скважине:\n {" ".join(tables_filter)}. '
+                        f"При продолжении план пересохранится, продолжить?",
+                    )
+                    if mes == QMessageBox.StandardButton.No:
+                        # self.pause_app()
+                        return
         return True
 
     @staticmethod
