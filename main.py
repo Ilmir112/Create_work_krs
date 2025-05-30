@@ -2228,11 +2228,12 @@ class MyWindow(MyMainWindow):
 
         # # Запускаем обработчик исключений в отдельном потоке
         self.thread = QThread()
+        # self.work_thread = ExcelWorker
+        #
+        # for drive in ExcelWorker.drives:
+        #     self.work_thread.find_and_delete_files(drive)
         self.excepthook.moveToThread(self.thread)
-        self.work_thread = ExcelWorker
-
-        for drive in ExcelWorker.drives:
-            self.work_thread.find_and_delete_files(drive)
+        #
 
         # self.thread.started.connect(self.excepthook.handleException)
         self.thread.start()

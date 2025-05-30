@@ -269,7 +269,7 @@ class GnktOsvWindow(GnktModel):
                           f'(первичный-последующий спуск);\n' \
                           f'в интервале {niz_nkt - 20}-{self.data_well.perforation_roof - 10}м не ' \
                           f'более 2м/мин;\n' \
-                          f'в интервале {self.data_well.perforation_roof - 10}-{self.data_well.current_bottom}м не более 2-5 м/мин;'
+                          f'в интервале {self.data_well.perforation_sole + 10}-{self.data_well.current_bottom}м не более 2-5 м/мин;'
 
             down_gntk_str = f'Скорость подъёма по интервалам:\n'
             f'в интервале забой-{self.data_well.perforation_roof - 10}м не более 10 м/мин;\n'
