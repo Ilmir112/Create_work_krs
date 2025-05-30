@@ -69,7 +69,7 @@ class TabPageGnkt(TabPageUnion):
 
         self.acid_proc_label = QLabel("Концентрация кислоты", self)
         self.acid_proc_edit = QLineEdit(self)
-        self.acid_proc_edit.setText('15')
+        self.acid_proc_edit.setText('12')
         self.acid_proc_edit.setClearButtonEnabled(True)
         self.acid_proc_edit.setValidator(self.validator_int)
 

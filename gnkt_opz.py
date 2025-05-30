@@ -72,7 +72,7 @@ class TabPageGnkt(QWidget):
         self.skv_proc_label = QLabel("Концентрация СКВ", self)
         self.skv_proc_edit = QLineEdit(self)
         self.skv_proc_edit.setClearButtonEnabled(True)
-        self.skv_proc_edit.setText('15')
+        self.skv_proc_edit.setText('12')
         self.skv_proc_edit.setValidator(self.validator_int)
 
         self.acid_label = QLabel("необходимость кислотной обработки", self)
@@ -92,7 +92,7 @@ class TabPageGnkt(QWidget):
 
         self.acid_proc_label = QLabel("Концентрация кислоты", self)
         self.acid_proc_edit = QLineEdit(self)
-        self.acid_proc_edit.setText('15')
+        self.acid_proc_edit.setText('12')
         self.acid_proc_edit.setClearButtonEnabled(True)
         self.acid_proc_edit.setValidator(self.validator_int)
 
@@ -331,8 +331,8 @@ class GnktOpz(GnktModel):
             sole_plast = self.tableWidget.item(row, 2).text()
             svk_true_combo = self.tableWidget.cellWidget(row, 3).currentText()
             acid_edit = self.tableWidget.cellWidget(row, 4).currentText()
-            acid_proc_edit = int(float(self.tableWidget.item(row, 5).text()))
-            acid_volume_edit = round(float(self.tableWidget.item(row, 6).text()), 1)
+            acid_proc_edit = int(float(self.tableWidget.item(row, 5).text().replace(",", ".")))
+            acid_volume_edit = round(float(self.tableWidget.item(row, 6).text().replace(",", ".")), 1)
             acid_info.append(
                 [plast_combo, svk_true_combo, roof_plast, sole_plast, acid_edit, acid_proc_edit, acid_volume_edit])
             interval_sko += f'{roof_plast}-{sole_plast}, '
@@ -547,7 +547,7 @@ class GnktOpz(GnktModel):
              'Мастер ГНКТ, состав бригады', None],
             [None, 29, 'Сдать территорию скважину представителю Заказчика. Составить Акт.',
              None, None, None, None, None, None, None,
-             'Мастер ГНКТ, представитель Заказчика', None],
+             'Мастер ГНКТ, предст. Заказчика', None],
         ]
         paker_opr = [f'Опрессовать пакер на {self.data_well.max_admissible_pressure.get_value}атм',
                      5,

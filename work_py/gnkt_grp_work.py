@@ -169,7 +169,7 @@ class TabPageGnkt(TabPageUnion):
             self.acid_volume_edit.setClearButtonEnabled(True)
             self.acid_proc_label = QLabel("Концентрация кислоты", self)
             self.acid_proc_edit = QLineEdit(self)
-            self.acid_proc_edit.setText('15')
+            self.acid_proc_edit.setText('12')
             self.acid_proc_edit.setClearButtonEnabled(True)
             self.acid_proc_edit.setValidator(self.validator_int)
             self.pressure_Label = QLabel("Давление закачки", self)
@@ -836,7 +836,7 @@ class GnktModel(WindowUnion):
 
             elif '73' in str(nkt_in):
                 nkt_in = 73
-                nkt_str += f'{nkt_in}, \n'
+                nkt_str += f'{nkt_in} \n'
                 nkt_widht = 5.5
                 nkt_widht_str += f'{nkt_widht}\n'
                 vn_str += f'{nkt_in - 2 * nkt_widht}\n'
@@ -855,7 +855,7 @@ class GnktModel(WindowUnion):
                 volume = round((volume_vn * length) / 1000, 1)
                 volume_str += f'{volume}\n'
 
-            length_str += f'{length + len_a}, \n{length}-'
+            length_str += f'{length + len_a} \n{length}-'
             len_a += length
 
         nkt_widht_str = nkt_widht_str[:-1]
@@ -942,6 +942,10 @@ class GnktModel(WindowUnion):
             if length_paker > 4:
                 QMessageBox.warning(self, 'Длина пакера', 'Длина пакера больше 4м')
                 length_paker = 2.6
+        if isinstance(self.data_well.date_commissioning.get_value, datetime):
+            date_commissioning = self.data_well.date_commissioning.get_value.strftime('%d.%m.%Y')
+        else:
+            date_commissioning = self.data_well.date_commissioning.get_value
 
         schema_well_list = [
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -1103,7 +1107,7 @@ class GnktModel(WindowUnion):
              self.date_dmy(self.data_well.date_drilling_cancel),
              None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Дата ввода в эксплуатацию', None,
-             None, None, None, f'{self.data_well.date_commissioning.get_value}', None, None, None, None, None],
+             None, None, None, f'{date_commissioning}', None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Р в межколонном пространстве',
              None, None, None, None, self.data_well.pressure_mkp.get_value, None, ' ', None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Первоначальное Р опр-ки ЭК', None,

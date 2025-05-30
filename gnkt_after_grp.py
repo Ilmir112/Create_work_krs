@@ -356,6 +356,7 @@ def gnkt_work(self, volume_gntk, fluid_work_insert):
         [None, 29, f'Скорость подъёма по интервалам:\n'
                    f'в интервале забой-{self.data_well.perforation_roof + 10}м не более 10 м/мин;\n'
                    f'в интервале {self.data_well.perforation_roof + 10}-{self.data_well.perforation_roof - 10} не более 2 м/мин;\n'
+                   f'в интервале {self.data_well.perforation_roof - 10}-{niz_nkt - 20} не более 2 м/мин;\n'
                    f'в интервале {niz_nkt - 20}-2м не более 15-20 м/мин;\n'
                    f'в устьевом оборудовании не более 0.5 м/мин.',
          None, None, None, None, None, None, None,

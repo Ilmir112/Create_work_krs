@@ -70,7 +70,7 @@ class FindIndexPZ(MyMainWindow):
         self.category_h2s = 0
         self.category_gas_factor = 0
 
-        self.thread_excel = None
+        self.thread_excel = ExcelWorker(self)
 
         self.without_damping = False
         self.insert_index = 0
