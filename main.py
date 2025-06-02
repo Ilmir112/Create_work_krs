@@ -89,11 +89,10 @@ class ExcelWorker(QThread):
 
         check_true = True
 
-
-
         try:
-            db = connection_to_database(decrypt("DB_NAME_USER"))
-            self.check_correct_well = CheckWellExistence(db)
+            if data_list.connect_in_base:
+                db = connection_to_database(decrypt("DB_NAME_USER"))
+                self.check_correct_well = CheckWellExistence(db)
             check_true, stop_app = (
                 self.check_correct_well.checking_well_database_without_juming(
                     well_number, deposit_area, region
@@ -109,9 +108,6 @@ class ExcelWorker(QThread):
                 f"Ошибка при проверке записи: {type(e).__name__}\n\n{str(e)}",
             )
             return check_true
-
-
-
 
     # Функция для поиска и удаления файлов по условию
     @staticmethod
@@ -2220,7 +2216,6 @@ class MyWindow(MyMainWindow):
         self.table_pvr = None
         self.data_well = None
 
-
         threading.Timer(2.0, self.close_splash).start()
 
         self.log_widget = QPlainTextEditLogger(self)
@@ -3686,10 +3681,11 @@ class MyWindow(MyMainWindow):
         data_list.pause = True
         if self.insert_index:
             if self.insert_index > self.data_well.count_row_well:
-                assde = self.insert_index-self.data_well.count_row_well -1
-                self.data_well.data_list[self.insert_index-self.data_well.count_row_well][1] = self.data_well.current_bottom
+                assde = self.insert_index - self.data_well.count_row_well - 1
+                self.data_well.data_list[self.insert_index - self.data_well.count_row_well][
+                    1] = self.data_well.current_bottom
 
-                self.data_well.data_list[self.insert_index-self.data_well.count_row_well][2] = json.dumps(
+                self.data_well.data_list[self.insert_index - self.data_well.count_row_well][2] = json.dumps(
                     self.data_well.dict_perforation, default=str, ensure_ascii=False, indent=4
                 )
 

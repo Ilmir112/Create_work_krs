@@ -690,13 +690,12 @@ class CheckWellExistence:
                 cursor.close()
         else:
             from data_base.work_with_base import ClassifierWell
-            data = ClassifierWell.get_data_from_db(self, region)
+            region_json = {"region": region}
+            data = ApiClient.request_post(ApiClient.read_wells_silencing_response_first(), region_json)
+
             if data:
-                for index, date in enumerate(data[0]):
-                    if '2025' in date:
-                        break
-                asaw = data[0][index]
-                date_in_base = datetime.strptime(data[0][index], "%Y-%m-%d").strftime('%d.%m.%Y')
+                date_in_base = data["today"]
+                date_in_base = datetime.strptime(date_in_base, "%Y-%m-%d").strftime('%d.%m.%Y')
                 if date_in_base == date_string:
                     result = True
 

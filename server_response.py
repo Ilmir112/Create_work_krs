@@ -210,6 +210,10 @@ class ApiClient:
         return "/wells_silencing_router/find_well_silencing_all"
 
     @classmethod
+    def read_wells_silencing_response_first(cls):
+        return "/wells_silencing_router/find_well_silencing_all_one"
+
+    @classmethod
     def read_wells_silencing_response_for_delete_well(cls):
         return "/wells_silencing_router/delete_well_silencing"
 
