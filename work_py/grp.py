@@ -187,9 +187,9 @@ class GrpWindow(WindowUnion):
     def grpPaker(self, diameter_paker, paker_depth, paker_khost, gis_otz_true_quest, gis_otz_after_true_quest,
                  normalization_true_quest, current_depth):
         if 'Ойл' in data_list.contractor:
-            schema_grp = '6'
+            schema_grp = '5'
         elif 'РН' in data_list.contractor:
-            schema_grp = '6'
+            schema_grp = '5'
 
         if self.data_well.column_diameter.get_value > 133:
             nkt_diam = 89
@@ -224,7 +224,7 @@ class GrpWindow(WindowUnion):
              'мастер КРС', ''],
             [f'Привязка по ГК и ЛМ', None,
              f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через РИТС {data_list.contractor}". '
-             f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №11 утвержденной главным инженером  '
+             f'Произвести  монтаж ПАРТИИ ГИС согласно схемы №11 утвержденной главным инженером  '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
              f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины Отбить забой по ГК и ЛМ',
              None, None, None, None, None, None, None,

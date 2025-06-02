@@ -144,103 +144,72 @@ class CreatePZ(MyMainWindow):
                              top=Side(style='thin', color=red),
                              bottom=Side(style='thin', color=red))
         max_row = ws.max_row
-        if 'Ойл' in data_list.contractor:
-            for row_index, row_gnvp in enumerate(dict_events_gnvp[self.data_well.work_plan]):
-                data = ws.cell(row=row_index + max_row + 1, column=2)
 
-                data.value = row_gnvp[1]
-                ws.merge_cells(start_row=row_index + max_row + 1, start_column=2, end_row=row_index + max_row + 1,
-                               end_column=12 + merge_count)
-                if 'Мероприятия' in str(data.value) or \
-                        'Меры по предупреждению' in str(data.value) or \
-                        ' ТЕХНОЛОГИЧЕСКИЕ ПРОЦЕССЫ' in str(data.value) or \
-                        'Признаки отравления сернистым водородом' in str(data.value) or \
-                        'Контроль воздушной среды проводится:' in str(data.value) or \
-                        'Требования безопасности при выполнении работ:' in str(data.value) or \
-                        'Меры по предупреждению' in str(data.value) or \
-                        'Меры по предупреждению' in str(data.value) or \
-                        'Меры по предупреждению' in str(data.value) or \
-                        "о недопустимости нецелевого расхода" in str(data.value):
-                    data.alignment = Alignment(wrap_text=True, horizontal='center',
-                                               vertical='center')
-                    data.fill = data_list.yellow_fill
-                    data.font = Font(name='Times New Roman', size=13, bold=True)
 
-                else:
-                    data.alignment = Alignment(wrap_text=True, horizontal='left',
-                                               vertical='center')
+        self.data_well.insert_index = max_row + 1
+        # Устанавливаем красный цвет для текста
+        red_font = Font(name='Arial Cyr', size=13, color='FF0000', bold=True)
+        for i in range(self.data_well.insert_index,
+                       self.data_well.insert_index + len(dict_events_gnvp[self.data_well.work_plan])):
+            for col in range(12):
+                data = ws.cell(row=i, column=col + 1)
+                data.border = thin_border
+                data.value = dict_events_gnvp[self.data_well.work_plan][i - self.data_well.insert_index][col]
 
-                    data.font = Font(name='Arial', size=12)
-                if not data.value is None:
-                    text = data.value
-                    for key, value in text_width_dict.items():
-                        if value[0] <= len(text) <= value[1]:
-                            ws.row_dimensions[row_index + max_row + 1].height = int(key) * 1.1
+                ws.cell(row=i, column=col + 1).font = Font(name='Arial Cyr', size=13, bold=False)
+            data_2 = ws.cell(row=i, column=3).value
+            data_1 = ws.cell(row=i, column=2).value
 
-        elif 'РН' in data_list.contractor:
-            self.data_well.insert_index = max_row + 1
-            # Устанавливаем красный цвет для текста
-            red_font = Font(name='Arial Cyr', size=13, color='FF0000', bold=True)
-            for i in range(self.data_well.insert_index,
-                           self.data_well.insert_index + len(dict_events_gnvp[self.data_well.work_plan])):
-                for col in range(12):
-                    data = ws.cell(row=i, column=col + 1)
-                    data.border = thin_border
-                    data.value = dict_events_gnvp[self.data_well.work_plan][i - self.data_well.insert_index][col]
+            if 'Мероприятия' in str(data_1):
+                ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
+                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                               vertical='center')
 
-                    ws.cell(row=i, column=col + 1).font = Font(name='Arial Cyr', size=13, bold=False)
-                data_2 = ws.cell(row=i, column=3).value
-                data_1 = ws.cell(row=i, column=2).value
-                if 'Мероприятия' in str(data_1):
-                    ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
-                    ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                   vertical='center')
+                ws.cell(row=i, column=2).font = Font(name='Arial Cyr', size=13, bold=True)
+            elif 'При работе с вертлюгами обеспечить' in str(data_2) \
+                    or 'На основании приказа' in str(data_2) \
+                    or 'Согласно мероприятий по снижению а' in str(data_2) \
+                    or 'Во время нештатных ' in str(data_2) \
+                    or 'Для предотвращения падения ' in str(data_2) \
+                    or 'После герметизации устья' in str(data_2) \
+                    or 'При свинчивании и развинчивании' in str(data_2) \
+                    or 'Сборку фрезерующего, ' in str(data_2) \
+                    or 'При нулевых и отрицательных' in str(data_2):
+                ws.merge_cells(start_row=i, start_column=3, end_row=i, end_column=11)
+                ws.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                               vertical='center')
+                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                               vertical='center')
+                ws.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                vertical='center')
+                ws.cell(row=i, column=3).font = Font(name='Arial Cyr', size=13, bold=True)
+                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                               vertical='center')
+            else:
+                ws.merge_cells(start_row=i, start_column=3, end_row=i, end_column=11)
+                ws.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
+                                                               vertical='center')
 
-                    ws.cell(row=i, column=2).font = Font(name='Arial Cyr', size=13, bold=True)
-                elif 'При работе с вертлюгами обеспечить' in str(data_2) \
-                        or 'На основании приказа' in str(data_2) \
-                        or 'Согласно мероприятий по снижению а' in str(data_2) \
-                        or 'Во время нештатных ' in str(data_2) \
-                        or 'Для предотвращения падения ' in str(data_2) \
-                        or 'После герметизации устья' in str(data_2) \
-                        or 'При свинчивании и развинчивании' in str(data_2) \
-                        or 'Сборку фрезерующего, ' in str(data_2) \
-                        or 'При нулевых и отрицательных' in str(data_2):
-                    ws.merge_cells(start_row=i, start_column=3, end_row=i, end_column=11)
-                    ws.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                   vertical='center')
-                    ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                   vertical='center')
-                    ws.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                    vertical='center')
-                    ws.cell(row=i, column=3).font = Font(name='Arial Cyr', size=13, bold=True)
-                    ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                   vertical='center')
-                else:
-                    ws.merge_cells(start_row=i, start_column=3, end_row=i, end_column=11)
-                    ws.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
-                                                                   vertical='center')
+                ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                               vertical='center')
+                ws.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
+                                                                vertical='center')
+                ws.cell(row=i, column=3).font = Font(name='Arial Cyr', size=13, bold=False)
 
-                    ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                   vertical='center')
-                    ws.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
-                                                                    vertical='center')
-                    ws.cell(row=i, column=3).font = Font(name='Arial Cyr', size=13, bold=False)
+            if 'ВЫ ДОЛЖНЫ ОТКАЗАТЬСЯ' in str(data_2):
+                ws.cell(row=i, column=3).font = red_font
 
-                if 'ВЫ ДОЛЖНЫ ОТКАЗАТЬСЯ' in str(data_2):
-                    ws.cell(row=i, column=3).font = red_font
-
-                if data_2:
-                    text = ws.cell(row=i, column=3).value
-                    text1 = ws.cell(row=i, column=2).value
-                    for key, value in text_width_dict.items():
-                        text_length = len(text)
-                        if value[0] <= text_length <= value[1]:
-                            if '\n' in text:
-                                row_dimension_value = int(len(text) / 4 + text.count('\n') * 6)
-                            else:
-                                row_dimension_value = int(len(text) / 4)
-                            ws.row_dimensions[i].height = row_dimension_value
+            if data_2:
+                text = ws.cell(row=i, column=3).value
+                text1 = ws.cell(row=i, column=2).value
+                for key, value in text_width_dict.items():
+                    text_length = len(text)
+                    if value[0] <= text_length <= value[1]:
+                        if '\n' in text:
+                            row_dimension_value = int(len(text) / 4 + text.count('\n') * 3)
+                        else:
+                            row_dimension_value = int(len(text) / 4)
+                        ws.row_dimensions[i].height = row_dimension_value
 
         self.data_well.insert_index += len(dict_events_gnvp[self.data_well.work_plan]) - 1
 
