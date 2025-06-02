@@ -2,6 +2,9 @@
 import json
 import os
 import shutil
+
+import requests.exceptions
+
 import data_list
 import sys
 import socket

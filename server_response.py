@@ -69,7 +69,6 @@ class ApiClient:
     def request_post(path, json_data):
 
         url = ApiClient.get_endpoint(path)
-
         try:
             response = requests.post(url, json=ApiClient.serialize_datetime(json_data))
             response.raise_for_status()
@@ -210,6 +209,10 @@ class ApiClient:
         return "/wells_silencing_router/find_well_silencing_all"
 
     @classmethod
+    def send_logger_message(cls):
+        return "/prometheus/logger_send"
+
+    @classmethod
     def read_wells_silencing_response_first(cls):
         return "/wells_silencing_router/find_well_silencing_all_one"
 
@@ -259,6 +262,11 @@ class ApiClient:
     def add_new_user(cls, params_dict, api_url):
         serializable_params = cls.serialize_datetime(params_dict)
         return cls.request_post(api_url, serializable_params)
+
+    @classmethod
+    def send_logs(cls, params_dict, api_url):
+        # serializable_params = cls.serialize_datetime(params_dict)
+        return cls.request_post(api_url, params_dict)
 
     @classmethod
     def find_all(cls, api_url):

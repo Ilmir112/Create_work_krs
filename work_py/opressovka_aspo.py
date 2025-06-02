@@ -4,6 +4,7 @@ import data_list
 from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
     QTabWidget, QPushButton
 
+from log_files.log import logger
 from work_py.opressovka import OpressovkaEK, TabPageSo
 from work_py.parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
 from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm
@@ -49,20 +50,21 @@ class TabPageSoAspo(TabPageUnion):
         self.grid.addWidget(self.paker_depth_edit, 4, 3)
 
     def update_paker(self):
-
-        if self.data_well.open_trunk_well is True:
-            paker_depth = self.paker_depth_edit.text()
-            if paker_depth != '':
-                paker_khost = self.data_well.current_bottom - int(paker_depth)
-                self.paker_khost_edit.setText(f'{paker_khost}')
-                self.diameter_paker_edit.setText(f'{TabPageSo.paker_diameter_select(int(paker_depth))}')
-        else:
-            paker_depth = self.paker_depth_edit.text()
-            if paker_depth != '':
-                paker_khost = 10
-                self.paker_khost_edit.setText(f'{paker_khost}')
-                self.diameter_paker_edit.setText(f'{TabPageSo.paker_diameter_select(int(paker_depth))}')
-
+        try:
+            if self.data_well.open_trunk_well is True:
+                paker_depth = self.paker_depth_edit.text()
+                if paker_depth != '':
+                    paker_khost = self.data_well.current_bottom - int(paker_depth)
+                    self.paker_khost_edit.setText(f'{paker_khost}')
+                    self.diameter_paker_edit.setText(f'{self.paker_diameter_select(int(paker_depth))}')
+            else:
+                paker_depth = self.paker_depth_edit.text()
+                if paker_depth != '':
+                    paker_khost = 10
+                    self.paker_khost_edit.setText(f'{paker_khost}')
+                    self.diameter_paker_edit.setText(f'{self.paker_diameter_select(int(paker_depth))}')
+        except Exception as e:
+            logger.critical(e)
 
 class TabWidget(TabWidgetUnion):
     def __init__(self, parent=None):
@@ -88,9 +90,12 @@ class PakerAspo(WindowUnion):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
-        diameter_paker = int(float(self.tab_widget.currentWidget().diameter_paker_edit.text()))
-        paker_khost = int(float(self.tab_widget.currentWidget().paker_khost_edit.text()))
-        paker_depth = int(float(self.tab_widget.currentWidget().paker_depth_edit.text()))
+        try:
+            diameter_paker = int(float(self.tab_widget.currentWidget().diameter_paker_edit.text().replace(",", ".")))
+            paker_khost = int(float(self.tab_widget.currentWidget().paker_khost_edit.text().replace(",", ".")))
+            paker_depth = int(float(self.tab_widget.currentWidget().paker_depth_edit.text().replace(",", ".")))
+        except ValueError:
+            logger.critical()
 
         if int(paker_khost) + int(paker_depth) > self.data_well.current_bottom:
             QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер '

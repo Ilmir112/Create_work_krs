@@ -217,7 +217,7 @@ class Change_fluid_Window(WindowUnion):
             else:
                 plast_new_combo = currentWidget.plast_new_combo.text()
 
-            pressure_new_edit = float(self.tab_widget.currentWidget().pressure_new_edit.text())
+            pressure_new_edit = float(self.tab_widget.currentWidget().pressure_new_edit.text().replace(',', '.'))
 
             if (plast_new_combo == '' or fluid_new_edit == '' or pressure_new_edit == ''):
                 mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
