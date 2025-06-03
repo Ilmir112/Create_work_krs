@@ -2,6 +2,7 @@
 from PyQt5.QtWidgets import  QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QPushButton
 
 import data_list
+from log_files.log import logger
 
 from work_py.acid_paker import CheckableComboBox
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
@@ -161,6 +162,7 @@ class BlockPackWindow(WindowUnion):
             block_type_edit = round(
                 float(self.tab_widget.currentWidget().block_type_volume_edit.text().replace(',', '.')), 1)
         except Exception as e:
+            logger.critical(e)
             QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
 
         work_list = self.block_pack_work(current_edit, pero_combo,

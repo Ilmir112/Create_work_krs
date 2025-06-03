@@ -24,7 +24,6 @@ class TabPageSoChange(TabPageUnion):
         self.need_change_zgs_combo = QComboBox(self)
         self.need_change_zgs_combo.addItems(['Нет', 'Да'])
 
-
         self.plast_new_label = QLabel('индекс нового пласта', self)
         aaddf = self.data_well.plast_project
         if self.data_well.plast_project:
@@ -182,7 +181,7 @@ class TabWidget(TabWidgetUnion):
         self.addTab(TabPageSoChange(parent), 'Смена объема')
 
 
-class Change_fluid_Window(WindowUnion):
+class ChangeFluidWindow(WindowUnion):
     def __init__(self, data_well, table_widget, parent=None):
         super().__init__(data_well)
 
@@ -220,13 +219,13 @@ class Change_fluid_Window(WindowUnion):
             pressure_new_edit = float(self.tab_widget.currentWidget().pressure_new_edit.text().replace(',', '.'))
 
             if (plast_new_combo == '' or fluid_new_edit == '' or pressure_new_edit == ''):
-                mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
+                QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
                 return
             if fluid_new_edit > 1.65 or fluid_new_edit < 0.87:
-                mes = QMessageBox.critical(self, 'Ошибка', 'Жидкость не может быть данным удельным весом')
+                QMessageBox.critical(self, 'Ошибка', 'Жидкость не может быть данным удельным весом')
                 return
-            if pressure_new_edit < 10 == False:
-                mes = QMessageBox.critical(self, 'Ошибка', 'Ожидаемое давление слишком низкое')
+            if pressure_new_edit >= 10:
+                QMessageBox.critical(self, 'Ошибка', 'Ожидаемое давление слишком низкое')
                 return
 
             if self.data_well.plast_project:
@@ -235,15 +234,13 @@ class Change_fluid_Window(WindowUnion):
                 plast_new_combo = self.tab_widget.currentWidget().plast_new_combo.text()
 
                 self.data_well.dict_category.setdefault(plast_new_combo, {}).setdefault('отключение',
-                                                                                                False)
+                                                                                        False)
                 self.data_well.plast_project.append(plast_new_combo)
 
             pressure_new_edit = self.tab_widget.currentWidget().pressure_new_edit.text()
 
             if pressure_new_edit != '':
                 pressure_new_edit = int(float(pressure_new_edit.replace(',', '.')))
-
-
 
             if self.data_well.dict_category[plast_new_combo]['отключение'] != 'планируемый':
                 h2s_pr_edit = self.tab_widget.currentWidget().h2s_pr_edit.text().replace(',', '.')
@@ -297,7 +294,7 @@ class Change_fluid_Window(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window  = None
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
     def fluid_change_old_plast(self, fluid_new_edit):
@@ -326,8 +323,8 @@ class Change_fluid_Window(WindowUnion):
         from work_py.alone_oreration import well_volume, update_fluid
 
         fluid_work, self.data_well.fluid_work_short, plast, expected_pressure = need_h2s(self, fluid_new,
-                                                                                                 plast_new,
-                                                                                                 pressure_new)
+                                                                                         plast_new,
+                                                                                         pressure_new)
 
         fluid_change_list = [
             [

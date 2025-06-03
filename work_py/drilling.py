@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdi
 
 import data_list
 from PyQt5.QtCore import Qt
+
+from log_files.log import logger
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
 
@@ -315,6 +317,7 @@ class DrillWindow(WindowUnion):
                 return
             need_privyazka_q_combo = self.tab_widget.currentWidget().need_privyazka_q_combo.currentText()
         except Exception as e:
+            logger.critical(e)
             QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
 
         self.cutter_calibrator_combo = self.tab_widget.currentWidget().cutter_calibrator_combo.currentText()

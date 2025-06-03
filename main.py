@@ -51,7 +51,7 @@ from openpyxl.workbook import Workbook
 from openpyxl.styles import Alignment, Font
 from block_name import region_select
 
-from log_files.log import logger, QPlainTextEditLogger
+from log_files.log import logger
 from openpyxl.drawing.image import Image
 from PyQt5.QtCore import QThread, pyqtSlot, Qt, QObject, pyqtSignal, QTimer
 from PyQt5.QtGui import QPixmap
@@ -68,15 +68,12 @@ class UncaughtExceptions(QObject):
 
     @pyqtSlot(object)
     def handle_exception(self, ex):
-        try:
-            logger.critical(
+       logger.critical(
                 f"{self.data_well.well_number.get_value}"
                 f" {self.data_well.well_area.get_value} Критическая ошибка: {ex}"
             )
-        except:
-            logger.critical(
-                f"{self.data_well.well_number} {self.data_well.well_area} Критическая ошибка: {ex}"
-            )
+
+
 
 
 class ExcelWorker(QThread):
@@ -112,7 +109,7 @@ class ExcelWorker(QThread):
             )
             return check_true
 
-    # Функция для поиска и удаления файлов по условию
+
     @staticmethod
     def find_and_delete_files(drive):
         for root, dirs, files in os.walk(drive):
@@ -1732,7 +1729,10 @@ class MyMainWindow(QMainWindow):
             140: (601, 700),
             160: (701, 800),
             180: (801, 900),
-            200: (901, 1500),
+            200: (901, 1200),
+            250: (1201, 1350),
+            300: (1351, 1500),
+            350: (1501, 2000)
         }
         index_setSpan = 0
         if work_plan == "gnkt_frez":
@@ -1915,7 +1915,7 @@ class MyMainWindow(QMainWindow):
                         text = data
                         for key, value in text_width_dict.items():
                             if value[0] <= len(text) <= value[1]:
-                                text_width = key
+                                text_width = key + text.count("\n") * 4
                                 table_widget.setRowHeight(row, int(text_width))
         if "gnkt" not in work_plan and self.data_well.insert_index2:
             for row in range(table_widget.rowCount()):
@@ -2221,9 +2221,9 @@ class MyWindow(MyMainWindow):
 
         threading.Timer(2.0, self.close_splash).start()
 
-        self.log_widget = QPlainTextEditLogger(self)
-        logger.addHandler(self.log_widget)
-        self.setCentralWidget(self.log_widget.widget)
+        # self.log_widget = QPlainTextEditLogger(self)
+        # logger.addHandler(self.log_widget)
+        # self.setCentralWidget(self.log_widget.widget)
 
         # Обработка критических ошибок
         self.excepthook = UncaughtExceptions(self.data_well)
@@ -2236,9 +2236,8 @@ class MyWindow(MyMainWindow):
         # for drive in ExcelWorker.drives:
         #     self.work_thread.find_and_delete_files(drive)
         self.excepthook.moveToThread(self.thread)
-        #
 
-        # self.thread.started.connect(self.excepthook.handleException)
+        # self.thread.started.connect(self.excepthook.handle_exception)
         self.thread.start()
 
         try:
@@ -2250,13 +2249,12 @@ class MyWindow(MyMainWindow):
                 f"{data_list.path_image}imageFiles/icon/zima.png"
             )  # путь к  изображению
 
-            # # splash_pix = QPixmap(f"{data_list.path_image}imageFiles/icon/zima.png")  # путь к  изображению
-            # splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
-            # splash.setMask(splash_pix.mask())
-            # splash.show()
+            splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+            splash.setMask(splash_pix.mask())
+            splash.show()
 
-            # # Задержка на )5 секунд
-            # QTimer.singleShot(1000, splash.close
+            # Задержка на )5 секунд
+            QTimer.singleShot(1000, splash.close)
 
             data_list.connect_in_base, self.db = connect_to_database(
                 decrypt("DB_NAME_USER")
@@ -2269,6 +2267,7 @@ class MyWindow(MyMainWindow):
 
             data_list.pause = False
         except Exception as e:
+            logger.critical(e)
             QMessageBox.warning(
                 None,
                 "КРИТИЧЕСКАЯ ОШИБКА",
@@ -3530,9 +3529,9 @@ class MyWindow(MyMainWindow):
         self.populate_row(self.insert_index, pvo_cat1_work_list, self.table_widget)
 
     def fluid_change_action(self):
-        from work_py.change_fluid import Change_fluid_Window
+        from work_py.change_fluid import ChangeFluidWindow
 
-        self.add_window(Change_fluid_Window)
+        self.add_window(ChangeFluidWindow)
 
     def clay_solision(self):
         from work_py.claySolution import ClayWindow
@@ -4411,6 +4410,7 @@ class SaveInExcel(MyWindow):
         except:
             return num
 
+
     def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
         global cell_num
         from openpyxl.utils.cell import range_boundaries, get_column_letter
@@ -4432,7 +4432,12 @@ class SaveInExcel(MyWindow):
             170: (601, 700),
             190: (701, 800),
             230: (801, 1000),
-            270: (1000, 1500),
+            270: (1000, 1200),
+            300: (1200, 1500),
+            330: (1501, 1700),
+            350: (1701, 2000),
+            380: (1701, 2000),
+            400: (2001, 3000)
         }
 
         for ind, _range in enumerate(ws.merged_cells.ranges):
@@ -4445,12 +4450,14 @@ class SaveInExcel(MyWindow):
         # print(col_width)
         for i, row_data in enumerate(work_list):
             for column, data in enumerate(row_data):
-                if column == 2:
+                if column == 2 and i > ind_ins:
                     if data is not None:
                         text = data
+                        text_len = len(text)
                         for key, value in text_width_dict.items():
-                            if value[0] <= len(text) <= value[1]:
-                                ws2.row_dimensions[i + 1].height = int(key)
+                            if value[0] <= text_len <= value[1]:
+                                ws2.row_dimensions[i + 1].height = min([400, int(key) + text.count("\n") * 3])
+
         if "prs" not in self.data_well.work_plan:
             head = self.head_ind(0, ind_ins)
             merge_column = 10

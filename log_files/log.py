@@ -21,17 +21,18 @@ class FastAPILogHandler(logging.Handler):
                 'log': log_entry,
                 'level': record.levelname,
                 'logger': record.name,
-                'created': record.created
+                "filename": record.filename,
+                "line": record.lineno
             }
 
             response = ApiClient.request_post(self.url, payload)
-            if response.status_code == 200:
-                return True
 
         except requests.exceptions.RequestException as e:
             logger.critical(f'Ошибка при отправке логов {e}')
+            return
         except Exception as e:
             logger.critical(f'Ошибка при обработке исключений при отправке логов {e}')
+            return
 
 
 # Настройка логгера
@@ -56,17 +57,16 @@ logger.addHandler(file_handler)
 logger.addHandler(console_handler)
 logger.addHandler(fastapi_handler)
 
-
-class QPlainTextEditLogger(logging.Handler, QObject):
-    appendPlainText = pyqtSignal(str)
-
-    def __init__(self, parent):
-        super().__init__()
-        QObject.__init__(self)
-        self.widget = QPlainTextEdit(parent)
-        self.widget.setReadOnly(True)
-        self.appendPlainText.connect(self.widget.appendPlainText)
-
-    def emit(self, record):
-        msg = self.format(record)
-        self.appendPlainText.emit(msg)
+# class QPlainTextEditLogger(logging.Handler, QObject):
+#     appendPlainText = pyqtSignal(str)
+#
+#     def __init__(self, parent):
+#         super().__init__()
+#         QObject.__init__(self)
+#         self.widget = QPlainTextEdit(parent)
+#         self.widget.setReadOnly(True)
+#         self.appendPlainText.connect(self.widget.appendPlainText)
+#
+#     def emit(self, record):
+#         msg = self.format(record)
+#         self.appendPlainText.emit(msg)

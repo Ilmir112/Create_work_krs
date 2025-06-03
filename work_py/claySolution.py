@@ -1,3 +1,4 @@
+from log_files.log import logger
 from work_py.alone_oreration import volume_vn_ek, volume_vn_nkt, well_volume
 
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
@@ -167,15 +168,18 @@ class ClayWindow(WindowUnion):
         self.roof_rir_edit, self.sole_rir_edit, self.volume_cement = '', '', ''
 
     def add_work(self):
-        self.current_widget = self.tab_widget.currentWidget()
-        self.purpose_of_clay = self.current_widget.purpose_of_clay_combo.currentText()
+        try:
+            self.current_widget = self.tab_widget.currentWidget()
+            self.purpose_of_clay = self.current_widget.purpose_of_clay_combo.currentText()
 
-        self.strategies = {
-            'сбитие приемистости': ClaySolutionForRir(self),
-            'в колонне': ClaySolutionForEk(self)
-        }
+            self.strategies = {
+                'сбитие приемистости': ClaySolutionForRir(self),
+                'в колонне': ClaySolutionForEk(self)
+            }
 
-        strategy = self.strategies.get(self.purpose_of_clay)
+            strategy = self.strategies.get(self.purpose_of_clay)
+        except Exception as e:
+            logger.critical(e)
         if strategy:
             work_list = strategy.add_work_clay()
             self.populate_row(self.insert_index, work_list, self.table_widget)

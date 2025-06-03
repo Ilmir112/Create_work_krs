@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QStyledItemDelegate, qApp, QMessageBox,
     QTableWidgetItem, QLineEdit
 
 import data_list
+from log_files.log import logger
 from work_py.alone_oreration import kot_work
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm
@@ -82,8 +83,8 @@ class CheckableComboBoxChild(QComboBox):
                         item.setCheckState(Qt.Checked)
                     return False
             return False
-        except Exception:
-            pass
+        except Exception as e:
+            logger.critical(e)
 
     def timerEvent(self, event):
 

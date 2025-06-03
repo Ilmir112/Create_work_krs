@@ -11,7 +11,7 @@ from H2S import calv_h2s
 
 from work_py.alone_oreration import well_volume
 
-from work_py.change_fluid import Change_fluid_Window
+from work_py.change_fluid import ChangeFluidWindow
 
 from work_py.alone_oreration import need_h2s
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
@@ -1420,7 +1420,7 @@ class SwabWindow(WindowUnion):
                                   'мастер КРС', ovtr4])
 
         if self.need_change_zgs_combo == 'Да':
-            paker_list.extend(Change_fluid_Window.fluid_change(self, self.plast_new, self.fluid_new, self.pressure_new))
+            paker_list.extend(ChangeFluidWindow.fluid_change(self, self.plast_new, self.fluid_new, self.pressure_new))
             paker_list.append([None, None,
                                f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {self.swab_paker_depth}м с доливом скважины в '
                                f'объеме {round(self.swab_paker_depth * 1.12 / 1000, 1)}м3 удельным весом'
@@ -1628,7 +1628,7 @@ class SwabWindow(WindowUnion):
 
         if self.need_change_zgs_combo == 'Да':
             # print(plast_new, fluid_new, pressure_new)
-            paker_list.extend(Change_fluid_Window.fluid_change(self, self.plast_new, self.fluid_new, self.pressure_new))
+            paker_list.extend(ChangeFluidWindow.fluid_change(self, self.plast_new, self.fluid_new, self.pressure_new))
             paker_list.append([None, None,
                                f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {self.swab_paker_depth}м с доливом скважины в '
                                f'объеме {round(self.swab_paker_depth * 1.12 / 1000, 1)}м3 '
@@ -1783,7 +1783,7 @@ class SwabWindow(WindowUnion):
         ]
 
         if self.need_change_zgs_combo == 'Да':
-            paker_list.extend(Change_fluid_Window.fluid_change(self, self.plast_new, self.fluid_new, self.pressure_new))
+            paker_list.extend(ChangeFluidWindow.fluid_change(self, self.plast_new, self.fluid_new, self.pressure_new))
             paker_list.append([None, None,
                                f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {self.swab_paker_depth}м с '
                                f'доливом скважины в '
@@ -1894,7 +1894,7 @@ class SwabWindow(WindowUnion):
                                   'мастер КРС', ovtr4])
 
         if self.need_change_zgs_combo == 'Да':
-            paker_list.extend(Change_fluid_Window.fluid_change(self, self.plast_new, self.fluid_new, self.pressure_new))
+            paker_list.extend(ChangeFluidWindow.fluid_change(self, self.plast_new, self.fluid_new, self.pressure_new))
             paker_list.append([None, None,
                                f'Поднять {paker_select} на НКТ{nkt_diam} c глубины {self.swab_paker_depth}м с доливом скважины в '
                                f'объеме {round(self.swab_paker_depth * 1.12 / 1000, 1)}м3 удельным весом '

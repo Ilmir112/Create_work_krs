@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QMessageBox
 
+from log_files.log import logger
+
 
 class CalcFond:
 
@@ -39,5 +41,6 @@ class CalcFond:
                 calc_pressure_dict[nkt_l] = 149 - p if pressure_nkt < 149 - p else pressure_nkt
         except Exception as e:
             QMessageBox.warning(None, 'Ошибка', f'Ошибка расчета опрессовки НКТ {type(e).__name__}\n\n{str(e)}')
+            logger.critical(e)
         return calc_pressure_dict
 

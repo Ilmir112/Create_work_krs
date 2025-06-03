@@ -689,7 +689,6 @@ class CheckWellExistence:
             if cursor:
                 cursor.close()
         else:
-            from data_base.work_with_base import ClassifierWell
             region_json = {"region": region}
             data = ApiClient.request_post(ApiClient.read_wells_silencing_response_first(), region_json)
 

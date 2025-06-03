@@ -5,6 +5,7 @@ from openpyxl.descriptors import String
 import data_list
 from abc import ABC, abstractmethod
 
+from log_files.log import logger
 from main import MyMainWindow
 
 from work_py.parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
@@ -233,33 +234,35 @@ class GnoDescentWindow(WindowUnion):
 
 
     def add_work(self):
+        try:
+            self.current_widget = self.tab_widget.currentWidget()
+            self.lift_key = self.current_widget.gno_combo.currentText()
+            if sum(list(self.data_well.dict_nkt_after.values())) > self.data_well.current_bottom and \
+                    self.lift_key not in ['ОРД', 'ОРЗ']:
+                QMessageBox.warning(self, 'Ошибка', f'Длина НКТ {sum(list(self.data_well.dict_nkt_before.values()))}м '
+                                                    f'После ремонта больше текущего забоя {self.data_well.current_bottom}м')
+                return
 
-        self.current_widget = self.tab_widget.currentWidget()
-        self.lift_key = self.current_widget.gno_combo.currentText()
-        if sum(list(self.data_well.dict_nkt_after.values())) > self.data_well.current_bottom and \
-                self.lift_key not in ['ОРД', 'ОРЗ']:
-            QMessageBox.warning(self, 'Ошибка', f'Длина НКТ {sum(list(self.data_well.dict_nkt_before.values()))}м '
-                                                f'После ремонта больше текущего забоя {self.data_well.current_bottom}м')
-            return
 
+            if self.check_descent_paker() is None:
+                return
 
-        if self.check_descent_paker() is None:
-            return
-
-        self.lift_dict_strategies = {
-            'НН с пакером': DescentNnWithPaker(self),
-            'НВ с пакером': DescentNvWithPaker(self),
-            'ЭЦН с пакером': DescentEcnWithPaker(self),
-            'ЭЦН': DescentEcn(self),
-            'НВ': DescentNv(self),
-            'НН': DescentNn(self),
-            'ОРД': DescentORD(self),
-            'ОРЗ': DescentOrz(self),
-            'воронка': DescentVoronka(self),
-            'консервация': Conservation(self),
-            'пакер': DescentPaker(self)
-        }
-        work_list = self.on_execute_strategy(self.lift_key)
+            self.lift_dict_strategies = {
+                'НН с пакером': DescentNnWithPaker(self),
+                'НВ с пакером': DescentNvWithPaker(self),
+                'ЭЦН с пакером': DescentEcnWithPaker(self),
+                'ЭЦН': DescentEcn(self),
+                'НВ': DescentNv(self),
+                'НН': DescentNn(self),
+                'ОРД': DescentORD(self),
+                'ОРЗ': DescentOrz(self),
+                'воронка': DescentVoronka(self),
+                'консервация': Conservation(self),
+                'пакер': DescentPaker(self)
+            }
+            work_list = self.on_execute_strategy(self.lift_key)
+        except Exception as e:
+            logger.critical(e)
         if work_list:
             self.populate_row(self.insert_index, work_list, self.table_widget)
             data_list.pause = False
