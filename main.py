@@ -1127,7 +1127,7 @@ class MyMainWindow(QMainWindow):
                     "well_oilfield": self.data_well.well_oilfield.get_value,
                     "costumer": data_list.costumer,
                     "cdng": self.data_well.cdng.get_value,
-                    "inventory_number": self.data_well.inventory_number.get_value,
+                    "inventory_number": str(self.data_well.inventory_number.get_value),
                     "wellhead_fittings": self.data_well.wellhead_fittings,
                     "appointment": self.data_well.appointment_well.get_value,
                     "angle_data": {"инклинометрия": self.data_well.angle_data},
