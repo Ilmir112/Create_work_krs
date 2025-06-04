@@ -5,7 +5,7 @@ import data_list
 
 from work_py.acid_paker import CheckableComboBox
 from work_py.alone_oreration import well_volume
-
+from log_files.log import logger
 from work_py.rationingKRS import lifting_nkt_norm, descentNKT_norm
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
@@ -131,28 +131,30 @@ class GonsWindow(WindowUnion):
         vbox.addWidget(self.buttonAdd, 2, 0)
 
     def add_work(self):
+        try:
+            plast_combo = str(self.tab_widget.currentWidget().plast_combo.combo_box.currentText())
+            acid_edit = self.tab_widget.currentWidget().acid_edit.currentText()
+            acid_volume_edit = float(self.tab_widget.currentWidget().acid_volume_edit.text().replace(',', '.'))
+            acid_proc_edit = int(float(self.tab_widget.currentWidget().acid_proc_edit.text().replace(',', '.')))
+            bottom_point = self.tab_widget.currentWidget().point_bottom_edit.text().replace(',', '.')
+            acid_calcul_edit = self.tab_widget.currentWidget().acid_calcul_edit.text()
+            points_sko_edit = self.tab_widget.currentWidget().points_sko_edit.text()
+            pressure_edit = int(float(self.tab_widget.currentWidget().pressure_edit.text().replace(',', '.')))
+            iron_true_combo = self.tab_widget.currentWidget().iron_true_combo.currentText()
+            iron_volume_edit = self.tab_widget.currentWidget().iron_volume_edit.text()
 
-        plast_combo = str(self.tab_widget.currentWidget().plast_combo.combo_box.currentText())
-        acid_edit = self.tab_widget.currentWidget().acid_edit.currentText()
-        acid_volume_edit = float(self.tab_widget.currentWidget().acid_volume_edit.text().replace(',', '.'))
-        acid_proc_edit = int(float(self.tab_widget.currentWidget().acid_proc_edit.text().replace(',', '.')))
-        bottom_point = self.tab_widget.currentWidget().point_bottom_edit.text().replace(',', '.')
-        acid_calcul_edit = self.tab_widget.currentWidget().acid_calcul_edit.text()
-        points_sko_edit = self.tab_widget.currentWidget().points_sko_edit.text()
-        pressure_edit = int(float(self.tab_widget.currentWidget().pressure_edit.text().replace(',', '.')))
-        iron_true_combo = self.tab_widget.currentWidget().iron_true_combo.currentText()
-        iron_volume_edit = self.tab_widget.currentWidget().iron_volume_edit.text()
+            if int(float(bottom_point)) >= self.data_well.current_bottom:
+                QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
+                return
+            if not acid_edit or not acid_volume_edit or not acid_proc_edit or not bottom_point or not acid_calcul_edit \
+                    or not points_sko_edit or not pressure_edit:
+                QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
+                return
 
-        if int(float(bottom_point)) >= self.data_well.current_bottom:
-            QMessageBox.warning(self, "ВНИМАНИЕ", 'Не корректная компоновка')
-            return
-        if not acid_edit or not acid_volume_edit or not acid_proc_edit or not bottom_point or not acid_calcul_edit \
-                or not points_sko_edit or not pressure_edit:
-            QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
-            return
-
-        work_list = self.acid_gons(plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, points_sko_edit, bottom_point,
-                                  acid_calcul_edit, pressure_edit, iron_true_combo, iron_volume_edit)
+            work_list = self.acid_gons(plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, points_sko_edit, bottom_point,
+                                      acid_calcul_edit, pressure_edit, iron_true_combo, iron_volume_edit)
+        except Exception as e:
+            logger.critical(e)
         self.populate_row(self.insert_index, work_list, self.table_widget)
         self.calculate_chemistry(acid_edit, acid_volume_edit)
         data_list.pause = False

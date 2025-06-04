@@ -975,113 +975,79 @@ class DataWindow(WindowUnion):
             if bottomhole_drill == "отсут":
                 QMessageBox.warning(self, "Ошибка", "Ошибка в пробуренном забое")
                 return
-            bottomhole_artificial = (
-                self.current_widget.bottomhole_artificial_edit_type.text().replace(
-                    ",", "."
-                )
-            )
+            bottomhole_artificial = self.current_widget.bottomhole_artificial_edit_type.text().replace(",", ".")
+
             if bottomhole_artificial == "отсут":
-                QMessageBox.warning(self, "Ошибка", "Ошибка в исскуственном забое")
+                QMessageBox.warning(self, "Ошибка", "Ошибка в искусcтвенном забое")
                 return
-            current_bottom = (
-                self.current_widget.current_bottom_edit_type.text().replace(",", ".")
-            )
+            current_bottom = self.current_widget.current_bottom_edit_type.text().replace(",", ".")
             if current_bottom == "отсут":
-                QMessageBox.warning(self, "Ошибка", "Ошибка в исскуственном забое")
+                QMessageBox.warning(self, "Ошибка", "Ошибка в искусcтвенном забое")
                 return
             max_angle_depth = (
                 self.current_widget.max_angle_depth_edit_type.text().replace(",", ".")
             )
             max_angle = self.current_widget.max_angle_edit_type.text().replace(",", ".")
-            max_expected_pressure = (
-                self.current_widget.max_expected_pressure_edit_type.text().replace(
-                    ",", "."
-                )
-            )
-            max_admissible_pressure = (
-                self.current_widget.max_admissible_pressure_edit_type.text().replace(
-                    ",", "."
-                )
-            )
+            max_expected_pressure = self.current_widget.max_expected_pressure_edit_type.text().replace(",", ".")
 
-            column_direction_diameter = (
-                self.current_widget.column_direction_diameter_edit.text().replace(
-                    ",", "."
-                )
-            )
-            column_direction_wall_thickness = (
-                self.current_widget.column_direction_wall_thickness_edit.text().replace(
-                    ",", "."
-                )
-            )
-            column_direction_length = (
-                self.current_widget.column_direction_length_edit.text().replace(
-                    ",", "."
-                )
-            )
-            level_cement_direction = (
-                self.current_widget.level_cement_direction_edit.text()
-            )
-            column_conductor_diameter = (
-                self.current_widget.column_conductor_diameter_edit.text().replace(
-                    ",", "."
-                )
-            )
-            column_conductor_wall_thickness = (
+            max_admissible_pressure = self.current_widget.max_admissible_pressure_edit_type.text().replace(",", ".")
+
+            column_direction_diameter = self.current_widget.column_direction_diameter_edit.text().replace(",", ".")
+            column_direction_wall_thickness = self.current_widget.column_direction_wall_thickness_edit.text().replace(",", ".")
+            column_direction_length = self.current_widget.column_direction_length_edit.text().replace(",", ".")
+            level_cement_direction = self.current_widget.level_cement_direction_edit.text().replace(",", ".")
+            column_conductor_diameter = self.current_widget.column_conductor_diameter_edit.text().replace(",", ".")
+            column_conductor_wall_thickness = str(
                 self.current_widget.column_conductor_wall_thickness_edit.text().replace(
                     ",", "."
                 )
             )
-            column_conductor_length = (
+            column_conductor_length = str(
                 self.current_widget.column_conductor_length_edit.text().replace(
                     ",", "."
                 )
             )
-            level_cement_conductor = (
+            level_cement_conductor = str(
                 self.current_widget.level_cement_conductor_edit.text().replace(",", ".")
             )
 
-            dict_pump_shgn_do = str(self.current_widget.pump_SHGN_do_edit_type.text())
+            dict_pump_shgn_do = str(self.current_widget.pump_SHGN_do_edit_type.text()).replace(",", ".")
             dict_pump_shgn_h_do = (
-                self.current_widget.pump_SHGN_depth_do_edit_type.text()
+                self.current_widget.pump_SHGN_depth_do_edit_type.text().replace(",", ".")
             )
 
             dict_pump_shgn_posle = str(
-                self.current_widget.pump_SHGN_posle_edit_type.text()
+                self.current_widget.pump_SHGN_posle_edit_type.text().replace(",", ".")
             )
             dict_pump_shgn_h_posle = str(
-                self.current_widget.pump_SHGN_depth_posle_edit_type.text()
+                self.current_widget.pump_SHGN_depth_posle_edit_type.text().replace(",", ".")
             )
 
-            dict_pump_ecn_do = str(self.current_widget.pump_ECN_do_edit_type.text())
-            dict_pump_ecn_h_do = self.current_widget.pump_ECN_depth_do_edit_type.text()
+            dict_pump_ecn_do = str(self.current_widget.pump_ECN_do_edit_type.text()).replace(",", ".")
+            dict_pump_ecn_h_do = self.current_widget.pump_ECN_depth_do_edit_type.text().replace(",", ".")
 
             dict_pump_ecn_posle = str(
-                self.current_widget.pump_ECN_posle_edit_type.text()
+                self.current_widget.pump_ECN_posle_edit_type.text().replace(",", ".")
             )
             dict_pump_ecn_h_posle = str(
-                self.current_widget.pump_ECN_depth_posle_edit_type.text()
+                self.current_widget.pump_ECN_depth_posle_edit_type.text().replace(",", ".")
             )
 
             # print(f'прио {type(dict_pump_h_posle)}')
-            paker_do = str(self.current_widget.paker_do_edit_type.text())
+            paker_do = str(self.current_widget.paker_do_edit_type.text()).replace(",", ".")
             depth_fond_paker_do = str(
                 self.current_widget.paker_depth_do_edit_type.text()
             )
             paker_posle = self.current_widget.paker_posle_edit_type.text()
-            depth_fond_paker_posle = (
-                self.current_widget.paker_depth_posle_edit_type.text()
-            )
+            depth_fond_paker_posle = self.current_widget.paker_depth_posle_edit_type.text().replace(",", ".")
 
             paker2_do = str(self.current_widget.paker2_do_edit_type.text())
-            depth_fond_paker2_do = self.current_widget.paker2_depth_do_edit_type.text()
+            depth_fond_paker2_do = self.current_widget.paker2_depth_do_edit_type.text().replace(",", ".")
             paker2_posle = self.current_widget.paker2_posle_edit_type.text()
-            depth_fond_paker2_posle = (
-                self.current_widget.paker2_depth_posle_edit_type.text()
-            )
+            depth_fond_paker2_posle = self.current_widget.paker2_depth_posle_edit_type.text().replace(",", ".")
 
-            static_level = self.current_widget.static_level_edit_type.text()
-            dinamic_level = self.current_widget.dinamic_level_edit_type.text()
+            static_level = self.current_widget.static_level_edit_type.text().replace(",", ".")
+            dinamic_level = self.current_widget.dinamic_level_edit_type.text().replace(",", ".")
             date_commissioning_line = self.current_widget.date_commissioning_line.text()
             result_pressure_date = self.current_widget.result_pressure_date.text()
             curator = str(self.current_widget.curator_сombo.currentText())

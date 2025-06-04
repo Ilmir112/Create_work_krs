@@ -12,6 +12,7 @@ from datetime import datetime
 from data_base.config_base import connection_to_database, WorkDatabaseWell
 from decrypt import decrypt
 from find import FindIndexPZ
+from log_files.log import logger
 from server_response import ApiClient
 
 from work_py.advanted_file import merge_overlapping_intervals
@@ -325,54 +326,56 @@ class DopPlanWindow(WindowUnion):
         self.perforation_list = []
 
     def add_row_table(self):
+        try:
+            current_widget = self.tab_widget.currentWidget()
 
-        current_widget = self.tab_widget.currentWidget()
+            self.plast_line = current_widget.plast_line.text()
+            self.roof_edit = current_widget.roof_edit.text().replace(',', '.')
+            self.sole_edit = current_widget.sole_edit.text().replace(',', '.')
+            self.date_pvr_edit = current_widget.date_pvr_edit.text()
+            self.count_pvr_edit = current_widget.count_pvr_edit.text()
+            self.type_pvr_edit = current_widget.type_pvr_edit.text()
+            self.pressure_pvr_edit = current_widget.pressure_pvr_edit.text().replace(',', '.')
+            self.date_pressure_edit = current_widget.date_pressure_edit.text()
+            vertical_line = current_widget.vertical_line.text().replace(',', '.')
 
-        self.plast_line = current_widget.plast_line.text()
-        self.roof_edit = current_widget.roof_edit.text().replace(',', '.')
-        self.sole_edit = current_widget.sole_edit.text().replace(',', '.')
-        self.date_pvr_edit = current_widget.date_pvr_edit.text()
-        self.count_pvr_edit = current_widget.count_pvr_edit.text()
-        self.type_pvr_edit = current_widget.type_pvr_edit.text()
-        self.pressure_pvr_edit = current_widget.pressure_pvr_edit.text().replace(',', '.')
-        self.date_pressure_edit = current_widget.date_pressure_edit.text()
-        vertical_line = current_widget.vertical_line.text().replace(',', '.')
+            if '' in [self.plast_line, self.roof_edit, self.sole_edit, self.count_pvr_edit, self.type_pvr_edit]:
+                QMessageBox.warning(self, 'Ошибка', 'Не введены все данные')
+                return
+            udlin = round(float(self.roof_edit) - float(vertical_line), 1)
+            if len(self.perforation_list) == 0:
+                QMessageBox.warning(self, 'Ошибка', 'Нужно сначало добавить проектные интервалы перфорации')
+                return
 
-        if '' in [self.plast_line, self.roof_edit, self.sole_edit, self.count_pvr_edit, self.type_pvr_edit]:
-            QMessageBox.warning(self, 'Ошибка', 'Не введены все данные')
-            return
-        udlin = round(float(self.roof_edit) - float(vertical_line), 1)
-        if len(self.perforation_list) == 0:
-            QMessageBox.warning(self, 'Ошибка', 'Нужно сначало добавить проектные интервалы перфорации')
-            return
+            if [self.plast_line, vertical_line, self.roof_edit, self.sole_edit, self.date_pvr_edit, self.count_pvr_edit,
+                self.type_pvr_edit, self.pressure_pvr_edit, self.date_pressure_edit] not in self.perforation_list:
+                self.perforation_list.append(
+                    [self.plast_line, vertical_line, self.roof_edit, self.sole_edit, self.date_pvr_edit,
+                     self.count_pvr_edit,
+                     self.type_pvr_edit, self.pressure_pvr_edit, self.date_pressure_edit])
+            rows = 0
+            self.tableWidget.insertRow(rows)
 
-        if [self.plast_line, vertical_line, self.roof_edit, self.sole_edit, self.date_pvr_edit, self.count_pvr_edit,
-            self.type_pvr_edit, self.pressure_pvr_edit, self.date_pressure_edit] not in self.perforation_list:
-            self.perforation_list.append(
-                [self.plast_line, vertical_line, self.roof_edit, self.sole_edit, self.date_pvr_edit,
-                 self.count_pvr_edit,
-                 self.type_pvr_edit, self.pressure_pvr_edit, self.date_pressure_edit])
-        rows = 0
-        self.tableWidget.insertRow(rows)
+            self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(self.plast_line)))
+            self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(vertical_line)))
+            self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(self.roof_edit)))
+            self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(self.sole_edit)))
+            self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(self.date_pvr_edit)))
 
-        self.tableWidget.setItem(rows, 0, QTableWidgetItem(str(self.plast_line)))
-        self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(vertical_line)))
-        self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(self.roof_edit)))
-        self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(self.sole_edit)))
-        self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(self.date_pvr_edit)))
-
-        if self.old_index == 0:
-            self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(self.count_pvr_edit)))
-            self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(self.type_pvr_edit)))
-            self.tableWidget.setItem(rows, 8, QTableWidgetItem(str(udlin)))
-            self.tableWidget.setItem(rows, 9, QTableWidgetItem(str(self.pressure_pvr_edit)))
-            self.tableWidget.setItem(rows, 10, QTableWidgetItem(str(self.date_pressure_edit)))
-        else:
-            self.tableWidget.setItem(rows, 5, QTableWidgetItem(str(self.count_pvr_edit)))
-            self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(self.type_pvr_edit)))
-            self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(udlin)))
-            self.tableWidget.setItem(rows, 8, QTableWidgetItem(str(self.pressure_pvr_edit)))
-            self.tableWidget.setItem(rows, 9, QTableWidgetItem(str(self.date_pressure_edit)))
+            if self.old_index == 0:
+                self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(self.count_pvr_edit)))
+                self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(self.type_pvr_edit)))
+                self.tableWidget.setItem(rows, 8, QTableWidgetItem(str(udlin)))
+                self.tableWidget.setItem(rows, 9, QTableWidgetItem(str(self.pressure_pvr_edit)))
+                self.tableWidget.setItem(rows, 10, QTableWidgetItem(str(self.date_pressure_edit)))
+            else:
+                self.tableWidget.setItem(rows, 5, QTableWidgetItem(str(self.count_pvr_edit)))
+                self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(self.type_pvr_edit)))
+                self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(udlin)))
+                self.tableWidget.setItem(rows, 8, QTableWidgetItem(str(self.pressure_pvr_edit)))
+                self.tableWidget.setItem(rows, 9, QTableWidgetItem(str(self.date_pressure_edit)))
+        except Exception as e:
+            logger.critical(e)
 
     def add_perforation_project(self):
         current_widget = self.tab_widget.currentWidget()
@@ -589,64 +592,7 @@ class DopPlanWindow(WindowUnion):
                      'fill': {'color': 'RGB(00000000)'},
                      'borders': {'left': None, 'right': None, 'top': None, 'bottom': None},
                      'alignment': {'horizontal': None, 'vertical': None, 'wrap_text': None}}]
-            # rows = self.tableWidget.rowCount()
-            # while self.target_row_index != self.target_row_index_cancel:
-            #     index = str(int(self.target_row_index + index_row + 2))
-            #     data[index] = [
-            #         {'value': '', 'font': {'name': 'Times New Roman Cyr', 'size': 10.0, 'bold': False, 'italic': False},
-            #          'fill': {'color': 'RGB(00000000)'},
-            #          'borders': {'left': None, 'right': None, 'top': None, 'bottom': None},
-            #          'alignment': {'horizontal': None, 'vertical': None, 'wrap_text': True}},
-            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-            #          'fill': {'color': 'RGB(00000000)'},
-            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-            #          'fill': {'color': 'RGB(00000000)'},
-            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-            #          'alignment': {'horizontal': None, 'vertical': None, 'wrap_text': None}},
-            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-            #          'fill': {'color': 'RGB(00000000)'},
-            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-            #          'fill': {'color': 'RGB(00000000)'},
-            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-            #          'fill': {'color': 'RGB(00000000)'},
-            #          'borders': {'left': 'thin', 'right': None, 'top': 'thin', 'bottom': 'thin'},
-            #          'alignment': {'horizontal': None, 'vertical': 'center', 'wrap_text': None}},
-            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-            #          'fill': {'color': 'RGB(00000000)'},
-            #          'borders': {'left': 'thin', 'right': None, 'top': 'thin', 'bottom': 'thin'},
-            #          'alignment': {'horizontal': None, 'vertical': 'center', 'wrap_text': None}},
-            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-            #          'fill': {'color': 'RGB(00000000)'},
-            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-            #          'fill': {'color': 'RGB(00000000)'},
-            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-            #          'fill': {'color': 'RGB(00000000)'},
-            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-            #          'fill': {'color': 'RGB(00000000)'},
-            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-            #         {'value': '', 'font': {'name': 'Arial Cyr', 'size': 12.0, 'bold': False, 'italic': True},
-            #          'fill': {'color': 'RGB(00000000)'},
-            #          'borders': {'left': 'thin', 'right': 'thin', 'top': 'thin', 'bottom': 'thin'},
-            #          'alignment': {'horizontal': 'center', 'vertical': 'center', 'wrap_text': None}},
-            #         {'value': '', 'font': {'name': 'Calibri', 'size': 11.0, 'bold': False, 'italic': False},
-            #          'fill': {'color': 'RGB(00000000)'},
-            #          'borders': {'left': None, 'right': None, 'top': None, 'bottom': None},
-            #          'alignment': {'horizontal': None, 'vertical': None, 'wrap_text': None}}]
-            #
-            #     self.target_row_index += 1
+
         data[str(self.bottom_row_index)][3]['value'] = current_bottom
         data[str(self.bottom_row_index)][5]['value'] = current_bottom_date_edit
         data[str(self.bottom_row_index)][10 - self.old_index]['value'] = method_bottom_combo
@@ -665,258 +611,190 @@ class DopPlanWindow(WindowUnion):
         from data_base.work_with_base import round_cell
         from data_list import ProtectedIsNonNone
         from work_py.advanted_file import definition_plast_work
-        self.data_well.data_list = []
+        try:
+            self.data_well.data_list = []
 
-        current_widget = self.tab_widget.currentWidget()
-        method_bottom_combo = current_widget.method_bottom_combo.currentText()
-        if method_bottom_combo == '':
-            QMessageBox.critical(self, 'Забой', 'Выберете метод определения забоя')
-            return
-
-        change_pvr_combo = current_widget.change_pvr_combo.currentText()
-        if change_pvr_combo == '':
-            QMessageBox.warning(self, 'Ошибка', 'Нужно выбрать пункт изменения ПВР')
-            return
-        if data_list.data_in_base:
-
-            fluid = current_widget.fluid_edit.text().replace(',', '.')
-
-            current_bottom = current_widget.current_bottom_edit.text()
-            if current_bottom != '':
-                current_bottom = round_cell(current_bottom.replace(',', '.'))
-
-            work_earlier = current_widget.work_edit.toPlainText()
-            number_dp = current_widget.number_DP_Combo.currentText()
-
-            current_bottom_date_edit = current_widget.current_bottom_date_edit.text()
-
-            template_depth_edit = int(float(current_widget.template_depth_edit.text().replace(',', '.')))
-            if str(template_depth_edit).isdigit() is False:
-                QMessageBox.critical(self, 'Ошибка', 'ошибка в глубине диаметра')
-                return
-            template_length_edit = current_widget.template_length_edit.text()
-            if self.data_well.column_additional:
-                template_depth_addition_edit = current_widget.template_depth_addition_edit.text()
-                template_length_addition_edit = current_widget.template_length_addition_edit.text()
-            skm_interval_edit = current_widget.skm_interval_edit.text()
-            raiding_interval_edit = current_widget.raiding_interval_edit.text()
-
-            if current_bottom == '' or fluid == '' or work_earlier == '' or \
-                    template_depth_edit == '' or template_length_edit == '':
-                # print(current_bottom, fluid, work_earlier)
-                QMessageBox.critical(self, 'Забой', 'не все значения введены')
-                return
-            if template_length_edit == '0' or template_length_edit == '':
-                mes = QMessageBox.question(self, 'Длина шаблона', 'в скважину во время ремонта не был спущен шаблон, '
-                                                                  'так ли это?')
-                if mes == QMessageBox.StandardButton.No:
-                    return
-            if float(template_depth_edit) > float(self.data_well.bottom_hole_drill.get_value):
-                QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже искусственного забоя забоя')
+            current_widget = self.tab_widget.currentWidget()
+            method_bottom_combo = current_widget.method_bottom_combo.currentText()
+            if method_bottom_combo == '':
+                QMessageBox.critical(self, 'Забой', 'Выберете метод определения забоя')
                 return
 
-            if number_dp != '':
-                self.data_well.number_dp = int(float(number_dp))
-
-            if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
-                QMessageBox.critical(self, 'рабочая жидкость',
-                                     'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
+            change_pvr_combo = current_widget.change_pvr_combo.currentText()
+            if change_pvr_combo == '':
+                QMessageBox.warning(self, 'Ошибка', 'Нужно выбрать пункт изменения ПВР')
                 return
-
             if data_list.data_in_base:
-                if 'г/см3' not in fluid:
-                    QMessageBox.critical(self, 'уд.вес', 'нужно добавить значение "г/см3" в уд.вес')
+
+                fluid = current_widget.fluid_edit.text().replace(',', '.')
+
+                current_bottom = current_widget.current_bottom_edit.text()
+                if current_bottom != '':
+                    current_bottom = round_cell(current_bottom.replace(',', '.'))
+
+                work_earlier = current_widget.work_edit.toPlainText()
+                number_dp = current_widget.number_DP_Combo.currentText()
+
+                current_bottom_date_edit = current_widget.current_bottom_date_edit.text()
+
+                template_depth_edit = int(float(current_widget.template_depth_edit.text().replace(',', '.')))
+                if str(template_depth_edit).isdigit() is False:
+                    QMessageBox.critical(self, 'Ошибка', 'ошибка в глубине диаметра')
                     return
-                self.data_well.fluid_work = fluid
-                self.data_well.fluid_work_short = fluid[:7]
+                template_length_edit = current_widget.template_length_edit.text()
+                if self.data_well.column_additional:
+                    template_depth_addition_edit = current_widget.template_depth_addition_edit.text()
+                    template_length_addition_edit = current_widget.template_length_addition_edit.text()
+                skm_interval_edit = current_widget.skm_interval_edit.text()
+                raiding_interval_edit = current_widget.raiding_interval_edit.text()
 
-                self.data_well.fluid = float(fluid[:4].replace('г', ''))
-            else:
-                self.data_well.fluid = float(fluid)
-
-                if float(current_bottom) > self.data_well.bottom_hole_drill.get_value:
-                    QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
+                if current_bottom == '' or fluid == '' or work_earlier == '' or \
+                        template_depth_edit == '' or template_length_edit == '':
+                    # print(current_bottom, fluid, work_earlier)
+                    QMessageBox.critical(self, 'Забой', 'не все значения введены')
                     return
-                self.data_well.fluid_work, self.data_well.fluid_work_short = self.calc_work_fluid(fluid)
+                if template_length_edit == '0' or template_length_edit == '':
+                    mes = QMessageBox.question(self, 'Длина шаблона', 'в скважину во время ремонта не был спущен шаблон, '
+                                                                      'так ли это?')
+                    if mes == QMessageBox.StandardButton.No:
+                        return
+                if float(template_depth_edit) > float(self.data_well.bottom_hole_drill.get_value):
+                    QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже искусственного забоя забоя')
+                    return
 
-            self.data_well.template_depth = float(template_depth_edit)
-            self.data_well.template_length = float(template_length_edit)
-            if self.data_well.column_additional:
-                self.data_well.template_depth = float(template_depth_addition_edit)
-                self.data_well.template_length = float(template_length_addition_edit)
+                if number_dp != '':
+                    self.data_well.number_dp = int(float(number_dp))
 
-            try:
-                skm_interval = []
-                if ',' in skm_interval_edit:
-                    for skm in skm_interval_edit.split(','):
-                        if '-' in skm:
-                            skm_interval.append(list(map(int, skm.split('-'))))
+                if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
+                    QMessageBox.critical(self, 'рабочая жидкость',
+                                         'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
+                    return
+
+                if data_list.data_in_base:
+                    if 'г/см3' not in fluid:
+                        QMessageBox.critical(self, 'уд.вес', 'нужно добавить значение "г/см3" в уд.вес')
+                        return
+                    self.data_well.fluid_work = fluid
+                    self.data_well.fluid_work_short = fluid[:7]
+
+                    self.data_well.fluid = float(fluid[:4].replace('г', ''))
                 else:
-                    if '-' in skm_interval_edit:
-                        skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
+                    self.data_well.fluid = float(fluid)
 
-                skm_interval_new = merge_overlapping_intervals(skm_interval)
+                    if float(current_bottom) > self.data_well.bottom_hole_drill.get_value:
+                        QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
+                        return
+                    self.data_well.fluid_work, self.data_well.fluid_work_short = self.calc_work_fluid(fluid)
 
-                self.data_well.skm_interval = skm_interval_new
+                self.data_well.template_depth = float(template_depth_edit)
+                self.data_well.template_length = float(template_length_edit)
+                if self.data_well.column_additional:
+                    self.data_well.template_depth = float(template_depth_addition_edit)
+                    self.data_well.template_length = float(template_length_addition_edit)
 
-            except Exception:
-                QMessageBox.warning(self, 'Ошибка',
-                                    'в интервале скреперования отсутствует корректные интервалы скреперования')
-                return
+                try:
+                    skm_interval = []
+                    if ',' in skm_interval_edit:
+                        for skm in skm_interval_edit.split(','):
+                            if '-' in skm:
+                                skm_interval.append(list(map(int, skm.split('-'))))
+                    else:
+                        if '-' in skm_interval_edit:
+                            skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
 
-            try:
-                raiding_interval = []
-                if ',' in raiding_interval_edit:
-                    for skm in raiding_interval_edit.split(','):
-                        if '-' in skm:
-                            raiding_interval.append(list(map(int, skm.split('-'))))
+                    skm_interval_new = merge_overlapping_intervals(skm_interval)
+
+                    self.data_well.skm_interval = skm_interval_new
+
+                except Exception:
+                    QMessageBox.warning(self, 'Ошибка',
+                                        'в интервале скреперования отсутствует корректные интервалы скреперования')
+                    return
+
+                try:
+                    raiding_interval = []
+                    if ',' in raiding_interval_edit:
+                        for skm in raiding_interval_edit.split(','):
+                            if '-' in skm:
+                                raiding_interval.append(list(map(int, skm.split('-'))))
+                    else:
+                        if '-' in raiding_interval_edit:
+                            raid = raiding_interval_edit.split('-')
+                            raiding_interval.append(list(map(int, raid)))
+
+                    raiding_interval_new = merge_overlapping_intervals(raiding_interval)
+
+                    self.data_well.ribbing_interval = raiding_interval_new
+
+                except Exception as e:
+                    QMessageBox.warning(self, 'Ошибка',
+                                        f'в интервале райбирования отсутствует корректные интервалы '
+                                        f' {e}')
+                    return
+
+                if len(self.data_well.skm_interval) == 0:
+                    mes = QMessageBox.question(self, 'Ошибка',
+                                               'Интервалы скреперования отсутствуют, так ли это?')
+                    if mes == QMessageBox.StandardButton.No:
+                        return
+
+                if len(self.data_well.ribbing_interval) == 0:
+                    mes = QMessageBox.question(self, 'Ошибка',
+                                               'Интервалы Райбирования отсутствуют, так ли это?')
+                    if mes == QMessageBox.StandardButton.No:
+                        return
+
+                self.data_well.count_template = 1
+                well_data_in_base_combo = current_widget.well_data_in_base_combo.currentText()
+                if well_data_in_base_combo == '':
+                    QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
+                    return
+                list_dop_plan = [current_widget.well_data_in_base_combo.itemText(i) for i in range(current_widget.well_data_in_base_combo.count())]
+                if any([f'ДП№{number_dp}' in dop_plan or f'ДП№ {number_dp}' in dop_plan for dop_plan in list_dop_plan]):
+                    question = QMessageBox.question(self, 'Ошибка', f'дополнительный план работ № {number_dp} '
+                                                                    f'есть в базе, обновить доп план?')
+                    if question == QMessageBox.StandardButton.No:
+                        return
+
+                index_change_line = current_widget.index_change_line.text()
+                well_number = current_widget.well_number_edit.text()
+                well_area = current_widget.well_area_edit.text()
+                if well_area != '' and well_area != '':
+                    self.data_well.well_number, self.data_well.well_area = \
+                        ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
+                if index_change_line != '':
+                    index_change_line = int(float(index_change_line))
                 else:
-                    if '-' in raiding_interval_edit:
-                        raid = raiding_interval_edit.split('-')
-                        raiding_interval.append(list(map(int, raid)))
-
-                raiding_interval_new = merge_overlapping_intervals(raiding_interval)
-
-                self.data_well.ribbing_interval = raiding_interval_new
-
-            except Exception as e:
-                QMessageBox.warning(self, 'Ошибка',
-                                    f'в интервале райбирования отсутствует корректные интервалы '
-                                    f' {e}')
-                return
-
-            if len(self.data_well.skm_interval) == 0:
-                mes = QMessageBox.question(self, 'Ошибка',
-                                           'Интервалы скреперования отсутствуют, так ли это?')
-                if mes == QMessageBox.StandardButton.No:
+                    QMessageBox.critical(self, 'пункт', 'Необходимо выбрать пункт плана работ')
                     return
 
-            if len(self.data_well.ribbing_interval) == 0:
-                mes = QMessageBox.question(self, 'Ошибка',
-                                           'Интервалы Райбирования отсутствуют, так ли это?')
-                if mes == QMessageBox.StandardButton.No:
-                    return
+                if ' от' in well_data_in_base_combo:
+                    data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-2]
+                    work_plan_in_base = well_data_in_base_combo.split(' ')[3]
 
-            self.data_well.count_template = 1
-            well_data_in_base_combo = current_widget.well_data_in_base_combo.currentText()
-            if well_data_in_base_combo == '':
-                QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
-                return
-            list_dop_plan = [current_widget.well_data_in_base_combo.itemText(i) for i in range(current_widget.well_data_in_base_combo.count())]
-            if any([f'ДП№{number_dp}' in dop_plan or f'ДП№ {number_dp}' in dop_plan for dop_plan in list_dop_plan]):
-                question = QMessageBox.question(self, 'Ошибка', f'дополнительный план работ № {number_dp} '
-                                                                f'есть в базе, обновить доп план?')
-                if question == QMessageBox.StandardButton.No:
-                    return
+                # db = connection_to_database(decrypt("DB_WELL_DATA"))
+                # data_well_base = WorkDatabaseWell(db, self.data_well)
+                #
+                # data_well = data_well_base.check_in_database_well_data(well_number, well_area,
+                #                                                        work_plan_in_base, data_well_data_in_base_combo)
+                #
+                # if data_well:
+                #     self.data_well.type_kr = data_well[2]
+                #
+                #     if data_well[3]:
+                #         # self.data_well.dict_category = json.loads(data_well[3])
+                #         self.data_well.well_oilfield = ProtectedIsNonNone(data_well[4])
+                #         self.data_well.appointment_well = ProtectedIsNonNone(data_well[5])
+                #         self.data_well.inventory_number = ProtectedIsNonNone(data_well[6])
+                #         self.data_well.wellhead_fittings = data_well[7]
+                #         self.data_well.emergency_well = False
+                #         self.data_well.type_absorbent == "EVASORB марки 121"
+                #         if data_well[8]:
+                #             self.data_well.angle_data = json.loads(data_well[8])
+                #         else:
+                #             self.data_well.angle_data = []
 
-            index_change_line = current_widget.index_change_line.text()
-            well_number = current_widget.well_number_edit.text()
-            well_area = current_widget.well_area_edit.text()
-            if well_area != '' and well_area != '':
-                self.data_well.well_number, self.data_well.well_area = \
-                    ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
-            if index_change_line != '':
-                index_change_line = int(float(index_change_line))
-            else:
-                QMessageBox.critical(self, 'пункт', 'Необходимо выбрать пункт плана работ')
-                return
-
-            if ' от' in well_data_in_base_combo:
-                data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-2]
-                work_plan_in_base = well_data_in_base_combo.split(' ')[3]
-
-            # db = connection_to_database(decrypt("DB_WELL_DATA"))
-            # data_well_base = WorkDatabaseWell(db, self.data_well)
-            #
-            # data_well = data_well_base.check_in_database_well_data(well_number, well_area,
-            #                                                        work_plan_in_base, data_well_data_in_base_combo)
-            #
-            # if data_well:
-            #     self.data_well.type_kr = data_well[2]
-            #
-            #     if data_well[3]:
-            #         # self.data_well.dict_category = json.loads(data_well[3])
-            #         self.data_well.well_oilfield = ProtectedIsNonNone(data_well[4])
-            #         self.data_well.appointment_well = ProtectedIsNonNone(data_well[5])
-            #         self.data_well.inventory_number = ProtectedIsNonNone(data_well[6])
-            #         self.data_well.wellhead_fittings = data_well[7]
-            #         self.data_well.emergency_well = False
-            #         self.data_well.type_absorbent == "EVASORB марки 121"
-            #         if data_well[8]:
-            #             self.data_well.angle_data = json.loads(data_well[8])
-            #         else:
-            #             self.data_well.angle_data = []
-
-            self.data_well.current_bottom = current_bottom
-
-            if skm_interval_edit not in ['', 0, '0-0'] and '-' in skm_interval_edit:
-                if ',' in skm_interval_edit:
-                    for skm_int in skm_interval_edit.split(','):
-                        self.data_well.skm_interval.append(list(map(int, skm_int.split('-'))))
-                else:
-                    self.data_well.skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
-
-            rows = self.tableWidget.rowCount()
-
-            self.work_with_excel(well_number, well_area, list_dop_plan[3], list_dop_plan[2])
-            if change_pvr_combo == 'Да':
-                if rows == 0:
-                    QMessageBox.warning(self, 'Ошибка', 'Нужно загрузить интервалы перфорации')
-                    return
-
-                plast_row = []
-                for row in range(rows):
-                    list_row = []
-                    for col in range(13):
-                        item = self.tableWidget.item(row, col)
-                        if item is not None:
-                            list_row.append(item.text())
-                        else:
-                            list_row.append(None)
-                    plast_row.append(list_row)
-                data_list.data, data_list.row_heights, data_list.col_width, data_list.boundaries_dict = \
-                    self.insert_row_in_pvr(self.data, self.row_heights, self.col_width, self.boundaries_dict, plast_row,
-                                           current_bottom, current_bottom_date_edit, method_bottom_combo)
-            else:
-
-                data_list.data, data_list.row_heights, data_list.col_width, data_list.boundaries_dict = \
-                    self.change_pvr_in_bottom(self.data, self.row_heights, self.col_width, self.boundaries_dict,
-                                              current_bottom, current_bottom_date_edit, method_bottom_combo)
-            if data_list.data_in_base:
-                data_list.dop_work_list = self.work_list(work_earlier)
-            else:
-                work_list = self.work_list(work_earlier)
-                self.populate_row(self.insert_index + 3, work_list, self.table_widget, self.work_plan)
-
-                if len(self.data_well.dict_perforation) != 0:
-                    for plast, vertical_line, roof_int, sole_int, date_pvr_edit, count_pvr_edit, \
-                            type_pvr_edit, pressure_pvr_edit, date_pressure_edit in self.data_well.dict_perforation:
-                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
-                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
-
-                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append(
-                            (float(roof_int), float(sole_int)))
-                        self.data_well.dict_perforation_short.setdefault(plast, {}).setdefault('интервал', []).append(
-                            (float(roof_int), float(sole_int)))
-                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
-                        self.data_well.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
-
-        else:
-            fluid = current_widget.fluid_edit.text().replace(',', '.')
-            current_bottom = current_widget.current_bottom_edit.text()
-            if current_bottom != '':
-                current_bottom = round_cell(current_bottom.replace(',', '.'))
-
-            work_earlier = current_widget.work_edit.toPlainText()
-            number_dp = current_widget.number_DP_Combo.currentText()
-
-            template_depth_edit = current_widget.template_depth_edit.text()
-            template_length_edit = current_widget.template_length_edit.text()
-            if self.data_well.column_additional:
-                template_depth_addition_edit = current_widget.template_depth_addition_edit.text()
-                template_length_addition_edit = current_widget.template_length_addition_edit.text()
-            skm_interval_edit = current_widget.skm_interval_edit.text()
-            try:
+                self.data_well.current_bottom = current_bottom
 
                 if skm_interval_edit not in ['', 0, '0-0'] and '-' in skm_interval_edit:
                     if ',' in skm_interval_edit:
@@ -925,46 +803,117 @@ class DopPlanWindow(WindowUnion):
                     else:
                         self.data_well.skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
 
-            except Exception:
-                QMessageBox.warning(self, 'Ошибка',
-                                    'в интервале скреперования отсутствует корректные интервалы скреперования')
-                return
+                rows = self.tableWidget.rowCount()
 
-            if current_bottom == '' or fluid == '' or work_earlier == '' or \
-                    template_depth_edit == '' or template_length_edit == '':
-                # print(current_bottom, fluid, work_earlier)
-                QMessageBox.critical(self, 'Забой', 'не все значения введены')
-                return
-            if template_length_edit == '0':
-                QMessageBox.critical(self, 'Длина шаблона',
-                                     'Введите длину шаблонов которые были спущены в скважину')
-                return
-            if float(template_depth_edit) > float(current_bottom):
-                QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже текущего забоя')
-                return
-            if number_dp != '':
-                self.data_well.number_dp = int(float(number_dp))
+                self.work_with_excel(well_number, well_area, list_dop_plan[3], list_dop_plan[2])
+                if change_pvr_combo == 'Да':
+                    if rows == 0:
+                        QMessageBox.warning(self, 'Ошибка', 'Нужно загрузить интервалы перфорации')
+                        return
 
-            if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
-                QMessageBox.critical(self, 'рабочая жидкость',
-                                     'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
-                return
+                    plast_row = []
+                    for row in range(rows):
+                        list_row = []
+                        for col in range(13):
+                            item = self.tableWidget.item(row, col)
+                            if item is not None:
+                                list_row.append(item.text())
+                            else:
+                                list_row.append(None)
+                        plast_row.append(list_row)
+                    data_list.data, data_list.row_heights, data_list.col_width, data_list.boundaries_dict = \
+                        self.insert_row_in_pvr(self.data, self.row_heights, self.col_width, self.boundaries_dict, plast_row,
+                                               current_bottom, current_bottom_date_edit, method_bottom_combo)
+                else:
 
-            # if float(current_bottom) > self.data_well.bottom_hole_drill.get_value:
-            #     QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
-            #     return
-            self.data_well.fluid_work, self.data_well.fluid_work_short = self.calc_work_fluid(fluid)
+                    data_list.data, data_list.row_heights, data_list.col_width, data_list.boundaries_dict = \
+                        self.change_pvr_in_bottom(self.data, self.row_heights, self.col_width, self.boundaries_dict,
+                                                  current_bottom, current_bottom_date_edit, method_bottom_combo)
+                if data_list.data_in_base:
+                    data_list.dop_work_list = self.work_list(work_earlier)
+                else:
+                    work_list = self.work_list(work_earlier)
+                    self.populate_row(self.insert_index + 3, work_list, self.table_widget, self.work_plan)
 
-            self.data_well.template_depth = float(template_depth_edit)
-            self.data_well.template_length = float(template_length_edit)
-            if self.data_well.column_additional:
-                self.data_well.template_depth = float(template_depth_addition_edit)
-                self.data_well.template_length = float(template_length_addition_edit)
+                    if len(self.data_well.dict_perforation) != 0:
+                        for plast, vertical_line, roof_int, sole_int, date_pvr_edit, count_pvr_edit, \
+                                type_pvr_edit, pressure_pvr_edit, date_pressure_edit in self.data_well.dict_perforation:
+                            self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
+                            self.data_well.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
 
-            work_list = self.work_list(work_earlier)
-            # self.data_well.insert_index2 = self.insert_index
-            self.populate_row(self.insert_index, work_list, self.table_widget, self.work_plan)
-            definition_plast_work(self)
+                            self.data_well.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append(
+                                (float(roof_int), float(sole_int)))
+                            self.data_well.dict_perforation_short.setdefault(plast, {}).setdefault('интервал', []).append(
+                                (float(roof_int), float(sole_int)))
+                            self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
+                            self.data_well.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
+
+            else:
+                fluid = current_widget.fluid_edit.text().replace(',', '.')
+                current_bottom = current_widget.current_bottom_edit.text()
+                if current_bottom != '':
+                    current_bottom = round_cell(current_bottom.replace(',', '.'))
+
+                work_earlier = current_widget.work_edit.toPlainText()
+                number_dp = current_widget.number_DP_Combo.currentText()
+
+                template_depth_edit = current_widget.template_depth_edit.text()
+                template_length_edit = current_widget.template_length_edit.text()
+                if self.data_well.column_additional:
+                    template_depth_addition_edit = current_widget.template_depth_addition_edit.text()
+                    template_length_addition_edit = current_widget.template_length_addition_edit.text()
+                skm_interval_edit = current_widget.skm_interval_edit.text()
+                try:
+
+                    if skm_interval_edit not in ['', 0, '0-0'] and '-' in skm_interval_edit:
+                        if ',' in skm_interval_edit:
+                            for skm_int in skm_interval_edit.split(','):
+                                self.data_well.skm_interval.append(list(map(int, skm_int.split('-'))))
+                        else:
+                            self.data_well.skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
+
+                except Exception:
+                    QMessageBox.warning(self, 'Ошибка',
+                                        'в интервале скреперования отсутствует корректные интервалы скреперования')
+                    return
+
+                if current_bottom == '' or fluid == '' or work_earlier == '' or \
+                        template_depth_edit == '' or template_length_edit == '':
+                    # print(current_bottom, fluid, work_earlier)
+                    QMessageBox.critical(self, 'Забой', 'не все значения введены')
+                    return
+                if template_length_edit == '0':
+                    QMessageBox.critical(self, 'Длина шаблона',
+                                         'Введите длину шаблонов которые были спущены в скважину')
+                    return
+                if float(template_depth_edit) > float(current_bottom):
+                    QMessageBox.critical(self, 'Забой', 'Шаблонирование не может быть ниже текущего забоя')
+                    return
+                if number_dp != '':
+                    self.data_well.number_dp = int(float(number_dp))
+
+                if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
+                    QMessageBox.critical(self, 'рабочая жидкость',
+                                         'уд. вес рабочей жидкости не может быть меньше 0,87 и больше 1,64')
+                    return
+
+                # if float(current_bottom) > self.data_well.bottom_hole_drill.get_value:
+                #     QMessageBox.critical(self, 'Забой', 'Текущий забой больше пробуренного забоя')
+                #     return
+                self.data_well.fluid_work, self.data_well.fluid_work_short = self.calc_work_fluid(fluid)
+
+                self.data_well.template_depth = float(template_depth_edit)
+                self.data_well.template_length = float(template_length_edit)
+                if self.data_well.column_additional:
+                    self.data_well.template_depth = float(template_depth_addition_edit)
+                    self.data_well.template_length = float(template_length_addition_edit)
+
+                work_list = self.work_list(work_earlier)
+                # self.data_well.insert_index2 = self.insert_index
+                self.populate_row(self.insert_index, work_list, self.table_widget, self.work_plan)
+                definition_plast_work(self)
+        except Exception as e:
+            logger.critical(e)
 
         data_list.pause = False
         self.close()

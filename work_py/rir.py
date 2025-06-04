@@ -4,7 +4,7 @@ import data_list
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QLabel, QComboBox, QLineEdit, QGridLayout, QWidget, QPushButton
 from work_py.alone_oreration import volume_vn_ek, well_volume, volume_vn_nkt
-from work_py.change_fluid import Change_fluid_Window
+from work_py.change_fluid import ChangeFluidWindow
 from work_py.opressovka import OpressovkaEK
 
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
@@ -531,7 +531,7 @@ class RirWindow(WindowUnion):
              'мастер КРС', 0.67]]
         work_list.extend(ozc_list)
         if need_change_zgs_combo == "Да":
-            for row in Change_fluid_Window.fluid_change(self, plast_new_combo, fluid_new_edit,
+            for row in ChangeFluidWindow.fluid_change(self, plast_new_combo, fluid_new_edit,
                                                         pressure_new_edit):
                 work_list.append(row)
             work_list.append([
@@ -821,7 +821,7 @@ class RirWindow(WindowUnion):
                 uzm_pero_list.pop(-1)
 
         if need_change_zgs_combo == "Да":
-            for row in Change_fluid_Window.fluid_change(self, plast_new_combo, fluid_new_edit,
+            for row in ChangeFluidWindow.fluid_change(self, plast_new_combo, fluid_new_edit,
                                                         pressure_new_edit):
                 uzm_pero_list.append(row)
             uzm_pero_list.append([
@@ -1027,7 +1027,7 @@ class RirWindow(WindowUnion):
         self.calculate_chemistry('цемент', volume_cement)
 
         if need_change_zgs_combo == "Да":
-            for row in Change_fluid_Window.fluid_change(self, plast_new_combo, fluid_new_edit,
+            for row in ChangeFluidWindow.fluid_change(self, plast_new_combo, fluid_new_edit,
                                                         pressure_new_edit):
                 rir_list.append(row)
 
