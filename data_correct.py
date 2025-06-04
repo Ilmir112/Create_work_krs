@@ -912,13 +912,15 @@ class DataWindow(WindowUnion):
 
         region_combo = self.current_widget.region_combo.currentText()
         type_kr_combo = self.current_widget.type_kr_combo.currentText()
-        self.distance_from_well_to_sampling_point_line = float(
-            self.current_widget.distance_from_well_to_sampling_point_line.text()
-        )
-        if self.distance_from_well_to_sampling_point_line == 0:
+
+        self.distance_from_well_to_sampling_point_line = self.current_widget.distance_from_well_to_sampling_point_line.text()
+        if (self.check_str_isdigit(self.distance_from_well_to_sampling_point_line) is False or
+                self.distance_from_well_to_sampling_point_line == '0'):
             QMessageBox.warning(
                 self, "Ошибка", "Нужно внести данные по расстоянию до ПНТЖ"
             )
+        else:
+            self.distance_from_well_to_sampling_point_line = float(self.distance_from_well_to_sampling_point_line)
         try:
             if region_combo == "":
                 QMessageBox.warning(self, "ОШИБКА", "Не выбран регион")
