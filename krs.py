@@ -562,6 +562,15 @@ class GnoParent(ABC):
              None, None, None, None, None, None, None,
              ' Мастер КРС.', 1.5]
         ]
+        if self.data_well.well_number.get_value in ['2010', '5082', "2352", "305г", "343ТНП", "2191", "598", "572",
+                                                    "2111", "4152", "6728г", "1002"]:
+            QMessageBox.warning(None, 'Опережающее глушение', "В скважине необходимо произвести опережающее глушение")
+
+            krs_begin.extend([
+                [None, None, f'Согласно графика по скважине необходимо в приоритете произвести опережающее глушение',
+             None, None, None, None, None, None, None,
+             ' Мастер КРС.', None]])
+
         сat_h2s_list = list(map(int, [self.data_well.dict_category[plast]["по сероводороду"].category for plast in
                                       self.data_well.plast_work if self.data_well.dict_category.get(plast) and
                                       self.data_well.dict_category[plast]["отключение"] == "рабочий"]))

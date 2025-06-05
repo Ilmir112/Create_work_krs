@@ -33,7 +33,7 @@ class TabPageUnion(QWidget):
         self.grid = QGridLayout(self)
 
         self.validator_float = QDoubleValidator(0.0, 8000.0, 2)
-        self.validator_float_wall_thickness = QDoubleValidator(4.0, 14.0, 1)
+        self.validator_float_wall_thickness = QDoubleValidator(4.0, 16.0, 1)
         self.validator_int = QIntValidator(0, 8000)
         self.data_well = data_well
 
@@ -203,12 +203,13 @@ class TabPageUnion(QWidget):
         self.table_name = str(self.well_number_edit.text()) + self.well_area_edit.text()
         if data_list.data_in_base:
             well_list = self.check_in_database_well_data2(self.well_number_edit.text())
-            well_list = sorted(well_list, key=lambda x: x.split(' ')[-2], reverse=True)
-            self.well_data_in_base_combo.clear()
             if well_list:
-                self.well_area_edit.textChanged.connect(self.update_well_area)
-                self.well_area_edit.setText(well_list[0].split(' ')[1])
-                self.well_data_in_base_combo.addItems(well_list)
+                well_list = sorted(well_list, key=lambda x: x.split(' ')[-2], reverse=True)
+                self.well_data_in_base_combo.clear()
+                if well_list:
+                    self.well_area_edit.textChanged.connect(self.update_well_area)
+                    self.well_area_edit.setText(well_list[0].split(' ')[1])
+                    self.well_data_in_base_combo.addItems(well_list)
 
     def insert_repairs_data(self, response):
         self.data_well.distance_from_well_to_sampling_point = 20

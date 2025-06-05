@@ -161,7 +161,6 @@ class TabPageSoCorrect(TabPageUnion):
         self.column_add_true_comboBox = QComboBox(self)
         self.column_add_true_comboBox.addItems(["в наличии", "отсутствует"])
 
-
         self.column_add_label = QLabel("диаметр \nдоп. колонны", self)
         self.column_add_edit_type = FloatLineEdit()
         self.column_add_edit_type.setText(
@@ -173,7 +172,7 @@ class TabPageSoCorrect(TabPageUnion):
         self.column_add_wall_thicknessedit_type2 = FloatLineEdit()
         self.column_add_wall_thicknessedit_type2.setValidator(self.validator_float_wall_thickness)
         self.column_add_wall_thicknessedit_type2.setText(
-            f"{self.ifNone(self.data_well.column_additional_wall_thickness.get_value)}"
+            f"{str(self.ifNone(self.data_well.column_additional_wall_thickness.get_value)).replace('.', ',')}"
         )
         # self.column_add_wall_thicknessedit_type2.setClearButtonEnabled(True)
 
@@ -919,8 +918,10 @@ class DataWindow(WindowUnion):
             QMessageBox.warning(
                 self, "Ошибка", "Нужно внести данные по расстоянию до ПНТЖ"
             )
+            return
         else:
             self.distance_from_well_to_sampling_point_line = float(self.distance_from_well_to_sampling_point_line)
+
         try:
             if region_combo == "":
                 QMessageBox.warning(self, "ОШИБКА", "Не выбран регион")
@@ -932,16 +933,16 @@ class DataWindow(WindowUnion):
             else:
                 self.data_well.type_kr = type_kr_combo
 
-            column_type = self.current_widget.column_type.text().replace(",", ".")
+            column_type = self.current_widget.column_type.text().replace(",", ".").strip()
             column_wall_thickness = (
-                self.current_widget.column_wall_thickness_edit_type2.text()
+                self.current_widget.column_wall_thickness_edit_type2.text().replace(",", ".").strip()
             )
             shoe_column = (
                 self.current_widget.shoe_column_edit_type2.text()
                 .strip()
                 .replace(",", ".")
             )
-            level_cement = self.current_widget.level_cement_edit.text()
+            level_cement = self.current_widget.level_cement_edit.text().replace(",", ".").strip()
             if "-" in level_cement:
                 level_cement = level_cement.split("-")[0]
             head_column = float(
@@ -956,44 +957,42 @@ class DataWindow(WindowUnion):
                 self.data_well.column_additional = False
 
             column_additional_diameter = (
-                self.current_widget.column_add_edit_type.text().replace(",", ".")
+                self.current_widget.column_add_edit_type.text().replace(",", ".").strip()
             )
             column_additional_wall_thickness = (
-                self.current_widget.column_add_wall_thicknessedit_type2.text().replace(
-                    ",", "."
-                )
+                self.current_widget.column_add_wall_thicknessedit_type2.text().replace(",", ".").strip()
             )
             shoe_column_additional = (
-                self.current_widget.shoe_column_add_edit_type2.text().replace(",", ".")
+                self.current_widget.shoe_column_add_edit_type2.text().replace(",", ".").strip()
             )
             head_column_additional = (
-                self.current_widget.head_column_add_edit_type2.text().replace(",", ".")
+                self.current_widget.head_column_add_edit_type2.text().replace(",", ".").strip()
             )
             bottomhole_drill = (
-                self.current_widget.bottomhole_drill_edit_type.text().replace(",", ".")
+                self.current_widget.bottomhole_drill_edit_type.text().replace(",", ".").strip()
             )
             if bottomhole_drill == "отсут":
                 QMessageBox.warning(self, "Ошибка", "Ошибка в пробуренном забое")
                 return
-            bottomhole_artificial = self.current_widget.bottomhole_artificial_edit_type.text().replace(",", ".")
+            bottomhole_artificial = self.current_widget.bottomhole_artificial_edit_type.text().replace(",", ".").strip()
 
             if bottomhole_artificial == "отсут":
                 QMessageBox.warning(self, "Ошибка", "Ошибка в искусcтвенном забое")
                 return
-            current_bottom = self.current_widget.current_bottom_edit_type.text().replace(",", ".")
+            current_bottom = self.current_widget.current_bottom_edit_type.text().replace(",", ".").strip()
             if current_bottom == "отсут":
                 QMessageBox.warning(self, "Ошибка", "Ошибка в искусcтвенном забое")
                 return
             max_angle_depth = (
-                self.current_widget.max_angle_depth_edit_type.text().replace(",", ".")
+                self.current_widget.max_angle_depth_edit_type.text().replace(",", ".").strip()
             )
-            max_angle = self.current_widget.max_angle_edit_type.text().replace(",", ".")
-            max_expected_pressure = self.current_widget.max_expected_pressure_edit_type.text().replace(",", ".")
+            max_angle = self.current_widget.max_angle_edit_type.text().replace(",", ".").strip()
+            max_expected_pressure = self.current_widget.max_expected_pressure_edit_type.text().replace(",", ".").strip()
 
-            max_admissible_pressure = self.current_widget.max_admissible_pressure_edit_type.text().replace(",", ".")
+            max_admissible_pressure = self.current_widget.max_admissible_pressure_edit_type.text().replace(",", ".").strip()
 
             column_direction_diameter = self.current_widget.column_direction_diameter_edit.text().replace(",", ".")
-            column_direction_wall_thickness = self.current_widget.column_direction_wall_thickness_edit.text().replace(",", ".")
+            column_direction_wall_thickness = self.current_widget.column_direction_wall_thickness_edit.text().replace(",", ".").strip()
             column_direction_length = self.current_widget.column_direction_length_edit.text().replace(",", ".")
             level_cement_direction = self.current_widget.level_cement_direction_edit.text().replace(",", ".")
             column_conductor_diameter = self.current_widget.column_conductor_diameter_edit.text().replace(",", ".")
@@ -1806,10 +1805,9 @@ class DataWindow(WindowUnion):
                         f" требуется пакер "
                         f"диаметром {paker_diameter}",
                     )
-
                     self.data_well.check_data_in_pz.append(
                         f"Не корректно указан диаметр фондового пакера в карте спуска "
-                        f'ремонта {self.data_well.paker_before["before"].split("/")[0]} требуется пакер '
+                        f'ремонта {self.data_well.paker_before["after"].split("/")[0]} требуется пакер '
                         f"диаметром {paker_diameter}"
                     )
 
