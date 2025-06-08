@@ -3,8 +3,6 @@ import json
 import os
 import shutil
 
-import requests.exceptions
-
 import data_list
 import sys
 import socket
@@ -1524,6 +1522,7 @@ class MyMainWindow(QMainWindow):
                     f"файл под таким именем открыт, закройте его: {type(e).__name__}\n  {str(e)}",
                 )
         try:
+            # Создаем объект Excel
             # Создаем объект Excel
             excel = win32com.client.Dispatch("Excel.Application")
             # win32api.SetFileAttributes(file_name, win32con.FILE_ATTRIBUTE_NORMAL)
@@ -4073,20 +4072,40 @@ class SaveInExcel(MyWindow):
         filenames = self.definition_filenames()
         full_path = path + "/" + filenames
         gnkt_data = self.gnkt_data.data_gnkt
+        params = {
 
-        insert_data_base_gnkt(
-            self,
-            data_list.contractor,
-            filenames,
-            gnkt_data.gnkt_number_combo,
-            int(gnkt_data.length_gnkt_edit),
-            float(gnkt_data.diameter_length),
-            float(gnkt_data.iznos_gnkt_edit) * 1.014,
-            int(gnkt_data.pipe_mileage_edit) + int(gnkt_data.current_bottom_edit * 1.1),
-            gnkt_data.pipe_fatigue,
-            int(gnkt_data.pvo_number),
-            gnkt_data.previous_well_combo,
-        )
+                "id": 0,
+                "gnkt_number": gnkt_data.gnkt_number_combo,
+                "well_number": self.data_well.well_number.get_value,
+                "well_area": self.data_well.well_area.get_value,
+                "contractor": data_list.contractor,
+                "length_gnkt":  int(gnkt_data.length_gnkt_edit),
+                "diameter_gnkt": float(gnkt_data.diameter_length),
+                "wear_gnkt": float(gnkt_data.iznos_gnkt_edit) * 1.014,
+                "mileage_gnkt": int(gnkt_data.pipe_mileage_edit) + int(gnkt_data.current_bottom_edit * 1.1),
+                "tubing_fatigue": gnkt_data.pipe_fatigue,
+                "previous_well": gnkt_data.previous_well_combo,
+                "date_repair": data_list.current_date,
+                "pvo_number": int(gnkt_data.pvo_number)
+            }
+        response = ApiClient.request_post(ApiClient.add_data_gnkt(), params)
+        if response is None:
+            QMessageBox.warning(self, "ошибка", "скважина не добавлена в well_data")
+            # return
+
+        # insert_data_base_gnkt(
+        #     self,
+        #     data_list.contractor,
+        #     filenames,
+        #     gnkt_data.gnkt_number_combo,
+        #     int(gnkt_data.length_gnkt_edit),
+        #     float(gnkt_data.diameter_length),
+        #     float(gnkt_data.iznos_gnkt_edit) * 1.014,
+        #     int(gnkt_data.pipe_mileage_edit) + int(gnkt_data.current_bottom_edit * 1.1),
+        #     gnkt_data.pipe_fatigue,
+        #     int(gnkt_data.pvo_number),
+        #     gnkt_data.previous_well_combo,
+        # )
 
         if self.data_well.bvo is True:
             ws5 = self.gnkt_data.wb_gnkt.create_sheet("Sheet1")

@@ -1,6 +1,6 @@
 import block_name
 import data_list
-from datetime import datetime
+from datetime import datetime, date
 from data_base.config_base import connection_to_database, GnktDatabaseWell
 from PyQt5.QtWidgets import QInputDialog, QTabWidget, QWidget, QApplication, QLabel, \
     QLineEdit, QGridLayout, QComboBox, QPushButton, QMessageBox
@@ -11,6 +11,7 @@ from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict, read_database_gnkt
 from openpyxl.styles import PatternFill, Font, Alignment
 
 from open_pz import CreatePZ
+from server_response import ApiClient
 from work_py.acid_paker import CheckableComboBox
 from work_py.alone_oreration import well_volume
 from work_py.parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
@@ -220,11 +221,21 @@ class TabPageGnkt(TabPageUnion):
                     contractor_in = 'oil_service'
 
                 result_gnkt = data_gnkt.update_data_gnkt(contractor_in, previus_well)
-
                 self.length_gnkt_edit.setText(str(result_gnkt[3]))
                 self.iznos_gnkt_edit.setText(str(result_gnkt[5]))
                 self.pipe_mileage_edit.setText(str(result_gnkt[6]))
                 self.pvo_number_edit.setText(str(result_gnkt[10]))
+                params = {
+                    "well_number": previus_well.split(" ")[0],
+                    "well_area": previus_well.split(" ")[1],
+                    "date_repair": previus_well.split(" ")[2]
+                }
+                result_gnkt = ApiClient.request_params_get(ApiClient.find_gnkt_data_by_well_number(), params)
+                if result_gnkt:
+                    self.length_gnkt_edit.setText(str(result_gnkt["length_gnkt"]))
+                    self.iznos_gnkt_edit.setText(str(result_gnkt["wear_gnkt"]))
+                    self.pipe_mileage_edit.setText(str(result_gnkt["mileage_gnkt"]))
+                    self.pvo_number_edit.setText(str(result_gnkt["pvo_number"]))
 
 
         except Exception as e:
@@ -232,10 +243,17 @@ class TabPageGnkt(TabPageUnion):
 
     def update_number_gnkt(self, gnkt_number):
         if gnkt_number != '':
-            well_previus_list = read_database_gnkt(data_list.contractor, gnkt_number)
-
+            well_previus_list = self.append_list_previus_well(gnkt_number)
             self.previous_well_combo.clear()
             self.previous_well_combo.addItems(list(map(str, well_previus_list)))
+
+    def append_list_previus_well(self, gnkt_number):
+        params = {"gnkt_number": gnkt_number}
+        well_previus_list = ApiClient.request_params_get(ApiClient.find_gnkt_data_by_gnkt(), params)
+        new_list = []
+        for wells_data in well_previus_list:
+            new_list.append(f'{wells_data["well_number"]} {wells_data["well_area"]} {wells_data["date_repair"]}')
+        return new_list
 
 
 class TabWidget(TabWidgetUnion):
@@ -293,8 +311,6 @@ class GnktModel(WindowUnion):
                     count_insert += 1
                     count_interval = self.data_well.dict_perforation[plast]['счет_объединение']
 
-
-
                     try:
                         if roof_plast > self.data_well.depth_fond_paker_before["before"] and \
                                 roof_plast < self.data_well.current_bottom and count_insert <= 5:
@@ -332,7 +348,7 @@ class GnktModel(WindowUnion):
         from openpyxl.utils.cell import range_boundaries, get_column_letter
 
         col_width = [2.85546875, 14.42578125, 16.140625, 22.85546875, 17.140625, 14.42578125, 13.0, 13.0, 17.0,
-                    14.42578125, 13.0, 21, 12.140625, None]
+                     14.42578125, 13.0, 21, 12.140625, None]
 
         text_width_dict = {35: (0, 100), 50: (101, 200), 70: (201, 300), 110: (301, 400), 120: (401, 500),
                            130: (501, 600), 150: (601, 700), 170: (701, 800), 190: (801, 900), 230: (901, 1500)}
@@ -487,6 +503,7 @@ class GnktModel(WindowUnion):
                     elif 'Рахимьянов' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind - 1}'
                         self.insert_image(ws2, f'{data_list.path_image}imageFiles/рахимьянов.png', coordinate)
+
     def work_with_data_gnkt(self):
         if self.data_gnkt is None:
 
@@ -589,7 +606,7 @@ class GnktModel(WindowUnion):
             return
 
         question = QMessageBox.question(self, 'Забой',
-                                              f'Забой нужно нормализовать до глубины {self.current_bottom_edit}м?')
+                                        f'Забой нужно нормализовать до глубины {self.current_bottom_edit}м?')
         if question == QMessageBox.StandardButton.No:
             return
 
@@ -695,7 +712,6 @@ class GnktModel(WindowUnion):
                        None, None, None, None, None, None, None, None,
                        'Мастер ГНКТ, состав бригады, представитель Заказчика', None])
 
-
         work_list = [[None,
                       18,
                       f'ПРИМЕЧАНИЕ:\n '
@@ -747,9 +763,9 @@ class GnktModel(WindowUnion):
                      ]
         if self.data_well.region == 'ТГМ' and acid_edit == 'HF':
             work_list[2] = [None, 20,
-                      'без реагирования',
-                      None, None, None, None, None, None, None,
-                      'Мастер ГНКТ, состав бригады', None]
+                            'без реагирования',
+                            None, None, None, None, None, None, None,
+                            'Мастер ГНКТ, состав бригады', None]
 
         opz.extend(work_list)
 
@@ -785,11 +801,11 @@ class GnktModel(WindowUnion):
             if self.data_well.paker_before["before"] != 0:
                 if self.data_well.dict_perforation[plast_ind]['подошва'] > \
                         self.data_well.depth_fond_paker_before["before"]:
-                        if pressure != 0:
-                            pressure.append(max(list(map(
-                                float, self.data_well.dict_perforation[plast_ind]["давление"]))))
-                            if "вертикаль" in list(self.data_well.dict_perforation[plast_ind].keys()):
-                                vertikal.append(min(self.data_well.dict_perforation[plast_ind]["вертикаль"]))
+                    if pressure != 0:
+                        pressure.append(max(list(map(
+                            float, self.data_well.dict_perforation[plast_ind]["давление"]))))
+                        if "вертикаль" in list(self.data_well.dict_perforation[plast_ind].keys()):
+                            vertikal.append(min(self.data_well.dict_perforation[plast_ind]["вертикаль"]))
 
 
             else:
@@ -808,7 +824,6 @@ class GnktModel(WindowUnion):
 
         vertikal = min(vertikal)
         koef_anomal.append(round(float(self.pressure) * 101325 / (float(vertikal) * 9.81 * 1000), 1))
-
 
         koef_anomal = max(koef_anomal)
 
@@ -871,7 +886,9 @@ class GnktModel(WindowUnion):
         length_nkt = '\n'.join(length_str)
 
         volume_pm_ek = round(
-            3.14 * (self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value) ** 2 / 4 / 1000, 2)
+            3.14 * (
+                    self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value) ** 2 / 4 / 1000,
+            2)
         volume_pm_dp = round(3.14 * (self.data_well.column_additional_diameter.get_value - 2 *
                                      self.data_well.column_additional_wall_thickness.get_value) ** 2 / 4 / 1000, 2)
 
@@ -880,7 +897,8 @@ class GnktModel(WindowUnion):
             column_data_add_wall_thickness = self.data_well.column_additional_wall_thickness.get_value
 
             column_data_add_vn_volume = round(
-                self.data_well.column_additional_diameter.get_value - 2 * self.data_well.column_additional_wall_thickness.get_value, 1)
+                self.data_well.column_additional_diameter.get_value - 2 * self.data_well.column_additional_wall_thickness.get_value,
+                1)
             column_add_head = self.data_well.head_column_additional.get_value
             column_add_shoe = self.data_well.shoe_column_additional.get_value
 
@@ -907,7 +925,7 @@ class GnktModel(WindowUnion):
         if self.data_well.curator == 'ОР' and self.data_well.region == 'ТГМ' and \
                 self.data_well.depth_fond_paker_second_before["before"] != 0:
             length_paker = round(float(self.data_well.depth_fond_paker_second_before["before"]) - float(
-                    self.data_well.depth_fond_paker_before["before"]), 1)
+                self.data_well.depth_fond_paker_before["before"]), 1)
             voronka = round(nkt_length + length_paker, 1)
         voronka_str = ''
         nkt_schema = ''
@@ -938,7 +956,8 @@ class GnktModel(WindowUnion):
         length_paker = 2.6
         if self.data_well.curator == 'ОР' and self.data_well.region == 'ТГМ' and \
                 self.data_well.depth_fond_paker_second_before["before"] != 0:
-            length_paker = self.data_well.depth_fond_paker_second_before["before"] - self.data_well.depth_fond_paker_before["before"]
+            length_paker = self.data_well.depth_fond_paker_second_before["before"] - \
+                           self.data_well.depth_fond_paker_before["before"]
             if length_paker > 4:
                 QMessageBox.warning(self, 'Длина пакера', 'Длина пакера больше 4м')
                 length_paker = 2.6
@@ -981,7 +1000,9 @@ class GnktModel(WindowUnion):
              None,
              f'{self.data_well.column_direction_diameter.get_value}',
              self.data_well.column_direction_wall_thickness.get_value,
-             round(self.data_well.column_direction_diameter.get_value - 2 * self.data_well.column_direction_wall_thickness.get_value, 1),
+             round(
+                 self.data_well.column_direction_diameter.get_value - 2 * self.data_well.column_direction_wall_thickness.get_value,
+                 1),
              f'0-', self.data_well.column_direction_length.get_value,
              f'{self.data_well.level_cement_direction.get_value}-{self.data_well.column_direction_length.get_value}',
              None,
@@ -997,7 +1018,8 @@ class GnktModel(WindowUnion):
              f'{self.data_well.column_diameter.get_value}',
              f'{self.data_well.column_wall_thickness.get_value}',
              f'{round(float(self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value), 1)}',
-             f'0-', self.data_well.shoe_column.get_value, f'{self.data_well.level_cement_column.get_value}-{self.data_well.shoe_column.get_value}',
+             f'0-', self.data_well.shoe_column.get_value,
+             f'{self.data_well.level_cement_column.get_value}-{self.data_well.shoe_column.get_value}',
              volume_pm_ek,
              self.well_volume_ek],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
@@ -1089,7 +1111,8 @@ class GnktModel(WindowUnion):
              None, self.data_well.gaz_factor_percent[0], None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Коэффициент аномальности', None,
              None, None, None, koef_anomal, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, 'Расчетная плотность жидкости глушения',
+            [None, None, None, None, None, None, None, None, None, None, None, None,
+             'Расчетная плотность жидкости глушения',
              None, None, None, None, fluid_edit, None, 'в объеме', None, self.well_volume_ek, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Плотность рабочей жидкости',
              None, None, None, None, self.fluid_work_edit, None, None, None, None, None],
@@ -1158,20 +1181,22 @@ class GnktModel(WindowUnion):
              None, None, None, None, None],
         ]
         if self.data_well.column_direction_mine_true:
-            schema_well_list.insert(10, [None, None, None, None, None, None, None, None, None, None, None, None, 'Шахтное направление', None,
-             None,
-             f'{self.data_well.column_direction_mine_diameter.get_value}',
-             self.data_well.column_direction_mine_wall_thickness.get_value,
-             round(
-                 float(self.data_well.column_direction_mine_diameter.get_value) - 2 * float(self.data_well.column_direction_mine_wall_thickness.get_value),
-                 1),
-             f'0-', self.data_well.column_direction_mine_length.get_value,
-             f'{self.data_well.level_cement_direction_mine.get_value}-{self.data_well.column_direction_mine_length.get_value}',
-             None,
-             None])
+            schema_well_list.insert(10, [None, None, None, None, None, None, None, None, None, None, None, None,
+                                         'Шахтное направление', None,
+                                         None,
+                                         f'{self.data_well.column_direction_mine_diameter.get_value}',
+                                         self.data_well.column_direction_mine_wall_thickness.get_value,
+                                         round(
+                                             float(self.data_well.column_direction_mine_diameter.get_value) - 2 * float(
+                                                 self.data_well.column_direction_mine_wall_thickness.get_value),
+                                             1),
+                                         f'0-', self.data_well.column_direction_mine_length.get_value,
+                                         f'{self.data_well.level_cement_direction_mine.get_value}-{self.data_well.column_direction_mine_length.get_value}',
+                                         None,
+                                         None])
         else:
             schema_well_list.insert(10, [None, None, None, None, None, None, None, None, None, None, None, None,
-                                        'Шахтное направление', None, None, '-', '-', '-', None, None, '-', '-', None])
+                                         'Шахтное направление', None, None, '-', '-', '-', None, None, '-', '-', None])
 
         if self.data_well.work_plan == 'gnkt_bopz':
             schema_well_list.append(list_gnkt_bopz)
@@ -1208,12 +1233,12 @@ class GnktModel(WindowUnion):
                     vertikal_1 = None
                     if 'вертикаль' in self.data_well.dict_perforation[plast].keys():
                         if len(self.data_well.dict_perforation[plast]['вертикаль']) > 2:
-                            vertikal_1 = sorted(self.data_well.dict_perforation[plast]['вертикаль'])[count_interval-1]
+                            vertikal_1 = sorted(self.data_well.dict_perforation[plast]['вертикаль'])[count_interval - 1]
                         else:
                             vertikal_1 = sorted(self.data_well.dict_perforation[plast]['вертикаль'])[0]
                     pressure_1 = ''
                     if 'давление' in list(self.data_well.dict_perforation[plast].keys()):
-                        pressure_1 = list(filter(lambda  x: x != 0, self.data_well.dict_perforation[plast]['давление']))
+                        pressure_1 = list(filter(lambda x: x != 0, self.data_well.dict_perforation[plast]['давление']))
                         if len(pressure_1) != 0:
                             pressure_1 = pressure_1[0]
                     zamer_1 = ''
@@ -1225,7 +1250,8 @@ class GnktModel(WindowUnion):
                                 zamer_1 = zamer_1[0]
 
                     pvr_list.append(
-                        [None, None, None, None, None, None, None, None, None, None, None, None, plast, None, vertikal_1,
+                        [None, None, None, None, None, None, None, None, None, None, None, None, plast, None,
+                         vertikal_1,
                          None, interval[0],
                          None, interval[1], None, izol, pressure_1,
                          zamer_1, None])

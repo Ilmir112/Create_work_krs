@@ -185,6 +185,22 @@ class ApiClient:
         return "/auth/register"
 
     @classmethod
+    def find_gnkt_data_all(cls):
+        return "/gnkt_data_router/find_gnkt_data_all"
+
+    @classmethod
+    def find_gnkt_data_by_gnkt(cls):
+        return "/gnkt_data_router/find_gnkt_data_by_gnkt"
+
+    @classmethod
+    def add_data_gnkt(cls):
+        return "/gnkt_data_router/add_data"
+
+    @classmethod
+    def find_gnkt_data_by_well_number(cls):
+        return "/gnkt_data_router/find_gnkt_data_by_well_number"
+
+    @classmethod
     def find_wells_data_response_filter_well_number_well_area(cls):
         return "/wells_data_router/find_wells_data"
 
