@@ -90,10 +90,7 @@ class TabPageUnion(QWidget):
     def update_well_area(self, well_area):
         if self.well_number_edit.text() != '' and data_list.connect_in_base and well_area != '':
             params = {"well_number": self.well_number_edit.text(), "well_area": well_area}
-            response = ApiClient.request_params_get(ApiClient.find_wells_data_response_filter_well_number_well_area(),
-                                                    params)
-            if response:
-                self.insert_response_data(response)
+            self.data_well = ApiClient.insert_well_data_from_database(self.data_well, params)
 
     def update_table_in_base_combo(self):
         from work_py.dop_plan_py import DopPlanWindow
@@ -207,7 +204,7 @@ class TabPageUnion(QWidget):
                 well_list = sorted(well_list, key=lambda x: x.split(' ')[-2], reverse=True)
                 self.well_data_in_base_combo.clear()
                 if well_list:
-                    self.well_area_edit.textChanged.connect(self.update_well_area)
+                    # self.well_area_edit.textChanged.connect(self.update_well_area)
                     self.well_area_edit.setText(well_list[0].split(' ')[1])
                     self.well_data_in_base_combo.addItems(well_list)
 
@@ -228,109 +225,6 @@ class TabPageUnion(QWidget):
         return json.loads(response["data_change_paragraph"]["данные"]), \
                response["category_dict"]["данные по категории"], \
                response['excel_json']["excel"]
-
-    def insert_response_data(self, response):
-
-        if response['column_direction']['diameter'] != 0:
-            self.data_well.column_direction_true = True
-        else:
-            self.data_well.column_direction_true = False
-        self.data_well.column_direction_diameter = ProtectedIsDigit(response["column_direction"]['diameter'])
-        self.data_well.column_direction_wall_thickness = ProtectedIsDigit(
-            response["column_direction"]['wall_thickness'])
-        self.data_well.column_direction_length = data_list.ProtectedIsDigit(response["column_direction"]["shoe"])
-        self.data_well.level_cement_direction = ProtectedIsDigit(response["column_direction"]["level_cement"])
-        self.data_well.column_conductor_diameter = ProtectedIsDigit(response["column_conductor"]["diameter"])
-        self.data_well.column_conductor_wall_thickness = ProtectedIsDigit(
-            response["column_conductor"]["wall_thickness"])
-        self.data_well.column_conductor_length = ProtectedIsDigit(response["column_conductor"]["shoe"])
-        self.data_well.level_cement_conductor = ProtectedIsDigit(response["column_conductor"]["level_cement"])
-        if self.data_well.column_conductor_diameter.get_value not in ['0', None, 0, '']:
-            self.data_well.column_direction_true = True
-        self.data_well.well_oilfield = ProtectedIsDigit(response["well_oilfield"])
-        self.data_well.level_cement_column = ProtectedIsDigit(response["column_production"]["level_cement"])
-        self.data_well.appointment_well = ProtectedIsNonNone(response["appointment"])
-        self.data_well.column_diameter = ProtectedIsDigit(response["column_production"]["diameter"])
-        self.data_well.column_wall_thickness = ProtectedIsDigit(response["column_production"]["wall_thickness"])
-        self.data_well.shoe_column = ProtectedIsDigit(response["column_production"]["shoe"])
-        self.data_well.head_column = ProtectedIsDigit(response["column_production"]["head"])
-        self.data_well.diameter_doloto_ek = ProtectedIsDigit(response["diameter_doloto_ek"])
-        self.data_well.column_additional = False
-        self.data_well.column_additional_diameter = ProtectedIsDigit(response["column_additional"]["diameter"])
-        if response["column_additional"]["diameter"] != 0:
-            self.data_well.column_additional = True
-        self.data_well.column_additional_wall_thickness = ProtectedIsDigit(
-            response["column_additional"]["wall_thickness"])
-        self.data_well.shoe_column_additional = ProtectedIsDigit(response["column_additional"]["shoe"])
-        self.data_well.head_column_additional = ProtectedIsDigit(response["column_additional"]["head"])
-        # self.data_well.curator = response["куратор"]
-        self.data_well.dict_pump_shgn = response["equipment"]["ШГН"]["тип"]
-
-        self.data_well.dict_pump_shgn['before'] = self.data_well.dict_pump_shgn['before']
-        self.data_well.dict_pump_shgn['after'] = self.data_well.dict_pump_shgn['after']
-
-        self.data_well.dict_pump_shgn_depth = response["equipment"]["ШГН"]["глубина "]
-
-        self.data_well.dict_pump_shgn_depth['before'] = self.data_well.dict_pump_shgn_depth['before']
-        self.data_well.dict_pump_shgn_depth['after'] = self.data_well.dict_pump_shgn_depth['after']
-
-        self.data_well.dict_pump_ecn = response["equipment"]["ЭЦН"]["тип"]
-
-        self.data_well.dict_pump_ecn['before'] = self.data_well.dict_pump_ecn['before']
-        self.data_well.dict_pump_ecn['after'] = self.data_well.dict_pump_ecn['after']
-        self.data_well.dict_pump_ecn_depth = response["equipment"]["ЭЦН"]["глубина "]
-
-        self.data_well.dict_pump_ecn_depth['before'] = self.data_well.dict_pump_ecn_depth['before']
-        self.data_well.dict_pump_ecn_depth['after'] = self.data_well.dict_pump_ecn_depth['after']
-        self.data_well.paker_before = response["equipment"]["пакер"]["тип"]
-
-        self.data_well.paker_before['before'] = self.data_well.paker_before['before']
-        self.data_well.paker_before['after'] = self.data_well.paker_before['after']
-        self.data_well.depth_fond_paker_before = response["equipment"]["пакер"]["глубина "]
-
-        self.data_well.depth_fond_paker_before['before'] = self.data_well.depth_fond_paker_before['before']
-        self.data_well.depth_fond_paker_before['after'] = self.data_well.depth_fond_paker_before['after']
-
-        self.data_well.paker_second_before = response["equipment"]["пакер2"]["тип"]
-
-        self.data_well.paker_second_before['before'] = self.data_well.paker_second_before['before']
-        self.data_well.paker_second_before['after'] = self.data_well.paker_second_before['after']
-
-        self.data_well.depth_fond_paker_second_before = response["equipment"]["пакер2"]["глубина "]
-
-        self.data_well.depth_fond_paker_second_before['before'] = self.data_well.depth_fond_paker_second_before[
-            'before']
-        self.data_well.depth_fond_paker_second_before['after'] = self.data_well.depth_fond_paker_second_before[
-            'after']
-
-        self.data_well.dict_nkt_after = response["nkt_data"]["После"]
-        self.data_well.dict_nkt_before = response["nkt_data"]["До"]
-        self.data_well.dict_sucker_rod_after = response["sucker_pod"]["После"]
-        self.data_well.dict_sucker_rod = response["sucker_pod"]["До"]
-
-        self.data_well.inventory_number = response["inventory_number"]
-        self.data_well.bottom_hole_drill = ProtectedIsDigit(response["bottom_hole_drill"])
-        self.data_well.bottom_hole_artificial = ProtectedIsDigit(response["bottom_hole_artificial"])
-        self.data_well.max_angle = ProtectedIsDigit(response["max_angle"])
-        self.data_well.max_angle_depth = ProtectedIsDigit(response["max_angle_depth"])
-        self.data_well.max_expected_pressure = ProtectedIsDigit(response["max_expected_pressure"])
-        self.data_well.max_admissible_pressure = ProtectedIsDigit(response["max_admissible_pressure"])
-
-        self.data_well.cdng = data_list.ProtectedIsNonNone(response["cdng"])
-        self.data_well.date_commissioning = data_list.ProtectedIsNonNone(datetime.strptime(response["date_commissioning"], "%Y-%m-%d"))
-        self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(datetime.strptime(response["last_pressure_date"], "%Y-%m-%d"))
-
-        # if 'ПВР план' in list(response.keys()):
-        #     self.data_well.dict_perforation_project = response['ПВР план']
-        # else:
-        #     self.data_well.dict_perforation_project = ''
-
-        # self.data_well.data_well_dict = well_data_dict
-
-        self.data_well.well_volume_in_pz = [well_volume(self, self.data_well.head_column_additional.get_value)]
-        self.data_well.check_data_in_pz = []
-        self.data_well.without_damping = False
-        return
 
     def calculate_h2s(self, type_absorbent, category_h2s, h2s_mg, h2s_pr):
         if '2' in str(category_h2s) or '1' in str(category_h2s):
@@ -1641,13 +1535,14 @@ class WindowUnion(MyMainWindow):
 
     def extraction_data(self, table_name, paragraph_row=0):
         from data_base.work_with_base import insert_data_well_dop_plan
+        dict_category =None
         date_table = table_name.split(' ')[-2]
         wells_id = table_name.split(' ')[-1]
         well_number = table_name.split(' ')[0]
         well_area = table_name.split(' ')[1]
         type_kr = table_name.split(' ')[2].replace('None', 'null')
         contractor_select = data_list.contractor
-        work_plan = table_name.split(' ')[-4]
+        work_plan = table_name.split(' ')[3]
         self.data_well.emergency_well = False
         if data_list.connect_in_base:
             params = {
@@ -1663,7 +1558,7 @@ class WindowUnion(MyMainWindow):
             if response:
                 data_change_paragraph, dict_category, FindIndexPZ.excel_json = TabPageUnion.insert_repairs_data(
                     self, response)
-
+                # self.data_well.bottom_hole_drill = ProtectedIsDigit(5000)
                 data = TabPageUnion.insert_data_dop_plan(self, data_change_paragraph, paragraph_row)
                 if data is None:
                     return None
@@ -1671,6 +1566,8 @@ class WindowUnion(MyMainWindow):
                     data = self.insert_data_plan(data_change_paragraph)
                     if data is None:
                         return None
+            else:
+                return
 
         else:
             db = connection_to_database(decrypt("DB_WELL_DATA"))

@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt
 from data_base.config_base import connection_to_database, WorkDatabaseWell
 from decrypt import decrypt
 from main import ExcelWorker
+from server_response import ApiClient
 
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 
@@ -62,7 +63,7 @@ class TabPageCorrect(TabPageUnion):
 
             self.grid.addWidget(self.well_data_label, 2, 6)
             self.grid.addWidget(self.well_data_in_base_combo, 3, 6)
-            self.well_area_edit.textEdited.connect(self.update_well_area)
+            # self.well_area_edit.textEdited.connect(self.update_well_area)
             self.well_data_in_base_combo.editTextChanged.connect(self.update_table_in_base_combo)
 
             # self.index_change_line.editingFinished.connect(self.update_table_in_base_combo)
@@ -114,6 +115,11 @@ class CorrectPlanWindow(WindowUnion):
         well_number = self.current_widget.well_number_edit.text()
         well_area = self.current_widget.well_area_edit.text()
 
+        if well_number != '' and well_area != '':
+            self.data_well.well_number, self.data_well.well_area = \
+                ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
+            self.data_well = ApiClient.insert_well_data_from_database(self.data_well)
+
         data_well_data_in_base_combo, data_table_in_base_combo = '', ''
         well_data_in_base_combo = self.current_widget.well_data_in_base_combo.currentText()
         if ' от' in well_data_in_base_combo:
@@ -156,9 +162,7 @@ class CorrectPlanWindow(WindowUnion):
             self.change_pvr_in_bottom(self.data, self.row_heights, self.col_width,
                                                self.boundaries_dict)
 
-        if well_number != '' and well_area != '':
-            self.data_well.well_number, self.data_well.well_area = \
-                ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
+
 
         self.thread_excel = ExcelWorker(self)
 

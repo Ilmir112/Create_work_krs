@@ -613,8 +613,19 @@ class DopPlanWindow(WindowUnion):
         from work_py.advanted_file import definition_plast_work
         try:
             self.data_well.data_list = []
-
             current_widget = self.tab_widget.currentWidget()
+
+            well_data_in_base_combo = current_widget.well_data_in_base_combo.currentText()
+            if well_data_in_base_combo == '':
+                QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
+                return
+
+            well_number = current_widget.well_number_edit.text()
+            well_area = current_widget.well_area_edit.text()
+            if well_area != '' and well_area != '':
+                self.data_well.well_number, self.data_well.well_area = \
+                    ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
+
             method_bottom_combo = current_widget.method_bottom_combo.currentText()
             if method_bottom_combo == '':
                 QMessageBox.critical(self, 'Забой', 'Выберете метод определения забоя')
@@ -625,7 +636,6 @@ class DopPlanWindow(WindowUnion):
                 QMessageBox.warning(self, 'Ошибка', 'Нужно выбрать пункт изменения ПВР')
                 return
             if data_list.data_in_base:
-
                 fluid = current_widget.fluid_edit.text().replace(',', '.')
 
                 current_bottom = current_widget.current_bottom_edit.text()
@@ -745,10 +755,7 @@ class DopPlanWindow(WindowUnion):
                         return
 
                 self.data_well.count_template = 1
-                well_data_in_base_combo = current_widget.well_data_in_base_combo.currentText()
-                if well_data_in_base_combo == '':
-                    QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
-                    return
+
                 list_dop_plan = [current_widget.well_data_in_base_combo.itemText(i) for i in range(current_widget.well_data_in_base_combo.count())]
                 if any([f'ДП№{number_dp}' in dop_plan or f'ДП№ {number_dp}' in dop_plan for dop_plan in list_dop_plan]):
                     question = QMessageBox.question(self, 'Ошибка', f'дополнительный план работ № {number_dp} '
@@ -757,11 +764,7 @@ class DopPlanWindow(WindowUnion):
                         return
 
                 index_change_line = current_widget.index_change_line.text()
-                well_number = current_widget.well_number_edit.text()
-                well_area = current_widget.well_area_edit.text()
-                if well_area != '' and well_area != '':
-                    self.data_well.well_number, self.data_well.well_area = \
-                        ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
+
                 if index_change_line != '':
                     index_change_line = int(float(index_change_line))
                 else:
@@ -771,6 +774,7 @@ class DopPlanWindow(WindowUnion):
                 if ' от' in well_data_in_base_combo:
                     data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-2]
                     work_plan_in_base = well_data_in_base_combo.split(' ')[3]
+                    type_kr = well_data_in_base_combo.split(' ')[2]
 
                 # db = connection_to_database(decrypt("DB_WELL_DATA"))
                 # data_well_base = WorkDatabaseWell(db, self.data_well)
@@ -805,7 +809,7 @@ class DopPlanWindow(WindowUnion):
 
                 rows = self.tableWidget.rowCount()
 
-                self.work_with_excel(well_number, well_area, list_dop_plan[3], list_dop_plan[2])
+                self.work_with_excel(well_number, well_area, work_plan_in_base, type_kr)
                 if change_pvr_combo == 'Да':
                     if rows == 0:
                         QMessageBox.warning(self, 'Ошибка', 'Нужно загрузить интервалы перфорации')
@@ -872,7 +876,7 @@ class DopPlanWindow(WindowUnion):
                         else:
                             self.data_well.skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
 
-                except Exception:
+                except Exception as e:
                     QMessageBox.warning(self, 'Ошибка',
                                         'в интервале скреперования отсутствует корректные интервалы скреперования')
                     return

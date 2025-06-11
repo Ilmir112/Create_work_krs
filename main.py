@@ -17,7 +17,7 @@ import win32gui
 import base64
 from io import BytesIO
 
-from server_response import ResponseWork, ApiClient
+from server_response import ApiClient
 from work_py.progress_bar_save import ProgressBarWindow
 from openpyxl.reader.excel import load_workbook
 from PyQt5.QtWidgets import (
@@ -154,11 +154,9 @@ class ExcelWorker(QThread):
                 "well_number": self.data_well.well_number.get_value,
                 "well_area": self.data_well.well_area.get_value,
             }
-            #
-            # self.wells_data_by_id = ApiClient.request_params_get(ApiClient.find_wells_data_response_find_id_by_wells_data(),
-            #                                              self.params)
+
             if self.data_well.work_plan in ["dop_plan", "dop_plan_in_base"]:
-                string_work = f" ДП№ {self.data_well.number_dp}"
+                string_work = f"ДП№{self.data_well.number_dp}"
             elif self.data_well.work_plan == "krs":
                 string_work = "ПР"
             elif self.data_well.work_plan == "plan_change":

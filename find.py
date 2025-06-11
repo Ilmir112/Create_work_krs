@@ -13,7 +13,7 @@ from openpyxl.utils.cell import range_boundaries, get_column_letter
 from openpyxl.workbook import Workbook
 from openpyxl_image_loader import SheetImageLoader
 
-from server_response import ApiClient
+
 from work_py.data_informations import dict_data_cdng
 
 from decrypt import decrypt

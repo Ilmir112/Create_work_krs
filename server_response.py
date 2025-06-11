@@ -3,11 +3,12 @@ import re
 import threading
 from datetime import datetime
 
-import certifi
+from data_list import ProtectedIsDigit, ProtectedIsNonNone
 import requests
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 
 import data_list
+
 
 
 class ApiClient:
@@ -20,6 +21,121 @@ class ApiClient:
         'http': SERVER_API,  # Обязательно http
         'https': SERVER_API,  # Обязательно http
     }
+    @classmethod
+    def insert_well_data_from_database(cls, data_well, params=None):
+        if params is None:
+            params ={
+                "well_number": data_well.well_number.get_value,
+                "well_area": data_well.well_area.get_value
+            }
+        response = ApiClient.request_params_get(ApiClient.find_wells_data_response_filter_well_number_well_area(), params)
+        if response:
+            if response['column_direction']['diameter'] != 0:
+                data_well.column_direction_true = True
+            else:
+                data_well.column_direction_true = False
+            data_well.column_direction_diameter = ProtectedIsDigit(response["column_direction"]['diameter'])
+            data_well.column_direction_wall_thickness = ProtectedIsDigit(
+                response["column_direction"]['wall_thickness'])
+            data_well.column_direction_length = data_list.ProtectedIsDigit(response["column_direction"]["shoe"])
+            data_well.level_cement_direction = ProtectedIsDigit(response["column_direction"]["level_cement"])
+            data_well.column_conductor_diameter = ProtectedIsDigit(response["column_conductor"]["diameter"])
+            data_well.column_conductor_wall_thickness = ProtectedIsDigit(
+                response["column_conductor"]["wall_thickness"])
+            data_well.column_conductor_length = ProtectedIsDigit(response["column_conductor"]["shoe"])
+            data_well.level_cement_conductor = ProtectedIsDigit(response["column_conductor"]["level_cement"])
+            if data_well.column_conductor_diameter.get_value not in ['0', None, 0, '']:
+                data_well.column_direction_true = True
+            data_well.well_oilfield = ProtectedIsDigit(response["well_oilfield"])
+            data_well.level_cement_column = ProtectedIsDigit(response["column_production"]["level_cement"])
+            data_well.appointment_well = ProtectedIsNonNone(response["appointment"])
+            data_well.column_diameter = ProtectedIsDigit(response["column_production"]["diameter"])
+            data_well.column_wall_thickness = ProtectedIsDigit(response["column_production"]["wall_thickness"])
+            data_well.shoe_column = ProtectedIsDigit(response["column_production"]["shoe"])
+            data_well.head_column = ProtectedIsDigit(response["column_production"]["head"])
+            data_well.diameter_doloto_ek = ProtectedIsDigit(response["diameter_doloto_ek"])
+            data_well.column_additional = False
+            data_well.column_additional_diameter = ProtectedIsDigit(response["column_additional"]["diameter"])
+            if response["column_additional"]["diameter"] != 0:
+                data_well.column_additional = True
+            data_well.column_additional_wall_thickness = ProtectedIsDigit(
+                response["column_additional"]["wall_thickness"])
+            data_well.shoe_column_additional = ProtectedIsDigit(response["column_additional"]["shoe"])
+            data_well.head_column_additional = ProtectedIsDigit(response["column_additional"]["head"])
+            # data_well.curator = response["куратор"]
+            data_well.dict_pump_shgn = response["equipment"]["ШГН"]["тип"]
+
+            data_well.dict_pump_shgn['before'] = data_well.dict_pump_shgn['before']
+            data_well.dict_pump_shgn['after'] = data_well.dict_pump_shgn['after']
+
+            data_well.dict_pump_shgn_depth = response["equipment"]["ШГН"]["глубина "]
+
+            data_well.dict_pump_shgn_depth['before'] = data_well.dict_pump_shgn_depth['before']
+            data_well.dict_pump_shgn_depth['after'] = data_well.dict_pump_shgn_depth['after']
+
+            data_well.dict_pump_ecn = response["equipment"]["ЭЦН"]["тип"]
+
+            data_well.dict_pump_ecn['before'] = data_well.dict_pump_ecn['before']
+            data_well.dict_pump_ecn['after'] = data_well.dict_pump_ecn['after']
+            data_well.dict_pump_ecn_depth = response["equipment"]["ЭЦН"]["глубина "]
+
+            data_well.dict_pump_ecn_depth['before'] = data_well.dict_pump_ecn_depth['before']
+            data_well.dict_pump_ecn_depth['after'] = data_well.dict_pump_ecn_depth['after']
+            data_well.paker_before = response["equipment"]["пакер"]["тип"]
+
+            data_well.paker_before['before'] = data_well.paker_before['before']
+            data_well.paker_before['after'] = data_well.paker_before['after']
+            data_well.depth_fond_paker_before = response["equipment"]["пакер"]["глубина "]
+
+            data_well.depth_fond_paker_before['before'] = data_well.depth_fond_paker_before['before']
+            data_well.depth_fond_paker_before['after'] = data_well.depth_fond_paker_before['after']
+
+            data_well.paker_second_before = response["equipment"]["пакер2"]["тип"]
+
+            data_well.paker_second_before['before'] = data_well.paker_second_before['before']
+            data_well.paker_second_before['after'] = data_well.paker_second_before['after']
+
+            data_well.depth_fond_paker_second_before = response["equipment"]["пакер2"]["глубина "]
+
+            data_well.depth_fond_paker_second_before['before'] = data_well.depth_fond_paker_second_before[
+                'before']
+            data_well.depth_fond_paker_second_before['after'] = data_well.depth_fond_paker_second_before[
+                'after']
+
+            data_well.dict_nkt_after = response["nkt_data"]["После"]
+            data_well.dict_nkt_before = response["nkt_data"]["До"]
+            data_well.dict_sucker_rod_after = response["sucker_pod"]["После"]
+            data_well.dict_sucker_rod = response["sucker_pod"]["До"]
+
+            data_well.inventory_number = response["inventory_number"]
+            data_well.bottom_hole_drill = ProtectedIsDigit(response["bottom_hole_drill"])
+            data_well.bottom_hole_artificial = ProtectedIsDigit(response["bottom_hole_artificial"])
+            data_well.max_angle = ProtectedIsDigit(response["max_angle"])
+            data_well.max_angle_depth = ProtectedIsDigit(response["max_angle_depth"])
+            data_well.max_expected_pressure = ProtectedIsDigit(response["max_expected_pressure"])
+            data_well.max_admissible_pressure = ProtectedIsDigit(response["max_admissible_pressure"])
+            data_well.cdng = data_list.ProtectedIsNonNone(response["cdng"])
+            data_well.date_commissioning = data_list.ProtectedIsNonNone(
+                datetime.strptime(response["date_commissioning"], "%Y-%m-%d"))
+            data_well.result_pressure_date = data_list.ProtectedIsNonNone(
+                datetime.strptime(response["last_pressure_date"], "%Y-%m-%d"))
+
+            # if 'ПВР план' in list(response.keys()):
+            #     data_well.dict_perforation_project = response['ПВР план']
+            # else:
+            #     data_well.dict_perforation_project = ''
+
+            # data_well.data_well_dict = well_data_dict
+
+            from work_py.alone_oreration import well_volume
+            data_well.well_volume_in_pz = []
+            data_well.check_data_in_pz = []
+            data_well.without_damping = False
+            return data_well
+
+    
+
+        
 
     @classmethod
     def run_in_thread(cls, target_method, *args, **kwargs):
