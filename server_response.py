@@ -10,7 +10,6 @@ from PyQt5.QtWidgets import QMainWindow, QMessageBox
 import data_list
 
 
-
 class ApiClient:
     with open(f'{data_list.path_image}users/server.json', 'r', encoding='utf-8') as file:
         server_dict = json.load(file)
@@ -21,14 +20,16 @@ class ApiClient:
         'http': SERVER_API,  # Обязательно http
         'https': SERVER_API,  # Обязательно http
     }
+
     @classmethod
     def insert_well_data_from_database(cls, data_well, params=None):
         if params is None:
-            params ={
+            params = {
                 "well_number": data_well.well_number.get_value,
                 "well_area": data_well.well_area.get_value
             }
-        response = ApiClient.request_params_get(ApiClient.find_wells_data_response_filter_well_number_well_area(), params)
+        response = ApiClient.request_params_get(ApiClient.find_wells_data_response_filter_well_number_well_area(),
+                                                params)
         if response:
             if response['column_direction']['diameter'] != 0:
                 data_well.column_direction_true = True
@@ -132,10 +133,6 @@ class ApiClient:
             data_well.check_data_in_pz = []
             data_well.without_damping = False
             return data_well
-
-    
-
-        
 
     @classmethod
     def run_in_thread(cls, target_method, *args, **kwargs):
