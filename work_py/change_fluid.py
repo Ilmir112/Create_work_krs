@@ -85,8 +85,8 @@ class TabPageSoChange(TabPageUnion):
                 self.h2s_mg_edit = QLineEdit(self)
                 self.h2s_mg_edit.setValidator(self.validator_float_five)
                 self.category_Label = QLabel('По газовому фактору')
-                self.data_well.category_gas_factor = QComboBox(self)
-                self.data_well.category_gas_factor.addItems(['2', '1', '3'])
+                self.category_gas_factor = QComboBox(self)
+                self.category_gas_factor.addItems(['2', '1', '3'])
                 self.gf_label = QLabel('Газовый фактор')
                 self.gf_edit = QLineEdit(self)
                 self.gf_edit.setValidator(self.validator_float_five)
@@ -110,7 +110,7 @@ class TabPageSoChange(TabPageUnion):
                 self.grid.addWidget(self.h2s_mg_edit, 16, 3)
 
                 self.grid.addWidget(self.category_Label, 11, 4)
-                self.grid.addWidget(self.data_well.category_gas_factor, 12, 4)
+                self.grid.addWidget(self.category_gas_factor, 12, 4)
 
                 self.grid.addWidget(self.gf_label, 13, 4)
                 self.grid.addWidget(self.gf_edit, 14, 4)
@@ -149,7 +149,7 @@ class TabPageSoChange(TabPageUnion):
                 self.h2s_mg_edit.setParent(None)
 
                 self.category_Label.setParent(None)
-                self.data_well.category_gas_factor.setParent(None)
+                self.category_gas_factor.setParent(None)
                 self.calc_plast_h2s.setParent(None)
 
                 self.gf_label.setParent(None)
@@ -256,7 +256,7 @@ class ChangeFluidWindow(WindowUnion):
                     category_pressure_line_combo = self.tab_widget.currentWidget().category_pressure_line_combo.currentText()
                     category_h2s_edit = self.tab_widget.currentWidget().category_h2s_edit.currentText()
 
-                    self.data_well.category_gas_factor = self.tab_widget.currentWidget().data_well.category_gas_factor.currentText()
+                    self.category_gas_factor = self.tab_widget.currentWidget().category_gas_factor.currentText()
                     gf_edit = self.tab_widget.currentWidget().gf_edit.text().replace(',', '.')
 
                     self.data_well.dict_category.setdefault(plast_new_combo, {}).setdefault(
@@ -273,7 +273,7 @@ class ChangeFluidWindow(WindowUnion):
 
                     self.data_well.dict_category.setdefault(plast_new_combo, {}).setdefault(
                         'по газовому фактору', Data_gaz(
-                            int(self.data_well.category_gas_factor),
+                            int(self.category_gas_factor),
                             float(gf_edit)))
                     try:
                         self.data_well.dict_category[plast_new_combo]['отключение'] = 'планируемый'

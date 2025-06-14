@@ -1,5 +1,4 @@
-
-from PyQt5.QtWidgets import  QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QPushButton
+from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QPushButton
 
 import data_list
 from log_files.log import logger
@@ -78,9 +77,10 @@ class TabPageSoBlock(TabPageUnion):
         self.block_volume_edit.setText(str(self.calculate_volume_block_pack()))
 
     def update_volume_block_pack(self):
-        self.fluid_new_edit.setText(str(float(self.data_well.fluid_work[:4]) + 0.04))
-        self.block_type_volume_edit.setText(f"{round(float(self.block_volume_edit.text()) * 0.044, 1)}")
-        self.oil_volume_edit.setText(str(round(float(self.block_volume_edit.text()) * 0.16, 1)))
+        self.fluid_new_edit.setText(str(float(self.data_well.fluid_work[:4].replace(",", ".")) + 0.04))
+        self.block_type_volume_edit.setText(
+            f"{round(float(self.block_volume_edit.text().replace(',', '.')) * 0.044, 1)}")
+        self.oil_volume_edit.setText(str(round(float(self.block_volume_edit.text().replace(",", ".")) * 0.16, 1)))
 
     def update_type_of_block_processing_combo(self):
         self.block_volume_edit.setText(str(self.calculate_volume_block_pack()))
@@ -178,7 +178,7 @@ class BlockPackWindow(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window  = None
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
     def block_pack_work(self, current_edit, pero_combo,
@@ -190,9 +190,9 @@ class BlockPackWindow(WindowUnion):
         if 1 < fluid_new_edit < 1.34:
             type_of_chemistry = 'CaCl'
             water_fresh = round(data_list.DICT_CALC_CACL[fluid_new_edit][1] * (
-                        block_volume_edit - oil_volume_edit - block_type_edit) / 1000, 1)
+                    block_volume_edit - oil_volume_edit - block_type_edit) / 1000, 1)
             volume_chemistry = round(data_list.DICT_CALC_CACL[fluid_new_edit][0] * (
-                        block_volume_edit - oil_volume_edit - block_type_edit) / 1000, 1)
+                    block_volume_edit - oil_volume_edit - block_type_edit) / 1000, 1)
         elif 1.34 < fluid_new_edit < 1.6:
             type_of_chemistry = 'CaЖГ'
             water_fresh = round(data_list.DICT_CALC_CAZHG[fluid_new_edit][
@@ -246,7 +246,7 @@ class BlockPackWindow(WindowUnion):
                  'Мастер КРС, представитель ЦДНГ', 2.49],
                 [None, None,
                  f'Провести закачку блок-пачки в трубное пространство скважины до гл.{current_edit}м в '
-                 f'объеме {block_volume_edit}м3. Довести тех.водой уд.весом {self.data_well.fluid_work}г/см3 в '
+                 f'объеме {block_volume_edit:.1f}м3. Довести тех.водой уд.весом {self.data_well.fluid_work}г/см3 в '
                  f'объеме {round(3 * current_edit / 1000, 1)}м3. '
                  f'Закрыть затрубное пространство. '
                  f'Продавить блок-пачку в интервал перфорации ствола продавочной жидкостью {self.data_well.fluid_work}г/см3 '
@@ -265,10 +265,9 @@ class BlockPackWindow(WindowUnion):
                        2)]]
         else:
             block_pack_list = [
-                [f'Приподнять компоновку до глубины {current_edit}мм', None,
-                 f'Приподнять компоновку на тНКТ{self.data_well.nkt_diam}мм до глубины {current_edit}м '
-                 f'с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм. '
-                 f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
+                [f'Приподнять компоновку до глубины {current_edit}м', None,
+                 f'Приподнять компоновку до глубины {current_edit}м '
+                 f'с замером. ',
                  None, None, None, None, None, None, None,
                  'мастер КРС', 2.5],
                 [None, None,
@@ -283,7 +282,7 @@ class BlockPackWindow(WindowUnion):
                  None, None, None, None, None, None, None,
                  'Мастер КРС, предст. заказчика', 4],
                 [None, None,
-                 f'Приготовить блокирующую пачку в объеме {block_volume_edit}м3 плотностью {fluid_new_edit}г/см3 с '
+                 f'Приготовить блокирующую пачку в объеме {block_volume_edit:2f}м3 плотностью {fluid_new_edit}г/см3 с '
                  f'использованием насосного агрегата ЦА-320:\n'
                  f'- в мерник агрегата перекачать нефть в объеме {round(oil_volume_edit / count_cycle, 1)}м3 и '
                  f'эмульгатор в объеме {round(block_type_edit, 1)}м3,и перемешать в течение 15-20 мин;\n'
@@ -304,11 +303,11 @@ class BlockPackWindow(WindowUnion):
                  'Мастер КРС, представитель ЦДНГ', 2.49],
                 [None, None,
                  f'Провести закачку блок-пачки в затрубное пространство скважины до гл.{current_edit}м в '
-                 f'объеме {volume_zatrub}м3.'
+                 f'объеме {volume_zatrub:.1f}м3.'
                  f'Закрыть затрубное пространство. '
                  f'Продавить блок-пачку в интервал перфорации оставшимся объемом блок пачки и продавочной жидкостью '
                  f'{self.data_well.fluid_work}г/см3 '
-                 f'в объеме {volume_zatrub}м3. '
+                 f'в объеме {volume_zatrub:.1f}м3. '
                  f'Технологический отстой - 2 часа. Для предотвращения срыва блокирующей пачки, при проведении '
                  f'спуско-подъемных операций на скважине, запрещается превышать предельную нормативную скорость подъема '
                  f'подземного (глубинного) скважинного оборудования.',

@@ -624,9 +624,8 @@ class DrillWindow(WindowUnion):
         self.data_well.current_bottom = current_depth
 
         for drill_sole, bottomType2 in drill_tuple:
-            if self.check_pressure(drill_sole) is True:
-                for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
-                    drilling_list.append(row)
+            for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
+                drilling_list.append(row)
 
         from work_py.alone_oreration import well_volume
         drilling_list_end = [

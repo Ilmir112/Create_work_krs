@@ -146,7 +146,7 @@ class ExcelWorker(QThread):
         if result:
             return result
 
-    def insert_data_in_database(self, excel_data_dict, data_well):
+    def insert_data_in_database(self, excel_data_dict):
         from data_base.config_base import connection_to_database, WorkDatabaseWell
 
         if data_list.connect_in_base:
@@ -1198,7 +1198,10 @@ class MyMainWindow(QMainWindow):
                     )
                     if mes == QMessageBox.StandardButton.Yes:
                         response = ApiClient.request_put_json(
-                            ApiClient.update_wells_data_response(), params, None, "json"
+                            ApiClient.update_wells_data_response(),
+                            params,
+                            None,
+                            "json"
                         )
                     else:
                         response = True
@@ -2184,6 +2187,7 @@ class MyWindow(MyMainWindow):
 
         self.initUI()
         self.login_window = None
+        self.copied_rows = None
         self.operation_window = None
         self.skm_depth = 0
         self.new_window = None
@@ -4298,7 +4302,7 @@ class SaveInExcel(MyWindow):
             excel_data_dict = excel_in_json(self, self.ws2)
             self.thread_excel_insert = ExcelWorker(self.data_well)
             response_answer = self.thread_excel_insert.insert_data_in_database(
-                excel_data_dict, self.data_well
+                excel_data_dict
             )
             if response_answer is None:
                 QMessageBox.warning(None, 'Ошибка', 'Ошибка связана с ограничением бесплатного сервера нужно '

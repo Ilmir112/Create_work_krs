@@ -75,14 +75,18 @@ class TabPageDp(QWidget):
         self.gnkt_number_combo.textChanged.connect(self.update_number_gnkt)
 
     def update_number_gnkt(self, number_gnkt):
-
         try:
+            if data_list.connect_in_base:
+                params = {
+                    "gnkt_number": number_gnkt,
+                }
 
-            conn = connect_to_database(decrypt("DB_NAME_GNKT"))
-            cursor = conn.cursor()
-            cursor.execute(f"SELECT * FROM КГМ WHERE today (%s), ?", (number_gnkt, self.previous_well_edit.text()))
+            else:
+                conn = connect_to_database(decrypt("DB_NAME_GNKT"))
+                cursor = conn.cursor()
+                cursor.execute(f"SELECT * FROM КГМ WHERE today (%s), ?", (number_gnkt, self.previous_well_edit.text()))
 
-            result_gnkt = cursor.fetchone()
+                result_gnkt = cursor.fetchone()
 
             self.length_gnkt_edit.setText(f'{result_gnkt[3]}')
             self.iznos_gnkt_edit.setText(f'{round(result_gnkt[5], 1)}')

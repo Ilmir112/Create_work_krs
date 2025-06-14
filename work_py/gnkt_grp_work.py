@@ -1,13 +1,13 @@
 import block_name
 import data_list
-from datetime import datetime, date
+from datetime import datetime
 from data_base.config_base import connection_to_database, GnktDatabaseWell
-from PyQt5.QtWidgets import QInputDialog, QTabWidget, QWidget, QApplication, QLabel, \
+from PyQt5.QtWidgets import QInputDialog, QWidget, QApplication, QLabel, \
     QLineEdit, QGridLayout, QComboBox, QPushButton, QMessageBox
 from openpyxl.utils import get_column_letter
 
 from decrypt import decrypt
-from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict, read_database_gnkt
+from gnkt_data.gnkt_data import gnkt_1, gnkt_2, gnkt_dict
 from openpyxl.styles import PatternFill, Font, Alignment
 
 from open_pz import CreatePZ
@@ -71,7 +71,8 @@ class TabPageGnkt(TabPageUnion):
         self.fluid_work_label = QLabel("уд.вес рабочей жидкости", self)
         self.fluid_work_edit = QLineEdit(self)
         if self.data_well.work_plan == 'gnkt_opz':
-            self.fluid_work_edit.setText(f'{self.data_well.water_density.get_value:.2f}')
+            if self.data_well.water_density.get_value:
+                self.fluid_work_edit.setText(f'{self.data_well.water_density.get_value:.2f}')
         else:
             self.fluid_work_edit.setText('1.01')
 

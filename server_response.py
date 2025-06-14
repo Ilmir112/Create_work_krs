@@ -264,7 +264,7 @@ class ApiClient:
             return {k: ApiClient.serialize_datetime(v) for k, v in obj.items()}
         elif isinstance(obj, list):
             return [ApiClient.serialize_datetime(item) for item in obj]
-        elif "excel" == obj:
+        elif obj in ["excel", "данные", "сводка"]:
             return obj
         elif isinstance(obj, str):
             matches = re.findall(r"\b\d{2}\.\d{2}\.\d{4}\b", obj)
