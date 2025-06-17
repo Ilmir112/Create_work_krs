@@ -76,12 +76,13 @@ class TabPageSoRir(TabPageUnion):
 
         self.pressure_new_label = QLabel('Ожидаемое давление', self)
         self.pressure_new_edit = QLineEdit(self)
-        self.pressure_new_edit.setValidator(self.validator_int)
+        self.pressure_new_edit.setValidator(self.validator_float)
 
         if len(self.data_well.plast_project) != 0:
             self.plast_new_label = QLabel('индекс нового пласта', self)
             self.plast_new_combo = QComboBox(self)
             self.plast_new_combo.addItems(self.data_well.plast_project)
+
         else:
             self.plast_new_label = QLabel('индекс нового пласта', self)
             self.plast_new_combo = QLineEdit(self)

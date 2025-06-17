@@ -66,12 +66,10 @@ class UncaughtExceptions(QObject):
 
     @pyqtSlot(object)
     def handle_exception(self, ex):
-       logger.critical(
-                f"{self.data_well.well_number.get_value}"
-                f" {self.data_well.well_area.get_value} Критическая ошибка: {ex}"
-            )
-
-
+        logger.critical(
+            f"{self.data_well.well_number.get_value}"
+            f" {self.data_well.well_area.get_value} Критическая ошибка: {ex}"
+        )
 
 
 class ExcelWorker(QThread):
@@ -106,7 +104,6 @@ class ExcelWorker(QThread):
                 f"Ошибка при проверке записи: {type(e).__name__}\n\n{str(e)}",
             )
             return check_true
-
 
     @staticmethod
     def find_and_delete_files(drive):
@@ -1200,7 +1197,10 @@ class MyMainWindow(QMainWindow):
                         response = ApiClient.request_put_json(
                             ApiClient.update_wells_data_response(),
                             params,
-                            None,
+                            {
+                                "well_number": self.data_well.well_number.get_value,
+                                "well_area": self.data_well.well_area.get_value
+                            },
                             "json"
                         )
                     else:
@@ -4076,20 +4076,20 @@ class SaveInExcel(MyWindow):
         gnkt_data = self.gnkt_data.data_gnkt
         params = {
 
-                "id": 0,
-                "gnkt_number": gnkt_data.gnkt_number_combo,
-                "well_number": self.data_well.well_number.get_value,
-                "well_area": self.data_well.well_area.get_value,
-                "contractor": data_list.contractor,
-                "length_gnkt":  int(gnkt_data.length_gnkt_edit),
-                "diameter_gnkt": float(gnkt_data.diameter_length),
-                "wear_gnkt": float(gnkt_data.iznos_gnkt_edit) * 1.014,
-                "mileage_gnkt": int(gnkt_data.pipe_mileage_edit) + int(gnkt_data.current_bottom_edit * 1.1),
-                "tubing_fatigue": gnkt_data.pipe_fatigue,
-                "previous_well": gnkt_data.previous_well_combo,
-                "date_repair": data_list.current_date,
-                "pvo_number": int(gnkt_data.pvo_number)
-            }
+            "id": 0,
+            "gnkt_number": gnkt_data.gnkt_number_combo,
+            "well_number": self.data_well.well_number.get_value,
+            "well_area": self.data_well.well_area.get_value,
+            "contractor": data_list.contractor,
+            "length_gnkt": int(gnkt_data.length_gnkt_edit),
+            "diameter_gnkt": float(gnkt_data.diameter_length),
+            "wear_gnkt": float(gnkt_data.iznos_gnkt_edit) * 1.014,
+            "mileage_gnkt": int(gnkt_data.pipe_mileage_edit) + int(gnkt_data.current_bottom_edit * 1.1),
+            "tubing_fatigue": gnkt_data.pipe_fatigue,
+            "previous_well": gnkt_data.previous_well_combo,
+            "date_repair": data_list.current_date,
+            "pvo_number": int(gnkt_data.pvo_number)
+        }
         response = ApiClient.request_post(ApiClient.add_data_gnkt(), params)
         if response is None:
             QMessageBox.warning(self, "ошибка", "скважина не добавлена в well_data")
@@ -4430,7 +4430,6 @@ class SaveInExcel(MyWindow):
                 return int(float(num))
         except:
             return num
-
 
     def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
         global cell_num

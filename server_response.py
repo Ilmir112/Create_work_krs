@@ -180,7 +180,6 @@ class ApiClient:
 
     @staticmethod
     def request_post(path, json_data):
-
         url = ApiClient.get_endpoint(path)
         try:
             response = requests.post(url, json=ApiClient.serialize_datetime(json_data))

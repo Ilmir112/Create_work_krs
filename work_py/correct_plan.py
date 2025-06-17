@@ -107,7 +107,6 @@ class CorrectPlanWindow(WindowUnion):
 
     def add_work(self):
         from data_base.work_with_base import insert_data_well_dop_plan
-        from work_py.dop_plan_py import DopPlanWindow
 
         from data_list import ProtectedIsNonNone
         self.current_widget = self.tab_widget.currentWidget()

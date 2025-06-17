@@ -456,7 +456,7 @@ class GnoParent(ABC):
 
     @abstractmethod
     def add_work_lift(self):
-        raise NotImplementedError('Не выбран метод реализации, метож должен быть переопределен')
+        raise NotImplementedError('Не выбран метод реализации, метод должен быть переопределен')
 
     def begin_work(self):
 
@@ -538,7 +538,9 @@ class GnoParent(ABC):
              f'{surfactant_hydrofabizer_str}', None,
              None, None, None, None, None, None, None,
              None],
-            [None, None, f'Замерить Ризб. При наличии избыточного давления произвести замер Ризб и уд.вес '
+
+            [None, None, f'Разрядить скважину до атмосферного давления (не более 2ч). Замерить Ризб. '
+                         f'При наличии избыточного давления произвести замер Ризб и уд.вес '
                          f'жидкости излива, по результату замеру произвести перерасчет и корректировку удельного '
                          f'веса тех.жидкости',
              None, None, None, None, None, None, None,
@@ -560,7 +562,8 @@ class GnoParent(ABC):
              f'жидкости глушения в '
              f'соответствии с уточненными геологической службой данными по пластовому давлению.',
              None, None, None, None, None, None, None,
-             ' Мастер КРС.', 1.5]
+             ' Мастер КРС.', 1.5],
+
         ]
         if self.data_well.well_number.get_value in ['2010', '5082', "2352", "305г", "343ТНП", "2191", "598", "572",
                                                     "2111", "4152", "6728г", "1002"]:
@@ -569,7 +572,7 @@ class GnoParent(ABC):
             krs_begin.extend([
                 [None, None, f'Согласно графика по скважине необходимо в приоритете произвести опережающее глушение',
              None, None, None, None, None, None, None,
-             ' Мастер КРС.', None]])
+             ' Мастер КРС', None]])
 
         сat_h2s_list = list(map(int, [self.data_well.dict_category[plast]["по сероводороду"].category for plast in
                                       self.data_well.plast_work if self.data_well.dict_category.get(plast) and
@@ -651,7 +654,10 @@ class GnoParent(ABC):
                              f'вес жидкостей промывок согласовать с Заказчиком,' \
                              f' при наличии Ризб - произвести замер, перерасчет ЖГ и повторное ' \
                              f'глушение с корректировкой удельного веса жидкости' \
-                             f' глушения. В СЛУЧАЕ ОТСУТСТВИЯ ЦИРКУЛЯЦИИ ПРИ ГЛУШЕНИИ СКВАЖИНЫ,' \
+                             f' глушения. \n' \
+                             f'При глушении скважины производить визуальный осмотр нулевого патрубка ' \
+                             f'на наличие пропусков, информацию отображать в акте на глушение и суточном рапорте. \n' \
+                             f'В СЛУЧАЕ ОТСУТСТВИЯ ЦИРКУЛЯЦИИ ПРИ ГЛУШЕНИИ СКВАЖИНЫ,' \
                              f' А ТАКЖЕ ПРИ ГАЗОВОМ ФАКТОРЕ БОЛЕЕ 200м3/сут ' \
                              f'ПРОИЗВЕСТИ ЗАМЕР СТАТИЧЕСКОГО УРОВНЯ В ТЕЧЕНИИ ЧАСА С ОТБИВКОЙ ' \
                              f'УРОВНЯ В СКВАЖИНЕ С ИНТЕРВАЛОМ 15 МИНУТ.' \
@@ -684,6 +690,23 @@ class GnoParent(ABC):
             well_jamming_short = f'Скважина без предварительного глушения'
             well_jamming_list2 = f'В случае наличия избыточного давления необходимость повторного глушения скважины ' \
                                  f'дополнительно согласовать со специалистами ПТО  и ЦДНГ.'
+        elif self.without_damping_true is False and self.lift_key in ['ОРД', 'ЭЦН']:
+            well_jamming_str = f'При положительном результате сбития клапана в присутствии представителя ЦДНГ:' \
+                               f'Произвести закачку в трубное пространство тех жидкости уд.весом ' \
+                               f'{self.data_well.fluid_work} в ' \
+                               f'объеме {round(volume_nkt_ustie, 1)}м3 ' \
+                               f'на поглощение при давлении не более ' \
+                               f'{self.data_well.max_admissible_pressure.get_value}атм до выхода чистого раствора.' \
+                               f'(при отсутствии на выходе  1.08 г/см3, ' \
+                               f'продолжить прокачку до выхода планового раствора). Закрыть ' \
+                               f'затрубное пространство. Закрыть скважину на стабилизацию не менее 2 часов. ' \
+                               f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость). ' \
+                               f'до выхода чистого раствора.\n' \
+                               f'При невозможности глушения по НКТ (не сбился клапан, рост давления) ' \
+                               f'согласовать с СВ глушение по затрубному пространству на циркуляцию при открытых НКТ'
+            well_jamming_short = f'Глушение в НКТ уд.весом {self.data_well.fluid_work_short} в ' \
+                                 f'объеме ' \
+                                 f'{round(volume_nkt_ustie, 1)}м3 '
         elif abs(self.length_nkt - self.data_well.perforation_roof) <= 150:
             well_jamming_str = f'Произвести глушение скважины в объеме {self.volume_well_jamming}м3 тех ' \
                                f'жидкостью уд.весом {self.data_well.fluid_work}' \
@@ -693,6 +716,7 @@ class GnoParent(ABC):
                                f'на желобную емкость). '
             well_jamming_short = (f'Глушение в НКТ в объеме {self.volume_well_jamming}м3 уд.весом '
                                   f'{self.data_well.fluid_work_short}')
+
         elif abs(self.length_nkt - self.data_well.perforation_roof) > 150:
             well_jamming_str = f'Произвести глушение скважины объеме {self.volume_well_jamming}м3 тех ' \
                                f'жидкостью уд.весом {self.data_well.fluid_work}' \
@@ -703,8 +727,7 @@ class GnoParent(ABC):
                                f'циркуляцию. Закрыть трубное пространство. ' \
                                f'Произвести закачку на поглощение не более ' \
                                f'{self.data_well.max_admissible_pressure.get_value}атм ' \
-                               f'тех жидкости в ' \
-                               f'объеме {round((volume_pod_nkt_str + volume_nkt_str) * 1.1, 1)}м3. ' \
+                               f'тех жидкости оставшейся жидкости. ' \
                                f'Закрыть скважину на ' \
                                f'стабилизацию не менее 2 часов. (согласовать глушение в коллектор, в случае ' \
                                f'отсутствия на желобную емкость. '
@@ -724,17 +747,7 @@ class GnoParent(ABC):
                                  f'объеме {volume_nkt_str}м3 ' \
                                  f'на циркуляцию.  '
 
-        elif self.without_damping_true is False and self.lift_key in ['ОРД', 'ЭЦН']:
-            well_jamming_str = f'Произвести закачку в трубное пространство тех жидкости уд.весом ' \
-                               f'{self.data_well.fluid_work_short} в ' \
-                               f'объеме {round(volume_nkt_ustie, 1)}м3 ' \
-                               f'на поглощение при давлении не более ' \
-                               f'{self.data_well.max_admissible_pressure.get_value}атм. Закрыть ' \
-                               f'затрубное пространство. Закрыть скважину на стабилизацию не менее 2 часов. ' \
-                               f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость). '
-            well_jamming_short = f'Глушение в НКТ уд.весом {self.data_well.fluid_work_short} в ' \
-                                 f'объеме ' \
-                                 f'{round(volume_nkt_ustie, 1)}м3 '
+
         elif self.without_damping_true is False and self.lift_key in ['НН', 'НВ']:
             well_jamming_str = f'Произвести глушение скважины в объеме {self.volume_well_jamming}м3 тех ' \
                                f'жидкостью уд.весом {self.data_well.fluid_work}' \
@@ -1649,7 +1662,7 @@ class LiftEcnWithPaker(GnoParent):
              None, None, None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 1.2],
             [None, None,
-             f'Сбить сбивной клапан. '
+             f'При герметичности, через лубрикатор произвести сброс лома в колонну НКТ. '
              f'{enc_jamming}', None, None,
              None, None, None, None, None,
              'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],

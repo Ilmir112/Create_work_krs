@@ -249,6 +249,18 @@ class FindIndexPZ(MyMainWindow):
         else:
             self.read_pz_prs()
 
+
+    def calculate_max_expected_pressure(self):
+        max_expected_pressure_list = []
+        for plast in self.dict_perforation.keys():
+            if "вертикаль" in self.dict_perforation[plast] and 'давление' in self.dict_perforation[plast]:
+                vertical = min(self.dict_perforation[plast]["вертикаль"])
+
+                max_expected_pressure = max(self.dict_perforation[plast]['давление']) - vertical * 9.81 * 0.890 / 100
+                max_expected_pressure_list.append(max_expected_pressure)
+        if max_expected_pressure_list:
+            return round(max(max_expected_pressure_list), 1)
+
     def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
         boundaries_dict = {}
 
@@ -3083,6 +3095,21 @@ class WellPerforation(FindIndexPZ):
 class WellCategory(FindIndexPZ):
 
     def read_well(self, begin_index, cancel_index):
+
+        calculate_max_expected_pressure = self.calculate_max_expected_pressure()
+        if self.region == "КГМ" and calculate_max_expected_pressure:
+            if abs(self.max_expected_pressure.get_value - calculate_max_expected_pressure) >= 10:
+                QMessageBox.warning(self, 'Ошибка', f"Ошибка в максимально ожидаемом давлении на устье, "
+                                                    f"должно быть {calculate_max_expected_pressure}атм")
+                self.check_data_in_pz.append(
+                    f"Ошибка в максимально ожидаемом давлении на устье: \n "
+                    f"Согласно расчета Ру = Рпл – (фл*g*h) / 100	\n"
+                    f"где:\n"
+                    f"ФЛ – плотность флюида; нефть 0.890 г/см3 \n"
+                    f"g – ускорение свободного падения (м/с2); 9,8м2/с\n"
+                    f"h – глубина скважины по вертикали (м) \n"
+                    f"Максимально ожидаемое давление на устье составляет {calculate_max_expected_pressure}атм"
+                )
 
         if self.end_index:
             self.read_work_data()

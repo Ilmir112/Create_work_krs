@@ -614,11 +614,15 @@ class DopPlanWindow(WindowUnion):
         try:
             self.data_well.data_list = []
             current_widget = self.tab_widget.currentWidget()
+            if hasattr(current_widget, "well_data_in_base_combo"):
+                well_data_in_base_combo = current_widget.well_data_in_base_combo.currentText()
+                if well_data_in_base_combo == '':
+                    QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
+                    return
 
-            well_data_in_base_combo = current_widget.well_data_in_base_combo.currentText()
-            if well_data_in_base_combo == '':
-                QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
-                return
+                if ' от' in well_data_in_base_combo:
+                    work_plan_in_base = well_data_in_base_combo.split(' ')[3]
+                    type_kr = well_data_in_base_combo.split(' ')[2]
 
             well_number = current_widget.well_number_edit.text()
             well_area = current_widget.well_area_edit.text()
@@ -771,10 +775,7 @@ class DopPlanWindow(WindowUnion):
                     QMessageBox.critical(self, 'пункт', 'Необходимо выбрать пункт плана работ')
                     return
 
-                if ' от' in well_data_in_base_combo:
-                    data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-2]
-                    work_plan_in_base = well_data_in_base_combo.split(' ')[3]
-                    type_kr = well_data_in_base_combo.split(' ')[2]
+
 
                 # db = connection_to_database(decrypt("DB_WELL_DATA"))
                 # data_well_base = WorkDatabaseWell(db, self.data_well)
@@ -809,7 +810,9 @@ class DopPlanWindow(WindowUnion):
 
                 rows = self.tableWidget.rowCount()
 
-                self.work_with_excel(well_number, well_area, work_plan_in_base, type_kr)
+                if hasattr(current_widget, "well_data_in_base_combo"):
+                    self.work_with_excel(well_number, well_area, work_plan_in_base, type_kr)
+
                 if change_pvr_combo == 'Да':
                     if rows == 0:
                         QMessageBox.warning(self, 'Ошибка', 'Нужно загрузить интервалы перфорации')

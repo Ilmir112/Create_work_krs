@@ -252,8 +252,9 @@ class TabPageGnkt(TabPageUnion):
         params = {"gnkt_number": gnkt_number}
         well_previus_list = ApiClient.request_params_get(ApiClient.find_gnkt_data_by_gnkt(), params)
         new_list = []
-        for wells_data in well_previus_list:
-            new_list.append(f'{wells_data["well_number"]} {wells_data["well_area"]} {wells_data["date_repair"]}')
+        if well_previus_list:
+            for wells_data in well_previus_list:
+                new_list.append(f'{wells_data["well_number"]} {wells_data["well_area"]} {wells_data["date_repair"]}')
         return new_list
 
 
