@@ -221,11 +221,11 @@ class TabPageGnkt(TabPageUnion):
                 if 'ойл-сервис' in data_list.contractor.lower():
                     contractor_in = 'oil_service'
 
-                result_gnkt = data_gnkt.update_data_gnkt(contractor_in, previus_well)
-                self.length_gnkt_edit.setText(str(result_gnkt[3]))
-                self.iznos_gnkt_edit.setText(str(result_gnkt[5]))
-                self.pipe_mileage_edit.setText(str(result_gnkt[6]))
-                self.pvo_number_edit.setText(str(result_gnkt[10]))
+                # result_gnkt = data_gnkt.update_data_gnkt(contractor_in, previus_well)
+                # self.length_gnkt_edit.setText(str(result_gnkt[3]))
+                # self.iznos_gnkt_edit.setText(str(result_gnkt[5]))
+                # self.pipe_mileage_edit.setText(str(result_gnkt[6]))
+                # self.pvo_number_edit.setText(str(result_gnkt[10]))
                 params = {
                     "well_number": previus_well.split(" ")[0],
                     "well_area": previus_well.split(" ")[1],

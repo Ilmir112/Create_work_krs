@@ -1118,8 +1118,8 @@ class MyMainWindow(QMainWindow):
                     "costumer": data_list.costumer,
                     "cdng": self.data_well.cdng.get_value,
                     "inventory_number": str(self.data_well.inventory_number.get_value),
-                    "wellhead_fittings": self.data_well.wellhead_fittings,
-                    "appointment": self.data_well.appointment_well.get_value,
+                    "wellhead_fittings": str(self.data_well.wellhead_fittings),
+                    "appointment": str(self.data_well.appointment_well.get_value),
                     "angle_data": {"инклинометрия": self.data_well.angle_data},
                     "column_direction": {
                         "diameter": self.data_well.column_direction_diameter.get_value,

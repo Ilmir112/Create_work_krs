@@ -259,7 +259,11 @@ class FindIndexPZ(MyMainWindow):
                 max_expected_pressure = max(self.dict_perforation[plast]['давление']) - vertical * 9.81 * 0.890 / 100
                 max_expected_pressure_list.append(max_expected_pressure)
         if max_expected_pressure_list:
-            return round(max(max_expected_pressure_list), 1)
+            calculate_max = round(max(max_expected_pressure_list), 1)
+            if calculate_max <= 0:
+                return 0
+            else:
+                return calculate_max
 
     def delete_rows_pz(self, ws, cat_well_min, data_well_max, data_x_max):
         boundaries_dict = {}
