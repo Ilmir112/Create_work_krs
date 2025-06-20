@@ -11,13 +11,13 @@ class TabPageVp(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.need_question_Label = QLabel("Нужно ли наращивать желонками", self)
+        self.need_question_label = QLabel("Нужно ли наращивать желонками", self)
         self.need_question_qcombo = QComboBox(self)
         self.need_question_qcombo.addItems(['Нет', 'Да', 'без ВП'])
 
         vp_list = ['ВП', 'ГПШ', 'ВПШ']
 
-        self.vp_type_Label = QLabel("вид пакера геофизического", self)
+        self.vp_type_label = QLabel("вид пакера геофизического", self)
         self.vp_type_qcombo = QComboBox(self)
         self.vp_type_qcombo.addItems(vp_list)
 
@@ -26,7 +26,7 @@ class TabPageVp(TabPageUnion):
         self.vp_depth_edit.setValidator(self.validator_int)
         self.vp_depth_edit.setText(f'{int(float(self.data_well.perforation_roof - 20))}')
 
-        self.cement_vp_Label = QLabel("Глубина докрепления цементом", self)
+        self.cement_vp_label = QLabel("Глубина докрепления цементом", self)
         self.cement_vp_edit = QLineEdit(self)
         self.cement_vp_edit.setValidator(self.validator_int)
         vp_depth = self.vp_depth_edit.text()
@@ -34,16 +34,16 @@ class TabPageVp(TabPageUnion):
             self.cement_vp_edit.setText(f'{int(float(vp_depth) - 3)}')
 
         # self.grid = QGridLayout(self)
-        self.grid.addWidget(self.need_question_Label, 4, 4)
+        self.grid.addWidget(self.need_question_label, 4, 4)
         self.grid.addWidget(self.need_question_qcombo, 5, 4)
 
-        self.grid.addWidget(self.vp_type_Label, 4, 5)
+        self.grid.addWidget(self.vp_type_label, 4, 5)
         self.grid.addWidget(self.vp_type_qcombo, 5, 5)
 
         self.grid.addWidget(self.vp_depth_label, 6, 3)
         self.grid.addWidget(self.vp_depth_edit, 7, 3)
 
-        self.grid.addWidget(self.cement_vp_Label, 6, 4)
+        self.grid.addWidget(self.cement_vp_label, 6, 4)
         self.grid.addWidget(self.cement_vp_edit, 7, 4)
 
         self.vp_depth_edit.textChanged.connect(self.update_vp_depth)
@@ -59,22 +59,22 @@ class TabPageVp(TabPageUnion):
     def update_vp(self, index):
 
         if index == "Да":
-            self.grid.addWidget(self.vp_type_Label, 4, 5)
+            self.grid.addWidget(self.vp_type_label, 4, 5)
             self.grid.addWidget(self.vp_type_qcombo, 5, 5)
             self.grid.addWidget(self.vp_depth_label, 6, 3)
             self.grid.addWidget(self.vp_depth_edit, 7, 3)
-            self.grid.addWidget(self.cement_vp_Label, 6, 4)
+            self.grid.addWidget(self.cement_vp_label, 6, 4)
             self.grid.addWidget(self.cement_vp_edit, 7, 4)
         elif index == "Нет":
-            self.cement_vp_Label.setParent(None)
+            self.cement_vp_label.setParent(None)
             self.cement_vp_edit.setParent(None)
             self.cement_vp_edit.setText(f'{int(float(self.data_well.current_bottom)) - 3}')
         else:
-            self.vp_type_Label.setParent(None)
+            self.vp_type_label.setParent(None)
             self.vp_type_qcombo.setParent(None)
             self.vp_depth_label.setParent(None)
             self.vp_depth_edit.setParent(None)
-            self.grid.addWidget(self.cement_vp_Label, 6, 4)
+            self.grid.addWidget(self.cement_vp_label, 6, 4)
             self.grid.addWidget(self.cement_vp_edit, 7, 4)
 
 

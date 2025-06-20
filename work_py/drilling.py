@@ -74,7 +74,7 @@ class TabPageSoDrill(TabPageUnion):
 
         self.drill_cm_combo.addItems(data_list.BOTTOM_TYPE_LIST)
 
-        self.need_privyazka_Label = QLabel("Привязка оборудования", self)
+        self.need_privyazka_label = QLabel("Привязка оборудования", self)
         self.need_privyazka_q_combo = QComboBox()
         self.need_privyazka_q_combo.addItems(['Нет', 'Да'])
 
@@ -107,7 +107,7 @@ class TabPageSoDrill(TabPageUnion):
 
         self.grid.addWidget(self.roof_drill_line, 8, 0)
         self.grid.addWidget(self.sole_drill_line, 8, 1)
-        self.grid.addWidget(self.need_privyazka_Label, 2, 6)
+        self.grid.addWidget(self.need_privyazka_label, 2, 6)
         self.grid.addWidget(self.need_privyazka_q_combo, 3, 6)
         self.grid.addWidget(self.drill_cm_combo, 8, 2, 2, 1)
 
@@ -257,7 +257,7 @@ class DrillWindow(WindowUnion):
 
     def add_string(self):
         drill_key = self.tab_widget.currentWidget().drill_select_combo.currentText()
-        self.drilling_bit_diam = self.tab_widget.currentWidget().drill_diameter_line.text()
+        self.drilling_bit_diam = self.tab_widget.currentWidget().drill_diameter_line.text().replace(",", ".")
         self.downhole_motor = self.tab_widget.currentWidget().downhole_motor_line.text()
         self.nkt_str = self.tab_widget.currentWidget().nkt_str_combo.currentText()
         current_depth = self.tab_widget.currentWidget().sole_drill_line.text()

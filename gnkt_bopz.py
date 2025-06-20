@@ -73,7 +73,7 @@ class TabPageGnkt(TabPageUnion):
         self.acid_proc_edit.setClearButtonEnabled(True)
         self.acid_proc_edit.setValidator(self.validator_int)
 
-        self.pressure_Label = QLabel("Давление закачки", self)
+        self.pressure_label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
         self.pressure_edit.setText(f'{self.data_well.max_admissible_pressure.get_value}')
         self.pressure_edit.setValidator(self.validator_int)
@@ -110,10 +110,10 @@ class TabPageGnkt(TabPageUnion):
         self.grid.addWidget(self.acid_proc_label, 6, 3)
         self.grid.addWidget(self.acid_proc_edit, 7, 3)
 
-        self.grid.addWidget(self.pressure_Label, 6, 5)
+        self.grid.addWidget(self.pressure_label, 6, 5)
         self.grid.addWidget(self.pressure_edit, 7, 5)
 
-        self.grid.addWidget(self.pressure_Label, 6, 5)
+        self.grid.addWidget(self.pressure_label, 6, 5)
         self.grid.addWidget(self.pressure_edit, 7, 5)
 
         self.grid.addWidget(self.fluid_project_label, 8, 1)

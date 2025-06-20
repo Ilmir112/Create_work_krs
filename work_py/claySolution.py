@@ -34,7 +34,7 @@ class TabPageSoClay(TabPageUnion):
         self.roof_clay_edit.setText(f'{self.data_well.perforation_roof + 70}')
         self.roof_clay_edit.setClearButtonEnabled(True)
 
-        self.sole_clay_LabelType = QLabel("Подошва ГР", self)
+        self.sole_clay_labelType = QLabel("Подошва ГР", self)
         self.sole_clay_edit = QLineEdit(self)
         self.sole_clay_edit.setText(f'{self.data_well.current_bottom}')
         self.sole_clay_edit.setValidator(self.validator_float)
@@ -43,7 +43,7 @@ class TabPageSoClay(TabPageUnion):
         self.volume_clay_edit = QLineEdit(self)
         self.volume_clay_edit.setValidator(self.validator_float)
 
-        self.rir_question_Label = QLabel("Нужно ли УЦМ производить на данной компоновке", self)
+        self.rir_question_label = QLabel("Нужно ли УЦМ производить на данной компоновке", self)
         self.rir_question_combo = QComboBox(self)
         self.rir_question_combo.addItems(['Нет', 'Да'])
 
@@ -68,10 +68,10 @@ class TabPageSoClay(TabPageUnion):
         if index == 0:
             self.grid.addWidget(self.roof_clay_label, 4, 4)
             self.grid.addWidget(self.roof_clay_edit, 5, 4)
-            self.grid.addWidget(self.sole_clay_LabelType, 4, 5)
+            self.grid.addWidget(self.sole_clay_labelType, 4, 5)
             self.grid.addWidget(self.sole_clay_edit, 5, 5)
 
-            self.grid.addWidget(self.rir_question_Label, 6, 3)
+            self.grid.addWidget(self.rir_question_label, 6, 3)
             self.grid.addWidget(self.rir_question_combo, 7, 3)
 
             self.current_bottom_label.setParent(None)
@@ -80,10 +80,10 @@ class TabPageSoClay(TabPageUnion):
             self.volume_clay_edit.setText(f'{5}')
             self.roof_clay_label.setParent(None)
             self.roof_clay_edit.setParent(None)
-            self.sole_clay_LabelType.setParent(None)
+            self.sole_clay_labelType.setParent(None)
             self.sole_clay_edit.setParent(None)
 
-            self.rir_question_Label.setParent(None)
+            self.rir_question_label.setParent(None)
             self.rir_question_combo.setParent(None)
 
             self.grid.addWidget(self.current_bottom_label, 6, 4)
@@ -104,7 +104,7 @@ class TabPageSoClay(TabPageUnion):
         if index == "Нет":
             self.roof_rir_label.setParent(None)
             self.roof_rir_edit.setParent(None)
-            self.sole_rir_LabelType.setParent(None)
+            self.sole_rir_labelType.setParent(None)
             self.sole_rir_edit.setParent(None)
             self.cement_volume_label.setParent(None)
             self.cement_volume_line.setParent(None)
@@ -116,7 +116,7 @@ class TabPageSoClay(TabPageUnion):
             self.roof_rir_edit.setText(f'{self.data_well.current_bottom - 50}')
             self.roof_rir_edit.setClearButtonEnabled(True)
 
-            self.sole_rir_LabelType = QLabel("Подошва РИР", self)
+            self.sole_rir_labelType = QLabel("Подошва РИР", self)
             self.sole_rir_edit = QLineEdit(self)
             self.sole_rir_edit.editingFinished.connect(self.update_volume_cement)
             self.roof_rir_edit.editingFinished.connect(self.update_volume_cement)
@@ -130,7 +130,7 @@ class TabPageSoClay(TabPageUnion):
 
             self.grid.addWidget(self.roof_rir_label, 6, 4)
             self.grid.addWidget(self.roof_rir_edit, 7, 4)
-            self.grid.addWidget(self.sole_rir_LabelType, 6, 5)
+            self.grid.addWidget(self.sole_rir_labelType, 6, 5)
             self.grid.addWidget(self.sole_rir_edit, 7, 5)
             self.grid.addWidget(self.cement_volume_label, 6, 6)
             self.grid.addWidget(self.cement_volume_line, 7, 6)

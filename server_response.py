@@ -15,6 +15,7 @@ class ApiClient:
         server_dict = json.load(file)
 
     SERVER_API = server_dict["host"]
+    print(SERVER_API)
     SETTINGS_TOKEN = None
     proxies = {
         'http': SERVER_API,  # Обязательно http

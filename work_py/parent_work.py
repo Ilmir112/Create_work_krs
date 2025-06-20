@@ -29,7 +29,7 @@ class TabPageUnion(QWidget):
         self.pressure_zumpf_question_combo = None
         self.pressure_zumpf_question_label = None
         self.need_privyazka_q_combo = None
-        self.need_privyazka_Label = None
+        self.need_privyazka_label = None
         self.grid = QGridLayout(self)
 
         self.validator_float = QDoubleValidator(0.0, 8000.0, 2)
@@ -54,7 +54,7 @@ class TabPageUnion(QWidget):
         self.paker_depth_zumpf_edit = QLineEdit(self)
         self.paker_depth_zumpf_edit.setValidator(self.validator_int)
 
-        self.need_privyazka_Label = QLabel("Привязка оборудования", self)
+        self.need_privyazka_label = QLabel("Привязка оборудования", self)
         self.need_privyazka_q_combo = QComboBox()
         self.need_privyazka_q_combo.addItems(['Нет', 'Да'])
 
@@ -84,7 +84,7 @@ class TabPageUnion(QWidget):
 
         self.grid.addWidget(self.pressure_zumpf_question_label, 1, 4)
         self.grid.addWidget(self.pressure_zumpf_question_combo, 2, 4)
-        self.grid.addWidget(self.need_privyazka_Label, 1, 6)
+        self.grid.addWidget(self.need_privyazka_label, 1, 6)
         self.grid.addWidget(self.need_privyazka_q_combo, 2, 6)
 
     def update_well_area(self, well_area):
@@ -476,14 +476,14 @@ class TabPageUnion(QWidget):
             self.iron_true_combo = QComboBox(self)
             self.iron_true_combo.addItems(['Нет', 'Да'])
 
-            self.pressure_Label = QLabel("Давление закачки", self)
+            self.pressure_label = QLabel("Давление закачки", self)
             self.pressure_edit = QLineEdit(self)
 
             if self.data_well:
                 if self.data_well.stabilizator_need:
                     self.iron_true_combo.setCurrentIndex(1)
 
-            self.grid.addWidget(self.pressure_Label, 6, 6)
+            self.grid.addWidget(self.pressure_label, 6, 6)
             self.grid.addWidget(self.pressure_edit, 7, 6)
 
             self.grid.addWidget(self.iron_label_type, 4, 4)
@@ -584,7 +584,7 @@ class TabPageUnion(QWidget):
             self.pressure_three_label.setVisible(True)
             self.pressure_three_edit.setVisible(True)
 
-            self.pressure_Label.setVisible(True)
+            self.pressure_label.setVisible(True)
             self.pressure_edit.setVisible(True)
 
             self.Qplast_after_labelType.setVisible(True)
@@ -620,16 +620,16 @@ class TabPageUnion(QWidget):
             self.acid_volume_edit.setText(f'{round(metr_pvr * float(calculate_sko), 1)}')
 
     def update_sko_type(self, type_sko):
+        self.sko_vt_label = QLabel('Высокотехнологическое СКО', self)
+        self.sko_vt_edit = QLineEdit(self)
+        self.grid.addWidget(self.sko_vt_label, 6, 7)
+        self.grid.addWidget(self.sko_vt_edit, 7, 7)
         if type_sko == 'ВТ':
-            self.sko_vt_label = QLabel('Высокотехнологическое СКО', self)
-            self.sko_vt_edit = QLineEdit(self)
-            self.grid.addWidget(self.sko_vt_label, 6, 7)
-            self.grid.addWidget(self.sko_vt_edit, 7, 7)
+            self.sko_vt_label.setVisible(True)
+            self.sko_vt_edit.setVisible(True)
         else:
-            self.sko_vt_label = QLabel('Высокотехнологическое СКО', self)
-            self.sko_vt_edit = QLineEdit(self)
-            self.sko_vt_label.setParent(None)
-            self.sko_vt_edit.setParent(None)
+            self.sko_vt_label.setVisible(False)
+            self.sko_vt_edit.setVisible(False)
 
     def change_volume_acid(self):
         if self.acid_volume_edit.text() != '':
@@ -769,9 +769,11 @@ class TabPageUnion(QWidget):
         return difference
 
     def update_paker_need(self, index):
+        self.grid.addWidget(self.paker_depth_zumpf_label, 1, 5)
+        self.grid.addWidget(self.paker_depth_zumpf_edit, 2, 5)
         if index == 'Нет':
-            self.paker_depth_zumpf_label.setParent(None)
-            self.paker_depth_zumpf_edit.setParent(None)
+            self.paker_depth_zumpf_label.setVisible(False)
+            self.paker_depth_zumpf_edit.setVisible(False)
         elif index == 'Да':
             if len(self.data_well.plast_work) != 0:
                 paker_depth_zumpf = int(self.data_well.perforation_roof + 10)
@@ -784,8 +786,8 @@ class TabPageUnion(QWidget):
 
             self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
 
-            self.grid.addWidget(self.paker_depth_zumpf_label, 1, 5)
-            self.grid.addWidget(self.paker_depth_zumpf_edit, 2, 5)
+            self.paker_depth_zumpf_label.setVisible(True)
+            self.paker_depth_zumpf_edit.setVisible(True)
 
     def update_paker(self):
         paker_depth = self.paker_depth_edit.text()

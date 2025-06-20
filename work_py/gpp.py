@@ -27,7 +27,7 @@ class TabPageSoGpp(TabPageUnion):
         self.current_depth_edit.setValidator(self.validator_float)
         self.current_depth_edit.setText(str(int(self.data_well.current_bottom)))
 
-        self.otz_after_question_Label = QLabel("Нужно ли отбивать забой после нормализации", self)
+        self.otz_after_question_label = QLabel("Нужно ли отбивать забой после нормализации", self)
         self.otz_after_question_qcombo = QComboBox(self)
         self.otz_after_question_qcombo.currentTextChanged.connect(self.update_paker)
         self.otz_after_question_qcombo.addItems(['Да', 'Нет'])
@@ -42,7 +42,7 @@ class TabPageSoGpp(TabPageUnion):
 
         self.grid.addWidget(self.current_depth_label, 3, 5)
         self.grid.addWidget(self.current_depth_edit, 4, 5)
-        self.grid.addWidget(self.otz_after_question_Label, 3, 6)
+        self.grid.addWidget(self.otz_after_question_label, 3, 6)
         self.grid.addWidget(self.otz_after_question_qcombo, 4, 6)
 
     def update_paker(self):

@@ -15,10 +15,10 @@ class TabPageDp(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.point_bottom_Label = QLabel("глубина нижней точки", self)
+        self.point_bottom_label = QLabel("глубина нижней точки", self)
         self.point_bottom_edit = QLineEdit(self)
 
-        self.points_sko_Label = QLabel("точки обработки", self)
+        self.points_sko_label = QLabel("точки обработки", self)
         self.points_sko_edit = QLineEdit(self)
 
         plast_work = ['']
@@ -40,7 +40,7 @@ class TabPageDp(TabPageUnion):
         self.acid_proc_edit.setText('12')
         self.acid_proc_edit.setClearButtonEnabled(True)
 
-        self.acid_calcul_Label = QLabel("объем кислоты на погонный метр", self)
+        self.acid_calcul_label = QLabel("объем кислоты на погонный метр", self)
         self.acid_calcul_edit = QLineEdit(self)
 
         self.iron_label_type = QLabel("необходимость стабилизатора железа", self)
@@ -49,7 +49,7 @@ class TabPageDp(TabPageUnion):
         self.iron_volume_label = QLabel("Объем стабилизатора", self)
         self.iron_volume_edit = QLineEdit(self)
 
-        self.pressure_Label = QLabel("Давление закачки", self)
+        self.pressure_label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
         self.pressure_edit.setClearButtonEnabled(True)
         self.pressure_edit.setText(str(self.data_well.max_admissible_pressure.get_value))
@@ -60,10 +60,10 @@ class TabPageDp(TabPageUnion):
         self.grid.addWidget(self.plast_combo, 3, 1)
 
 
-        self.grid.addWidget(self.points_sko_Label, 2, 2)
+        self.grid.addWidget(self.points_sko_label, 2, 2)
         self.grid.addWidget(self.points_sko_edit, 3, 2)
 
-        self.grid.addWidget(self.acid_calcul_Label, 2, 3)
+        self.grid.addWidget(self.acid_calcul_label, 2, 3)
         self.grid.addWidget(self.acid_calcul_edit, 3, 3)
 
         self.grid.addWidget(self.iron_label_type, 2, 4)
@@ -81,10 +81,10 @@ class TabPageDp(TabPageUnion):
         self.grid.addWidget(self.acid_proc_label, 6, 3)
         self.grid.addWidget(self.acid_proc_edit, 7, 3)
 
-        self.grid.addWidget(self.point_bottom_Label, 6, 4)
+        self.grid.addWidget(self.point_bottom_label, 6, 4)
         self.grid.addWidget(self.point_bottom_edit, 7, 4)
 
-        self.grid.addWidget(self.pressure_Label, 6, 5)
+        self.grid.addWidget(self.pressure_label, 6, 5)
         self.grid.addWidget(self.pressure_edit, 7, 5)
 
         self.acid_calcul_edit.textChanged.connect(self.update_volume_points)

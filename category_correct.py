@@ -45,20 +45,20 @@ class TabPageSo(TabPageUnion):
 
         self.cat_P_P = self.data_well.category_pressure_well
 
-        self.category_pressure_Label = QLabel('По Рпл')
-        self.category_h2s_Label = QLabel('По H2S')
-        self.category_h2s2_Label = QLabel('По H2S')
-        self.category_Label = QLabel('По газовому фактору')
-        self.calc_h2s_Label = QLabel('расчет поглотителя H2S')
+        self.category_pressure_label = QLabel('По Рпл')
+        self.category_h2s_label = QLabel('По H2S')
+        self.category_h2s2_label = QLabel('По H2S')
+        self.category_label = QLabel('По газовому фактору')
+        self.calc_h2s_label = QLabel('расчет поглотителя H2S')
 
         # self.grid = QGridLayout(self)
         self.grid.addWidget(self.type_absorbent_label, 2, 1)
         self.grid.addWidget(self.type_absorbent, 3, 1)
-        self.grid.addWidget(self.category_pressure_Label, 5, 1)
-        self.grid.addWidget(self.category_h2s_Label, 6, 1)
-        self.grid.addWidget(self.category_h2s2_Label, 7, 1)
-        self.grid.addWidget(self.category_Label, 8, 1)
-        self.grid.addWidget(self.calc_h2s_Label, 12, 1)
+        self.grid.addWidget(self.category_pressure_label, 5, 1)
+        self.grid.addWidget(self.category_h2s_label, 6, 1)
+        self.grid.addWidget(self.category_h2s2_label, 7, 1)
+        self.grid.addWidget(self.category_label, 8, 1)
+        self.grid.addWidget(self.calc_h2s_label, 12, 1)
 
         n = 1
         work_plast_iter = None

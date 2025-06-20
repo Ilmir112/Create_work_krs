@@ -147,7 +147,7 @@ class TabPageGnkt(TabPageUnion):
                 self.acid_volume_edit.setParent(None)
                 self.acid_proc_label.setParent(None)
                 self.acid_proc_edit.setParent(None)
-                self.pressure_Label.setParent(None)
+                self.pressure_label.setParent(None)
                 self.pressure_edit.setParent(None)
                 self.roof_label.setParent(None)
                 self.roof_edit.setParent(None)
@@ -174,7 +174,7 @@ class TabPageGnkt(TabPageUnion):
             self.acid_proc_edit.setText('12')
             self.acid_proc_edit.setClearButtonEnabled(True)
             self.acid_proc_edit.setValidator(self.validator_int)
-            self.pressure_Label = QLabel("Давление закачки", self)
+            self.pressure_label = QLabel("Давление закачки", self)
             self.pressure_edit = QLineEdit(self)
             self.pressure_edit.setText(f'{self.data_well.max_admissible_pressure.get_value}')
             self.pressure_edit.setValidator(self.validator_int)
@@ -208,7 +208,7 @@ class TabPageGnkt(TabPageUnion):
             self.grid.addWidget(self.acid_volume_edit, 7, 4)
             self.grid.addWidget(self.acid_proc_label, 6, 5)
             self.grid.addWidget(self.acid_proc_edit, 7, 5)
-            self.grid.addWidget(self.pressure_Label, 6, 6)
+            self.grid.addWidget(self.pressure_label, 6, 6)
             self.grid.addWidget(self.pressure_edit, 7, 6)
 
     def update_data_gnkt(self):
@@ -221,11 +221,7 @@ class TabPageGnkt(TabPageUnion):
                 if 'ойл-сервис' in data_list.contractor.lower():
                     contractor_in = 'oil_service'
 
-                # result_gnkt = data_gnkt.update_data_gnkt(contractor_in, previus_well)
-                # self.length_gnkt_edit.setText(str(result_gnkt[3]))
-                # self.iznos_gnkt_edit.setText(str(result_gnkt[5]))
-                # self.pipe_mileage_edit.setText(str(result_gnkt[6]))
-                # self.pvo_number_edit.setText(str(result_gnkt[10]))
+
                 params = {
                     "well_number": previus_well.split(" ")[0],
                     "well_area": previus_well.split(" ")[1],

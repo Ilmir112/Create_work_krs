@@ -39,8 +39,8 @@ class TabPageSO(QWidget):
 
         grid = QGridLayout(self)
 
-        self.title_job_Label = QLabel("Должность", self)
-        self.surname_Label = QLabel("Фамилия И.О.", self)
+        self.title_job_label = QLabel("Должность", self)
+        self.surname_label = QLabel("Фамилия И.О.", self)
 
         self.сhief_engineer_edit = QLineEdit(self)
         self.сhief_engineer_name_edit = QLineEdit(self)
@@ -72,8 +72,8 @@ class TabPageSO(QWidget):
         grid.addWidget(self.regionLabel, 1, 0)
         grid.addWidget(self.region_combo_box, 1, 1)
 
-        grid.addWidget(self.title_job_Label, 3, 0)
-        grid.addWidget(self.surname_Label, 3, 2)
+        grid.addWidget(self.title_job_label, 3, 0)
+        grid.addWidget(self.surname_label, 3, 2)
         grid.addWidget(self.сhief_engineer_edit, 4, 0, 1, 2)
         grid.addWidget(self.сhief_engineer_name_edit, 4, 2, 1, 2)
         grid.addWidget(self.chief_geologist_edit_type, 6, 0, 1, 2)

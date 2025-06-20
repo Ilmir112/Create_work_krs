@@ -22,33 +22,33 @@ class TabPageSo(TabPageUnion):
         self.template_labelType = QLabel("Вид компоновки шаблона", self)
         self.template_combo = QComboBox(self)
 
-        self.template_str_Label = QLabel("строчка с шаблонами", self)
+        self.template_str_label = QLabel("строчка с шаблонами", self)
         self.template_str_edit = QLineEdit(self)
 
-        self.skm_teml_str_Label = QLabel("глубины спуска шаблонов", self)
+        self.skm_teml_str_label = QLabel("глубины спуска шаблонов", self)
         self.skm_teml_str_edit = QLineEdit(self)
 
-        self.template_first_Label = QLabel("диаметр первого шаблона", self)
+        self.template_first_label = QLabel("диаметр первого шаблона", self)
         self.template_first_edit = QLineEdit(self)
         self.template_first_edit.setValidator(validator)
 
-        self.length_template_first_Label = QLabel("длина первого шаблона", self)
+        self.length_template_first_label = QLabel("длина первого шаблона", self)
         self.length_template_first_edit = QLineEdit(self)
         self.length_template_first_edit.setValidator(validator)
 
-        self.dictance_template_first_Label = QLabel("расстояние", self)
+        self.dictance_template_first_label = QLabel("расстояние", self)
         self.dictance_template_first_edit = QLineEdit(self)
         self.dictance_template_first_edit.setValidator(validator)
 
-        self.template_second_Label = QLabel("диаметр второго шаблона", self)
+        self.template_second_label = QLabel("диаметр второго шаблона", self)
         self.template_second_edit = QLineEdit(self)
         self.template_second_edit.setValidator(validator)
 
-        self.length_template_second_Label = QLabel("длина второго шаблона", self)
+        self.length_template_second_label = QLabel("длина второго шаблона", self)
         self.length_template_second_edit = QLineEdit(self)
         self.length_template_second_edit.setValidator(validator)
 
-        self.dictance_template_second_Label = QLabel("расстояние-2", self)
+        self.dictance_template_second_label = QLabel("расстояние-2", self)
         self.dictance_template_second_edit = QLineEdit(self)
         self.dictance_template_second_edit.setValidator(validator)
 
@@ -56,7 +56,7 @@ class TabPageSo(TabPageUnion):
         self.current_bottom_edit = QLineEdit(self)
         self.current_bottom_edit.setText(f'{self.data_well.current_bottom}')
 
-        self.privyazka_question_Label = QLabel("Нужно ли привязывать компоновку", self)
+        self.privyazka_question_label = QLabel("Нужно ли привязывать компоновку", self)
         self.privyazka_question_QCombo = QComboBox(self)
         self.privyazka_question_QCombo.addItems(['Нет', 'Да'])
 
@@ -101,19 +101,19 @@ class TabPageSo(TabPageUnion):
 
             self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
             self.grid.addWidget(self.template_combo, 2, 2, 2, 8)
-            self.grid.addWidget(self.template_first_Label, 4, 2)
+            self.grid.addWidget(self.template_first_label, 4, 2)
             self.grid.addWidget(self.template_first_edit, 5, 2)
-            self.grid.addWidget(self.length_template_first_Label, 4, 3)
+            self.grid.addWidget(self.length_template_first_label, 4, 3)
             self.grid.addWidget(self.length_template_first_edit, 5, 3)
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
+            self.grid.addWidget(self.dictance_template_first_label, 4, 4)
             self.grid.addWidget(self.dictance_template_first_edit, 5, 4)
 
-            self.grid.addWidget(self.template_second_Label, 4, 7)
+            self.grid.addWidget(self.template_second_label, 4, 7)
             self.grid.addWidget(self.template_second_edit, 5, 7)
-            self.grid.addWidget(self.length_template_second_Label, 4, 8)
+            self.grid.addWidget(self.length_template_second_label, 4, 8)
             self.grid.addWidget(self.length_template_second_edit, 5, 8)
             self.dictance_template_second_edit.setParent(None)
-            self.dictance_template_second_Label.setParent(None)
+            self.dictance_template_second_label.setParent(None)
 
         else:
             first_template, template_second = TabPageSoWith.template_diam_additional_ek(self)
@@ -125,20 +125,20 @@ class TabPageSo(TabPageUnion):
 
             self.grid.addWidget(self.template_labelType, 1, 2, 1, 8)
             self.grid.addWidget(self.template_combo, 2, 2, 2, 8)
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
+            self.grid.addWidget(self.dictance_template_first_label, 4, 2)
             self.grid.addWidget(self.dictance_template_first_edit, 5, 2)
 
-            self.grid.addWidget(self.template_first_Label, 4, 3)
+            self.grid.addWidget(self.template_first_label, 4, 3)
             self.grid.addWidget(self.template_first_edit, 5, 3)
 
-            self.grid.addWidget(self.length_template_first_Label, 4, 4)
+            self.grid.addWidget(self.length_template_first_label, 4, 4)
             self.grid.addWidget(self.length_template_first_edit, 5, 4)
 
-            self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
+            self.grid.addWidget(self.dictance_template_second_label, 4, 5)
             self.grid.addWidget(self.dictance_template_second_edit, 5, 5)
-            self.grid.addWidget(self.template_second_Label, 4, 6)
+            self.grid.addWidget(self.template_second_label, 4, 6)
             self.grid.addWidget(self.template_second_edit, 5, 6)
-            self.grid.addWidget(self.length_template_second_Label, 4, 7)
+            self.grid.addWidget(self.length_template_second_label, 4, 7)
             self.grid.addWidget(self.length_template_second_edit, 5, 7)
 
         self.grid.addWidget(self.current_bottom_label, 8, 3)
@@ -150,7 +150,7 @@ class TabPageSo(TabPageUnion):
         self.grid.addWidget(self.solvent_label, 8, 5)
         self.grid.addWidget(self.solvent_volume_edit, 9, 5)
 
-        self.grid.addWidget(self.privyazka_question_Label, 8, 6)
+        self.grid.addWidget(self.privyazka_question_label, 8, 6)
         self.grid.addWidget(self.privyazka_question_QCombo, 9, 6)
 
         self.grid.addWidget(self.note_label, 8, 7)
@@ -159,10 +159,10 @@ class TabPageSo(TabPageUnion):
         self.grid.addWidget(self.kot_label, 8, 8)
         self.grid.addWidget(self.kot_question_qcombo, 9, 8)
 
-        self.grid.addWidget(self.template_str_Label, 13, 1, 1, 8)
+        self.grid.addWidget(self.template_str_label, 13, 1, 1, 8)
         self.grid.addWidget(self.template_str_edit, 14, 1, 1, 8)
 
-        self.grid.addWidget(self.skm_teml_str_Label, 15, 1, 1, 8)
+        self.grid.addWidget(self.skm_teml_str_label, 15, 1, 1, 8)
         self.grid.addWidget(self.skm_teml_str_edit, 16, 1, 1, 8)
 
         self.template_first_edit.setText(str(first_template))
@@ -396,12 +396,12 @@ class TabPageSo(TabPageUnion):
         length_template_second = int(self.length_template_second_edit.text())
         dictance_template_second = int(self.dictance_template_second_edit.text())
 
-        self.template_first_Label.setParent(None)
+        self.template_first_label.setParent(None)
         self.template_first_edit.setParent(None)
-        self.length_template_first_Label.setParent(None)
+        self.length_template_first_label.setParent(None)
         self.length_template_first_edit.setParent(None)
 
-        self.dictance_template_first_Label.setParent(None)
+        self.dictance_template_first_label.setParent(None)
         self.dictance_template_first_edit.setParent(None)
         self.dictance_template_second_edit.setParent(None)
 
@@ -412,12 +412,12 @@ class TabPageSo(TabPageUnion):
 
         if index == 'шаблон ЭК с хвостом':
             self.dictance_template_second_edit.setParent(None)
-            self.dictance_template_second_Label.setParent(None)
-            self.grid.addWidget(self.template_first_Label, 4, 2)
+            self.dictance_template_second_label.setParent(None)
+            self.grid.addWidget(self.template_first_label, 4, 2)
             self.grid.addWidget(self.template_first_edit, 5, 2)
-            self.grid.addWidget(self.length_template_first_Label, 4, 3)
+            self.grid.addWidget(self.length_template_first_label, 4, 3)
             self.grid.addWidget(self.length_template_first_edit, 5, 3)
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
+            self.grid.addWidget(self.dictance_template_first_label, 4, 4)
             self.grid.addWidget(self.dictance_template_first_edit, 5, 4)
 
             template_str = f'перо {kot_str} + шаблон-{first_template}мм L-2м {valve}+ НКТ{nkt_diam}мм ' \
@@ -431,9 +431,9 @@ class TabPageSo(TabPageUnion):
 
         elif index == 'шаблон без хвоста':
             self.dictance_template_second_edit.setParent(None)
-            self.dictance_template_second_Label.setParent(None)
+            self.dictance_template_second_label.setParent(None)
             self.dictance_template_first_edit.setParent(None)
-            self.dictance_template_first_Label.setParent(None)
+            self.dictance_template_first_label.setParent(None)
 
             template_str = f'перо {kot_str} + шаблон-{template_second}мм L-{length_template_second}м '
             self.template_depth = self.data_well.current_bottom
@@ -441,13 +441,13 @@ class TabPageSo(TabPageUnion):
 
         elif index == 'шаблон открытый ствол':
 
-            self.grid.addWidget(self.template_first_Label, 4, 2)
+            self.grid.addWidget(self.template_first_label, 4, 2)
             self.grid.addWidget(self.template_first_edit, 5, 2)
-            # self.grid.addWidget(self.length_template_first_Label, 4, 3)
+            # self.grid.addWidget(self.length_template_first_label, 4, 3)
             # self.grid.addWidget(self.length_template_first_edit, 5, 3)
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 4)
+            self.grid.addWidget(self.dictance_template_first_label, 4, 4)
             self.grid.addWidget(self.dictance_template_first_edit, 5, 4)
-            # self.grid.addWidget(self.length_template_second_Label, 4, 9)
+            # self.grid.addWidget(self.length_template_second_label, 4, 9)
             # self.grid.addWidget(self.length_template_second_edit, 5, 9)
 
             self.template_first_edit.setText('фильтр направление')
@@ -464,15 +464,15 @@ class TabPageSo(TabPageUnion):
 
         elif index == 'шаблон ДП с хвостом':
 
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
+            self.grid.addWidget(self.dictance_template_first_label, 4, 2)
             self.grid.addWidget(self.dictance_template_first_edit, 5, 2)
-            self.grid.addWidget(self.template_first_Label, 4, 3)
+            self.grid.addWidget(self.template_first_label, 4, 3)
             self.grid.addWidget(self.template_first_edit, 5, 3)
-            self.grid.addWidget(self.length_template_first_Label, 4, 4)
+            self.grid.addWidget(self.length_template_first_label, 4, 4)
             self.grid.addWidget(self.length_template_first_edit, 5, 4)
-            self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
+            self.grid.addWidget(self.dictance_template_second_label, 4, 5)
             self.grid.addWidget(self.dictance_template_second_edit, 5, 5)
-            self.grid.addWidget(self.length_template_second_Label, 4, 8)
+            self.grid.addWidget(self.length_template_second_label, 4, 8)
             self.grid.addWidget(self.length_template_second_edit, 5, 8)
 
             dictance_template_first = int(self.data_well.current_bottom - roof_add_column_plast + 5)
@@ -495,16 +495,16 @@ class TabPageSo(TabPageUnion):
 
         elif index == 'шаблон ДП без хвоста':
             self.dictance_template_first_edit.setParent(None)
-            self.dictance_template_first_Label.setParent(None)
-            self.grid.addWidget(self.template_first_Label, 4, 2)
+            self.dictance_template_first_label.setParent(None)
+            self.grid.addWidget(self.template_first_label, 4, 2)
             self.grid.addWidget(self.template_first_edit, 5, 2)
-            self.grid.addWidget(self.length_template_first_Label, 4, 3)
+            self.grid.addWidget(self.length_template_first_label, 4, 3)
             self.grid.addWidget(self.length_template_first_edit, 5, 3)
-            self.grid.addWidget(self.dictance_template_second_Label, 4, 6)
+            self.grid.addWidget(self.dictance_template_second_label, 4, 6)
             self.grid.addWidget(self.dictance_template_second_edit, 5, 6)
-            self.grid.addWidget(self.template_second_Label, 4, 7)
+            self.grid.addWidget(self.template_second_label, 4, 7)
             self.grid.addWidget(self.template_second_edit, 5, 7)
-            self.grid.addWidget(self.length_template_second_Label, 4, 8)
+            self.grid.addWidget(self.length_template_second_label, 4, 8)
             self.grid.addWidget(self.length_template_second_edit, 5, 8)
 
             dictance_template_second = int(
@@ -526,15 +526,15 @@ class TabPageSo(TabPageUnion):
                            f'шаблон-{template_second}мм до гл.{self.template_depth}м'
 
         elif index == 'шаблон ДП открытый ствол':
-            self.grid.addWidget(self.dictance_template_first_Label, 4, 2)
+            self.grid.addWidget(self.dictance_template_first_label, 4, 2)
             self.grid.addWidget(self.dictance_template_first_edit, 5, 2)
-            self.grid.addWidget(self.template_first_Label, 4, 3)
+            self.grid.addWidget(self.template_first_label, 4, 3)
             self.grid.addWidget(self.template_first_edit, 5, 3)
-            self.grid.addWidget(self.length_template_first_Label, 4, 4)
+            self.grid.addWidget(self.length_template_first_label, 4, 4)
             self.grid.addWidget(self.length_template_first_edit, 5, 4)
-            self.grid.addWidget(self.dictance_template_second_Label, 4, 5)
+            self.grid.addWidget(self.dictance_template_second_label, 4, 5)
             self.grid.addWidget(self.dictance_template_second_edit, 5, 5)
-            self.grid.addWidget(self.length_template_second_Label, 4, 8)
+            self.grid.addWidget(self.length_template_second_label, 4, 8)
             self.grid.addWidget(self.length_template_second_edit, 5, 8)
 
             dictance_template_first = int(self.data_well.current_bottom - roof_add_column_plast + 5)

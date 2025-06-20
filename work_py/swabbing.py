@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from PyQt5.QtCore import QEvent, Qt
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
 from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, \
     QLineEdit, QGridLayout, \
@@ -98,7 +98,7 @@ class TabPageSoSwab(TabPageUnion):
         self.need_change_zgs_combo = QComboBox(self)
         self.need_change_zgs_combo.addItems(['Нет', 'Да'])
 
-        self.need_privyazka_Label = QLabel("Привязка оборудования", self)
+        self.need_privyazka_label = QLabel("Привязка оборудования", self)
         self.need_privyazka_q_combo = QComboBox()
         self.need_privyazka_q_combo.addItems(['Нет', 'Да'])
 
@@ -141,7 +141,7 @@ class TabPageSoSwab(TabPageUnion):
         self.grid.addWidget(self.pakerEdit, 1, 4)
         self.grid.addWidget(self.paker2Label, 0, 5)
         self.grid.addWidget(self.paker2Edit, 1, 5)
-        self.grid.addWidget(self.need_privyazka_Label, 0, 9)
+        self.grid.addWidget(self.need_privyazka_label, 0, 9)
         self.grid.addWidget(self.need_privyazka_q_combo, 1, 9)
 
         self.grid.addWidget(self.swab_type_label, 6, 1)
@@ -178,8 +178,7 @@ class TabPageSoSwab(TabPageUnion):
         self.paker2Edit.textChanged.connect(self.update_paker_edit)
         self.pakerEdit.textChanged.connect(self.update_paker_diameter)
         self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
-        self.need_change_zgs_combo.setCurrentIndex(1)
-        self.need_change_zgs_combo.setCurrentIndex(0)
+
         self.pressure_zumpf_question_combo.currentTextChanged.connect(self.update_paker_need)
         self.pressure_zumpf_question_combo.setCurrentIndex(1)
         self.pressure_zumpf_question_combo.setCurrentIndex(0)
@@ -203,63 +202,82 @@ class TabPageSoSwab(TabPageUnion):
             self.grid.addWidget(self.paker_depth_zumpf_label, 0, 7)
             self.grid.addWidget(self.paker_depth_zumpf_edit, 1, 7)
         elif index == 'Нет':
-            self.paker_depth_zumpf_label.setParent(None)
-            self.paker_depth_zumpf_edit.setParent(None)
+            self.paker_depth_zumpf_label.setVisible(False)
+            self.paker_depth_zumpf_edit.setVisible(False)
 
     def update_change_fluid(self, index):
-        if index == 'Да' and self.data_well:
-
+        if index == "Да":
             category_h2s_list_plan = list(
                 map(int, [self.data_well.dict_category[plast]['по сероводороду'].category for plast in
                           self.data_well.plast_project if self.data_well.dict_category.get(plast) and
                           self.data_well.dict_category[plast]['отключение'] == 'планируемый']))
+            self.category_pressure_label = QLabel('По Рпл')
+            self.category_pressure_line_combo = QComboBox(self)
+            self.category_pressure_line_combo.addItems(['1', '2', '3'])
+            self.category_h2s_label = QLabel('По H2S')
+            self.category_h2s_edit = QComboBox(self)
+            self.category_h2s_edit.addItems(['2', '1', '3'])
+            self.h2s_pr_label = QLabel('значение H2s в %')
+            self.h2s_pr_edit = QLineEdit(self)
+            self.h2s_pr_edit.setValidator(self.validator_float)
+            self.h2s_mg_label = QLabel('значение H2s в мг/л')
+            self.h2s_mg_edit = QLineEdit(self)
+            self.h2s_mg_edit.setValidator(self.validator_float)
+            self.category_label = QLabel('По газовому фактору')
+            self.category_gf = QComboBox(self)
+            self.category_gf.addItems(['2', '1', '3'])
+            self.gf_label = QLabel('Газовый фактор')
+            self.gf_edit = QLineEdit(self)
+            self.gf_edit.setValidator(self.validator_float)
+            self.h2s_mg_edit.textChanged.connect(self.update_calculate_h2s)
+            self.h2s_pr_edit.textChanged.connect(self.update_calculate_h2s)
+            self.gf_edit.textChanged.connect(self.update_calculate_h2s)
+
+            self.calc_h2s_label = QLabel('расчет поглотителя H2S по вскрываемому пласту')
+            self.calc_plast_h2s = QLineEdit(self)
+
+            self.grid.addWidget(self.category_pressure_label, 11, 2)
+            self.grid.addWidget(self.category_pressure_line_combo, 12, 2)
+
+            self.grid.addWidget(self.category_h2s_label, 11, 3)
+            self.grid.addWidget(self.category_h2s_edit, 12, 3)
+
+            self.grid.addWidget(self.h2s_pr_label, 13, 3)
+            self.grid.addWidget(self.h2s_pr_edit, 14, 3)
+
+            self.grid.addWidget(self.h2s_mg_label, 15, 3)
+            self.grid.addWidget(self.h2s_mg_edit, 16, 3)
+
+            self.grid.addWidget(self.category_label, 11, 4)
+            self.grid.addWidget(self.category_gf, 12, 4)
+
+            self.grid.addWidget(self.gf_label, 13, 4)
+            self.grid.addWidget(self.gf_edit, 14, 4)
+
+            self.grid.addWidget(self.calc_h2s_label, 11, 5)
+            self.grid.addWidget(self.calc_plast_h2s, 12, 5)
 
             if not category_h2s_list_plan:
-                self.category_pressure_Label = QLabel('По Рпл')
-                self.category_pressure_line_combo = QComboBox(self)
-                self.category_pressure_line_combo.addItems(['1', '2', '3'])
-                self.category_h2s_Label = QLabel('По H2S')
-                self.category_h2s_edit = QComboBox(self)
-                self.category_h2s_edit.addItems(['2', '1', '3'])
-                self.h2s_pr_label = QLabel('значение H2s в %')
-                self.h2s_pr_edit = QLineEdit(self)
-                self.h2s_pr_edit.setValidator(self.validator_float)
-                self.h2s_mg_label = QLabel('значение H2s в мг/л')
-                self.h2s_mg_edit = QLineEdit(self)
-                self.h2s_mg_edit.setValidator(self.validator_float)
-                self.category_Label = QLabel('По газовому фактору')
-                self.category_gf = QComboBox(self)
-                self.category_gf.addItems(['2', '1', '3'])
-                self.gf_label = QLabel('Газовый фактор')
-                self.gf_edit = QLineEdit(self)
-                self.gf_edit.setValidator(self.validator_float)
-                self.h2s_mg_edit.textChanged.connect(self.update_calculate_h2s)
-                self.h2s_pr_edit.textChanged.connect(self.update_calculate_h2s)
-                self.gf_edit.textChanged.connect(self.update_calculate_h2s)
+                self.category_pressure_label.setVisible(True)
+                self.category_pressure_line_combo.setVisible(True)
 
-                self.calc_h2s_Label = QLabel('расчет поглотителя H2S по вскрываемому пласту')
-                self.calc_plast_h2s = QLineEdit(self)
+                self.category_h2s_label.setVisible(True)
+                self.category_h2s_edit.setVisible(True)
 
-                self.grid.addWidget(self.category_pressure_Label, 11, 2)
-                self.grid.addWidget(self.category_pressure_line_combo, 12, 2)
+                self.h2s_pr_label.setVisible(True)
+                self.h2s_pr_edit.setVisible(True)
 
-                self.grid.addWidget(self.category_h2s_Label, 11, 3)
-                self.grid.addWidget(self.category_h2s_edit, 12, 3)
+                self.h2s_mg_label.setVisible(True)
+                self.h2s_mg_edit.setVisible(True)
+                self.category_label.setVisible(True)
+                self.category_gf.setVisible(True)
 
-                self.grid.addWidget(self.h2s_pr_label, 13, 3)
-                self.grid.addWidget(self.h2s_pr_edit, 14, 3)
+                self.gf_label.setVisible(True)
+                self.gf_edit.setVisible(True)
 
-                self.grid.addWidget(self.h2s_mg_label, 15, 3)
-                self.grid.addWidget(self.h2s_mg_edit, 16, 3)
+                self.calc_h2s_label.setVisible(True)
+                self.calc_plast_h2s.setVisible(True)
 
-                self.grid.addWidget(self.category_Label, 11, 4)
-                self.grid.addWidget(self.category_gf, 12, 4)
-
-                self.grid.addWidget(self.gf_label, 13, 4)
-                self.grid.addWidget(self.gf_edit, 14, 4)
-
-                self.grid.addWidget(self.calc_h2s_Label, 11, 5)
-                self.grid.addWidget(self.calc_plast_h2s, 12, 5)
 
             if len(self.data_well.plast_project) != 0:
                 # self.plast_new_combo = QComboBox(self)
@@ -281,37 +299,65 @@ class TabPageSoSwab(TabPageUnion):
 
             self.grid.addWidget(self.pressure_new_label, 9, 4)
             self.grid.addWidget(self.pressure_new_edit, 10, 4)
+
+            if index == 'Да' and self.data_well:
+                self.category_pressure_label.setVisible(True)
+                self.category_pressure_line_combo.setVisible(True)
+
+                self.category_h2s_label.setVisible(True)
+                self.category_h2s_edit.setVisible(True)
+
+                self.h2s_pr_label.setVisible(True)
+                self.h2s_pr_edit.setVisible(True)
+
+                self.h2s_mg_label.setVisible(True)
+                self.h2s_mg_edit.setVisible(True)
+
+                self.category_label.setVisible(True)
+                self.category_gf.setVisible(True)
+                self.calc_plast_h2s.setVisible(True)
+
+                self.gf_label.setVisible(True)
+                self.gf_edit.setVisible(True)
+
+                self.calc_h2s_label.setVisible(True)
+
+                self.plast_new_label.setVisible(True)
+                self.plast_new_combo.setVisible(True)
+                self.fluid_new_label.setVisible(True)
+                self.fluid_new_edit.setVisible(True)
+                self.pressure_new_label.setVisible(True)
+                self.pressure_new_edit.setVisible(True)
+
         else:
-            try:
-                self.category_pressure_Label.setParent(None)
-                self.category_pressure_line_combo.setParent(None)
+            self.category_pressure_label.setVisible(False)
+            self.category_pressure_line_combo.setVisible(False)
 
-                self.category_h2s_Label.setParent(None)
-                self.category_h2s_edit.setParent(None)
+            self.category_h2s_label.setVisible(False)
+            self.category_h2s_edit.setVisible(False)
 
-                self.h2s_pr_label.setParent(None)
-                self.h2s_pr_edit.setParent(None)
+            self.h2s_pr_label.setVisible(False)
+            self.h2s_pr_edit.setVisible(False)
 
-                self.h2s_mg_label.setParent(None)
-                self.h2s_mg_edit.setParent(None)
+            self.h2s_mg_label.setVisible(False)
+            self.h2s_mg_edit.setVisible(False)
 
-                self.category_Label.setParent(None)
-                self.category_gf.setParent(None)
-                self.calc_plast_h2s.setParent(None)
+            self.category_label.setVisible(False)
+            self.category_gf.setVisible(False)
+            self.calc_plast_h2s.setVisible(False)
 
-                self.gf_label.setParent(None)
-                self.gf_edit.setParent(None)
+            self.gf_label.setVisible(False)
+            self.gf_edit.setVisible(False)
 
-                self.calc_h2s_Label.setParent(None)
+            self.calc_h2s_label.setVisible(False)
 
-                self.plast_new_label.setParent(None)
-                self.plast_new_combo.setParent(None)
-                self.fluid_new_label.setParent(None)
-                self.fluid_new_edit.setParent(None)
-                self.pressure_new_label.setParent(None)
-                self.pressure_new_edit.setParent(None)
-            except Exception:
-                pass
+            self.plast_new_label.setVisible(False)
+            self.plast_new_combo.setVisible(False)
+            self.fluid_new_label.setVisible(False)
+            self.fluid_new_edit.setVisible(False)
+            self.pressure_new_label.setVisible(False)
+            self.pressure_new_edit.setVisible(False)
+            
 
     def update_calculate_h2s(self):
         if self.category_h2s_edit.currentText() in ['3', 3]:
@@ -341,8 +387,8 @@ class TabPageSoSwab(TabPageUnion):
             paker_depth = self.pakerEdit.text()
 
             if self.swab_true_edit_type.currentText() not in ['однопакерная']:
-                self.pressure_zumpf_question_label.setParent(None)
-                self.pressure_zumpf_question_combo.setParent(None)
+                self.pressure_zumpf_question_label.setVisible(False)
+                self.pressure_zumpf_question_combo.setVisible(False)
             else:
                 self.grid.addWidget(self.pressure_zumpf_question_label, 2, 8)
                 self.grid.addWidget(self.pressure_zumpf_question_combo, 3, 8)
@@ -399,8 +445,8 @@ class TabPageSoSwab(TabPageUnion):
             self.grid.addWidget(self.plast_combo, 1, 1)
             self.grid.addWidget(self.kvost_label, 0, 3)
             self.grid.addWidget(self.khvostEdit, 1, 3)
-            self.paker2Label.setParent(None)
-            self.paker2Edit.setParent(None)
+            self.paker2Label.setVisible(False)
+            self.paker2Edit.setVisible(False)
             self.grid.addWidget(self.pakerLabel, 0, 4)
             self.grid.addWidget(self.pakerEdit, 1, 4)
             self.grid.addWidget(self.diameter_paker_label_type, 0, 2)
@@ -420,34 +466,34 @@ class TabPageSoSwab(TabPageUnion):
             paker_layout_list_tab = ["Пласт", "хвост", "пакер", "2-й пакер", "вид освоения", "объем освоения"]
         elif self.swab_true_edit_type.currentText() == 'воронка':
             self.pakerLabel.setText('Глубина воронки')
-            self.kvost_label.setParent(None)
-            self.khvostEdit.setParent(None)
-            self.paker2Label.setParent(None)
-            self.paker2Edit.setParent(None)
-            self.diameter_paker_label_type.setParent(None)
-            self.diameter_paker_edit.setParent(None)
+            self.kvost_label.setVisible(False)
+            self.khvostEdit.setVisible(False)
+            self.paker2Label.setVisible(False)
+            self.paker2Edit.setVisible(False)
+            self.diameter_paker_label_type.setVisible(False)
+            self.diameter_paker_edit.setVisible(False)
 
-            self.plast_new_label.setParent(None)
-            self.plast_new_combo.setParent(None)
+            self.plast_new_label.setVisible(False)
+            self.plast_new_combo.setVisible(False)
 
-            self.fluid_new_label.setParent(None)
-            self.fluid_new_edit.setParent(None)
-            self.pressure_new_label.setParent(None)
-            self.pressure_new_edit.setParent(None)
+            self.fluid_new_label.setVisible(False)
+            self.fluid_new_edit.setVisible(False)
+            self.pressure_new_label.setVisible(False)
+            self.pressure_new_edit.setVisible(False)
             paker_layout_list_tab = ["Пласт", "воронка", "вид освоения", "объем освоения"]
 
         elif self.swab_true_edit_type.currentText() == 'пакер с заглушкой':
-            # self.swab_type_label.setParent(None)
-            # self.swab_type_combo.setParent(None)
-            # self.swab_volume_edit.setParent(None)
+            # self.swab_type_label.setVisible(False)
+            # self.swab_type_combo.setVisible(False)
+            # self.swab_volume_edit.setVisible(False)
 
-            self.kvost_label.setParent(None)
-            self.khvostEdit.setParent(None)
-            self.pakerLabel.setParent(None)
-            self.pakerEdit.setParent(None)
+            self.kvost_label.setVisible(False)
+            self.khvostEdit.setVisible(False)
+            self.pakerLabel.setVisible(False)
+            self.pakerEdit.setVisible(False)
 
-            self.diameter_paker_label_type.setParent(None)
-            self.diameter_paker_edit.setParent(None)
+            self.diameter_paker_label_type.setVisible(False)
+            self.diameter_paker_edit.setVisible(False)
             # self.pakerLabel.setText('Глубина пакера')
             # self.paker2Label.setText('Глубина понижения')
             self.paker2Edit.setText(f'{self.data_well.perforation_roof + 10}')
@@ -460,24 +506,24 @@ class TabPageSoSwab(TabPageUnion):
             self.grid.addWidget(self.pakerEdit, 1, 4)
             self.grid.addWidget(self.diameter_paker_label_type, 0, 2)
             self.grid.addWidget(self.diameter_paker_edit, 1, 2)
-            self.paker2Label.setParent(None)
-            self.paker2Edit.setParent(None)
+            self.paker2Label.setVisible(False)
+            self.paker2Edit.setVisible(False)
             paker_layout_list_tab = ["Пласт", "хвост", "пакер", "вид освоения", "объем освоения"]
         elif self.swab_true_edit_type.currentText() == 'Опрессовка снижением уровня на шаблоне':
-            self.depth_gauge_label.setParent(None)
-            self.depth_gauge_combo.setParent(None)
-            self.swab_volume_editLabel.setParent(None)
-            self.swab_type_label.setParent(None)
-            self.swab_type_combo.setParent(None)
-            self.swab_volume_edit.setParent(None)
-            self.plast_label.setParent(None)
-            self.plast_combo.setParent(None)
-            self.kvost_label.setParent(None)
-            self.khvostEdit.setParent(None)
-            self.pakerLabel.setParent(None)
-            self.pakerEdit.setParent(None)
-            self.diameter_paker_label_type.setParent(None)
-            self.diameter_paker_edit.setParent(None)
+            self.depth_gauge_label.setVisible(False)
+            self.depth_gauge_combo.setVisible(False)
+            self.swab_volume_editLabel.setVisible(False)
+            self.swab_type_label.setVisible(False)
+            self.swab_type_combo.setVisible(False)
+            self.swab_volume_edit.setVisible(False)
+            self.plast_label.setVisible(False)
+            self.plast_combo.setVisible(False)
+            self.kvost_label.setVisible(False)
+            self.khvostEdit.setVisible(False)
+            self.pakerLabel.setVisible(False)
+            self.pakerEdit.setVisible(False)
+            self.diameter_paker_label_type.setVisible(False)
+            self.diameter_paker_edit.setVisible(False)
             self.paker2Label.setText('Глубина Понижения уровня')
             depth_swab = int(float(self.data_well.current_bottom - 250))
             if depth_swab > 1500:
@@ -501,12 +547,12 @@ class TabPageSoSwab(TabPageUnion):
             self.template_second_need_label = QLabel('Необходимость шаблонов в компоновке')
             self.template_second_need_combo = QComboBox(self)
             self.template_second_need_combo.addItems(['Да', 'Нет'])
-            self.template_second_Label = QLabel("диаметр шаблона", self)
+            self.template_second_label = QLabel("диаметр шаблона", self)
             self.template_second_edit = QLineEdit(self)
             self.template_second_edit.setValidator(self.validator_int)
             self.template_second_edit.setText(str(template_second))
 
-            self.length_template_second_Label = QLabel("длина шаблона", self)
+            self.length_template_second_label = QLabel("длина шаблона", self)
             self.length_template_second_edit = QLineEdit(self)
             self.length_template_second_edit.setValidator(self.validator_int)
             self.length_template_second_edit.setText('4')
@@ -514,10 +560,10 @@ class TabPageSoSwab(TabPageUnion):
             self.grid.addWidget(self.template_second_need_label, 3, 2)
             self.grid.addWidget(self.template_second_need_combo, 4, 2)
 
-            self.grid.addWidget(self.template_second_Label, 3, 3)
+            self.grid.addWidget(self.template_second_label, 3, 3)
             self.grid.addWidget(self.template_second_edit, 4, 3)
 
-            self.grid.addWidget(self.length_template_second_Label, 3, 4)
+            self.grid.addWidget(self.length_template_second_label, 3, 4)
             self.grid.addWidget(self.length_template_second_edit, 4, 4)
 
         elif self.swab_true_edit_type.currentText() == 'Опрессовка снижением уровня на пакере с заглушкой':

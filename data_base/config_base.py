@@ -44,6 +44,7 @@ class PostgresConnection(DatabaseConnection):
         db_host = decrypt('DB_HOST')
         db_port = decrypt('DB_PORT')
 
+
         try:
             connection = psycopg2.connect(
                 dbname=self.db_name,

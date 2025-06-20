@@ -202,7 +202,7 @@ class TabPageSoAcid(TabPageUnion):
         if self.data_well:
             self.paker2_depth.setText(f'{int(self.data_well.perforation_roof - 20)}')
 
-        self.need_privyazka_Label = QLabel("Привязка оборудования", self)
+        self.need_privyazka_label = QLabel("Привязка оборудования", self)
         self.need_privyazka_q_combo = QComboBox()
         self.need_privyazka_q_combo.addItems(['Нет', 'Да'])
 
@@ -230,11 +230,11 @@ class TabPageSoAcid(TabPageUnion):
         self.pressure_zumpf_question_combo = QComboBox(self)
         self.pressure_zumpf_question_combo.addItems(["Нет", "Да"])
 
-        self.pressure_Label = QLabel("Давление закачки", self)
+        self.pressure_label = QLabel("Давление закачки", self)
         self.pressure_edit = QLineEdit(self)
         self.pressure_edit.setClearButtonEnabled(True)
 
-        self.grid.addWidget(self.pressure_Label, 6, 6)
+        self.grid.addWidget(self.pressure_label, 6, 6)
         self.grid.addWidget(self.pressure_edit, 7, 6)
 
         self.grid.addWidget(self.paker_layout_label, 0, 0, 1, 0)
@@ -259,7 +259,7 @@ class TabPageSoAcid(TabPageUnion):
         self.grid.addWidget(self.paker_depth_edit, 3, 5)
         self.grid.addWidget(self.paker2Label, 2, 6)
         self.grid.addWidget(self.paker2_depth, 3, 6)
-        self.grid.addWidget(self.need_privyazka_Label, 2, 7)
+        self.grid.addWidget(self.need_privyazka_label, 2, 7)
         self.grid.addWidget(self.need_privyazka_q_combo, 3, 7)
 
         self.grid.addWidget(self.pressure_zumpf_question_label, 2, 8)

@@ -34,8 +34,8 @@ class TabPageSO(QWidget):
 
         self.region_select = self.region_combo_box.currentText()
 
-        self.title_job_Label = QLabel("Должность", self)
-        self.surname_Label = QLabel("Фамилия И.О.", self)
+        self.title_job_label = QLabel("Должность", self)
+        self.surname_label = QLabel("Фамилия И.О.", self)
 
         self.nach_chng_edit_type = QLineEdit(self)
         self.nach_chng_edit_type.setReadOnly(True)
@@ -62,8 +62,8 @@ class TabPageSO(QWidget):
         grid.addWidget(self.cdngLabel, 1, 2)
         grid.addWidget(self.cdng_combo_box, 1, 3)
 
-        grid.addWidget(self.title_job_Label, 3, 0)
-        grid.addWidget(self.surname_Label, 3, 2)
+        grid.addWidget(self.title_job_label, 3, 0)
+        grid.addWidget(self.surname_label, 3, 2)
         grid.addWidget(self.nach_chng_edit_type, 4, 0)
         grid.addWidget(self.nach_chng_name_edit_type, 4, 2)
         grid.addWidget(self.tehnolog_edit_type, 6, 0)

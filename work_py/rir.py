@@ -28,7 +28,7 @@ class TabPageSoRir(TabPageUnion):
                 len(self.data_well.leakiness_interval) == 0:
             self.paker_need_combo.setCurrentIndex(1)
 
-        self.rir_type_Label = QLabel("Вид РИР", self)
+        self.rir_type_label = QLabel("Вид РИР", self)
         self.rir_type_combo = QComboBox(self)
         self.rir_type_combo.addItems(['', 'РИР на пере', 'УЦМ в глухой колонне',
                                       'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП', 'РИР ОВП с пакером',
@@ -53,7 +53,7 @@ class TabPageSoRir(TabPageUnion):
         # self.roof_rir_edit.setText()
         self.roof_rir_edit.setClearButtonEnabled(True)
 
-        self.sole_rir_LabelType = QLabel("Подошва РИР", self)
+        self.sole_rir_labelType = QLabel("Подошва РИР", self)
 
         self.sole_rir_edit = QLineEdit(self)
         self.sole_rir_edit.setValidator(self.validator_int)
@@ -93,13 +93,13 @@ class TabPageSoRir(TabPageUnion):
         self.grid.addWidget(self.paker_need_labelType, 4, 1)
         self.grid.addWidget(self.paker_need_combo, 5, 1)
 
-        self.grid.addWidget(self.rir_type_Label, 4, 2)
+        self.grid.addWidget(self.rir_type_label, 4, 2)
         self.grid.addWidget(self.rir_type_combo, 5, 2)
         self.grid.addWidget(self.plast_label, 4, 3)
         self.grid.addWidget(self.plast_combo, 5, 3)
         self.grid.addWidget(self.roof_rir_label, 4, 4)
         self.grid.addWidget(self.roof_rir_edit, 5, 4)
-        self.grid.addWidget(self.sole_rir_LabelType, 4, 5)
+        self.grid.addWidget(self.sole_rir_labelType, 4, 5)
         self.grid.addWidget(self.sole_rir_edit, 5, 5)
 
         self.grid.addWidget(self.diameter_paker_label_type, 1, 1)
@@ -114,7 +114,7 @@ class TabPageSoRir(TabPageUnion):
         # self.grid.addWidget(self.pressure_zumpf_question_label, 1, 4)
         # self.grid.addWidget(self.pressure_zumpf_question_combo, 2, 4)
         #
-        # self.grid.addWidget(self.need_privyazka_Label, 1, 6)
+        # self.grid.addWidget(self.need_privyazka_label, 1, 6)
         # self.grid.addWidget(self.need_privyazka_q_combo, 2, 6)
 
         self.grid.addWidget(self.need_change_zgs_label, 9, 2)
@@ -252,27 +252,33 @@ class TabPageSoRir(TabPageUnion):
                 self.cement_volume_line.setText(f'{2}')
 
     def update_paker_need_ek(self, index):
+        self.grid.addWidget(self.diameter_paker_label_type, 1, 1)
+        self.grid.addWidget(self.diameter_paker_edit, 2, 1)
+
+        self.grid.addWidget(self.paker_khost_label, 1, 2)
+        self.grid.addWidget(self.paker_khost_edit, 2, 2)
+
+        self.grid.addWidget(self.paker_depth_label, 1, 3)
+        self.grid.addWidget(self.paker_depth_edit, 2, 3)
+
+        self.grid.addWidget(self.pressure_zumpf_question_label, 1, 4)
+        self.grid.addWidget(self.pressure_zumpf_question_combo, 2, 4)
+        if self.pressure_zumpf_question_combo.currentText() == 'Да':
+            self.paker_depth_zumpf_edit.setText(f'{self.data_well.perforation_sole + 10}')
         if index == 'Нужно СПО':
-            self.grid.addWidget(self.diameter_paker_label_type, 1, 1)
-            self.grid.addWidget(self.diameter_paker_edit, 2, 1)
-
-            self.grid.addWidget(self.paker_khost_label, 1, 2)
-            self.grid.addWidget(self.paker_khost_edit, 2, 2)
-
-            self.grid.addWidget(self.paker_depth_label, 1, 3)
-            self.grid.addWidget(self.paker_depth_edit, 2, 3)
-
-            self.grid.addWidget(self.pressure_zumpf_question_label, 1, 4)
-            self.grid.addWidget(self.pressure_zumpf_question_combo, 2, 4)
-            if self.pressure_zumpf_question_combo.currentText() == 'Да':
-                self.paker_depth_zumpf_edit.setText(f'{self.data_well.perforation_sole + 10}')
+            self.diameter_paker_label_type.setVisible(True)
+            self.diameter_paker_edit.setVisible(True)
+            self.paker_khost_label.setVisible(True)
+            self.paker_khost_edit.setVisible(True)
+            self.paker_depth_label.setVisible(True)
+            self.paker_depth_edit.setVisible(True)
         else:
-            self.diameter_paker_label_type.setParent(None)
-            self.diameter_paker_edit.setParent(None)
-            self.paker_khost_label.setParent(None)
-            self.paker_khost_edit.setParent(None)
-            self.paker_depth_label.setParent(None)
-            self.paker_depth_edit.setParent(None)
+            self.diameter_paker_label_type.setVisible(False)
+            self.diameter_paker_edit.setVisible(False)
+            self.paker_khost_label.setVisible(False)
+            self.paker_khost_edit.setVisible(False)
+            self.paker_depth_label.setVisible(False)
+            self.paker_depth_edit.setVisible(False)
             try:
                 self.pressure_zumpf_question_label.setParent(None)
                 self.pressure_zumpf_question_combo.setParent(None)

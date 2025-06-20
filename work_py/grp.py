@@ -27,12 +27,12 @@ class TabPageSoGrp(TabPageUnion):
         asaw = self.data_well.perforation_roof
         self.paker_depth_edit.setText(str(int(float(self.data_well.perforation_roof)) - 50))
 
-        self.otz_question_Label = QLabel("Нужно ли отбивать забой после подьема пакера ГРП", self)
+        self.otz_question_label = QLabel("Нужно ли отбивать забой после подьема пакера ГРП", self)
         self.otz_question_qcombo = QComboBox(self)
         self.otz_question_qcombo.currentTextChanged.connect(self.update_paker)
         self.otz_question_qcombo.addItems(['Да', 'Нет'])
 
-        self.normalization_question_Label = QLabel("Нужно ли нормализовывать забой?", self)
+        self.normalization_question_label = QLabel("Нужно ли нормализовывать забой?", self)
         self.normalization_qcombo = QComboBox(self)
         self.normalization_qcombo.currentTextChanged.connect(self.update_paker)
         self.normalization_qcombo.addItems(['Да', 'Нет'])
@@ -42,7 +42,7 @@ class TabPageSoGrp(TabPageUnion):
         self.current_depth_edit.setValidator(self.validator_float)
         self.current_depth_edit.setText(str(int(self.data_well.current_bottom)))
 
-        self.otz_after_question_Label = QLabel("Нужно ли отбивать забой после нормализации", self)
+        self.otz_after_question_label = QLabel("Нужно ли отбивать забой после нормализации", self)
         self.otz_after_question_qcombo = QComboBox(self)
         self.otz_after_question_qcombo.currentTextChanged.connect(self.update_paker)
         self.otz_after_question_qcombo.addItems(['Да', 'Нет'])
@@ -66,16 +66,16 @@ class TabPageSoGrp(TabPageUnion):
         self.grid.addWidget(self.paker_depth_label, 3, 3)
         self.grid.addWidget(self.paker_depth_edit, 4, 3)
 
-        self.grid.addWidget(self.otz_question_Label, 3, 4)
+        self.grid.addWidget(self.otz_question_label, 3, 4)
         self.grid.addWidget(self.otz_question_qcombo, 4, 4)
 
-        self.grid.addWidget(self.normalization_question_Label, 3, 5)
+        self.grid.addWidget(self.normalization_question_label, 3, 5)
         self.grid.addWidget(self.normalization_qcombo, 4, 5)
 
         self.grid.addWidget(self.current_depth_label, 3, 6)
         self.grid.addWidget(self.current_depth_edit, 4, 6)
 
-        self.grid.addWidget(self.otz_after_question_Label, 3, 7)
+        self.grid.addWidget(self.otz_after_question_label, 3, 7)
         self.grid.addWidget(self.otz_after_question_qcombo, 4, 7)
 
     def update_paker(self):

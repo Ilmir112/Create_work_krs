@@ -3234,7 +3234,6 @@ class MyWindow(MyMainWindow):
         self.ws2_prs = None
 
         try:
-            adw = data_list.user
             if "Зуфаров" in data_list.user[1]:
                 for filename in os.listdir(temp_folder):
                     file_path = os.path.join(temp_folder, filename)

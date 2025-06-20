@@ -26,23 +26,23 @@ class TabPageSoSand(TabPageUnion):
         self.roof_sand_edit.setText(f'{self.data_well.perforation_roof - 20}')
         self.roof_sand_edit.setClearButtonEnabled(True)
 
-        self.sole_sand_LabelType = QLabel("Подошва ПМ", self)
+        self.sole_sand_labelType = QLabel("Подошва ПМ", self)
         self.sole_sand_edit = QLineEdit(self)
         self.sole_sand_edit.setText(f'{self.data_well.current_bottom}')
         self.sole_sand_edit.setValidator(self.validator)
 
-        self.privyazka_question_Label = QLabel("Нужно ли привязывать компоновку", self)
+        self.privyazka_question_label = QLabel("Нужно ли привязывать компоновку", self)
         self.privyazka_question_QCombo = QComboBox(self)
         self.privyazka_question_QCombo.addItems(['Нет', 'Да'])
 
-        self.rir_question_Label = QLabel("Нужно ли производить УЦМ на данной компоновке", self)
+        self.rir_question_label = QLabel("Нужно ли производить УЦМ на данной компоновке", self)
         self.rir_question_qcombo = QComboBox(self)
         self.rir_question_qcombo.addItems(['Нет', 'Да'])
 
         self.roof_rir_label = QLabel("Плановая кровля РИР", self)
         self.roof_rir_edit = QLineEdit(self)
 
-        self.sole_rir_LabelType = QLabel("Подошва РИР", self)
+        self.sole_rir_labelType = QLabel("Подошва РИР", self)
         self.sole_rir_edit = QLineEdit(self)
 
         self.need_change_zgs_label = QLabel('Необходимо ли менять ЖГС', self)
@@ -69,20 +69,20 @@ class TabPageSoSand(TabPageUnion):
 
         # self.grid = QGridLayout(self)
 
-        self.grid.addWidget(self.privyazka_question_Label, 4, 3)
+        self.grid.addWidget(self.privyazka_question_label, 4, 3)
         self.grid.addWidget(self.privyazka_question_QCombo, 5, 3)
 
         self.grid.addWidget(self.roof_sand_label, 4, 4)
         self.grid.addWidget(self.roof_sand_edit, 5, 4)
-        self.grid.addWidget(self.sole_sand_LabelType, 4, 5)
+        self.grid.addWidget(self.sole_sand_labelType, 4, 5)
         self.grid.addWidget(self.sole_sand_edit, 5, 5)
 
-        self.grid.addWidget(self.rir_question_Label, 6, 3)
+        self.grid.addWidget(self.rir_question_label, 6, 3)
         self.grid.addWidget(self.rir_question_qcombo, 7, 3)
 
         self.grid.addWidget(self.roof_rir_label, 6, 4)
         self.grid.addWidget(self.roof_rir_edit, 7, 4)
-        self.grid.addWidget(self.sole_rir_LabelType, 6, 5)
+        self.grid.addWidget(self.sole_rir_labelType, 6, 5)
         self.grid.addWidget(self.sole_rir_edit, 7, 5)
         self.grid.addWidget(self.cement_volume_label, 6, 6)
         self.grid.addWidget(self.cement_volume_line, 7, 6)
@@ -138,7 +138,7 @@ class TabPageSoSand(TabPageUnion):
         if index == "Да":
             self.grid.addWidget(self.roof_rir_label, 6, 4)
             self.grid.addWidget(self.roof_rir_edit, 7, 4)
-            self.grid.addWidget(self.sole_rir_LabelType, 6, 5)
+            self.grid.addWidget(self.sole_rir_labelType, 6, 5)
             self.grid.addWidget(self.sole_rir_edit, 7, 5)
             self.grid.addWidget(self.cement_volume_label, 6, 6)
             self.grid.addWidget(self.cement_volume_line, 7, 6)
@@ -147,7 +147,7 @@ class TabPageSoSand(TabPageUnion):
         else:
             self.roof_rir_label.setParent(None)
             self.roof_rir_edit.setParent(None)
-            self.sole_rir_LabelType.setParent(None)
+            self.sole_rir_labelType.setParent(None)
             self.sole_rir_edit.setParent(None)
             self.cement_volume_label.setParent(None)
             self.cement_volume_line.setParent(None)

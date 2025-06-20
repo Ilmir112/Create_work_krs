@@ -23,7 +23,7 @@ class TabPageSoWith(TabPageUnion):
         self.template_labelType = QLabel("Вид компоновки ПСШ", self)
         self.template_combo = QComboBox(self)
 
-        self.privyazka_question_Label = QLabel("Нужно ли привязывать компоновку", self)
+        self.privyazka_question_label = QLabel("Нужно ли привязывать компоновку", self)
         self.privyazka_question_QCombo = QComboBox(self)
         self.privyazka_question_QCombo.addItems(['Нет', 'Да'])
 
@@ -63,23 +63,23 @@ class TabPageSoWith(TabPageUnion):
         self.grid.addWidget(self.current_bottom_label, 8, 3)
         self.grid.addWidget(self.current_bottom_edit, 9, 3)
 
-        self.template_str_Label = QLabel("строка с СГМ", self)
+        self.template_str_label = QLabel("строка с СГМ", self)
         self.template_str_edit = QLineEdit(self)
 
-        self.grid.addWidget(self.template_str_Label, 11, 1, 1, 8)
+        self.grid.addWidget(self.template_str_label, 11, 1, 1, 8)
         self.grid.addWidget(self.template_str_edit, 12, 1, 1, 8)
 
-        self.skm_teml_str_Label = QLabel("глубины спуска шаблонов", self)
+        self.skm_teml_str_label = QLabel("глубины спуска шаблонов", self)
         self.skm_teml_str_edit = QLineEdit(self)
 
-        self.grid.addWidget(self.skm_teml_str_Label, 13, 1, 1, 8)
+        self.grid.addWidget(self.skm_teml_str_label, 13, 1, 1, 8)
         self.grid.addWidget(self.skm_teml_str_edit, 14, 1, 1, 8)
 
 
 
 
 
-        self.grid.addWidget(self.privyazka_question_Label, 8, 6)
+        self.grid.addWidget(self.privyazka_question_label, 8, 6)
         self.grid.addWidget(self.privyazka_question_QCombo, 9, 6)
 
 

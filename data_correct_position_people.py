@@ -32,15 +32,15 @@ class TabPageSO(QWidget):
 
         self.region_select = self.region_combo_box.currentText()
 
-        self.title_job_Label = QLabel("Должность", self)
-        self.surname_Label = QLabel("Фамилия И.О.", self)
+        self.title_job_label = QLabel("Должность", self)
+        self.surname_label = QLabel("Фамилия И.О.", self)
 
-        self.chief_Label = QLabel("Руководители региона", self)
-        self.head_of_orm_Label = QLabel("Сектор разработки", self)
-        self.head_of_gtm_Label = QLabel("Сектор Анализа ГТМ", self)
-        self.head_of_go_Label = QLabel("Сектор геологический и ВНС", self)
-        self.head_of_grr_Label = QLabel("Сектор геолого-разведки", self)
-        self.head_of_usrsist_Label = QLabel("Сектор супервайзерской службы", self)
+        self.chief_label = QLabel("Руководители региона", self)
+        self.head_of_orm_label = QLabel("Сектор разработки", self)
+        self.head_of_gtm_label = QLabel("Сектор Анализа ГТМ", self)
+        self.head_of_go_label = QLabel("Сектор геологический и ВНС", self)
+        self.head_of_grr_label = QLabel("Сектор геолого-разведки", self)
+        self.head_of_usrsist_label = QLabel("Сектор супервайзерской службы", self)
 
         self.chief_engineer_edit_type = QLineEdit(self)
         self.chief_engineer_edit_type.setReadOnly(True)
@@ -81,39 +81,39 @@ class TabPageSO(QWidget):
         grid.addWidget(self.regionLabel, 1, 0)
         grid.addWidget(self.region_combo_box, 1, 1)
 
-        grid.addWidget(self.chief_Label, 2, 1)
-        grid.addWidget(self.title_job_Label, 3, 0)
-        grid.addWidget(self.surname_Label, 3, 2)
+        grid.addWidget(self.chief_label, 2, 1)
+        grid.addWidget(self.title_job_label, 3, 0)
+        grid.addWidget(self.surname_label, 3, 2)
         grid.addWidget(self.chief_engineer_edit_type, 4, 0)
         grid.addWidget(self.chief_engineer_name_edit_type, 4, 2)
         grid.addWidget(self.chief_geologist_edit_type, 6, 0)
         grid.addWidget(self.chief_geologist_name_edit_type, 6, 2)
 
-        grid.addWidget(self.head_of_orm_Label, 7, 1)
+        grid.addWidget(self.head_of_orm_label, 7, 1)
 
         grid.addWidget(self.head_of_orm_edit_type, 9, 0)
         grid.addWidget(self.head_of_orm_name_edit_type, 9, 2)
         grid.addWidget(self.representative_of_orm_edit_type, 10, 0)
         grid.addWidget(self.representative_of_orm_name_edit_type, 10, 2)
 
-        grid.addWidget(self.head_of_gtm_Label, 11, 1)
+        grid.addWidget(self.head_of_gtm_label, 11, 1)
 
         grid.addWidget(self.head_of_gtm_edit_type, 13, 0)
         grid.addWidget(self.head_of_gtm_name_edit_type, 13, 2)
         grid.addWidget(self.representative_of_gtm_edit_type, 14, 0)
         grid.addWidget(self.representative_of_gtm_name_edit_type, 14, 2)
 
-        grid.addWidget(self.head_of_go_Label, 15, 1)
+        grid.addWidget(self.head_of_go_label, 15, 1)
 
         grid.addWidget(self.representative_of_go_edit_type, 17, 0)
         grid.addWidget(self.representative_of_go_name_edit_type, 17, 2)
 
-        grid.addWidget(self.head_of_grr_Label, 18, 1)
+        grid.addWidget(self.head_of_grr_label, 18, 1)
 
         grid.addWidget(self.representative_of_grr_edit_type, 20, 0)
         grid.addWidget(self.representative_of_grr_name_edit_type, 20, 2)
 
-        grid.addWidget(self.head_of_usrsist_Label, 21, 1)
+        grid.addWidget(self.head_of_usrsist_label, 21, 1)
 
         grid.addWidget(self.head_of_usrsist_edit_type, 23, 0)
         grid.addWidget(self.head_of_usrsist_name_edit_type, 23, 2)

@@ -72,10 +72,10 @@ class TabPageSoChange(TabPageUnion):
                           self.data_well.dict_category[plast]['отключение'] == 'планируемый']))
 
             if not category_h2s_list_plan:
-                self.category_pressure_Label = QLabel('По Рпл')
+                self.category_pressure_label = QLabel('По Рпл')
                 self.category_pressure_line_combo = QComboBox(self)
                 self.category_pressure_line_combo.addItems(['1', '2', '3'])
-                self.category_h2s_Label = QLabel('По H2S')
+                self.category_h2s_label = QLabel('По H2S')
                 self.category_h2s_edit = QComboBox(self)
                 self.category_h2s_edit.addItems(['2', '1', '3'])
                 self.h2s_pr_label = QLabel('значение H2s в %')
@@ -84,7 +84,7 @@ class TabPageSoChange(TabPageUnion):
                 self.h2s_mg_label = QLabel('значение H2s в мг/л')
                 self.h2s_mg_edit = QLineEdit(self)
                 self.h2s_mg_edit.setValidator(self.validator_float_five)
-                self.category_Label = QLabel('По газовому фактору')
+                self.category_label = QLabel('По газовому фактору')
                 self.category_gas_factor = QComboBox(self)
                 self.category_gas_factor.addItems(['2', '1', '3'])
                 self.gf_label = QLabel('Газовый фактор')
@@ -94,13 +94,13 @@ class TabPageSoChange(TabPageUnion):
                 self.h2s_pr_edit.textChanged.connect(self.update_calculate_h2s)
                 self.gf_edit.textChanged.connect(self.update_calculate_h2s)
 
-                self.calc_h2s_Label = QLabel('расчет поглотителя H2S по вскрываемому пласту')
+                self.calc_h2s_label = QLabel('расчет поглотителя H2S по вскрываемому пласту')
                 self.calc_plast_h2s = QLineEdit(self)
 
-                self.grid.addWidget(self.category_pressure_Label, 11, 2)
+                self.grid.addWidget(self.category_pressure_label, 11, 2)
                 self.grid.addWidget(self.category_pressure_line_combo, 12, 2)
 
-                self.grid.addWidget(self.category_h2s_Label, 11, 3)
+                self.grid.addWidget(self.category_h2s_label, 11, 3)
                 self.grid.addWidget(self.category_h2s_edit, 12, 3)
 
                 self.grid.addWidget(self.h2s_pr_label, 13, 3)
@@ -109,13 +109,13 @@ class TabPageSoChange(TabPageUnion):
                 self.grid.addWidget(self.h2s_mg_label, 15, 3)
                 self.grid.addWidget(self.h2s_mg_edit, 16, 3)
 
-                self.grid.addWidget(self.category_Label, 11, 4)
+                self.grid.addWidget(self.category_label, 11, 4)
                 self.grid.addWidget(self.category_gas_factor, 12, 4)
 
                 self.grid.addWidget(self.gf_label, 13, 4)
                 self.grid.addWidget(self.gf_edit, 14, 4)
 
-                self.grid.addWidget(self.calc_h2s_Label, 11, 5)
+                self.grid.addWidget(self.calc_h2s_label, 11, 5)
                 self.grid.addWidget(self.calc_plast_h2s, 12, 5)
 
             # if len(self.data_well.plast_project) != 0:
@@ -136,10 +136,10 @@ class TabPageSoChange(TabPageUnion):
             self.grid.addWidget(self.pressure_new_edit, 10, 4)
         else:
             try:
-                self.category_pressure_Label.setParent(None)
+                self.category_pressure_label.setParent(None)
                 self.category_pressure_line_combo.setParent(None)
 
-                self.category_h2s_Label.setParent(None)
+                self.category_h2s_label.setParent(None)
                 self.category_h2s_edit.setParent(None)
 
                 self.h2s_pr_label.setParent(None)
@@ -148,14 +148,14 @@ class TabPageSoChange(TabPageUnion):
                 self.h2s_mg_label.setParent(None)
                 self.h2s_mg_edit.setParent(None)
 
-                self.category_Label.setParent(None)
+                self.category_label.setParent(None)
                 self.category_gas_factor.setParent(None)
                 self.calc_plast_h2s.setParent(None)
 
                 self.gf_label.setParent(None)
                 self.gf_edit.setParent(None)
 
-                self.calc_h2s_Label.setParent(None)
+                self.calc_h2s_label.setParent(None)
 
                 self.plast_new_label.setParent(None)
                 self.plast_new_combo.setParent(None)

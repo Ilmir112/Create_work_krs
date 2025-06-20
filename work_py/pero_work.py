@@ -20,7 +20,7 @@ class TabPageSoSand(TabPageUnion):
         self.current_edit.setValidator(self.validator)
         self.current_edit.setText(str(self.data_well.current_bottom))
 
-        self.pero_combo_Label = QLabel("выбор пера", self)
+        self.pero_combo_label = QLabel("выбор пера", self)
         self.pero_combo = QComboBox(self)
         self.pero_combo.addItems(
             ['перо + КОТ', 'Перо', 'обточную муфту + КОТ', 'обточную муфту', 'перо-110мм', 'пило-муфту'])
@@ -62,7 +62,7 @@ class TabPageSoSand(TabPageUnion):
         self.grid.addWidget(self.current_label, 4, 3)
         self.grid.addWidget(self.current_edit, 5, 3)
 
-        self.grid.addWidget(self.pero_combo_Label, 4, 4)
+        self.grid.addWidget(self.pero_combo_label, 4, 4)
         self.grid.addWidget(self.pero_combo, 5, 4)
         self.grid.addWidget(self.solvent_question_label, 4, 5)
         self.grid.addWidget(self.solvent_question_combo, 5, 5)

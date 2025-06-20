@@ -16,7 +16,7 @@ class TabPageSoBlock(TabPageUnion):
         self.current_edit.setValidator(self.validator_float)
         self.current_edit.setText(str(self.data_well.current_bottom))
 
-        self.pero_combo_Label = QLabel("выбор компоновки", self)
+        self.pero_combo_label = QLabel("выбор компоновки", self)
         self.pero_combo = QComboBox(self)
         self.pero_combo.addItems(['перо', 'обточную муфту', 'перо-110мм', 'пило-муфту', 'по затрубу'])
 
@@ -30,15 +30,15 @@ class TabPageSoBlock(TabPageUnion):
         self.plast_combo = CheckableComboBox(self)
         self.plast_combo.combo_box.addItems(plast_work)
 
-        self.block_Label = QLabel("объем блок пачки", self)
+        self.block_label = QLabel("объем блок пачки", self)
         self.block_volume_edit = QLineEdit(self)
         self.block_volume_edit.setValidator(self.validator_float)
 
-        self.oil_Label = QLabel("объем нефти", self)
+        self.oil_label = QLabel("объем нефти", self)
         self.oil_volume_edit = QLineEdit(self)
         self.oil_volume_edit.setValidator(self.validator_float)
 
-        self.block_type_Label = QLabel("объем Эмульгатора", self)
+        self.block_type_label = QLabel("объем Эмульгатора", self)
         self.block_type_volume_edit = QLineEdit(self)
         self.block_type_volume_edit.setValidator(self.validator_float)
 
@@ -57,17 +57,17 @@ class TabPageSoBlock(TabPageUnion):
         self.grid.addWidget(self.current_label, 4, 3)
         self.grid.addWidget(self.current_edit, 5, 3)
 
-        self.grid.addWidget(self.pero_combo_Label, 4, 4)
+        self.grid.addWidget(self.pero_combo_label, 4, 4)
         self.grid.addWidget(self.pero_combo, 5, 4)
-        self.grid.addWidget(self.block_Label, 4, 5)
+        self.grid.addWidget(self.block_label, 4, 5)
         self.grid.addWidget(self.block_volume_edit, 5, 5)
-        self.grid.addWidget(self.block_type_Label, 4, 6)
+        self.grid.addWidget(self.block_type_label, 4, 6)
         self.grid.addWidget(self.block_type_volume_edit, 5, 6)
 
         self.grid.addWidget(self.type_of_block_processing_label, 6, 2)
         self.grid.addWidget(self.type_of_block_processing_combo, 7, 2)
 
-        self.grid.addWidget(self.oil_Label, 6, 3)
+        self.grid.addWidget(self.oil_label, 6, 3)
         self.grid.addWidget(self.oil_volume_edit, 7, 3)
 
         self.grid.addWidget(self.fluid_new_label, 9, 4)
