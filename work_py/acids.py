@@ -137,7 +137,7 @@ class GonsWindow(WindowUnion):
             acid_volume_edit = float(self.tab_widget.currentWidget().acid_volume_edit.text().replace(',', '.'))
             acid_proc_edit = int(float(self.tab_widget.currentWidget().acid_proc_edit.text().replace(',', '.')))
             bottom_point = self.tab_widget.currentWidget().point_bottom_edit.text().replace(',', '.')
-            acid_calcul_edit = self.tab_widget.currentWidget().acid_calcul_edit.text()
+            acid_calcul_edit = self.tab_widget.currentWidget().acid_calcul_edit.text().replace(',', '.')
             points_sko_edit = self.tab_widget.currentWidget().points_sko_edit.text()
             pressure_edit = int(float(self.tab_widget.currentWidget().pressure_edit.text().replace(',', '.')))
             iron_true_combo = self.tab_widget.currentWidget().iron_true_combo.currentText()

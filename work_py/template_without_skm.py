@@ -561,7 +561,8 @@ class TabPageSo(TabPageUnion):
         self.skm_teml_str_edit.setText(skm_teml_str)
 
         if 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and \
-                '122' in str(self.data_well.paker_before["after"]):
+                '122' in str(self.data_well.paker_before["after"]) and \
+                str(self.data_well.column_diameter.get_value) == "146":
             self.template_second_edit.setText(str(126))
 
     def definition_ecn_true(self, depth_ecn):

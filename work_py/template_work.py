@@ -526,8 +526,8 @@ class TabPageSoWith(TabPageUnion):
                 first_template, template_second = self.template_diam_additional_ek()
                 # print(f'диаметры шаблонов {first_template, template_second}')
 
-            if 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and '122' in str(
-                    self.data_well.paker_before["after"]):
+            if 'ПОМ' in 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and '122' in str(
+                    self.data_well.paker_before["after"]) and str(self.data_well.column_diameter.get_value) == "146":
                 self.template_second_edit.setText(str(126))
 
             self.template_first_edit.setText(str(int(first_template)))
@@ -970,7 +970,7 @@ class TabPageSoWith(TabPageUnion):
             if diam_internal[0] <= diam_internal_ek <= diam_internal[1]:
                 template_first_diam = diam
         if 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and '122' in str(
-                self.data_well.paker_before["after"]):
+                self.data_well.paker_before["after"]) and str(self.data_well.column_diameter.get_value) == "146":
             template_second_diam = 126
         return (template_first_diam, template_second_diam)
 
@@ -1010,7 +1010,7 @@ class TabPageSoWith(TabPageUnion):
                 template_first_diam = diam
                 break
         if 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and '122' in str(
-                self.data_well.paker_before["after"]):
+                self.data_well.paker_before["after"]) and str(self.data_well.column_diameter.get_value) == "146":
             template_second_diam = 126
 
         if self.data_well.column_additional_diameter == '114':

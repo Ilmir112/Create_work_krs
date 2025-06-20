@@ -162,7 +162,9 @@ class TabPageSoRaid(TabPageUnion):
             if diam_internal_bit[0] <= diam_internal_ek <= diam_internal_bit[1]:
                 bit_diameter = diam
 
-        if 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and '122' in str(self.data_well.paker_before["after"]):
+        if 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and \
+                '122' in str(self.data_well.paker_before["after"]) and \
+                str(self.data_well.column_diameter.get_value) == "146":
             bit_diameter = 126
 
         return bit_diameter

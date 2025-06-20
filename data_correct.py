@@ -921,6 +921,8 @@ class DataWindow(WindowUnion):
             return
         else:
             self.distance_from_well_to_sampling_point_line = float(self.distance_from_well_to_sampling_point_line)
+            self.data_well.distance_from_well_to_sampling_point = float(self.distance_from_well_to_sampling_point_line)
+
 
         try:
             if region_combo == "":
