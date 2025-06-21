@@ -30,7 +30,7 @@ class TabPageSoPrint(TabPageUnion):
                 (self.data_well.column_additional and self.data_well.head_column_additional.get_value <
                  self.data_well.current_bottom):
             self.nkt_select_combo.setCurrentIndex(0)
-        elif self.data_well.max_angle < 50:
+        elif self.data_well.max_angle.get_value < 50:
             self.nkt_select_combo.setCurrentIndex(2)
 
         else:
