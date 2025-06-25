@@ -15,7 +15,6 @@ class ApiClient:
         server_dict = json.load(file)
 
     SERVER_API = server_dict["host"]
-    print(SERVER_API)
     SETTINGS_TOKEN = None
     proxies = {
         'http': SERVER_API,  # Обязательно http
@@ -181,9 +180,13 @@ class ApiClient:
 
     @staticmethod
     def request_post(path, json_data):
+        headers = {}
+        if ApiClient.SETTINGS_TOKEN:
+            token = ApiClient.SETTINGS_TOKEN.value("auth_token", "")
+            headers["Authorization"] = f"Bearer {token}"
         url = ApiClient.get_endpoint(path)
         try:
-            response = requests.post(url, json=ApiClient.serialize_datetime(json_data))
+            response = requests.post(url, json=ApiClient.serialize_datetime(json_data), headers=headers)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:

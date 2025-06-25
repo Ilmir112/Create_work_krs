@@ -1643,109 +1643,112 @@ class WindowUnion(MyMainWindow):
 
     def extraction_data(self, table_name, paragraph_row=0):
         from data_base.work_with_base import insert_data_well_dop_plan
-        date_table = table_name.split(' ')[-2]
-        wells_id = table_name.split(' ')[-1]
-        well_number = table_name.split(' ')[0]
-        well_area = table_name.split(' ')[1]
-        type_kr = table_name.split(' ')[2].replace('None', 'null')
-        contractor_select = data_list.contractor
-        work_plan = table_name.split(' ')[-4]
-        self.data_well.emergency_well = False
-        if data_list.connect_in_base:
-            params = {
-                "well_number": well_number,
-                "well_area": well_area,
-                "type_kr": type_kr,
-                "work_plan": work_plan,
-                "date_create": date_table,
-                "wells_id": int(wells_id),
-                "contractor": data_list.contractor
-            }
-            response = ApiClient.request_params_get(ApiClient.find_wells_repair_well_by_id(), params)
-            if response:
-                data_change_paragraph, dict_category, FindIndexPZ.excel_json = TabPageUnion.insert_repairs_data(
-                    self, response)
+        if len(table_name.split(' ')) > 3:
+            date_table = table_name.split(' ')[-2]
+            wells_id = table_name.split(' ')[-1]
+            well_number = table_name.split(' ')[0]
+            well_area = table_name.split(' ')[1]
+            type_kr = table_name.split(' ')[2].replace('None', 'null')
+            contractor_select = data_list.contractor
+            work_plan = table_name.split(' ')[-4]
+            self.data_well.emergency_well = False
+            if data_list.connect_in_base:
+                params = {
+                    "well_number": well_number,
+                    "well_area": well_area,
+                    "type_kr": type_kr,
+                    "work_plan": work_plan,
+                    "date_create": date_table,
+                    "wells_id": int(wells_id),
+                    "contractor": data_list.contractor
+                }
+                response = ApiClient.request_params_get(ApiClient.find_wells_repair_well_by_id(), params)
+                if response:
+                    data_change_paragraph, dict_category, FindIndexPZ.excel_json = TabPageUnion.insert_repairs_data(
+                        self, response)
 
-                data = TabPageUnion.insert_data_dop_plan(self, data_change_paragraph, paragraph_row)
-                if data is None:
+                    data = TabPageUnion.insert_data_dop_plan(self, data_change_paragraph, paragraph_row)
+                    if data is None:
+                        return None
+                    elif self.data_well.work_plan == 'plan_change':
+                        data = self.insert_data_plan(data_change_paragraph)
+                        if data is None:
+                            return None
+
+            else:
+                db = connection_to_database(decrypt("DB_WELL_DATA"))
+                data_well_base = WorkDatabaseWell(db, self.data_well)
+
+                result_table = data_well_base.extraction_data(str(well_number), well_area, type_kr,
+                                                              work_plan, date_table, contractor_select)
+
+                if result_table is None:
+                    QMessageBox.warning(self, 'Ошибка',
+                                        f'В базе данных скв {well_number} {well_area} отсутствует данные, '
+                                        f'используйте excel вариант плана работ')
                     return None
-                elif self.data_well.work_plan == 'plan_change':
-                    data = self.insert_data_plan(data_change_paragraph)
-                    if data is None:
-                        return None
 
+                if result_table[0]:
+                    result = json.loads(result_table[0])
+
+                    self.data_well.type_absorbent = 'EVASORB марки 121'
+                    if 'ХИМТЕХНО 101' in str(result[paragraph_row][7]):
+                        self.data_well.type_absorbent = 'ХИМТЕХНО 101 Марка А'
+                    elif 'СНПХ-1200' in str(result[paragraph_row][7]):
+                        self.data_well.type_absorbent = 'СНПХ-1200'
+                    elif 'ПСВ-3401' in str(result[paragraph_row][7]):
+                        self.data_well.type_absorbent = 'ПСВ-3401'
+                    elif 'Гастрит-К131М' in str(result[paragraph_row][7]):
+                        self.data_well.type_absorbent = 'Гастрит-К131М'
+
+                    insert_data_well_dop_plan(self, result_table[1])
+
+                    self.data_well.type_kr = result_table[2]
+                    if self.data_well.work_plan in ['dop_plan', 'dop_plan_in_base']:
+                        data = self.insert_data_dop_plan(result, paragraph_row)
+                        if data is None:
+                            return None
+                    elif self.data_well.work_plan == 'plan_change':
+                        data = self.insert_data_plan(result)
+                        if data is None:
+                            return None
+                    data_list.data_well_is_True = True
+                    dict_category = result_table[3]
+
+            if dict_category:
+                dict_data_well = json.loads(dict_category)
+                # self.data_well.dict_category
+                pressure = namedtuple("pressure", "category data_pressure")
+                Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
+                Data_gaz = namedtuple("Data_gaz", "category data")
+                self.data_well.dict_category = {}
+                self.data_well.category_pressure_list = []
+                self.data_well.category_h2s_list = []
+                self.data_well.category_gaz_factor_percent = []
+                for plast, plast_data in dict_data_well.items():
+                    self.data_well.dict_category.setdefault(plast, {}).setdefault(
+                        'по давлению',
+                        pressure(*dict_data_well[plast]['по давлению']))
+                    self.data_well.dict_category.setdefault(plast, {}).setdefault(
+                        'по сероводороду', Data_h2s(*dict_data_well[plast]['по сероводороду']))
+                    self.data_well.dict_category.setdefault(plast, {}).setdefault(
+                        'по газовому фактору', Data_gaz(*dict_data_well[plast]['по газовому фактору']))
+
+                    self.data_well.dict_category.setdefault(plast, {}).setdefault(
+                        'отключение', dict_data_well[plast]['отключение'])
+
+                    self.data_well.category_pressure_list.append(plast_data['по давлению'][0])
+                    self.data_well.category_h2s_list.append(plast_data['по сероводороду'][0])
+                    self.data_well.category_gaz_factor_percent.append(plast_data['по газовому фактору'][0])
+
+            else:
+                data_list.data_in_base = False
+                QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
+                                    f"Таблицы '{table_name}' нет в базе данных.")
+
+            return True
         else:
-            db = connection_to_database(decrypt("DB_WELL_DATA"))
-            data_well_base = WorkDatabaseWell(db, self.data_well)
-
-            result_table = data_well_base.extraction_data(str(well_number), well_area, type_kr,
-                                                          work_plan, date_table, contractor_select)
-
-            if result_table is None:
-                QMessageBox.warning(self, 'Ошибка',
-                                    f'В базе данных скв {well_number} {well_area} отсутствует данные, '
-                                    f'используйте excel вариант плана работ')
-                return None
-
-            if result_table[0]:
-                result = json.loads(result_table[0])
-
-                self.data_well.type_absorbent = 'EVASORB марки 121'
-                if 'ХИМТЕХНО 101' in str(result[paragraph_row][7]):
-                    self.data_well.type_absorbent = 'ХИМТЕХНО 101 Марка А'
-                elif 'СНПХ-1200' in str(result[paragraph_row][7]):
-                    self.data_well.type_absorbent = 'СНПХ-1200'
-                elif 'ПСВ-3401' in str(result[paragraph_row][7]):
-                    self.data_well.type_absorbent = 'ПСВ-3401'
-                elif 'Гастрит-К131М' in str(result[paragraph_row][7]):
-                    self.data_well.type_absorbent = 'Гастрит-К131М'
-
-                insert_data_well_dop_plan(self, result_table[1])
-
-                self.data_well.type_kr = result_table[2]
-                if self.data_well.work_plan in ['dop_plan', 'dop_plan_in_base']:
-                    data = self.insert_data_dop_plan(result, paragraph_row)
-                    if data is None:
-                        return None
-                elif self.data_well.work_plan == 'plan_change':
-                    data = self.insert_data_plan(result)
-                    if data is None:
-                        return None
-                data_list.data_well_is_True = True
-                dict_category = result_table[3]
-
-        if dict_category:
-            dict_data_well = json.loads(dict_category)
-            # self.data_well.dict_category
-            pressure = namedtuple("pressure", "category data_pressure")
-            Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
-            Data_gaz = namedtuple("Data_gaz", "category data")
-            self.data_well.dict_category = {}
-            self.data_well.category_pressure_list = []
-            self.data_well.category_h2s_list = []
-            self.data_well.category_gaz_factor_percent = []
-            for plast, plast_data in dict_data_well.items():
-                self.data_well.dict_category.setdefault(plast, {}).setdefault(
-                    'по давлению',
-                    pressure(*dict_data_well[plast]['по давлению']))
-                self.data_well.dict_category.setdefault(plast, {}).setdefault(
-                    'по сероводороду', Data_h2s(*dict_data_well[plast]['по сероводороду']))
-                self.data_well.dict_category.setdefault(plast, {}).setdefault(
-                    'по газовому фактору', Data_gaz(*dict_data_well[plast]['по газовому фактору']))
-
-                self.data_well.dict_category.setdefault(plast, {}).setdefault(
-                    'отключение', dict_data_well[plast]['отключение'])
-
-                self.data_well.category_pressure_list.append(plast_data['по давлению'][0])
-                self.data_well.category_h2s_list.append(plast_data['по сероводороду'][0])
-                self.data_well.category_gaz_factor_percent.append(plast_data['по газовому фактору'][0])
-
-        else:
-            data_list.data_in_base = False
-            QMessageBox.warning(self, 'Проверка наличия таблицы в базе данных',
-                                f"Таблицы '{table_name}' нет в базе данных.")
-
-        return True
+            return
 
     def insert_data_plan(self, result):
         self.data_well.data_list = []

@@ -4106,8 +4106,6 @@ class SaveInExcel(MyWindow):
         full_path = path + "/" + filenames
         gnkt_data = self.gnkt_data.data_gnkt
         params = {
-
-            "id": 0,
             "gnkt_number": gnkt_data.gnkt_number_combo,
             "well_number": self.data_well.well_number.get_value,
             "well_area": self.data_well.well_area.get_value,
