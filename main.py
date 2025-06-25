@@ -980,7 +980,7 @@ class MyMainWindow(QMainWindow):
                 0,
                 False,
             )
-            adw = self.data_well.number_dp
+
 
             db = connection_to_database(decrypt("DB_WELL_DATA"))
             data_well_base = WorkDatabaseWell(db, self.data_well)
@@ -1077,8 +1077,21 @@ class MyMainWindow(QMainWindow):
                 self.data_well.cat_well_max.get_value,
                 self.data_well.data_pvr_min.get_value,
             )
-            if read_data is None:
-                self.data_well = None
+
+            if self.data_window is None:
+                from data_correct import DataWindow
+                data_list.pause = True
+
+                self.data_window = DataWindow(self.data_well)
+                self.data_window.setWindowTitle("Сверка данных")
+                self.data_window.setGeometry(100, 100, 300, 400)
+
+                self.data_window.show()
+                self.pause_app()
+                data_list.pause = True
+                self.data_window = None
+
+            if data_list.operation_window is False:
                 return
 
             WellPerforation.read_well(
@@ -1087,11 +1100,28 @@ class MyMainWindow(QMainWindow):
                 self.data_well.data_pvr_max.get_value + 1,
             )
 
+            from perforation_correct import PerforationCorrect
+
+            self.perforation_correct_window2 = PerforationCorrect(self.data_well)
+            self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
+            # self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
+
+            self.set_modal_window(self.perforation_correct_window2)
+            self.pause_app()
+            data_list.pause = True
+            self.perforation_correct_window2 = None
+            # definition_plast_work(self)
+
+            if data_list.operation_window is False:
+                return
+
             self.data_well = WellCategory.read_well(
                 self.data_well,
                 self.data_well.cat_well_min.get_value,
                 self.data_well.data_well_min.get_value,
             )
+            if data_list.operation_window is False:
+                return
 
             if self.data_well.leakiness is True:
                 if WellCondition.leakage_window is None:
@@ -1108,7 +1138,8 @@ class MyMainWindow(QMainWindow):
                     # print(f'словарь нарушений {self.data_well.dict_leakiness}')
                     data_list.pause = True
                     WellCondition.leakage_window = None  # Discard reference.
-
+            if data_list.operation_window is False:
+                return
             if data_list.connect_in_base:
                 params = {
                     "id": 0,
@@ -3247,6 +3278,7 @@ class MyWindow(MyMainWindow):
             )
         self.rir_window = None
         self.data_well = None
+
         if not self.table_widget is None:
             self.table_widget.clear()
             self.work_window = None
@@ -3255,7 +3287,7 @@ class MyWindow(MyMainWindow):
             self.tab_widget = None
 
             data_list.lift_ecn_can = False
-            data_list.pause = True
+            data_list.pause = False
             data_list.diameter_length = 0
             self.operation_window = None
 
@@ -3705,11 +3737,12 @@ class MyWindow(MyMainWindow):
             self.leakage_window = LeakageWindow(self.data_well)
             self.leakage_window.setWindowTitle("Корректировка негерметичности")
             # WellCondition.leakage_window.setGeometry(200, 400, 300, 400)
+            data_list.pause = False
             self.set_modal_window(self.leakage_window)
 
             # print(f'словарь нарушений {self.data_well.dict_leakiness}')
             data_list.pause = True
-            self.data_well.dict_leakiness = self.leakage_window.add_work()
+            # self.data_well.dict_leakiness = self.leakage_window.add_work()
             self.data_well.data_list[-1][5] = json.dumps(
                 self.data_well.dict_leakiness, default=str, ensure_ascii=False, indent=4
             )
@@ -3717,7 +3750,6 @@ class MyWindow(MyMainWindow):
 
         else:
             data_list.pause = True
-            self.leakage_window.close()  # Close window.
             self.leakage_window = None  # Discard reference.
 
     def correctData(self):

@@ -2487,17 +2487,7 @@ class WellData(FindIndexPZ):
         except Exception as e:
             QMessageBox.warning(self, "Ошибка", f"Ошибка в расчетах {e}")
 
-        if self.data_window is None:
-            from data_correct import DataWindow
 
-            self.data_window = DataWindow(self)
-            self.data_window.setWindowTitle("Сверка данных")
-            self.data_window.setGeometry(100, 100, 300, 400)
-
-            self.data_window.show()
-            self.pause_app()
-            data_list.pause = True
-            self.data_window = None
 
         if self.work_plan in ["krs", "prs"]:
             from data_base.config_base import connection_to_database
@@ -3076,21 +3066,21 @@ class WellPerforation(FindIndexPZ):
                 self.dict_perforation.setdefault(plast, {}).setdefault("БСУ", 89)
                 print("Ошибка БСУ")
 
-        if self.perforation_correct_window2 is None:
-            from perforation_correct import PerforationCorrect
-
-            self.perforation_correct_window2 = PerforationCorrect(self)
-            self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
-            # self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
-
-            self.perforation_correct_window2.show()
-            self.pause_app()
-            data_list.pause = True
-            self.perforation_correct_window2 = None
-            # definition_plast_work(self)
-        else:
-            self.perforation_correct_window2.close()
-            self.perforation_correct_window2 = None
+        # if self.perforation_correct_window2 is None:
+        #     from perforation_correct import PerforationCorrect
+        #
+        #     self.perforation_correct_window2 = PerforationCorrect(self)
+        #     self.perforation_correct_window2.setWindowTitle("Сверка данных перфорации")
+        #     # self.perforation_correct_window2.setGeometry(200, 400, 100, 400)
+        #
+        #     self.perforation_correct_window2.show()
+        #     self.pause_app()
+        #     data_list.pause = True
+        #     self.perforation_correct_window2 = None
+        #     # definition_plast_work(self)
+        # else:
+        #     self.perforation_correct_window2.close()
+        #     self.perforation_correct_window2 = None
 
         if len(self.dict_perforation_project) != 0:
             self.plast_project = list(self.dict_perforation_project.keys())

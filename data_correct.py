@@ -884,7 +884,7 @@ class DataWindow(WindowUnion):
 
     def __init__(self, data_well: FindIndexPZ):
         super(DataWindow, self).__init__(data_well)
-
+        self.close_from_button = False
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.setWindowModality(
@@ -906,7 +906,7 @@ class DataWindow(WindowUnion):
     def add_row_table(self):
         from find import ProtectedIsNonNone, ProtectedIsDigit
         from work_py.opressovka import TabPageSo
-
+        self.close_from_button = True
         self.current_widget = self.tab_widget.currentWidget()
 
         region_combo = self.current_widget.region_combo.currentText()
@@ -1836,6 +1836,22 @@ class DataWindow(WindowUnion):
     def check_date_format(date_string):
         pattern = r"^\d{2}\.\d{2}\.\d{4}$"
         return bool(re.match(pattern, date_string))
+
+    def closeEvent(self, event):
+        # Обработка закрытия
+        if self.close_from_button:
+            print("Закрытие по кнопке")
+            data_list.operation_window = True
+            # тут можно делать что нужно при закрытии через кнопку
+        else:
+            data_list.operation_window = False
+            print("Закрытие через крестик")
+            # тут можно делать что нужно при стандартном закрытии
+
+
+        data_list.pause = False
+
+        event.accept()  # разрешаем закрытие
 
     def check_if_none(self, value):
         if (

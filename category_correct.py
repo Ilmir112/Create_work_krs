@@ -251,7 +251,7 @@ class CategoryWindow(WindowUnion):
 
         self.tab_widget = TabWidget(self.data_well)
         self.dict_category = {}
-
+        self.close_from_button = False
         self.buttonAdd = QPushButton('сохранить данные')
         self.buttonAdd.clicked.connect(self.add_row_table)
 
@@ -260,10 +260,22 @@ class CategoryWindow(WindowUnion):
         # vbox.addWidget(self.tableWidget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 3, 0)
 
+    def closeEvent(self, event):
+        # Обработка закрытия
+        if self.close_from_button:
+            data_list.operation_window = True
+            # тут можно делать что нужно при закрытии через кнопку
+        else:
+            data_list.operation_window = False
+
+        data_list.pause = False
+
+        event.accept()  # разрешаем закрытие
+
     def add_row_table(self):
 
         # Пересохранение по сереводорода
-
+        self.close_from_button = True
         cat_P_1 = self.data_well.category_pressure_well
         self.data_well.type_absorbent = self.tab_widget.currentWidget().type_absorbent.currentText()
         plast_index = []

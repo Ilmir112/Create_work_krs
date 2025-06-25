@@ -1,3 +1,5 @@
+import json
+
 from PyQt5 import  QtWidgets
 from PyQt5.Qt import *
 from PyQt5.QtGui import QDoubleValidator
@@ -80,8 +82,6 @@ class LeakageWindow(WindowUnion):
 
 
         if len(self.data_well.dict_leakiness) != 0:
-
-
             for nek in self.data_well.dict_leakiness['НЭК']['интервал']:
                 rows = self.tableWidget.rowCount()
 
@@ -188,6 +188,11 @@ class LeakageWindow(WindowUnion):
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()
+
+        self.data_well.data_list[-1][5] = json.dumps(
+            self.data_well.dict_leakiness, default=str, ensure_ascii=False, indent=4
+        )
+
         return dict_leakiness
 
     def del_row_table(self):

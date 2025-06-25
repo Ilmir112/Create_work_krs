@@ -163,9 +163,11 @@ class GonsWindow(WindowUnion):
         return work_list
 
     def closeEvent(self, event):
-                # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window  = None
+        # Закрываем основное окно при закрытии окна входа
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
+
+
     def acid_gons(self, plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, points_sko_edit, bottom_point,
                                   acid_calcul_edit, pressure_edit, iron_true_combo, iron_volume_edit):
         if iron_true_combo == 'Да':

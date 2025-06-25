@@ -165,6 +165,12 @@ class TabPageSo(QWidget):
     def check_plast_status(self, plast):
         return 0 if self.dict_perforation[plast]['отключение'] else 1
 
+    def closeEvent(self, event):
+        # Закрываем основное окно при закрытии окна входа
+        data_list.operation_window = None
+        event.accept()  # Принимаем событие закрытия
+        data_list.pause = True
+
     def check_template_status(self, plast):
         # print(self.dict_perforation[plast].keys())
         return 0 if self.dict_perforation[plast]['Прошаблонировано'] else 1
@@ -195,6 +201,7 @@ class PerforationCorrect(WindowUnion):
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
         self.setWindowModality(QtCore.Qt.ApplicationModal)  # Устанавливаем модальность окна
+        self.close_from_button = False
 
         self.tab_widget = TabWidget(self.data_well)
         self.dict_perforation_project = {}
@@ -209,6 +216,7 @@ class PerforationCorrect(WindowUnion):
         vbox.addWidget(self.buttonAdd, 3, 0)
 
     def add_row_table(self):
+        self.close_from_button = True
 
         plast_all = self.tab_widget.currentWidget().labels_plast
 
@@ -338,6 +346,19 @@ class PerforationCorrect(WindowUnion):
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()
+
+    def closeEvent(self, event):
+        # Обработка закрытия
+        if self.close_from_button:
+            data_list.operation_window = True
+            # тут можно делать что нужно при закрытии через кнопку
+        else:
+            data_list.operation_window = False
+
+        data_list.pause = False
+
+        event.accept()  # разрешаем закрытие
+
 
 
 if __name__ == "__main__":

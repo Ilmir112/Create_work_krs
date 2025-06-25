@@ -1982,9 +1982,9 @@ class LiftPumpNv(GnoParent):
              None, None, None, None, None,
              None, 1.2],
             [
-                f'{"".join(["Допустить фНКТ для определения текущего забоя. " if self.data_well.gips_in_well is True else ""])}Поднять  замковую опору с глубины {round(self.length_nkt, 1)}м',
+                f'{"".join(["Допустить фНКТ для определения текущего забоя. " if self.data_well.region == "КГМ" or self.data_well.gips_in_well is True else ""])}Поднять  замковую опору с глубины {round(self.length_nkt, 1)}м',
                 None,
-                f'{"".join(["Допустить фНКТ для определения текущего забоя. " if self.data_well.gips_in_well is True else ""])}Поднять  замковую опору  на НКТ с глубины {round(self.length_nkt, 1)}м (компоновка НКТ{self.nkt_diam_fond}) на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {self.data_well.fluid_work}  '
+                f'{"".join(["Допустить фНКТ для определения текущего забоя. " if self.data_well.region == "КГМ" or self.data_well.gips_in_well is True else ""])}Поднять  замковую опору  на НКТ с глубины {round(self.length_nkt, 1)}м (компоновка НКТ{self.nkt_diam_fond}) на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {self.data_well.fluid_work}  '
                 f'в объеме {round(round(self.length_nkt, 1) * 1.12 / 1000, 1)}м3 '
                 f'с контролем АСПО на стенках НКТ.',
                 None, None,
