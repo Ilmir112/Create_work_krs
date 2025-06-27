@@ -93,7 +93,7 @@ class TabPageUnion(QWidget):
             response = ApiClient.request_params_get(ApiClient.find_wells_data_response_filter_well_number_well_area(),
                                                     params)
             if response:
-                self.insert_response_data(response)
+                self.data_well = self.insert_response_data(response)
 
     def update_table_in_base_combo(self):
         from work_py.dop_plan_py import DopPlanWindow
@@ -309,6 +309,7 @@ class TabPageUnion(QWidget):
         self.data_well.dict_sucker_rod = response["sucker_pod"]["До"]
 
         self.data_well.inventory_number = response["inventory_number"]
+        self.data_well.angle_data = response["angle_data"]["инклинометрия"],
         self.data_well.bottom_hole_drill = ProtectedIsDigit(response["bottom_hole_drill"])
         self.data_well.bottom_hole_artificial = ProtectedIsDigit(response["bottom_hole_artificial"])
         self.data_well.max_angle = ProtectedIsDigit(response["max_angle"])
@@ -330,7 +331,7 @@ class TabPageUnion(QWidget):
         self.data_well.well_volume_in_pz = [well_volume(self, self.data_well.head_column_additional.get_value)]
         self.data_well.check_data_in_pz = []
         self.data_well.without_damping = False
-        return
+        return self.data_well
 
     def calculate_h2s(self, type_absorbent, category_h2s, h2s_mg, h2s_pr):
         if '2' in str(category_h2s) or '1' in str(category_h2s):
@@ -478,6 +479,7 @@ class TabPageUnion(QWidget):
 
             self.pressure_label = QLabel("Давление закачки", self)
             self.pressure_edit = QLineEdit(self)
+            self.pressure_edit.setText(str(self.data_well.max_admissible_pressure.get_value))
 
             if self.data_well:
                 if self.data_well.stabilizator_need:
@@ -557,7 +559,13 @@ class TabPageUnion(QWidget):
 
             self.iron_label_type.setVisible(False)
             self.iron_true_combo.setVisible(False)
+            self.pressure_label.setVisible(False)
+            self.pressure_edit.setVisible(False)
+            self.plast_combo.setVisible(False)
         else:
+            self.pressure_label.setVisible(True)
+            self.pressure_edit.setVisible(True)
+            self.plast_combo.setVisible(True)
             self.Qplast_labelType.setVisible(True)
             self.QplastEdit.setVisible(True)
             self.acid_label_type.setVisible(True)
@@ -863,7 +871,7 @@ class TabPageUnion(QWidget):
         self.data_well.drilling_interval = []
         self.data_well.for_paker_list = False
         self.data_well.grp_plan = False
-        self.data_well.angle_data = []
+
         self.data_well.nkt_opress_true = False
         self.data_well.bvo = False
         self.data_well.stabilizator_need = False
@@ -1756,7 +1764,6 @@ class WindowUnion(MyMainWindow):
         self.data_well.drilling_interval = []
         self.data_well.for_paker_list = False
         self.data_well.grp_plan = False
-        self.data_well.angle_data = []
         self.data_well.nkt_opress_true = False
         self.data_well.plast_project = []
         self.data_well.drilling_interval = []
@@ -1837,9 +1844,9 @@ class WindowUnion(MyMainWindow):
     def calculate_angle(max_depth_pvr, angle_data):
         tuple_angle = ()
         for depth, angle, _ in angle_data:
-            asdfg = abs(float(depth) - float(max_depth_pvr))
-            if abs(float(depth) - float(max_depth_pvr)) < 20:
+            if abs(float(depth) - float(max_depth_pvr)) < 10:
                 tuple_angle = depth, angle, f'Зенитный угол на глубине {depth}м равен {angle}гр'
+                break
         if tuple_angle:
             return tuple_angle
 

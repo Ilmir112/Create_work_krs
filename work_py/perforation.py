@@ -68,22 +68,22 @@ class TabPageSo(TabPageUnion):
             QMessageBox.warning(self, 'Ошибка', 'Сначало нужно добавить все плановые интервалы перфорации')
             TabPageSo.combobox_type_perforation.setCurrentIndex(0)
             return
-        self.question_need_paker_label = QLabel('Внедрять пакер в компоновку?')
-        self.question_need_paker_combo = QComboBox(self)
-        self.question_need_paker_combo.addItems(['Нет', 'Да'])
+        if self.check_combobox_in_layout(self.grid, "svk_true_combo") is False:
+            self.question_need_paker_label = QLabel('Внедрять пакер в компоновку?')
+            self.question_need_paker_combo = QComboBox(self)
+            self.question_need_paker_combo.addItems(['Нет', 'Да'])
 
-        self.skv_true_label_type = QLabel("необходимость кислотной ванны", self)
-        self.svk_true_combo = QComboBox(self)
-        self.svk_true_combo.addItems(['без СКВ', 'Нужно СКВ', ])
+            self.skv_true_label_type = QLabel("необходимость кислотной ванны", self)
+            self.svk_true_combo = QComboBox(self)
+            self.svk_true_combo.addItems(['без СКВ', 'Нужно СКВ', ])
+            self.svk_true_combo.setObjectName("svk_true_combo")
 
-        self.sko_true_label_type = QLabel("необходимость СКО", self)
-        self.sko_true_combo = QComboBox(self)
-        self.sko_true_combo.addItems(['Нет', 'Да'])
+            self.sko_true_label_type = QLabel("необходимость СКО", self)
+            self.sko_true_combo = QComboBox(self)
+            self.sko_true_combo.addItems(['Нет', 'Да'])
 
-        self.swab_true_label_type = QLabel("необходимость освоения", self)
-        self.swab_true_edit_type = QComboBox(self)
-
-        if index in ['Трубная перфорация', 'Трубная перфорация на депрессии']:
+            self.swab_true_label_type = QLabel("необходимость освоения", self)
+            self.swab_true_edit_type = QComboBox(self)
 
             self.grid.addWidget(self.question_need_paker_label, 0, 7)
             self.grid.addWidget(self.question_need_paker_combo, 1, 7)
@@ -103,36 +103,46 @@ class TabPageSo(TabPageUnion):
             self.svk_true_combo.currentTextChanged.connect(self.update_skv_edit)
             self.swab_true_edit_type.currentTextChanged.connect(self.update_need_swab)
 
+        if index in ['Трубная перфорация', 'Трубная перфорация на депрессии']:
+            self.question_need_paker_label.setVisible(True)
+            self.question_need_paker_combo.setVisible(True)
+            self.question_need_paker_combo.setVisible(True)
+            self.skv_true_label_type.setVisible(True)
+            self.svk_true_combo.setVisible(True)
+
+            self.sko_true_label_type.setVisible(True)
+            self.sko_true_combo.setVisible(True)
+
+            self.swab_true_label_type.setVisible(True)
+            self.swab_true_edit_type.setVisible(True)
         else:
-            self.question_need_paker_label.setParent(None)
-            self.question_need_paker_combo.setParent(None)
-            self.question_need_paker_combo.setParent(None)
-            self.skv_true_label_type.setParent(None)
-            self.svk_true_combo.setParent(None)
+            self.question_need_paker_label.setVisible(False)
+            self.question_need_paker_combo.setVisible(False)
+            self.question_need_paker_combo.setVisible(False)
+            self.skv_true_label_type.setVisible(False)
+            self.svk_true_combo.setVisible(False)
 
-            self.sko_true_label_type.setParent(None)
-            self.sko_true_combo.setParent(None)
+            self.sko_true_label_type.setVisible(False)
+            self.sko_true_combo.setVisible(False)
 
-            self.swab_true_label_type.setParent(None)
-            self.swab_true_edit_type.setParent(None)
+            self.swab_true_label_type.setVisible(False)
+            self.swab_true_edit_type.setVisible(False)
 
     def update_need_paker(self, index):
-        self.paker_label = QLabel("глубина пакера", self)
-        self.paker_depth_edit = QLineEdit(self)
-        self.diameter_paker_label_type = QLabel("Диаметр пакера", self)
-        self.diameter_paker_edit = QLineEdit(self)
+        if self.check_combobox_in_layout(self.grid, "paker_depth") is False:
 
-        if index == 'Нет':
-            self.paker_label.setParent(None)
-            self.paker_depth_edit.setParent(None)
-            self.diameter_paker_label_type.setParent(None)
-            self.diameter_paker_edit.setParent(None)
-        else:
+            self.paker_label = QLabel("глубина пакера", self)
+            self.paker_depth_edit = QLineEdit(self)
+            self.paker_depth_edit.setObjectName("paker_depth")
+            self.diameter_paker_label_type = QLabel("Диаметр пакера", self)
+            self.diameter_paker_edit = QLineEdit(self)
 
             self.grid.addWidget(self.paker_label, 0, 8)
             self.grid.addWidget(self.paker_depth_edit, 1, 8)
             self.grid.addWidget(self.diameter_paker_label_type, 0, 9)
             self.grid.addWidget(self.diameter_paker_edit, 1, 9)
+
+            self.paker_depth_edit.textChanged.connect(self.update_paker_depth_edit)
 
             self.tableWidget.min_roof = min(
                 [float(self.tableWidget.item(row, 0).text()) for row in range(self.tableWidget.rowCount())])
@@ -144,7 +154,16 @@ class TabPageSo(TabPageUnion):
             else:
                 self.paker_depth_edit.setText(str(float(self.data_well.head_column_additional.get_value) - 20))
 
-            self.paker_depth_edit.textChanged.connect(self.update_paker_depth_edit)
+        if index == 'Нет':
+            self.paker_label.setVisible(False)
+            self.paker_depth_edit.setVisible(False)
+            self.diameter_paker_label_type.setVisible(False)
+            self.diameter_paker_edit.setVisible(False)
+        else:
+            self.paker_label.setVisible(True)
+            self.paker_depth_edit.setVisible(True)
+            self.diameter_paker_label_type.setVisible(True)
+            self.diameter_paker_edit.setVisible(True)
 
     def update_paker_depth_edit(self):
         paker_depth_edit = self.paker_depth_edit.text()
@@ -155,8 +174,6 @@ class TabPageSo(TabPageUnion):
     def select_type_perforation(self, sole):
         if len(self.data_well.angle_data) == 0 and self.data_well.max_angle.get_value < 50:
             TabPageSo.combobox_type_perforation.setCurrentIndex(0)
-        elif len(self.data_well.angle_data) == 0 and self.data_well.max_angle.get_value >= 50:
-            TabPageSo.combobox_type_perforation.setCurrentIndex(1)
         elif len(self.data_well.angle_data) != 0:
             if sole != '':
                 angle_list = [(depth, angle) for depth, angle, curvature in self.data_well.angle_data
@@ -170,6 +187,8 @@ class TabPageSo(TabPageUnion):
                 else:
                     TabPageSo.combobox_type_perforation.setCurrentIndex(1)
                     return f'На глубине {depth_max}м угол {angle_depth}'
+        elif len(self.data_well.angle_data) == 0 and self.data_well.max_angle.get_value >= 50:
+            TabPageSo.combobox_type_perforation.setCurrentIndex(1)
 
 
 class TabWidget(TabWidgetUnion):
@@ -376,7 +395,7 @@ class PerforationWindow(WindowUnion):
         if count_otv < 0:
             QMessageBox.warning(self, 'НЕКОРРЕКТНО', 'ОБЪЕМ зарядов некорректен')
             return
-        TabPageSo.select_type_perforation(self, edit_type2)
+
         self.tableWidget.setSortingEnabled(False)
         rows = self.tableWidget.rowCount()
         self.tableWidget.insertRow(rows)
@@ -388,6 +407,7 @@ class PerforationWindow(WindowUnion):
         self.tableWidget.setItem(rows, 5, QTableWidgetItem(edit_index_formation))
         self.tableWidget.setItem(rows, 6, QTableWidgetItem(dop_information))
         self.tableWidget.setSortingEnabled(True)
+        TabPageSo.select_type_perforation(self, edit_type2)
         # print(edit_type, spinYearOfIssue, editSerialNumber, editSpecifications)
 
     def add_work(self):
@@ -653,7 +673,17 @@ class PerforationWindow(WindowUnion):
                  f'производить в присутствии ответственного ' \
                  f'представителя подрядчика по ГИС» (руководителя взрывных' \
                  f' работ или взрывника).'
-
+        if self.type_perforation in ['Трубная перфорация', 'Трубная перфорация на депрессии']:
+            from work_py.rationingKRS import liftingGNO
+            perforation.append([f'Поднять  трубный перфоратор {self.data_well.paker_before["before"]} ',
+             None,
+             f'Поднять  трубный перфоратор'
+             f'на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд.'
+             f' весом {self.data_well.fluid_work}  '
+             f'в объеме {self.tableWidget.min_roof * 1.2 / 1000:.1f}м3 с контролем АСПО на стенках НКТ.',
+             None, None,
+             None, None, None, None, None,
+             'Мастер КРС', round(liftingGNO(self.dict_nkt) * 1.2, 2)])
         perforation.append([None, None, end_list,
                             None, None, None, None, None, None, None,
                             'Подрядчик по ГИС', 2])

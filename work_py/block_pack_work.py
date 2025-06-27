@@ -282,7 +282,7 @@ class BlockPackWindow(WindowUnion):
                  None, None, None, None, None, None, None,
                  'Мастер КРС, предст. заказчика', 4],
                 [None, None,
-                 f'Приготовить блокирующую пачку в объеме {block_volume_edit:2f}м3 плотностью {fluid_new_edit}г/см3 с '
+                 f'Приготовить блокирующую пачку в объеме {block_volume_edit:.2f}м3 плотностью {fluid_new_edit}г/см3 с '
                  f'использованием насосного агрегата ЦА-320:\n'
                  f'- в мерник агрегата перекачать нефть в объеме {round(oil_volume_edit / count_cycle, 1)}м3 и '
                  f'эмульгатор в объеме {round(block_type_edit, 1)}м3,и перемешать в течение 15-20 мин;\n'

@@ -84,7 +84,7 @@ class LoginWindow(QDialog):
             }
 
             user_access = ApiClient.get_info_data(params, ApiClient.login_path())
-            if user_access:
+            if user_access and user_access != 401:
                 ApiClient.SETTINGS_TOKEN = QSettings('Zima', 'ZimaApp')
 
                 ApiClient.SETTINGS_TOKEN.setValue('auth_token', user_access["access_token"])
@@ -97,6 +97,10 @@ class LoginWindow(QDialog):
 
                 data_list.pause = False
                 self.close()
+            else:
+                QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
+                data_list.pause = True
+                self.user_dict = None
 
         else:
             last_name, first_name, second_name, _ = username.split(' ')

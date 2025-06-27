@@ -55,6 +55,7 @@ class ApiClient:
             data_well.shoe_column = ProtectedIsDigit(response["column_production"]["shoe"])
             data_well.head_column = ProtectedIsDigit(response["column_production"]["head"])
             data_well.diameter_doloto_ek = ProtectedIsDigit(response["diameter_doloto_ek"])
+            data_well.angle_data = response['angle_data']['инклинометрия']
             data_well.column_additional = False
             data_well.column_additional_diameter = ProtectedIsDigit(response["column_additional"]["diameter"])
             if response["column_additional"]["diameter"] != 0:
