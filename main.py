@@ -1142,7 +1142,6 @@ class MyMainWindow(QMainWindow):
                 return
             if data_list.connect_in_base:
                 params = {
-                    "id": 0,
                     "well_number": self.data_well.well_number.get_value,
                     "well_area": self.data_well.well_area.get_value,
                     "well_oilfield": self.data_well.well_oilfield.get_value,
