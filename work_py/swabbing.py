@@ -460,6 +460,8 @@ class TabPageSoSwab(TabPageUnion):
             self.grid.addWidget(self.plast_combo, 1, 1)
             self.grid.addWidget(self.pakerEdit, 1, 4)
             self.grid.addWidget(self.paker2Label, 0, 5)
+            self.paker2Label.setVisible(True)
+            self.paker2Edit.setVisible(True)
             self.grid.addWidget(self.paker2Edit, 1, 5)
             self.grid.addWidget(self.diameter_paker_label_type, 0, 2)
             self.grid.addWidget(self.diameter_paker_edit, 1, 2)
@@ -483,9 +485,6 @@ class TabPageSoSwab(TabPageUnion):
             paker_layout_list_tab = ["Пласт", "воронка", "вид освоения", "объем освоения"]
 
         elif self.swab_true_edit_type.currentText() == 'пакер с заглушкой':
-            # self.swab_type_label.setVisible(False)
-            # self.swab_type_combo.setVisible(False)
-            # self.swab_volume_edit.setVisible(False)
 
             self.kvost_label.setVisible(False)
             self.khvostEdit.setVisible(False)
@@ -494,8 +493,7 @@ class TabPageSoSwab(TabPageUnion):
 
             self.diameter_paker_label_type.setVisible(False)
             self.diameter_paker_edit.setVisible(False)
-            # self.pakerLabel.setText('Глубина пакера')
-            # self.paker2Label.setText('Глубина понижения')
+
             self.paker2Edit.setText(f'{self.data_well.perforation_roof + 10}')
             self.grid.addWidget(self.paker2Label, 0, 5)
             self.grid.addWidget(self.paker2Edit, 1, 5)

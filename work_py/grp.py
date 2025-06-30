@@ -124,7 +124,9 @@ class GrpWindow(WindowUnion):
         data_list.operation_window  = None
         event.accept() 
                 # Принимаем событие закрытия
+
     def add_work(self):
+
         diameter_paker = int(float(self.tab_widget.currentWidget().diameter_paker_edit.text().replace(',', '.')))
         paker_khost = int(float(self.tab_widget.currentWidget().paker_khost_edit.text().replace(',', '.')))
         paker_depth = int(float(self.tab_widget.currentWidget().paker_depth_edit.text().replace(',', '.')))
@@ -132,12 +134,17 @@ class GrpWindow(WindowUnion):
         gis_otz_after_true_quest = self.tab_widget.currentWidget().otz_after_question_qcombo.currentText()
         normalization_true_quest = self.tab_widget.currentWidget().normalization_qcombo.currentText()
         current_depth = int(float(self.tab_widget.currentWidget().current_depth_edit.text().replace(',', '.')))
+
         if self.check_true_depth_template(paker_depth) is False:
             return
         if self.check_depth_paker_in_perforation(paker_depth) is False:
             return
         if self.check_depth_in_skm_interval(paker_depth) is False:
             return
+        if paker_depth >self.data_well.perforation_roof:
+            mes = QMessageBox.question(self, "Вопрос", "Пакер ГРП между пластами?")
+            if mes == QMessageBox.StandardButton.No:
+                return
 
         if int(paker_khost) + int(paker_depth) > self.data_well.current_bottom:
             QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер ниже текущего забоя')

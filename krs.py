@@ -962,7 +962,8 @@ class LiftPaker(GnoParent):
              f'{kvostovik}'
              f'на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд.'
              f' весом {self.data_well.fluid_work}  '
-             f'в объеме {self.data_well.paker_before["before"] *1.2 /1000:.1f}м3 с контролем АСПО на стенках НКТ.', None, None,
+             f'в объеме {float(self.data_well.depth_fond_paker_before["before"]) * 1.2 /1000:.1f}м3 '
+             f'с контролем АСПО на стенках НКТ.', None, None,
              None, None, None, None, None,
              'Мастер КРС', round(liftingGNO(self.data_well.dict_nkt_before) * 1.2, 2)]
         ]

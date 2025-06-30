@@ -132,7 +132,7 @@ class TabPageSoRaid(TabPageUnion):
 
     def raiding_bit_diam_select(self, depth):
 
-        bit_diameter =0
+        bit_diameter = 0
         raiding_bit_dict = {
             85: (88, 92),
             91: (92.1, 96.6),
@@ -146,7 +146,7 @@ class TabPageSoRaid(TabPageUnion):
             125: (128, 133),
             140: (144, 148),
             144: (148.1, 154),
-            146: (154.1, 164),
+            154: (154.1, 164),
             160: (166, 176),
             190: (190.6, 203.6),
             204: (215, 221)

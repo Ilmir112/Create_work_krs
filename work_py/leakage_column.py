@@ -188,10 +188,10 @@ class LeakageWindow(WindowUnion):
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()
-
-        self.data_well.data_list[-1][5] = json.dumps(
-            self.data_well.dict_leakiness, default=str, ensure_ascii=False, indent=4
-        )
+        if len(self.data_well.data_list) != 0:
+            self.data_well.data_list[-1][5] = json.dumps(
+                self.data_well.dict_leakiness, default=str, ensure_ascii=False, indent=4
+            )
 
         return dict_leakiness
 

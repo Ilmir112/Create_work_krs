@@ -1641,11 +1641,7 @@ class DataWindow(WindowUnion):
                         str(self.data_well.dict_pump_shgn["before"]) != "0"
                         and len(self.data_well.dict_sucker_rod) == 0
                 ):
-                    assdf = (
-                        str(self.data_well.dict_pump_shgn["before"]),
-                        len(self.data_well.dict_sucker_rod),
-                        self.data_well.dict_sucker_rod,
-                    )
+
                     QMessageBox.warning(
                         self,
                         "ОШИБКА",

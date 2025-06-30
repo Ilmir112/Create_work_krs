@@ -514,19 +514,21 @@ class PerforationWindow(WindowUnion):
                 if self.check_depth_in_skm_interval(self.paker_depth) is False:
                     return
 
-                self.nkt_diam, self.nkt_pod, self.nkt_template = self.select_diameter_nkt(self.paker_depth,
-                                                                                          self.swab_true_edit_type)
-                if self.data_well.column_additional is False or \
-                        (self.data_well.column_additional and \
-                         self.data_well.head_column_additional.get_value > self.data_well.current_bottom):
-                    self.dict_nkt = {self.nkt_diam: float(self.tableWidget.min_roof)}
-                else:
-                    self.dict_nkt = {
-                        self.nkt_diam: round(self.data_well.head_column_additional.get_value, 0),
-                        self.nkt_pod: round(
-                            float(self.tableWidget.min_roof) - self.data_well.head_column_additional.get_value, 0)}
+
+
             else:
                 self.paker_layout_combo = 'воронка'
+            self.nkt_diam, self.nkt_pod, self.nkt_template = self.select_diameter_nkt(self.tableWidget.min_roof,
+                                                                                      self.swab_true_edit_type)
+            if self.data_well.column_additional is False or \
+                    (self.data_well.column_additional and \
+                     self.data_well.head_column_additional.get_value > self.data_well.current_bottom):
+                self.dict_nkt = {self.nkt_diam: float(self.tableWidget.min_roof)}
+            else:
+                self.dict_nkt = {
+                    self.nkt_diam: round(self.data_well.head_column_additional.get_value, 0),
+                    self.nkt_pod: round(
+                        float(self.tableWidget.min_roof) - self.data_well.head_column_additional.get_value, 0)}
 
             perforation[2] = [f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2)", None,
                               f"ГИС ( Трубная Перфорация ЗАДАЧА 2.9.2). \n{angle_text}", None, None, None, None,
@@ -541,8 +543,7 @@ class PerforationWindow(WindowUnion):
                     QMessageBox.information(self, 'Внимание', 'Подошва интервала перфорации ниже текущего забоя')
                     return
             perf_list = []
-            ["Кровля перфорации", "Подошва Перфорации", "Тип заряда", "отв на 1 п.м.", "Количество отверстий",
-             "Вскрываемые пласты", "доп информация"]
+
             roof = self.tableWidget.item(row, 0).text().replace(',', '.')
             sool = self.tableWidget.item(row, 1).text().replace(',', '.')
 
@@ -581,8 +582,6 @@ class PerforationWindow(WindowUnion):
                 set(map(tuple, self.data_well.dict_perforation[plast]['интервал'])))
 
             perforation.append(perf_list)
-
-        # print([self.data_well.dict_perforation[plast] for plast in self.data_well.plast_work])
 
         if self.type_perforation in ['Трубная перфорация', 'Трубная перфорация на депрессии']:
 
@@ -633,20 +632,22 @@ class PerforationWindow(WindowUnion):
                     schema_swab = '9'
                 elif 'РН' in data_list.contractor:
                     schema_swab = '9'
-                pipe_perforation.extend([[None, None,
-                                          f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабированиии утвержденной главным инженером '
-                                          f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г.'
-                                          f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое '
-                                          f'давление на устье {self.data_well.max_admissible_pressure.get_value}атм,'
-                                          f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести '
-                                          f'практическое обучение вахт по '
-                                          f'сигналу "выброс" с записью в журнале проведения учебных тревог',
-                                          None, None, None, None, None, None, None,
-                                          'Мастер КРС, подрядчик по ГИС', 1.3],
-                                         ['Понижение ', None,
-                                          'Произвести максимальное понижение уровня в скважине (дополнительно согласовать '
-                                          'с заказчиком глубину понижению уровня)',
-                                          None, None, None, None, None, None, None, 'подрядчика по ГИС', 30]])
+                pipe_perforation.extend([
+                    [None, None,
+                     f'Произвести  монтаж СВАБа согласно схемы №{schema_swab} при свабировании '
+                     f'утвержденной главным инженером '
+                     f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г.'
+                     f'Обвязать устье скважины с ЕДК на жесткую линию. Опрессовать ПВО на максимально допустимое '
+                     f'давление на устье {self.data_well.max_admissible_pressure.get_value}атм,'
+                     f' по невозможности на давление поглощения, но не менее 30атм в течении 30мин Провести '
+                     f'практическое обучение вахт по '
+                     f'сигналу "выброс" с записью в журнале проведения учебных тревог',
+                     None, None, None, None, None, None, None,
+                     'Мастер КРС, подрядчик по ГИС', 1.3],
+                    ['Понижение ', None,
+                     'Произвести максимальное понижение уровня в скважине (дополнительно согласовать '
+                     'с заказчиком глубину понижению уровня)',
+                     None, None, None, None, None, None, None, 'подрядчика по ГИС', 30]])
 
             for i in range(len(pipe_perforation)):
                 if i == 0:
@@ -676,14 +677,14 @@ class PerforationWindow(WindowUnion):
         if self.type_perforation in ['Трубная перфорация', 'Трубная перфорация на депрессии']:
             from work_py.rationingKRS import liftingGNO
             perforation.append([f'Поднять  трубный перфоратор {self.data_well.paker_before["before"]} ',
-             None,
-             f'Поднять  трубный перфоратор'
-             f'на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд.'
-             f' весом {self.data_well.fluid_work}  '
-             f'в объеме {self.tableWidget.min_roof * 1.2 / 1000:.1f}м3 с контролем АСПО на стенках НКТ.',
-             None, None,
-             None, None, None, None, None,
-             'Мастер КРС', round(liftingGNO(self.dict_nkt) * 1.2, 2)])
+                                None,
+                                f'Поднять  трубный перфоратор'
+                                f'на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд.'
+                                f' весом {self.data_well.fluid_work}  '
+                                f'в объеме {liftingGNO(self.dict_nkt) * 1.2 :.2f}м3 с контролем АСПО на стенках НКТ.',
+                                None, None,
+                                None, None, None, None, None,
+                                'Мастер КРС', 10.5])
         perforation.append([None, None, end_list,
                             None, None, None, None, None, None, None,
                             'Подрядчик по ГИС', 2])
