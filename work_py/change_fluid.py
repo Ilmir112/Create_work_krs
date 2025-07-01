@@ -224,7 +224,7 @@ class ChangeFluidWindow(WindowUnion):
             if fluid_new_edit > 1.65 or fluid_new_edit < 0.87:
                 QMessageBox.critical(self, 'Ошибка', 'Жидкость не может быть данным удельным весом')
                 return
-            if pressure_new_edit >= 10:
+            if pressure_new_edit <= 10:
                 QMessageBox.critical(self, 'Ошибка', 'Ожидаемое давление слишком низкое')
                 return
 

@@ -55,7 +55,9 @@ class ClassifierWell(MyMainWindow):
             region_json = {"region": region}
             data_response = ApiClient.request_post(ApiClient.read_wells_silencing_response_all(), region_json)
             data = []
-
+            if data_response == 500:
+                QMessageBox.warning(self, "Ошибка", "Ошибка соединения с базой")
+                return
             for num in data_response:
                 wells_data = []
                 for key, value in num.items():

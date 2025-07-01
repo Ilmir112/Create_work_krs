@@ -42,6 +42,11 @@ class TabPageSo(TabPageUnion):
     def geophygist_data(self):
         if self.ComboBoxGeophygist.currentText() in ['Гироскоп', 'АКЦ', 'ЭМДС', 'ПТС', 'РК', 'ГК и ЛМ']:
             self.lineedit_type.setText('0')
+            if self.data_well.open_trunk_well:
+                if self.data_well.column_additional:
+                    self.lineedit_type2.setText(self.data_well.shoe_column_additional.get_value - 10)
+                else:
+                    self.lineedit_type2.setText(f'{self.data_well.shoe_column.get_value - 10}')
             self.lineedit_type2.setText(f'{self.data_well.current_bottom}')
 
 
@@ -107,6 +112,16 @@ class GeophysicWindow(WindowUnion):
             if float(edit_type) > self.data_well.shoe_column_additional.get_value:
                 QMessageBox.information(self, 'Внимание', 'глубина исследований ниже башмака колонны')
                 return
+
+        if self.data_well.open_trunk_well:
+            if self.data_well.column_additional:
+                if edit_type2 > self.data_well.shoe_column_additional.get_value:
+                    QMessageBox.warning(self, "Ошибка", "Прибор выходит в открытый ствол")
+                    return
+            else:
+                if edit_type2 > self.data_well.shoe_column.get_value:
+                    QMessageBox.warning(self, "Ошибка", "Прибор выходит в открытый ствол")
+                    return
 
         dop_information = self.tab_widget.currentWidget().lineEditdop_information.text()
         if not edit_type or not edit_type2 or not researchGis:

@@ -11,7 +11,7 @@ class TabPageSoBlock(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.current_label = QLabel("забой", self)
+        self.current_label = QLabel("башмак НКТ", self)
         self.current_edit = QLineEdit(self)
         self.current_edit.setValidator(self.validator_float)
         self.current_edit.setText(str(self.data_well.current_bottom))
@@ -46,7 +46,7 @@ class TabPageSoBlock(TabPageUnion):
         self.fluid_new_edit = QLineEdit(self)
         self.fluid_new_edit.setValidator(self.validator_float)
 
-        self.type_of_block_processing_label = QLabel('Цель закачки блокпачки')
+        self.type_of_block_processing_label = QLabel('Цель закачки блок-пачки')
         self.type_of_block_processing_combo = QComboBox(self)
         self.type_of_block_processing_combo.addItems(['для глушения', 'для нормализации'])
 
@@ -78,9 +78,10 @@ class TabPageSoBlock(TabPageUnion):
 
     def update_volume_block_pack(self):
         self.fluid_new_edit.setText(str(float(self.data_well.fluid_work[:4].replace(",", ".")) + 0.04))
-        self.block_type_volume_edit.setText(
-            f"{round(float(self.block_volume_edit.text().replace(',', '.')) * 0.044, 1)}")
-        self.oil_volume_edit.setText(str(round(float(self.block_volume_edit.text().replace(",", ".")) * 0.16, 1)))
+        if self.block_volume_edit.text() != '':
+            self.block_type_volume_edit.setText(
+                f"{round(float(self.block_volume_edit.text().replace(',', '.')) * 0.044, 1)}")
+            self.oil_volume_edit.setText(str(round(float(self.block_volume_edit.text().replace(",", ".")) * 0.16, 1)))
 
     def update_type_of_block_processing_combo(self):
         self.block_volume_edit.setText(str(self.calculate_volume_block_pack()))
@@ -92,10 +93,16 @@ class TabPageSoBlock(TabPageUnion):
             k = 0.01
         if self.type_of_block_processing_combo.currentText() == 'для глушения':
             volume_udel = 1
+            shoe_nkt = sum(list(self.data_well.dict_nkt_before.values()))
+
         else:
             volume_udel = 2.5
+            shoe_nkt = float(self.current_edit.text())
+        if self.data_well.perforation_roof - shoe_nkt < 150:
+            depth_nkt = float(self.data_well.perforation_roof) - 150
+        else:
+            depth_nkt = shoe_nkt
 
-        depth_nkt = float(self.data_well.perforation_roof) - 150
         self.current_edit.setText(str(depth_nkt))
         volume_izb = 0.0007 * depth_nkt + k * self.calculate_pvr() + volume_udel * self.calculate_pvr()
 
