@@ -278,7 +278,6 @@ class TabPageSoSwab(TabPageUnion):
                 self.calc_h2s_label.setVisible(True)
                 self.calc_plast_h2s.setVisible(True)
 
-
             if len(self.data_well.plast_project) != 0:
                 # self.plast_new_combo = QComboBox(self)
                 self.plast_new_combo.addItems(self.data_well.plast_project)
@@ -357,7 +356,6 @@ class TabPageSoSwab(TabPageUnion):
             self.fluid_new_edit.setVisible(False)
             self.pressure_new_label.setVisible(False)
             self.pressure_new_edit.setVisible(False)
-            
 
     def update_calculate_h2s(self):
         if self.category_h2s_edit.currentText() in ['3', 3]:
@@ -956,8 +954,6 @@ class SwabWindow(WindowUnion):
                     swab_list = self.swabbing_with_paker()[1:]
                     work_list.extend(swab_list)
 
-
-
             elif self.swab_true_edit_type == 'воронка':
                 self.plast_combo = self.tableWidget.item(row, 0).text()
                 self.swab_paker_depth = int(float(self.tableWidget.item(row, 1).text()))
@@ -1036,8 +1032,8 @@ class SwabWindow(WindowUnion):
                                     '7. Работниками геофизической партии должен быть обеспечен контроль '
                                     'воздушной среды в воздухе рабочей зоны (внутри ПКС) каждые 30 мин с '
                                     'фиксацией в журнале ГВС. Ответственный - начальник геофизической партии.',
-                                   None, None, None, None, None, None, None,
-                                   'мастер КРС', None]
+                        None, None, None, None, None, None, None,
+                        'мастер КРС', None]
         work_list.insert(-2, swabing_list)
         if work_list:
             if self.depth_gauge_combo == 'Да':
@@ -1693,7 +1689,7 @@ class SwabWindow(WindowUnion):
 
     def swabbing_with_2paker(self):
 
-        from .opressovka import OpressovkaEK
+        from work_py.opressovka import OpressovkaEK
 
         swab_short, swab_select = self.swab_select()
 
@@ -1706,7 +1702,8 @@ class SwabWindow(WindowUnion):
                 self.swab_paker_depth < float(self.data_well.head_column_additional.get_value) and \
                 float(self.data_well.head_column_additional.get_value) > 600:
 
-            paker_select = f'заглушка + {self.depth_gauge} НКТ{nkt_diam} {self.paker_khost}м + пакер ПРО-ЯМО-{self.diameter_paker}мм ' \
+            paker_select = f'заглушка + {self.depth_gauge} НКТ{nkt_diam} {self.paker_khost}м + пакер ' \
+                           f'ПРО-ЯМО-{self.diameter_paker}мм ' \
                            f'(либо аналог) ' \
                            f'для ЭК {self.data_well.column_diameter.get_value}мм х ' \
                            f'{self.data_well.column_wall_thickness.get_value}мм + щелевой фильтр + ' \

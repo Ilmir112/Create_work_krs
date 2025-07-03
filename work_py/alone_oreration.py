@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QInputDialog
 
 import H2S
 import data_list
+from log_files.log import logger
 from selectPlast import CheckBoxDialog
 
 from .rationingKRS import lifting_nkt_norm, descentNKT_norm, well_volume_norm
@@ -420,13 +421,18 @@ def volume_vn_nkt(dict_nkt, roof=0,  sole=0):  # Внутренний объем
 def volume_rod(self, dict_sucker_rod):  # Объем штанг
 
     from find import FindIndexPZ
-    volume_rod = 0
-    # print(dict_sucker_rod)
-    for diam_rod, length_rod in dict_sucker_rod.items():
-        if diam_rod:
-            volume_rod += (3.14 * (length_rod * (
-                    FindIndexPZ.check_str_none(self, diam_rod) / 1000) / length_rod) ** 2) / 4 * length_rod
-    return round(volume_rod, 5)
+    try:
+        volume_rod = 0
+        # print(dict_sucker_rod)
+        for diam_rod, length_rod in dict_sucker_rod.items():
+            if diam_rod:
+                volume_rod += (3.14 * (length_rod * (
+                        FindIndexPZ.check_str_none(self, diam_rod) / 1000) / length_rod) ** 2) / 4 * length_rod
+        return round(volume_rod, 5)
+    except Exception as e:
+        logger.critical(e)
+
+
 
 
 def volume_nkt(dict_nkt):  # Внутренний объем НКТ по фондовым НКТ

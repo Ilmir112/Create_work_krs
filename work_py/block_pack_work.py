@@ -104,7 +104,8 @@ class TabPageSoBlock(TabPageUnion):
             depth_nkt = shoe_nkt
 
         self.current_edit.setText(str(depth_nkt))
-        volume_izb = 0.0007 * depth_nkt + k * self.calculate_pvr() + volume_udel * self.calculate_pvr()
+        count_pvr = self.calculate_pvr()
+        volume_izb = 0.0007 * depth_nkt + k * count_pvr + volume_udel * count_pvr
 
         volume_block = 0.001 * well_volume(self, float(self.current_edit.text())) * depth_nkt + volume_izb
         return round(volume_block, 1)
