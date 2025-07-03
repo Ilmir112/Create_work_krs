@@ -1103,10 +1103,13 @@ class WellNkt(FindIndexPZ):
                 for col_index, col in enumerate(row):
                     if "диаметр" in str(col).lower() and "мм" in str(col):
                         self.column_index_diametr_nkt = col_index
+                        continue
                     if "кол-во" in str(col).lower() and "шт" in str(col):
                         self.column_index_column_nkt = col_index
+                        continue
                     if "длина" in str(col).lower() and "м" in str(col):
                         self.column_index_lenght_nkt = col_index
+                        continue
         if self.column_index_lenght_nkt is None:
             QMessageBox.warning(self, "Ошибка", "Ошибка в поиске индекса длины НКТ")
             self.pause_app()

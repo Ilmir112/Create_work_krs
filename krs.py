@@ -233,11 +233,13 @@ class GnoWindow(WindowUnion):
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
+
     def add_work(self):
         from work_py.advanted_file import definition_plast_work
 
         self.current_widget = self.tab_widget.currentWidget()
         try:
+
             self.lift_key = self.current_widget.gno_combo.currentText()
 
             self.fluid = self.current_widget.fluid_edit.text().replace(',', '.')
@@ -257,6 +259,7 @@ class GnoWindow(WindowUnion):
             return
         self.data_well.current_bottom = current_bottom
         definition_plast_work(self)
+        self.definition_open_trunk_well()
         lift_strategy = None
         if self.lift_key == 'пакер':
             lift_strategy = LiftPaker(self)
@@ -332,6 +335,11 @@ class GnoParent(ABC):
 
         from work_py.descent_gno import TabPageGno
         self.nkt_diam_fond = TabPageGno.gno_nkt_opening(self.data_well.dict_nkt_before)
+
+        self.nv_list = ["Допустить фНКТ для определения текущего забоя. "
+                        if (self.data_well.region == "КГМ" or self.data_well.gips_in_well is True)
+                           and self.data_well.open_trunk_well is False else ""]
+
 
         self.without_damping_true = self.data_well.without_damping
         if self.without_damping_true and self.data_well.category_pressure in [1, '1', 2, '2']:
@@ -1760,6 +1768,7 @@ class LiftEcn(GnoParent):
             work_list.extend(self.append_posle_lift())
         return work_list
 
+
     def lifting_ecn(self):
         lift_ecn = [
             [f'Опрессовать ГНО на Р=50атм', None,
@@ -1874,6 +1883,7 @@ class LiftPumpNv(GnoParent):
         return work_list
 
     def lifting_nv(self):
+
         lift_pump_nv = [
             [f'Опрессовать ГНО на Р={40}атм', None,
              f'Опрессовать ГНО на Р={40}атм в течении 30мин в присутствии представителя ЦДНГ. '
@@ -1983,9 +1993,11 @@ class LiftPumpNv(GnoParent):
              None, None, None, None, None,
              None, 1.2],
             [
-                f'{"".join(["Допустить фНКТ для определения текущего забоя. " if self.data_well.region == "КГМ" or self.data_well.gips_in_well is True else ""])}Поднять  замковую опору с глубины {round(self.length_nkt, 1)}м',
+                f'{"".join(self.nv_list)} Поднять  замковую опору с глубины {round(self.length_nkt, 1)}м',
                 None,
-                f'{"".join(["Допустить фНКТ для определения текущего забоя. " if self.data_well.region == "КГМ" or self.data_well.gips_in_well is True else ""])}Поднять  замковую опору  на НКТ с глубины {round(self.length_nkt, 1)}м (компоновка НКТ{self.nkt_diam_fond}) на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд. весом {self.data_well.fluid_work}  '
+                f'{"".join(self.nv_list)} Поднять  замковую опору  на НКТ с глубины {round(self.length_nkt, 1)}м '
+                f'(компоновка НКТ{self.nkt_diam_fond}) на поверхность с замером, накручиванием колпачков с '
+                f'доливом скважины тех.жидкостью уд. весом {self.data_well.fluid_work}  '
                 f'в объеме {round(round(self.length_nkt, 1) * 1.12 / 1000, 1)}м3 '
                 f'с контролем АСПО на стенках НКТ.',
                 None, None,
@@ -2110,8 +2122,9 @@ class LiftPumpNn(GnoParent):
              f'Провести практическое обучение вахт по сигналу ВЫБРОС.', None, None,
              None, None, None, None, None,
              None, 1.2],
-            [f'Поднять  {self.data_well.dict_pump_shgn["before"]}', None,
-             f'Поднять  {self.data_well.dict_pump_shgn["before"]} с глубины {round(self.data_well.dict_pump_shgn_depth["before"], 1)}м '
+            [f'{"".join(self.nv_list)} Поднять  {self.data_well.dict_pump_shgn["before"]}', None,
+             f'{"".join(self.nv_list)} Поднять  {self.data_well.dict_pump_shgn["before"]} с глубины '
+             f'{round(self.data_well.dict_pump_shgn_depth["before"], 1)}м '
              f'(компоновка НКТ{self.nkt_diam_fond}) на поверхность с замером, накручиванием колпачков с доливом скважины '
              f'тех.жидкостью уд. весом {self.data_well.fluid_work}  '
              f'в объеме {round(round(self.length_nkt, 1) * 1.12 / 1000, 1)}м3 с контролем АСПО '
