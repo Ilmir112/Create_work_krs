@@ -1595,7 +1595,7 @@ class WellHistoryData(FindIndexPZ):
                         self.bur_rastvor = row[col]
 
                     elif "Максимально ожидаемое давление на устье" in str(value):
-                        aaa = row[col + 1]
+
                         self.max_expected_pressure = ProtectedIsDigit(row[col + 1])
                         self.max_expected_pressure = self.definition_is_none(
                             self.max_expected_pressure,

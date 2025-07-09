@@ -117,7 +117,6 @@ class TabPageUnion(QWidget):
 
         if number_dp != '':
 
-
             self.template_depth_edit.setText(str(self.data_well.template_depth))
             self.template_length_edit.setText(str(self.data_well.template_length))
             skm_interval = ''
@@ -318,8 +317,10 @@ class TabPageUnion(QWidget):
         self.data_well.max_admissible_pressure = ProtectedIsDigit(response["max_admissible_pressure"])
 
         self.data_well.cdng = data_list.ProtectedIsNonNone(response["cdng"])
-        self.data_well.date_commissioning = data_list.ProtectedIsNonNone(datetime.strptime(response["date_commissioning"], "%Y-%m-%d"))
-        self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(datetime.strptime(response["last_pressure_date"], "%Y-%m-%d"))
+        self.data_well.date_commissioning = data_list.ProtectedIsNonNone(
+            datetime.strptime(response["date_commissioning"], "%Y-%m-%d"))
+        self.data_well.result_pressure_date = data_list.ProtectedIsNonNone(
+            datetime.strptime(response["last_pressure_date"], "%Y-%m-%d"))
 
         # if 'ПВР план' in list(response.keys()):
         #     self.data_well.dict_perforation_project = response['ПВР план']
@@ -1906,15 +1907,13 @@ class WindowUnion(MyMainWindow):
             return False
 
     def pvo_gno(self, kat_pvo):
-        self.text_pvo = f'{self.data_well.max_expected_pressure.get_value}атм ' \
-                        f'(на максимально ожидаемое давление на устье в течении 30мин ' \
-                        f'(не менее 30атм), но не выше чем '\
-                        f'максимально допустимое давление опрессовки эксплуатационной колонны) '
+        self.text_pvo = f'{self.data_well.max_admissible_pressure.get_value}атм ' \
+                        f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
+                        f'давление опрессовки эксплуатационной колонны) '
         if self.data_well.curator == 'ВНС':
-            self.text_pvo = f'{self.data_well.max_expected_pressure.get_value * 1.1:.1f}атм. ' \
-                            f'(на максимально ожидаемое давление в течении ' \
-                            f'30мин +10% на скважинах освоения), но не выше чем '\
-                            f'максимально допустимое давление опрессовки эксплуатационной колонны) '
+            self.text_pvo = f'{self.data_well.max_admissible_pressure.get_value * 1.1:.1f}атм. ' \
+                            f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
+                            f' давление опрессовки эксплуатационной колонны) '
 
         date_str = data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]
 
@@ -1935,12 +1934,13 @@ class WindowUnion(MyMainWindow):
                 f' П178х168 или П168 х 146 или ' \
                 f'П178 х 146 в зависимости от типоразмера крестовины и колонной головки). Спустить и посадить ' \
                 f'пакер на глубину 10м. Опрессовать ПВО (трубные плашки превентора) на ' \
-                f'Р-{self.text_pvo} тех жидкостью {self.data_well.fluid_work} ' \
-                f'(на максимально ожидаемое давление на устье в течении 30мин (не менее 30атм), но не выше чем ' \
-                f'максимально допустимое давление опрессовки эксплуатационной колонны)сорвать и извлечь пакер' \
-                f'- Обеспечить обогрев превентора и СУП в зимнее время . \n Получить разрешение на ' \
+                f'Р-{self.text_pvo} тех жидкостью {self.data_well.fluid_work} сорвать и извлечь пакер ' \
+                f'Получить разрешение на ' \
                 f'производство работ в ' \
                 f'присутствии представителя ПФС'
+
+        if data_list.current_date in [11, 12, 1, 2, 3]:
+            pvo_1 += '\n- Обеспечить обогрев превентора и СУП в зимнее время.'
         if kat_pvo == 1:
             return pvo_1, f'Монтаж ПВО по схеме №2 + ГидроПревентор'
         else:

@@ -154,7 +154,6 @@ class TabPageSoWith(TabPageUnion):
         self.template_first_edit.setText(str(first_template))
         self.template_second_edit.setText(str(template_second))
 
-        self.length_template_first_edit.setText(str(4))
 
         self.dictance_template_first_edit.editingFinished.connect(self.update_template)
         self.template_first_edit.editingFinished.connect(self.update_template)
@@ -853,23 +852,23 @@ class TabPageSoWith(TabPageUnion):
     def definition_ecn_true(self, depth_ecn):
 
         if self.data_well.column_additional is False and self.data_well.dict_pump_ecn["after"] != 0 and \
-                self.data_well.column_diameter.get_value > 168:
+                self.data_well.column_diameter.get_value > 168 and self.data_well.max_angle.get_value < 45:
             return "4", "4"
         elif self.data_well.column_additional is False and self.data_well.dict_pump_ecn["after"] != 0:
             return "4", "30"
         elif self.data_well.column_additional is False and self.data_well.max_angle.get_value > 45:
             return "4", "10"
         elif self.data_well.column_additional is True and self.data_well.dict_pump_ecn["after"] != 0 \
-                and self.data_well.column_additional_diameter.get_value < 170:
+                and self.data_well.column_additional_diameter.get_value < 170 and self.data_well.max_angle.get_value < 45:
             if self.data_well.dict_pump_ecn["after"] != 0 and float(
                     depth_ecn) < self.data_well.head_column_additional.get_value and \
-                    self.data_well.column_diameter.get_value > 168:
+                    self.data_well.column_diameter.get_value > 168 and self.data_well.max_angle.get_value < 45:
                 return "4", "4"
             elif self.data_well.dict_pump_ecn["after"] != 0 and \
                     float(depth_ecn) < self.data_well.head_column_additional.get_value:
                 return "4", "30"
             elif self.data_well.dict_pump_ecn["after"] != 0 and \
-                    float(depth_ecn) >= self.data_well.head_column_additional.get_value:
+                    float(depth_ecn) >= self.data_well.head_column_additional.get_value :
                 return "30", "4"
 
         elif self.data_well.max_angle.get_value > 45 and self.data_well.current_bottom > \
@@ -975,48 +974,46 @@ class TabPageSoWith(TabPageUnion):
         return (template_first_diam, template_second_diam)
 
     def template_diam_additional_ek(self):  # Выбор диаметра шаблонов при наличии в скважине дополнительной колонны
-
-        diam_internal_ek = self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value
-        diam_internal_ek_addition = float(self.data_well.column_additional_diameter.get_value) - 2 * float(
-            self.data_well.column_additional_wall_thickness.get_value)
-
-        template_second_diam_dict = {
-            82: (84, 88),
-            84: (88, 92),
-            92: (92.1, 96.9),
-            94: (97, 102),
-            102: (102.1, 109),
-            106: (109, 115),
-            114: (118, 120),
-            116: (120.1, 121.9),
-            118: (122, 123.9),
-            120: (124, 127.9),
-            124: (128, 133),
-            140: (144, 148),
-            144: (148.1, 154),
-            152: (154.1, 164),
-            164: (166, 176),
-            190: (190.6, 203.6),
-            210: (215, 221)
-        }
-
-        for diam, diam_internal in template_second_diam_dict.items():
-            if diam_internal[0] <= diam_internal_ek <= diam_internal[1]:
-                template_second_diam = diam
-                break
-        for diam, diam_internal in template_second_diam_dict.items():
-            if diam_internal[0] <= diam_internal_ek_addition <= diam_internal[1]:
-                # print(diam_internal[0] <= diam_internal_ek_addition <= diam_internal[1], diam_internal[0],diam_internal_ek_addition,diam_internal[1])
-                template_first_diam = diam
-                break
-        if 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and '122' in str(
-                self.data_well.paker_before["after"]) and str(self.data_well.column_diameter.get_value) == "146":
-            template_second_diam = 126
-
-        if self.data_well.column_additional_diameter == '114':
-            template_first_diam = '94'
         try:
+            diam_internal_ek = self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value
+            diam_internal_ek_addition = float(self.data_well.column_additional_diameter.get_value) - 2 * float(
+                self.data_well.column_additional_wall_thickness.get_value)
+
+            template_second_diam_dict = {
+                82: (84, 88),
+                84: (88, 92),
+                92: (92.1, 96.9),
+                94: (97, 102),
+                102: (102.1, 109),
+                106: (109, 115),
+                114: (118, 120),
+                116: (120.1, 121.9),
+                118: (122, 123.9),
+                120: (124, 127.9),
+                124: (128, 133),
+                140: (144, 148),
+                144: (148.1, 154),
+                152: (154.1, 164),
+                164: (166, 176),
+                190: (190.6, 203.6),
+                210: (215, 221)
+            }
+
+            for diam, diam_internal in template_second_diam_dict.items():
+                if diam_internal[0] <= diam_internal_ek <= diam_internal[1]:
+                    template_second_diam = diam
+                    break
+            for diam, diam_internal in template_second_diam_dict.items():
+                if diam_internal[0] <= diam_internal_ek_addition <= diam_internal[1]:
+                    # print(diam_internal[0] <= diam_internal_ek_addition <= diam_internal[1], diam_internal[0],diam_internal_ek_addition,diam_internal[1])
+                    template_first_diam = diam
+                    break
+            if 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and '122' in str(
+                    self.data_well.paker_before["after"]) and str(self.data_well.column_diameter.get_value) == "146":
+                template_second_diam = 126
+
             return (template_first_diam, template_second_diam)
+
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка ', f'Ошибка  определения диаметра шаблонов {e}')
 

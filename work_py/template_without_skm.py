@@ -168,7 +168,7 @@ class TabPageSo(TabPageUnion):
         self.template_first_edit.setText(str(first_template))
         self.template_second_edit.setText(str(template_second))
 
-        self.length_template_first_edit.setText(str(2))
+        self.length_template_first_edit.setText(str(4))
 
         self.template_first_edit.textChanged.connect(self.update_template)
         self.length_template_second_edit.textChanged.connect(self.update_template)
@@ -568,13 +568,13 @@ class TabPageSo(TabPageUnion):
     def definition_ecn_true(self, depth_ecn):
 
         if self.data_well.column_additional is False and self.data_well.dict_pump_ecn["after"] != 0:
-            return "2", "30"
+            return "4", "30"
         elif self.data_well.column_additional is False and self.data_well.max_angle.get_value > 45:
-            return "2", "10"
+            return "4", "10"
         elif self.data_well.column_additional is True and self.data_well.dict_pump_ecn["after"] != 0:
             if self.data_well.dict_pump_ecn["after"] != 0 and \
                     float(depth_ecn) < self.data_well.head_column_additional.get_value:
-                return "2", "30"
+                return "4", "30"
 
             elif self.data_well.dict_pump_ecn["after"] != 0 and \
                     float(depth_ecn) >= self.data_well.head_column_additional.get_value:
@@ -582,7 +582,7 @@ class TabPageSo(TabPageUnion):
             elif self.data_well.max_angle.get_value > 45:
                 return "10", "4"
         else:
-            return "2", "4"
+            return "4", "4"
 
 
 class TabWidget(TabWidgetUnion):

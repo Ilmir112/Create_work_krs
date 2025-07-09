@@ -172,7 +172,7 @@ class GnoDescentWindow(WindowUnion):
     def closeEvent(self, event):
 
         # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window =None
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
     def check_descent_paker(self):
@@ -210,7 +210,8 @@ class GnoDescentWindow(WindowUnion):
                         (self.data_well.column_additional is False or
                          (self.data_well.column_additional and
                           self.data_well.current_bottom > self.data_well.head_column_additional.get_value and
-                          self.data_well.dict_pump_ecn_depth["after"] < self.data_well.head_column_additional.get_value)):
+                          self.data_well.dict_pump_ecn_depth[
+                              "after"] < self.data_well.head_column_additional.get_value)):
                     QMessageBox.critical(self, 'Ошибка',
                                          f'Нельзя спускать ЭЦН {self.data_well.paker_before["after"]}м'
                                          f'ниже глубины шаблонирования ЭК {self.data_well.template_depth}м')
@@ -232,7 +233,6 @@ class GnoDescentWindow(WindowUnion):
                     return
         return True
 
-
     def add_work(self):
         try:
             self.current_widget = self.tab_widget.currentWidget()
@@ -242,7 +242,6 @@ class GnoDescentWindow(WindowUnion):
                 QMessageBox.warning(self, 'Ошибка', f'Длина НКТ {sum(list(self.data_well.dict_nkt_before.values()))}м '
                                                     f'После ремонта больше текущего забоя {self.data_well.current_bottom}м')
                 return
-
 
             if self.check_descent_paker() is None:
                 return
@@ -366,8 +365,6 @@ class DescentParent(ABC):
              'Мастер КРС, предст. заказчика', None]
         ]
         return gno_list
-
-
 
     def append_note_6(self):
         work_list = [
@@ -681,7 +678,8 @@ class DescentPaker(DescentParent):
                 paker_descent.insert(2, self.privyazka_nkt()[0])
 
         if self.rgd_question_combo == 'Да':
-            if self.data_well.column_additional and self.data_well.depth_fond_paker_before['after'] >= self.data_well.head_column_additional.get_value:
+            if self.data_well.column_additional and self.data_well.depth_fond_paker_before[
+                'after'] >= self.data_well.head_column_additional.get_value:
                 # print(rgd_without_paker(self))
                 for row in rgd_without_paker(self)[::-1]:
                     paker_descent.insert(0, row)
@@ -807,6 +805,15 @@ class DescentOrz(DescentParent):
              f'(давление на максимальное возможное давление опрессовки эксплуатационной колонны), '
              f'в случае поглощения при опрессовке ФА, совместно с представителем ЦДНГ составляется АКТ '
              f'о невозможности проведения опрессовки ФА',
+             None, None, None, None, None, None, None,
+             'Мастер КРС, предст. заказчика', 0.7],
+            [None, None,
+             f'Обвязать устье скважины '
+             f'согласно схемы №10 утвержденной главным '
+             f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. Опрессовать ПВО на '
+             f'{self.data_well.max_admissible_pressure.get_value:.1f}атм '
+             f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше '
+             f'давление опрессовки эксплуатационной колонны)',
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 0.7],
             [None, None,
@@ -1045,7 +1052,7 @@ class DescentEcnWithPaker(DescentParent):
              'Мастер КРС, предст. заказчика', None],
             [None, None,
              'Опрессовать НКТ между УЭЦН и обратным клапаном, отдельно до спуска УЭЦН (составить акт). '
-             ,
+                ,
              None, None, None, None, None, None, None,
              'Мастер КРС, предст. заказчика', 0.3],
             [f'СПО {self.data_well.dict_pump_ecn["after"]} на НКТ{self.nkt_edit}, '
@@ -1349,5 +1356,3 @@ class DescentNn(DescentParent):
              'Мастер КРС, предст. заказчика', 11.5]
         ]
         return descent_nn
-
-     

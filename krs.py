@@ -233,7 +233,6 @@ class GnoWindow(WindowUnion):
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
-
     def add_work(self):
         from work_py.advanted_file import definition_plast_work
 
@@ -338,8 +337,10 @@ class GnoParent(ABC):
 
         self.nv_list = ["Допустить фНКТ для определения текущего забоя. "
                         if (self.data_well.region == "КГМ" or self.data_well.gips_in_well is True)
-                           and self.data_well.open_trunk_well is False else ""]
-
+                           and self.data_well.open_trunk_well is False and
+                           (self.data_well.column_additional is False or
+                            (self.data_well.column_additional and
+                             self.data_well.column_additional_diameter.get_value > 110)) else ""]
 
         self.without_damping_true = self.data_well.without_damping
         if self.without_damping_true and self.data_well.category_pressure in [1, '1', 2, '2']:
@@ -370,14 +371,17 @@ class GnoParent(ABC):
                     self.data_well.category_pvo, 1, 2)
         if self.data_well.max_expected_pressure.get_value < 30:
             self.data_well.max_expected_pressure = data_list.ProtectedIsDigit(30)
-        self.text_pvo = f'{self.data_well.max_expected_pressure.get_value}атм  ' \
-                        f'(на максимально ожидаемое давление на устье в течении 30мин (не менее 30атм), но не выше чем ' \
-                        f'максимально допустимое давление опрессовки эксплуатационной колонны) '
+
+        self.text_pvo = f'на давление {self.data_well.max_admissible_pressure.get_value}атм ' \
+                        f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
+                        f' давление опрессовки эксплуатационной колонны) '
         if self.data_well.curator == 'ВНС':
-            self.text_pvo = f'{self.data_well.max_admissible_pressure.get_value * 1.1:.1f}атм  на ' \
-                            f'максимально не ниже ожидаемого давления с выдержкой в течении 30 минут ' \
-                            f'(+10% на скважинах освоения), но не менее 30атм,  но не выше чем ' \
-                            f'максимально допустимое давление опрессовки эксплуатационной колонны)'
+            self.text_pvo = f'на давление {self.data_well.max_admissible_pressure.get_value * 1.1:.1f}атм на ' \
+                            f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
+                            f' давление опрессовки эксплуатационной колонны)'
+            # f'максимально не ниже ожидаемого давления с выдержкой в течении 30 минут ' \
+            # f'(+10% на скважинах освоения), но не менее 30атм,  но не выше чем ' \
+            # f'максимально допустимое давление опрессовки эксплуатационной колонны)'
 
     def lifting_unit(self):
         aprs_40 = 'Установить подъёмный агрегат на устье не менее 40т.\n' \
@@ -582,8 +586,8 @@ class GnoParent(ABC):
 
             krs_begin.extend([
                 [None, None, f'Согласно графика по скважине необходимо в приоритете произвести опережающее глушение',
-             None, None, None, None, None, None, None,
-             ' Мастер КРС', None]])
+                 None, None, None, None, None, None, None,
+                 ' Мастер КРС', None]])
 
         сat_h2s_list = list(map(int, [self.data_well.dict_category[plast]["по сероводороду"].category for plast in
                                       self.data_well.plast_work if self.data_well.dict_category.get(plast) and
@@ -596,8 +600,8 @@ class GnoParent(ABC):
                              f'содержащих сероводород, производить с применением СИЗОД и контролем загазованности '
                              f'на месте проведения работ. В случае обнаружения негерметичности задвижек коллекторной '
                              f'линии запретить производство работ.',
-             None, None, None, None, None, None, None,
-             ' Мастер КРС.', None]])
+                 None, None, None, None, None, None, None,
+                 ' Мастер КРС.', None]])
 
         if float(self.fluid) > 1.18:
             if self.pntzh_combo == '':
@@ -735,7 +739,7 @@ class GnoParent(ABC):
                                f'в трубное пространство ' \
                                f'тех жидкости в ' \
                                f'объеме {volume_nkt_ustie}м3 на ' \
-                               f'циркуляцию. Закрыть трубное пространство. ' \
+                               f'циркуляцию. Закрыть затрубное пространство. ' \
                                f'Произвести закачку на поглощение не более ' \
                                f'{self.data_well.max_admissible_pressure.get_value}атм ' \
                                f'тех жидкости оставшейся жидкости. ' \
@@ -970,7 +974,7 @@ class LiftPaker(GnoParent):
              f'{kvostovik}'
              f'на поверхность с замером, накручиванием колпачков с доливом скважины тех.жидкостью уд.'
              f' весом {self.data_well.fluid_work}  '
-             f'в объеме {float(self.data_well.depth_fond_paker_before["before"]) * 1.2 /1000:.1f}м3 '
+             f'в объеме {float(self.data_well.depth_fond_paker_before["before"]) * 1.2 / 1000:.1f}м3 '
              f'с контролем АСПО на стенках НКТ.', None, None,
              None, None, None, None, None,
              'Мастер КРС', round(liftingGNO(self.data_well.dict_nkt_before) * 1.2, 2)]
@@ -1004,8 +1008,7 @@ class LiftOrz(GnoParent):
                  f'Произвести глушение скважины в НКТ48мм тех.жидкостью в объеме обеспечивающим заполнение трубного '
                  f'пространства в объеме {round(1.3 * self.data_well.dict_nkt_before["48"] / 1000, 1)}м3 '
                  f'жидкостью уд.веса '
-                 f'{self.data_well.fluid_work}на давление поглощения до'
-                 f' {self.text_pvo}'
+                 f'{self.data_well.fluid_work}на давление поглощения'
                  f'Произвести глушение скважины в '
                  f'НКТ89мм тех.жидкостью на поглощение в объеме обеспечивающим заполнение '
                  f'межтрубного и подпакерного пространства '
@@ -1014,6 +1017,13 @@ class LiftOrz(GnoParent):
                  f'Произвести замер избыточного давления в скважине.',
                  None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика ', 0.7],
+                [None, None,
+                 f'Обвязать устье скважины '
+                 f'согласно схемы №10 утвержденной главным '
+                 f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г '
+                 f'. Опрессовать ПВО {self.text_pvo}',
+                 None, None, None, None, None, None, None,
+                 'Мастер КРС, предст. заказчика', 0.7],
                 [None, None,
                  f'{self.lifting_unit()}', None, None, None, None, None, None, None,
                  'Мастер КРС представитель Заказчика, пусков. Ком. ', 4.2],
@@ -1045,7 +1055,7 @@ class LiftOrz(GnoParent):
                  f'При отрицательном результате согласовать с УСРСиСТ ступенчатое увеличение '
                  f'нагрузки до 28т ( страг нагрузка НКТ по паспорту),  при необходимости  с '
                  f'противодавлением в НКТ '
-                 f'(время на прибытие СТП ЦА 320 +  АЦ не более 4 часов). Общие время на расхаживание - не более 6 '
+                 f'(время на прибытие СТП ЦА 320 + АЦ не более 4 часов). Общие время на расхаживание - не более 6 '
                  f'часов, через 5 часов'
                  f' с момента расхаживания пакера - выйти с согласование на УСРСиСТ, ПТО Региона - для составления '
                  f'алгоритма'
@@ -1114,6 +1124,13 @@ class LiftOrz(GnoParent):
             ]
             if self.without_damping_true:
                 lift_orz = lift_orz[1:]
+
+            if self.data_well.bvo:
+                lift_orz.insert(2, [
+                    None, None, 'Получить разрешение на производство работ по '
+                                'подъему НКТ-48мм от представителя ПФС до начало работ',
+                    None, None, None, None, None, None, None,
+                    'Мастер КРС, Представитель ПФС', None])
         return lift_orz
 
 
@@ -1768,7 +1785,6 @@ class LiftEcn(GnoParent):
             work_list.extend(self.append_posle_lift())
         return work_list
 
-
     def lifting_ecn(self):
         lift_ecn = [
             [f'Опрессовать ГНО на Р=50атм', None,
@@ -1883,7 +1899,6 @@ class LiftPumpNv(GnoParent):
         return work_list
 
     def lifting_nv(self):
-
         lift_pump_nv = [
             [f'Опрессовать ГНО на Р={40}атм', None,
              f'Опрессовать ГНО на Р={40}атм в течении 30мин в присутствии представителя ЦДНГ. '

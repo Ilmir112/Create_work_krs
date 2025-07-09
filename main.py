@@ -1733,6 +1733,7 @@ class MyMainWindow(QMainWindow):
                 for interval in self.data_well.dict_perforation[plast]["интервал"]:
                     if float(interval[0]) < depth < float(interval[1]):
                         check_true = False
+                        break
                     else:
                         check_true = True
             elif len(self.data_well.dict_perforation[plast]["интервал"]) == 0:
@@ -1741,7 +1742,7 @@ class MyMainWindow(QMainWindow):
         if check_true is False:
             QMessageBox.warning(
                 None,
-                "Проверка посадки пакера в интервал перфорации",
+                f"Проверка посадки пакера в интервал перфорации {interval}",
                 f"Проверка посадки показала пакер сажается в интервал перфорации, "
                 f"необходимо изменить глубину посадки!!!",
             )
@@ -5187,16 +5188,6 @@ class SaveInExcel(MyWindow):
             )
         return False
 
-
-class LoadThread(QThread):
-    finished = pyqtSignal()
-
-    def run(self):
-        import time
-
-        # Здесь вы можете выполнять длительные операции, например, загрузку данных
-        time.sleep(5)  # Симуляция длительной зподнагрузки
-        self.finished.emit()
 
 
 def show_splash_screen():

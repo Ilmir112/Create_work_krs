@@ -196,6 +196,7 @@ class TabPageSoAcid(TabPageUnion):
 
         self.pakerLabel = QLabel("глубина пакера", self)
         self.paker_depth_edit = QLineEdit(self)
+        self.paker_depth_edit.setValidator(self.validator_float)
 
         self.paker2Label = QLabel("глубина верхнего пакера", self)
         self.paker2_depth = QLineEdit(self)
