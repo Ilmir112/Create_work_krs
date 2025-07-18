@@ -336,7 +336,7 @@ class DrillWindow(WindowUnion):
                 return
             else:
                 if self.cutter_calibrator_combo == 'Да':
-                    self.cutter_calibrator = '+ фрез калибратор'
+                    self.cutter_calibrator = ' фрез калибратор + '
 
         rows = self.tableWidget.rowCount()
         if rows == 0:
@@ -375,6 +375,25 @@ class DrillWindow(WindowUnion):
         elif self.nkt_str == 'СБТ':
             drill_list = self.drilling_sbt(drill_tuple, self.drill_type_combo,
                                            self.drilling_bit_diam, self.downhole_motor)
+        plast = "открытый ствол"
+        if self.data_well.current_bottom > self.data_well.shoe_column.get_value and self.data_well.column_additional is False:
+            plast = "открытый ствол"
+            self.data_well.dict_perforation.setdefault("открытый ствол", {}).setdefault('отключение', False)
+            self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
+
+            self.data_well.dict_perforation.setdefault(
+                plast, {}).setdefault('интервал', []).append(
+                [float(self.data_well.shoe_column.get_value),
+                 float(self.data_well.current_bottom)])
+        elif self.data_well.current_bottom > self.data_well.shoe_column_additional.get_value and self.data_well.column_additional:
+            plast = "открытый ствол"
+            self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
+            self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
+
+            self.data_well.dict_perforation.setdefault(
+                plast, {}).setdefault('интервал', []).append(
+                [float(self.data_well.shoe_column_additional.get_value),
+                 float(self.data_well.current_bottom)])
 
         if drill_list:
             self.populate_row(self.insert_index, drill_list, self.table_widget)

@@ -13,7 +13,7 @@ from .rationingKRS import lifting_nkt_norm, descentNKT_norm, well_volume_norm
 
 
 def kot_select(self, current_bottom):
-    kot_select =''
+    kot_select = ''
     if self.data_well.column_additional is False \
             or (
             self.data_well.column_additional is True and self.data_well.current_bottom <= self.data_well.head_column_additional.get_value):
@@ -83,7 +83,8 @@ def check_h2s(self, plast=0, fluid_new=0, expected_pressure=0):
             fluid_new, ok = QInputDialog.getDouble(self, 'Новое значение удельного веса жидкости',
                                                    'Введите значение удельного веса жидкости', 1.02, 1, 1.72, 2)
         if len(self.data_well.dict_category) != 0:
-            expected_pressure = self.data_well.dict_category[self.data_well.plast_project[0]]['по давлению'].data_pressure
+            expected_pressure = self.data_well.dict_category[self.data_well.plast_project[0]][
+                'по давлению'].data_pressure
         else:
             expected_pressure, ok = QInputDialog.getDouble(self, 'Ожидаемое давление по пласту',
                                                            'Введите Ожидаемое давление по пласту', 0, 0, 300, 1)
@@ -100,17 +101,15 @@ def check_h2s(self, plast=0, fluid_new=0, expected_pressure=0):
 
 
 def need_h2s(self, fluid_new, plast_edit, expected_pressure):
-    
     сat_h2s_list = list(map(int, [self.data_well.dict_category[plast]['по сероводороду'].category for plast in
                                   self.data_well.plast_work if self.data_well.dict_category.get(plast) and
                                   self.data_well.dict_category[plast]['отключение'] == 'рабочий']))
 
     category_h2s_list_plan = list(map(int, [self.data_well.dict_category[plast]['по сероводороду'].category for plast in
-                                       self.data_well.plast_project if self.data_well.dict_category.get(plast) and
-                                       self.data_well.dict_category[plast]['отключение'] == 'планируемый']))
+                                            self.data_well.plast_project if self.data_well.dict_category.get(plast) and
+                                            self.data_well.dict_category[plast]['отключение'] == 'планируемый']))
 
     if len(category_h2s_list_plan) != 0:
-
         if category_h2s_list_plan[0] in [1, 2, '1', '2'] and len(self.data_well.plast_work) == 0:
             expenditure_h2s = round(
                 max([self.data_well.dict_category[plast]['по сероводороду'].poglot
@@ -123,7 +122,8 @@ def need_h2s(self, fluid_new, plast_edit, expected_pressure):
             fluid_work = f'{fluid_new}г/см3 '
             fluid_work_short = f'{fluid_new}г/см3 '
 
-        elif ((category_h2s_list_plan[0] in [1, 2]) or (сat_h2s_list[0] in [1, 2])) and len(self.data_well.plast_work) != 0:
+        elif ((category_h2s_list_plan[0] in [1, 2]) or (сat_h2s_list[0] in [1, 2])) and len(
+                self.data_well.plast_work) != 0:
             try:
                 expenditure_h2s_plan = max(
                     [self.data_well.dict_category[self.data_well.plast_project[0]]['по сероводороду'].poglot
@@ -153,8 +153,8 @@ def need_h2s(self, fluid_new, plast_edit, expected_pressure):
                                               'ВВедите давление вскрываемого пласта', 0, 0, 600, 1)
 
         category_h2s, ok = QInputDialog.getItem(None, 'Категория скважины по сероводороду вскрываемого пласта',
-                                           'Выберете категорию скважины по сероводороду вскрываемого пласта',
-                                           cat_list, 0, False)
+                                                'Выберете категорию скважины по сероводороду вскрываемого пласта',
+                                                cat_list, 0, False)
 
         category_h2s_list_plan.append(category_h2s)
         h2s_mg, _ = QInputDialog.getDouble(None, 'сероводород в мг/л',
@@ -175,7 +175,8 @@ def need_h2s(self, fluid_new, plast_edit, expected_pressure):
         if category_h2s_list_plan[0] in [1, 2]:
 
             expenditure_h2s = round(
-                max([self.data_well.dict_category[plast]['по сероводороду'].poglot for plast in self.data_well.plast_project]), 2)
+                max([self.data_well.dict_category[plast]['по сероводороду'].poglot for plast in
+                     self.data_well.plast_project]), 2)
             fluid_work = f'{fluid_new}г/см3 с добавлением поглотителя сероводорода {self.data_well.type_absorbent} из ' \
                          f'расчета {expenditure_h2s}кг/м3  либо аналог (СНПХ-1200, ХИМТЕХНО 101 Марка А)'
             fluid_work_short = f'{fluid_new}г/см3 {self.data_well.type_absorbent} {expenditure_h2s}кг/м3 '
@@ -236,9 +237,6 @@ def definition_q_nek(self):
     return definition_q_list
 
 
-
-
-
 def definition_bottom_gklm(self):
     priv_list = [[f'Отбить забой по ГК и ЛМ', None,
                   f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через РИТС {data_list.contractor}". '
@@ -263,32 +261,50 @@ def pressure_gis(self):
 
 
 def pvo_cat1(self):
+    pvo_text, ok = QInputDialog.getItem(
+                        self,
+                        "Категория ПВО",
+                        "Выберете категорию ПВО",
+                        ["1", "2", "3"],
+                        1,
+                        2,
+                    )
+    need_paker, ok = QInputDialog.getItem(
+        self,
+        "Категория ПВО",
+        "Нужно ли спускать пакер?",
+        ["Да", "Нет"]
+    )
+    paker_str = ("", "")
+    if need_paker == "Да":
+        paker_str = ("Спустить и посадить пакер на глубину 10м.", "сорвать и извлечь пакер.")
+
     self.text_pvo = f'на давление {self.data_well.max_admissible_pressure.get_value}атм  ' \
                     f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
                     f'давление опрессовки эксплуатационной колонны) '
 
     if self.data_well.curator == 'ВНС':
         self.text_pvo = f'{self.data_well.max_admissible_pressure.get_value:.1f}атм  на ' \
-                         f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
+                        f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
                         f' давление опрессовки эксплуатационной колонны) '
 
-    pvo_1 = f'Установить ПВО по схеме №2 утвержденной главным инженером {data_list.contractor} ' \
+    pvo_1 = f'Установить ПВО по схеме №{pvo_text} утвержденной главным инженером {data_list.contractor} ' \
             f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}' \
             f'(тип плашечный сдвоенный ПШП-2ФТ-160х21Г Крестовина КР160х21Г, ' \
             f'задвижка ЗМС 65х21 (3шт), Шарового крана 1КШ-73х21, авар. трубы (патрубок НКТ73х7-7-Е, ' \
             f' (при необходимости произвести монтаж переводника' \
             f' П178х168 или П168 х 146 или ' \
-            f'П178 х 146 в зависимости от типоразмера крестовины и колонной головки). Спустить и посадить ' \
-            f'пакер на глубину 10м. Опрессовать ПВО (трубные плашки превентора) на ' \
-            f'Р-{self.text_pvo},  сорвать и извлечь пакер. \n' \
+            f'П178 х 146 в зависимости от типоразмера крестовины и колонной головки). {paker_str[0]} ' \
+            f'Опрессовать ПВО (трубные плашки превентора) на ' \
+            f'Р-{self.text_pvo}, {paker_str[1]} \n' \
             f'- Обеспечить о обогрев превентора, станции управления ПВО оборудовать теплоизоляционными ' \
             f'материалом в зимней период. \n Получить разрешение на производство работ в присутствии представителя ПФС'
 
     pvo_list = [
         [None, None,
-         "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ "\
-         "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство "\
-         "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность"\
+         "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
+         "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
+         "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность" \
          " для жизни людей"
          " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. Представитель "
          "ПАСФ приглашается за 24 часа до проведения "
@@ -297,7 +313,7 @@ def pvo_cat1(self):
          "подъёмного агрегата для ремонта скважины.",
          None, None, None, None, None, None, None,
          'Мастер КРС', None],
-        [f'монтаж ПВО по схеме № 2 c гидроПВО', None,
+        [f'монтаж ПВО по схеме №{pvo_text} c гидроПВО', None,
          pvo_1, None, None,
          None, None, None, None, None,
          'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком', 4.67]]
@@ -306,7 +322,6 @@ def pvo_cat1(self):
 
 
 def fluid_change(self):
-    from open_pz import CreatePZ
 
     try:
         fluid_work, fluid_work_short, plast, expected_pressure = check_h2s(self)
@@ -314,16 +329,17 @@ def fluid_change(self):
         self.data_well.fluid_work, self.data_well.fluid_work_short = fluid_work, fluid_work_short
 
         fluid_change_list = [
-            [f'Cмена объема {self.data_well.fluid}г/см3- {round(well_volume(self, self.data_well.current_bottom), 1)}м3',
-             None,
-             f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {self.data_well.fluid_work} '
-             f'(по расчету по вскрываемому пласта Рожид- {expected_pressure}атм) в объеме не '
-             f'менее {round(well_volume(self, self.data_well.current_bottom), 1)}м3  в присутствии '
-             f'представителя заказчика, Составить акт. '
-             f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за '
-             f'2 часа до начала работ)',
-             None, None, None, None, None, None, None,
-             'мастер КРС', well_volume_norm(well_volume(self, self.data_well.current_bottom))]
+            [
+                f'Cмена объема {self.data_well.fluid}г/см3- {round(well_volume(self, self.data_well.current_bottom), 1)}м3',
+                None,
+                f'Произвести смену объема обратной промывкой по круговой циркуляции  жидкостью  {self.data_well.fluid_work} '
+                f'(по расчету по вскрываемому пласта Рожид- {expected_pressure}атм) в объеме не '
+                f'менее {round(well_volume(self, self.data_well.current_bottom), 1)}м3  в присутствии '
+                f'представителя заказчика, Составить акт. '
+                f'(Вызов представителя осуществлять телефонограммой за 12 часов, с подтверждением за '
+                f'2 часа до начала работ)',
+                None, None, None, None, None, None, None,
+                'мастер КРС', well_volume_norm(well_volume(self, self.data_well.current_bottom))]
         ]
 
 
@@ -369,7 +385,7 @@ def calculation_fluid_work(data_well, vertical, pressure):
         if fluid_work_calculate < 1.02 and (data_well.region == 'КГМ' or data_well.region == 'АГМ'):
             fluid_work_calculate = 1.02
         elif fluid_work_calculate < 1.02 and (data_well.region == 'ИГМ' or data_well.region == 'ТГМ'
-                or data_well.region == 'ЧГМ'):
+                                              or data_well.region == 'ЧГМ'):
             fluid_work_calculate = 1.01
 
         return fluid_work_calculate
@@ -381,31 +397,36 @@ def volume_vn_ek(self, current):
     if self.data_well.column_additional is False or self.data_well.column_additional is True \
             and current < self.data_well.head_column_additional.get_value:
         volume = round(
-            (self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value) ** 2 * 3.14 / 4 / 1000, 2)
+            (
+                        self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value) ** 2 * 3.14 / 4 / 1000,
+            2)
     else:
         volume = round(
-            (self.data_well.column_additional_diameter.get_value - 2 * self.data_well.column_additional_wall_thickness.get_value
-             ) ** 2 * 3.14 / 4 / 1000, 2)
+            (
+                        self.data_well.column_additional_diameter.get_value - 2 * self.data_well.column_additional_wall_thickness.get_value
+                        ) ** 2 * 3.14 / 4 / 1000, 2)
 
     return round(volume, 1)
 
 
-def volume_vn_nkt(dict_nkt, roof=0,  sole=0):  # Внутренний объем одного погонного местра НКТ
+def volume_vn_nkt(dict_nkt, roof=0, sole=0):  # Внутренний объем одного погонного местра НКТ
     volume_vn_nkt_sel = 0
     for nkt, length_nkt in dict_nkt.items():
-        difference_sole = sole-roof
+        difference_sole = sole - roof
         nkt = ''.join(c for c in str(nkt) if c.isdigit())
         if '60' in str(nkt):
             t_nkt = 5
-            volume_vn_nkt_sel += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * (length_nkt - (difference_sole)), 5)
+            volume_vn_nkt_sel += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * (length_nkt - (difference_sole)),
+                                       5)
             if (difference_sole) >= length_nkt:
                 difference_sole = 0
             else:
-                difference_sole = difference_sole - (sole-roof)
+                difference_sole = difference_sole - (sole - roof)
 
         elif '73' in str(nkt):
             t_nkt = 5.5
-            volume_vn_nkt_sel += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * (length_nkt-(difference_sole)), 5)
+            volume_vn_nkt_sel += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * (length_nkt - (difference_sole)),
+                                       5)
         elif '89' in str(nkt):
             t_nkt = 6
             volume_vn_nkt_sel += round(3.14 * (int(nkt) - 2 * t_nkt) ** 2 / 4000000 * length_nkt, 5)
@@ -430,8 +451,6 @@ def volume_rod(self, dict_sucker_rod):  # Объем штанг
         return round(volume_rod, 5)
     except Exception as e:
         logger.critical(e)
-
-
 
 
 def volume_nkt(dict_nkt):  # Внутренний объем НКТ по фондовым НКТ
@@ -500,17 +519,20 @@ def volume_pod_nkt(self):  # Расчет необходимого объема 
             self.data_well.column_wall_thickness.get_value) * 2) ** 2 / 4 / 1000 * (
                             float(self.data_well.current_bottom) - int(nkt_l)) / 1000
 
-    elif round(sum(list(self.data_well.dict_nkt_before.values())), 1) > float(self.data_well.head_column_additional.get_value):
+    elif round(sum(list(self.data_well.dict_nkt_before.values())), 1) > float(
+            self.data_well.head_column_additional.get_value):
         v_pod_gno = 3.14 * (
                 self.data_well.column_diameter.get_value - self.data_well.column_wall_thickness.get_value * 2) ** 2 / 4 / 1000 * (
                             float(self.data_well.head_column_additional.get_value) - nkt_l) / 1000 + 3.14 * (
                             self.data_well.column_additional_diameter.get_value - self.data_well.column_additional_wall_thickness.get_value * 2) ** 2 / 4 / 1000 * (
-                            self.data_well.current_bottom - float(self.data_well.head_column_additional.get_value)) / 1000
+                            self.data_well.current_bottom - float(
+                        self.data_well.head_column_additional.get_value)) / 1000
     elif nkt_l <= float(self.data_well.head_column_additional.get_value):
         v_pod_gno = 3.14 * (
                 self.data_well.column_additional_diameter.get_value - self.data_well.column_additional_wall_thickness.get_value * 2) ** 2 / 4 / 1000 * (
                             self.data_well.current_bottom - nkt_l) / 1000
-    volume_in_nkt = v_pod_gno + volume_vn_nkt(self.data_well.dict_nkt_before) - volume_rod(self, self.data_well.dict_sucker_rod)
+    volume_in_nkt = v_pod_gno + volume_vn_nkt(self.data_well.dict_nkt_before) - volume_rod(self,
+                                                                                           self.data_well.dict_sucker_rod)
     return round(volume_in_nkt, 1)
 
 
@@ -518,12 +540,10 @@ def volume_jamming_well(self, current_bottom):  # объем глушения с
 
     volume_jamming_well = round(
         (well_volume(self, current_bottom) - volume_nkt_metal(self.data_well.dict_nkt_before) - volume_rod(self,
-                                                                                               self.data_well.dict_sucker_rod)) * 1.1,
+                                                                                                           self.data_well.dict_sucker_rod)) * 1.1,
         1)
 
     return volume_jamming_well
-
-
 
 
 def is_number(num):
@@ -539,5 +559,3 @@ def is_number(num):
 def open_checkbox_dialog(self):
     dialog = CheckBoxDialog(self)
     dialog.exec_()
-
-

@@ -1,5 +1,3 @@
-import datetime
-
 import data_list
 from PyQt5.QtGui import QDoubleValidator, QIntValidator
 from PyQt5.QtWidgets import QMessageBox, QInputDialog, QLabel, QComboBox, QLineEdit, QGridLayout, QWidget, QPushButton
@@ -280,12 +278,13 @@ class TabPageSoRir(TabPageUnion):
             self.paker_depth_label.setVisible(False)
             self.paker_depth_edit.setVisible(False)
             try:
-                self.pressure_zumpf_question_label.setParent(None)
-                self.pressure_zumpf_question_combo.setParent(None)
+                self.pressure_zumpf_question_label.setVisible(False)
+                self.pressure_zumpf_question_combo.setVisible(False)
 
-                self.paker_depth_zumpf_label.setParent(None)
-                self.paker_depth_zumpf_edit.setParent(None)
-            except Exception:
+                self.paker_depth_zumpf_label.setVisible(False)
+                self.paker_depth_zumpf_edit.setVisible(False)
+            except Exception as e:
+                print(e)
                 pass
 
     def update_plast_edit(self):
@@ -304,7 +303,8 @@ class TabPageSoRir(TabPageUnion):
                             roof_plast = dict_perforation[plast]['кровля']
                         if sole_plast <= dict_perforation[plast]['подошва']:
                             sole_plast = dict_perforation[plast]['подошва']
-                    except Exception:
+                    except Exception as e:
+                        print(e)
                         pass
 
             if len(self.data_well.dict_leakiness):
@@ -538,8 +538,7 @@ class RirWindow(WindowUnion):
              'мастер КРС', 0.67]]
         work_list.extend(ozc_list)
         if need_change_zgs_combo == "Да":
-            for row in ChangeFluidWindow.fluid_change(self, plast_new_combo, fluid_new_edit,
-                                                        pressure_new_edit):
+            for row in ChangeFluidWindow.fluid_change(self, plast_new_combo, fluid_new_edit, pressure_new_edit):
                 work_list.append(row)
             work_list.append([
                 None, None,
@@ -828,8 +827,7 @@ class RirWindow(WindowUnion):
                 uzm_pero_list.pop(-1)
 
         if need_change_zgs_combo == "Да":
-            for row in ChangeFluidWindow.fluid_change(self, plast_new_combo, fluid_new_edit,
-                                                        pressure_new_edit):
+            for row in ChangeFluidWindow.fluid_change(self, plast_new_combo, fluid_new_edit, pressure_new_edit):
                 uzm_pero_list.append(row)
             uzm_pero_list.append([
                 None, None,
@@ -855,7 +853,7 @@ class RirWindow(WindowUnion):
                       roof_rir_edit, sole_rir_edit, volume_cement, need_change_zgs_combo='Нет', plast_new_combo='',
                       fluid_new_edit='', pressure_new_edit='', pressure_zumpf_question='Не нужно',
                       diameter_paker=122, paker_khost=0, paker_depth=0):
-        from .claySolution import ClayWindow
+        from work_py.claySolution import ClayWindow
 
         nkt_diam = ''.join(['73' if self.data_well.column_diameter.get_value > 110 else '60'])
 
@@ -1020,7 +1018,7 @@ class RirWindow(WindowUnion):
                 f'{self.data_well.fluid_work} в объеме '
                 f'{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии',
                 None,
-                f"В интервале {roof_rir_edit}-30м заполнить ствол скважины тех. жидкостью уд.в. 1,18г\см3 в объеме "
+                f"В интервале {roof_rir_edit} - 30м заполнить ствол скважины тех. жидкостью уд.в. 1,18г\см3 в объеме "
                 f"{well_volume(self, roof_rir_edit)}м3, обработанным ингибитором коррозии "
                 f"{well_volume(self, roof_rir_edit) * 11}гр с удельной дозировкой 11гр/м3 ",
                 None, None, None, None, None, None, None,
@@ -1034,8 +1032,7 @@ class RirWindow(WindowUnion):
         self.calculate_chemistry('цемент', volume_cement)
 
         if need_change_zgs_combo == "Да":
-            for row in ChangeFluidWindow.fluid_change(self, plast_new_combo, fluid_new_edit,
-                                                        pressure_new_edit):
+            for row in ChangeFluidWindow.fluid_change(self, plast_new_combo, fluid_new_edit, pressure_new_edit):
                 rir_list.append(row)
 
         rir_list.append(
@@ -1066,9 +1063,7 @@ class RirWindow(WindowUnion):
 
     def need_paker(self, paker_need_combo, plast_combo, diameter_paker, paker_khost,
                    paker_depth, pressure_zumpf_question, rir_rpk_plast_true=False):
-
         from work_py.opressovka import OpressovkaEK
-
 
         if paker_need_combo == 'Нужно СПО':
             try:
@@ -1076,7 +1071,8 @@ class RirWindow(WindowUnion):
                 if paker_depth_zumpf + paker_khost > self.data_well.current_bottom:
                     QMessageBox.warning(self, 'Ошибка', 'компоновка ниже текущего забоя')
                     return
-            except Exception:
+            except Exception as e:
+                print(e)
                 paker_depth_zumpf = 0
 
             rir_list = OpressovkaEK.paker_list(self, diameter_paker, paker_khost, paker_depth,
@@ -1260,7 +1256,6 @@ class RirWindow(WindowUnion):
                 if mes == QMessageBox.StandardButton.No:
                     return
 
-
             pressure_zumpf_question = current_widget.pressure_zumpf_question_combo.currentText()
             need_change_zgs_combo = current_widget.need_change_zgs_combo.currentText()
             volume_cement = current_widget.cement_volume_line.text().replace(',', '.')
@@ -1272,7 +1267,7 @@ class RirWindow(WindowUnion):
                 plast_new_combo = current_widget.plast_new_combo.text()
             fluid_new_edit = current_widget.fluid_new_edit.text().replace(',', '.')
             pressure_new_edit = current_widget.pressure_new_edit.text()
-        except Exception as e :
+        except Exception as e:
             QMessageBox.warning(self, 'ОШИБКА', f'Введены не все данные {e}')
 
         self.ozc_str_short, self.ozc_str, self.time_ozc = WindowUnion.calculate_time_ozc(roof_rir_edit)
@@ -1290,11 +1285,11 @@ class RirWindow(WindowUnion):
                 return
             if pressure_zumpf_question == 'Да':
                 if paker_depth + paker_khost > self.data_well.current_bottom:
-                    mes = QMessageBox.critical(self, 'Ошибка', 'Компоновка ниже текущего забоя')
+                    QMessageBox.critical(self, 'Ошибка', 'Компоновка ниже текущего забоя')
                     return
             if paker_depth + paker_khost > self.data_well.current_bottom:
-                    mes = QMessageBox.critical(self, 'Ошибка', 'Компоновка ниже текущего забоя')
-                    return
+                QMessageBox.critical(self, 'Ошибка', 'Компоновка ниже текущего забоя')
+                return
 
         else:
             diameter_paker = 122
@@ -1304,7 +1299,7 @@ class RirWindow(WindowUnion):
         if self.rir_type_combo == 'РИР на пере':  # ['РИР на пере', 'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП']
             if (plast_new_combo == '' or fluid_new_edit == '' or pressure_new_edit == '') and \
                     need_change_zgs_combo == 'Да':
-                mes = QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
+                QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
                 return
 
             work_list = self.rir_with_pero(paker_need_combo, plast_combo,
@@ -1336,8 +1331,8 @@ class RirWindow(WindowUnion):
             if "Ойл" in data_list.contractor:
                 mes = False
                 if self.data_well.column_additional is False or \
-                    (self.data_well.column_additional and
-                     self.data_well.head_column_additional.get_value > self.data_well.current_bottom):
+                        (self.data_well.column_additional and
+                         self.data_well.head_column_additional.get_value > self.data_well.current_bottom):
                     if self.data_well.template_depth < sole_rir_edit:
                         mes = True
 

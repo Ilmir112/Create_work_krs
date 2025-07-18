@@ -382,7 +382,8 @@ class TabPageSoWith(TabPageUnion):
                     self.dictance_template_second_edit.setText('1')
                     dictance_template_second = self.dictance_template_second_edit.text()
                 # if dictance_template_second is not None:
-                template_str = f'перо {kot_str}+ {skm_type}-{skm} {valve}+ НКТ{nkt_diam}мм {dictance_template_second:.0f}м ' \
+                template_str = f'перо {kot_str} + {skm_type}-{skm} {valve}+ НКТ{nkt_diam}мм ' \
+                               f'{dictance_template_second:.0f}м ' \
                                f' + шаблон-{template_second}мм L-{length_template_second}м '
                 self.template_depth = math.ceil(current_bottom - int(dictance_template_second))
                 self.data_well.skm_depth = self.template_depth + int(dictance_template_second)
@@ -394,7 +395,7 @@ class TabPageSoWith(TabPageUnion):
                 # if dictance_template_second is not None:
                 self.template_first_edit.setText('фильтр направление')
                 template_str = f'фильтр-направление L {length_template_first}м {kot_str} + НКТ{nkt_diam}мм ' \
-                               f'{dictance_template_first:.0f}м ' \
+                               f'{dictance_template_first}м ' \
                                f'+ {skm_type}-{skm} {valve}+  НКТ{nkt_diam}мм {dictance_template_second:.0f}м + ' \
                                f'шаблон-{template_second}мм L-{length_template_second}м '
                 self.template_depth = int(current_bottom - int(dictance_template_first) -

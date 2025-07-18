@@ -13,7 +13,6 @@ from openpyxl.utils.cell import range_boundaries, get_column_letter
 from openpyxl.workbook import Workbook
 from openpyxl_image_loader import SheetImageLoader
 
-
 from work_py.data_informations import dict_data_cdng
 
 from decrypt import decrypt
@@ -248,7 +247,6 @@ class FindIndexPZ(MyMainWindow):
             self.read_pz()
         else:
             self.read_pz_prs()
-
 
     def calculate_max_expected_pressure(self):
         max_expected_pressure_list = []
@@ -1571,6 +1569,11 @@ class WellHistoryData(FindIndexPZ):
                     if "Начало бурения" in str(value):
                         # self.date_drilling_run = row[col + 2]
                         self.date_drilling_run = row[col + 2]
+                        if type(self.date_drilling_run) != datetime:
+                            QMessageBox.warning(self,
+                                                "Ошибка",
+                                                f"Не корректный формат даты окончания бурения {self.date_drilling_run}")
+                            break
 
                     elif "Конец бурения" in str(value):
                         self.date_drilling_cancel = row[col + 1]
@@ -1581,6 +1584,12 @@ class WellHistoryData(FindIndexPZ):
                             col + 1,
                             1,
                         )
+                        if type(self.date_drilling_cancel) != datetime:
+                            QMessageBox.warning(self,
+                                                "Ошибка",
+                                                f"Не корректный формат даты окончания бурения "
+                                                f"{self.date_drilling_cancel}")
+                            break
                     elif "Дата ввода в экспл" in str(value):
                         self.date_commissioning = ProtectedIsNonNone(row[col + 2])
                         if type(self.date_commissioning.get_value) is datetime:
@@ -2490,8 +2499,6 @@ class WellData(FindIndexPZ):
         except Exception as e:
             QMessageBox.warning(self, "Ошибка", f"Ошибка в расчетах {e}")
 
-
-
         if self.work_plan in ["krs", "prs"]:
             from data_base.config_base import connection_to_database
             from data_base.config_base import WorkDatabaseWell
@@ -2927,7 +2934,7 @@ class WellPerforation(FindIndexPZ):
                                 plast, {}
                             ).setdefault("отключение", True)
                     else:
-                        asdef = row[col_close_index], type(row[col_close_index])
+
                         if isinstance(row[col_close_index], datetime) or "/" not in str(
                                 row[col_close_index]
                         ):
