@@ -94,7 +94,7 @@ class GeophysicWindow(WindowUnion):
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа
-        data_list.operation_window  = None
+        data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
     def add_row_table(self):
@@ -104,7 +104,8 @@ class GeophysicWindow(WindowUnion):
         researchGis = self.geophysicalSelect(str(self.tab_widget.currentWidget().ComboBoxGeophygist.currentText()))
 
         if self.data_well.column_additional is False or \
-            (self.data_well.column_additional and self.data_well.current_bottom > self.data_well.head_column_additional.get_value):
+                (
+                        self.data_well.column_additional and self.data_well.current_bottom > self.data_well.head_column_additional.get_value):
             if float(edit_type) > self.data_well.shoe_column.get_value:
                 QMessageBox.information(self, 'Внимание', 'глубина исследований ниже башмака колонны')
                 return
@@ -190,6 +191,7 @@ class GeophysicWindow(WindowUnion):
             research_short = f'ГК и ЛМ в интервале {edit_type}-{edit_type2}м.'
 
         return research, research_short
+
     def check_if_none_gis(self, value):
 
         if isinstance(value, int) or isinstance(value, float):
@@ -206,7 +208,7 @@ class GeophysicWindow(WindowUnion):
         rows = self.tableWidget.rowCount()
         cable_type_text = ''
         angle_text = ''
-        
+
         if self.data_well.angle_data:
             if self.data_well.max_angle.get_value > 45:
                 max_depth_pvr = max([float(self.tableWidget.item(row, 2).text()) for row in range(rows)])
@@ -216,7 +218,7 @@ class GeophysicWindow(WindowUnion):
                     if float(tuple_angle[0]) <= max_depth_pvr:
                         cable_type_text = ' СОГЛАСОВАТЬ ЖЕСТКИЙ КАБЕЛЬ'
                         angle_text = tuple_angle[2]
-        
+
         geophysical_research = [
             [" ", None,
              f'Вызвать геофизическую партию{cable_type_text}. Заявку оформить за 16 часов сутки через '
@@ -232,7 +234,8 @@ class GeophysicWindow(WindowUnion):
              f'главным инженером {data_list.contractor} '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. Опрессовать  плашки  ПВО '
              f'(на допустимое давление опрессовки ЭК, но '
-             f'не ниже максимального ожидаемого давления на устье) {self.data_well.max_admissible_pressure.get_value}атм, '
+             f'не ниже максимального ожидаемого давления на устье) '
+             f'{self.data_well.max_admissible_pressure.get_value}атм, '
              f'по невозможности на давление поглощения, но '
              f'не менее 30атм в течении 30мин (ОПРЕССОВКУ ПВО ЗАФИКСИРОВАТЬ В ВАХТОВОМ ЖУРНАЛЕ). \n {angle_text}',
              None, None, None, None, None, None, None,
@@ -249,9 +252,8 @@ class GeophysicWindow(WindowUnion):
                 edit1_1 = edit1.text()
                 edit2_1 = edit2.text()
                 geo_sel = self.geophysic_sel(value, edit1_1, edit2_1)
-                # print(f'геофои {geo_sel}')
                 research_gis_list.extend([geo_sel[1], None, geo_sel[0], None, None, None, None, None, None, None,
-                                         'подряд по ГИС', 4])
+                                          'подряд по ГИС', 4])
 
             if len(research_gis_list) == 0:
                 QMessageBox.critical(self, 'Ошибка', 'Исследования не добавлены')
@@ -262,10 +264,11 @@ class GeophysicWindow(WindowUnion):
 
         ori = QMessageBox.question(self, 'ОРИ', 'Нужна ли интерпретация?')
         if ori == QMessageBox.StandardButton.Yes:
-            geophysical_research.append([f'ОРИ', None,
-                                        f'Интерпретация данных ГИС, согласовать с ПТО и Ведущим инженером ЦДНГ опрессовку фНКТ ',
-                                        None, None, None, None, None, None, None,
-                                        'Мастер КРС, подрядчик по ГИС', 8])
+            geophysical_research.append(
+                [f'ОРИ', None,
+                 f'Интерпретация данных ГИС, согласовать с ПТО и Ведущим инженером ЦДНГ опрессовку фНКТ ',
+                 None, None, None, None, None, None, None,
+                 'Мастер КРС, подрядчик по ГИС', 8])
 
         if geophysical_research:
             self.populate_row(self.insert_index, geophysical_research, self.table_widget)

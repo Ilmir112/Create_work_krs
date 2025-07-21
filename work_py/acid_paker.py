@@ -14,6 +14,7 @@ from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm
 from work_py.swabbing import SwabWindow
 
 
+
 class CheckableComboBox(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1156,8 +1157,10 @@ class AcidPakerWindow(WindowUnion):
              'мастер КРС', None]]
 
         if self.need_privyazka_q_combo == 'Да' and self.paker_layout_combo in ['двухпакерная']:
-            if self.privyazka_nkt()[0] not in paker_list:
-                paker_list.insert(1, self.privyazka_nkt()[0])
+            if self.privyazka_nkt()[-1] not in paker_list:
+                for row in self.privyazka_nkt()[::-1]:
+                    paker_list.insert(1, row)
+
         if self.depth_gauge_combo == 'Да':
             paker_list.insert(0, [f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС', None,
                                   f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС',
@@ -1300,8 +1303,9 @@ class AcidPakerWindow(WindowUnion):
                  'мастер КРС', None]]
 
         if self.need_privyazka_q_combo == 'Да' and self.paker_layout_combo in ['однопакерная', 'пакер с заглушкой']:
-            if self.privyazka_nkt()[0] not in paker_list:
-                paker_list.insert(1, self.privyazka_nkt()[0])
+            if self.privyazka_nkt()[-1] not in paker_list:
+                for row in self.privyazka_nkt()[::-1]:
+                    paker_list.insert(1, row)
 
         if self.depth_gauge_combo == 'Да':
             paker_list.insert(0, [f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС', None,
@@ -1374,8 +1378,9 @@ class AcidPakerWindow(WindowUnion):
             for interval in self.data_well.dict_perforation[plast]['интервал']:
                 if abs(float(interval[1] - float(self.data_well.depth_fond_paker_before["after"]))) < 10 or abs(
                         float(interval[0] - float(self.data_well.depth_fond_paker_before["after"]))) < 10:
-                    if self.privyazka_nkt()[0] not in paker_list:
-                        paker_list.insert(1, self.privyazka_nkt()[0])
+                    if self.privyazka_nkt()[-1] not in paker_list:
+                        for row in self.privyazka_nkt()[::-1]:
+                            paker_list.insert(1, row)
         if self.depth_gauge_combo == 'Да':
             paker_list.insert(0, [f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС', None,
                                   f'Заявить {self.mtg_count} глубинных манометра подрядчику по ГИС',

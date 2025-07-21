@@ -1851,6 +1851,17 @@ class WindowUnion(MyMainWindow):
         if tuple_angle:
             return tuple_angle
 
+    @staticmethod
+    def calculate_angle_grad(angle_data):
+        angle_list = [45, 55]
+        angle_text = 'Установить в компоновке реперный патрубок на глубинах:\n '
+        for need_angle in angle_list:
+            for depth, angle, _ in angle_data[::-1]:
+                if float(angle) > float(need_angle):
+                    angle_text += f'{depth}м (Зенитный угол равен {angle}гр)\n'
+                    break
+        return angle_text[:-2]
+
     def calc_work_fluid(self, fluid_work_insert):
 
         self.data_well.fluid_short = fluid_work_insert

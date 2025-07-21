@@ -375,7 +375,7 @@ class FindIndexPZ(MyMainWindow):
                     [
                         "эксплуатационные горизонты и интервалы перфорации"
                         in str(col).lower()
-                        for col in row
+                        for col in row[:10]
                     ]
             ):
                 self.data_pvr_min = ProtectedIsDigit(row_ind)
@@ -1933,7 +1933,7 @@ class WellName(FindIndexPZ):
                     elif "инв. №" in str(value).lower():
                         self.inventory_number = ProtectedIsNonNone(row[col + 1])
                         # self.inventory_number = ProtectedIsNonNone(row[col + 1])
-                    elif "цех" in str(value):
+                    elif "цех" in str(value) and self.cdng.get_value == '':
                         self.cdng = ProtectedIsDigit(row[col + 1])
                         # self.cdng = ProtectedIsDigit(row[col + 1])
                     elif "назначение" in str(value):

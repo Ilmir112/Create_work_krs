@@ -270,6 +270,11 @@ class TabPageSoRir(TabPageUnion):
             self.paker_khost_edit.setVisible(True)
             self.paker_depth_label.setVisible(True)
             self.paker_depth_edit.setVisible(True)
+            self.pressure_zumpf_question_label.setVisible(True)
+            self.pressure_zumpf_question_combo.setVisible(True)
+
+            self.paker_depth_zumpf_label.setVisible(True)
+            self.paker_depth_zumpf_edit.setVisible(True)
         else:
             self.diameter_paker_label_type.setVisible(False)
             self.diameter_paker_edit.setVisible(False)

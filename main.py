@@ -55,7 +55,7 @@ from PyQt5.QtCore import QThread, pyqtSlot, Qt, QObject, pyqtSignal, QTimer
 from PyQt5.QtGui import QPixmap
 
 from work_py.rationingKRS import lifting_nkt_norm, descentNKT_norm
-
+from work_py.data_informations import dict_data_cdng
 
 class UncaughtExceptions(QObject):
     _exception_caught = pyqtSignal(object)
@@ -962,6 +962,8 @@ class MyMainWindow(QMainWindow):
             self.data_well.cat_well_max.get_value,
             self.data_well.data_pvr_min.get_value,
         )
+        if self.data_well.cdng.get_value not in dict_data_cdng:
+            return
 
         self.data_well.region = region_select(self.data_well.cdng.get_value)
 
@@ -980,7 +982,6 @@ class MyMainWindow(QMainWindow):
                 0,
                 False,
             )
-
 
             db = connection_to_database(decrypt("DB_WELL_DATA"))
             data_well_base = WorkDatabaseWell(db, self.data_well)
@@ -1328,13 +1329,33 @@ class MyMainWindow(QMainWindow):
             return self.data_well.expected_pressure
 
     def privyazka_nkt(self):
-        priv_list = [
+        angle_text = ''
+        priv_list = []
+        if self.data_well.angle_data and self.data_well.max_angle.get_value > 60:
+            angle_text = self.calculate_angle_grad(self.data_well.angle_data)
+            priv_list = [
+                [
+                    None,
+                    None,
+                    angle_text,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    None,
+                    "Мастер КРС",
+                    None,
+                ]]
+
+        priv_list.append(
             [
                 f"ГИС Привязка по ГК и ЛМ",
                 None,
                 f"Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через РИТС "
                 f'{data_list.contractor}". '
-                f"Произвести  монтаж ПАРТИИ ГИС согласно схемы  №11 утвержденной главным инженером "
+                f"Произвести  монтаж ПАРТИИ ГИС согласно схемы №11 утвержденной главным инженером "
                 f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                 f"ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины",
                 None,
@@ -1347,7 +1368,7 @@ class MyMainWindow(QMainWindow):
                 "Мастер КРС, подрядчик по ГИС",
                 4,
             ]
-        ]
+        )
         return priv_list
 
     def open_read_excel_file_pz(self):
@@ -5187,7 +5208,6 @@ class SaveInExcel(MyWindow):
                 podpis_dict[data_list.costumer][region]["grr"]["surname"],
             )
         return False
-
 
 
 def show_splash_screen():

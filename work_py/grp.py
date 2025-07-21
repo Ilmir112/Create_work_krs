@@ -149,7 +149,7 @@ class GrpWindow(WindowUnion):
         if int(paker_khost) + int(paker_depth) > self.data_well.current_bottom:
             QMessageBox.warning(self, 'Некорректные данные', f'Компоновка НКТ c хвостовик + пакер ниже текущего забоя')
             return
-        work_list = self.grpPaker(diameter_paker, paker_depth, paker_khost,
+        work_list = self.grp_paker(diameter_paker, paker_depth, paker_khost,
                                   gis_otz_true_quest, gis_otz_after_true_quest,
                                   normalization_true_quest, current_depth)
 
@@ -191,7 +191,7 @@ class GrpWindow(WindowUnion):
                           f' L-{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
         return paker_select, paker_short
 
-    def grpPaker(self, diameter_paker, paker_depth, paker_khost, gis_otz_true_quest, gis_otz_after_true_quest,
+    def grp_paker(self, diameter_paker, paker_depth, paker_khost, gis_otz_true_quest, gis_otz_after_true_quest,
                  normalization_true_quest, current_depth):
         if 'Ойл' in data_list.contractor:
             schema_grp = '5'
@@ -204,6 +204,12 @@ class GrpWindow(WindowUnion):
             nkt_diam = 73
         else:
             nkt_diam = 60
+
+        angle_text = ''
+        if self.data_well.angle_data:
+            if self.data_well.max_angle.get_value > 60:
+                angle_text = self.calculate_angle_grad(self.data_well.angle_data)
+                
 
         paker_list = [
             [f'За 48 часов оформить заявку на завоз оборудования ГРП.', None,
@@ -218,7 +224,7 @@ class GrpWindow(WindowUnion):
              'мастер КРС', None],
             [f'СПО: {self.paker_select(paker_depth, paker_khost)[1]} на НКТ{nkt_diam}м на Н {paker_depth}м', None,
              f'Спустить компоновку с замером и шаблонированием НКТ: {self.paker_select(paker_depth, paker_khost)[0]} на '
-             f'НКТ{nkt_diam}м на глубину {paker_depth}м, с замером, шаблонированием НКТ. '
+             f'НКТ{nkt_diam}м на глубину {paker_depth}м, с замером, шаблонированием НКТ. \n{angle_text}'
              f'{"".join(["(Произвести пробную посадку на глубине 50м)" if self.data_well.column_additional is False else " "])}',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(paker_depth, 1.2)],

@@ -266,7 +266,8 @@ class OpressovkaEK(WindowUnion):
                  'мастер КРС', lifting_nkt_norm(paker_depth, 1.2)]]
 
         if self.need_privyazka_q_combo == "Да":
-            paker_list.insert(1, self.privyazka_nkt()[0])
+            for row in self.privyazka_nkt()[::-1]:
+                paker_list.insert(1, row)
 
         return paker_list
 
@@ -367,8 +368,8 @@ class OpressovkaEK(WindowUnion):
                      f'При герметичности колонны:  Допустить пакер до глубины {pakerNEK}м',
                      None, None, None, None, None, None, None,
                      'мастер КРС', descentNKT_norm(pakerNEK - paker_depth, 1.2)],
-                    [OpressovkaEK.testing_pressure(self, paker_depth)[1], None,
-                     OpressovkaEK.testing_pressure(self, paker_depth)[0],
+                    [OpressovkaEK.testing_pressure(self, pakerNEK)[1], None,
+                     OpressovkaEK.testing_pressure(self, pakerNEK)[0],
                      None, None, None, None, None, None, None,
                      'мастер КРС', 0.77],
                     [f'Насыщение 5м3. Определение Q при Р-{self.data_well.max_admissible_pressure.get_value}', None,
@@ -442,7 +443,7 @@ class OpressovkaEK(WindowUnion):
             paker_list.append(row)
 
         if self.need_privyazka_q_combo == "Да":
-            paker_list.insert(1, self.privyazka_nkt()[0])
+            paker_list.insert(1, self.privyazka_nkt()[-1])
 
         return paker_list
 

@@ -6,7 +6,6 @@ import data_list
 from work_py.parent_work import TabWidgetUnion, WindowUnion, TabPageUnion
 
 from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
-from work_py.grp import GrpWindow
 
 
 class TabPageSoGpp(TabPageUnion):
@@ -122,6 +121,11 @@ class GppWindow(WindowUnion):
 
         self.check_gpp_upa(self.table_widget)
 
+        angle_text = ''
+        if self.data_well.angle_data:
+            if self.data_well.max_angle.get_value > 60:
+                angle_text = self.calculate_angle_grad(self.data_well.angle_data)
+
         gpp_list = [
             ['За 48 часов оформить заявку на завоз оборудования ГРП.',
              None, f'За 48 часов оформить заявку на завоз оборудования ГРП. Уложить НКТ на дополнительные стеллажи',
@@ -137,7 +141,7 @@ class GppWindow(WindowUnion):
              f'Спустить компоновку с замером и шаблонированием НКТ: {self.gpp_select(gpp_depth)[0]} на НКТ{nkt_diam} '
              f'на '
              f'глубину {gpp_depth}м, с замером, шаблонированием НКТ. В компоновке предусмотреть пакер с установкой '
-             f'на глубине 300м для внештатных ситуаций во время ГРП',
+             f'на глубине 300м для внештатных ситуаций во время ГРП\n{angle_text}',
              None, None, None, None, None, None, None,
              'мастер КРС', descentNKT_norm(gpp_depth, 1.2)],
             [None, None, f'При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ) '
@@ -146,13 +150,6 @@ class GppWindow(WindowUnion):
                          f'телефонограммой и выйти в вынужденный простой.',
              None, None, None, None, None, None, None,
              'мастер КРС', ''],
-            [f'СПО: {self.gpp_select(gpp_depth)[0]} на НКТ{nkt_diam} на Н {gpp_depth}м', None,
-             f'Спустить компоновку с замером и шаблонированием НКТ: {self.gpp_select(gpp_depth)[0]} на НКТ{nkt_diam} '
-             f'на '
-             f'глубину {gpp_depth}м, с замером, шаблонированием НКТ. В компоновке предусмотреть пакер с установкой '
-             f'на глубине 300м для внештатных ситуаций во время ГРП',
-             None, None, None, None, None, None, None,
-             'мастер КРС', descentNKT_norm(gpp_depth, 1.2)],
             [f'Опрессовать эксплуатационную колонну и пакер на Р='
              f'{self.data_well.max_admissible_pressure.get_value}атм',
              None,
@@ -174,13 +171,13 @@ class GppWindow(WindowUnion):
             [f'Привязка по ГК и ЛМ',
              None, f'Вызвать геофизическую партию. Заявку оформить за 16 часов сутки через РИТС '
                    f'{data_list.contractor}". '
-                   f'Произвести  монтаж ПАРТИИ ГИС согласно схемы  №11 утвержденной главным инженером '
+                   f'Произвести  монтаж ПАРТИИ ГИС согласно схемы №11 утвержденной главным инженером '
                    f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. '
                    f'ЗАДАЧА 2.8.1 Привязка технологического оборудования скважины',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', 4],
-            [f'Установить ГПП  на гл. {gpp_depth}м', None,
-             f'Установить ГПП  на гл. {gpp_depth}м. В случае отсутствия представителя подрядчика по ГРП ltd '
+            [f'Установить ГПП  на гл.{gpp_depth}м', None,
+             f'Установить ГПП  на гл.{gpp_depth}м. В случае отсутствия представителя подрядчика по ГРП ltd '
              f'оповестить Заказчика письменной телефонограммой и выйти в вынужденный простой.',
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГРП', 1.2],

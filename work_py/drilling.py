@@ -512,7 +512,7 @@ class DrillWindow(WindowUnion):
              'мастер КРС', lifting_nkt_norm(self.data_well.current_bottom, 1.3)]
         ]
         if need_privyazka_q_combo == 'Да':
-            privyazka_nkt_list = self.privyazka_nkt()[0]
+            privyazka_nkt_list = self.privyazka_nkt()[-1]
 
             drilling_list_end.insert(-1, privyazka_nkt_list)
             drilling_list_end.insert(-1, [f'Удостоверится в наличии необходимого забоя', None,
