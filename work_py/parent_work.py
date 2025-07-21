@@ -738,9 +738,8 @@ class TabPageUnion(QWidget):
     def update_need_swab(self, index):
         self.swab_pakerLabel = QLabel("Глубина посадки нижнего пакера при освоении", self)
         self.swab_paker_depth = QLineEdit(self)
-        if self.question_need_paker_combo == 'Да':
-            if self.paker_depth_edit.text() != '':
-                self.swab_paker_depth.setText(str(float(self.paker_depth_edit.text()) - 50))
+        if self.paker_depth_edit.text() != '':
+            self.swab_paker_depth.setText(str(float(self.paker_depth_edit.text()) - 50))
 
         self.swab_type_label = QLabel("задача при освоении", self)
         self.swab_type_combo = QComboBox(self)
