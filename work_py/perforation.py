@@ -433,6 +433,8 @@ class PerforationWindow(WindowUnion):
             else:
                 shema_str = 'б'
         angle_text = ''
+        self.pressure_zumph_combo = 'Нет'
+        self.need_change_zgs_combo = 'Нет'
         if self.data_well.angle_data:
             if self.data_well.max_angle.get_value > 45:
                 max_depth_pvr = max([float(self.tableWidget.item(row, 1).text()) for row in range(rows)])

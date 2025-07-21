@@ -1541,6 +1541,7 @@ class SwabWindow(WindowUnion):
             schema_swab = '7'
         elif 'РН' in data_list.contractor:
             schema_swab = '7'
+
         if self.pressure_zumph_combo == "Да":
             paker_list = [
                 [
