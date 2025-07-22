@@ -699,26 +699,28 @@ class TabPageUnion(QWidget):
                 self.pressure_mode(expected_pressure, self.plast_combo.combo_box.currentText()))
 
     def update_skv_edit(self, index):
-        self.skv_acid_label_type = QLabel("Вид кислоты для СКВ", self)
-        self.skv_acid_edit = QComboBox(self)
-        self.skv_acid_edit.addItems(['HCl', 'HF'])
-        self.skv_acid_edit.setCurrentIndex(0)
-        self.skv_acid_edit.setProperty('value', 'HCl')
-        self.skv_volume_label = QLabel("Объем СКВ", self)
-        self.skv_volume_edit = QLineEdit(self)
-        self.skv_volume_edit.setText('1')
-        self.skv_volume_edit.setClearButtonEnabled(True)
-        self.skv_proc_label = QLabel("Концентрация СКВ", self)
-        self.skv_proc_edit = QLineEdit(self)
-        self.skv_proc_edit.setClearButtonEnabled(True)
-        self.skv_proc_edit.setText('12')
+        if self.check_combobox_in_layout(self.grid, "skv_acid") is False:
+            self.skv_acid_label_type = QLabel("Вид кислоты для СКВ", self)
+            self.skv_acid_edit = QComboBox(self)
+            self.skv_acid_edit.setObjectName("skv_acid")
+            self.skv_acid_edit.addItems(['HCl', 'HF'])
+            self.skv_acid_edit.setCurrentIndex(0)
+            self.skv_acid_edit.setProperty('value', 'HCl')
+            self.skv_volume_label = QLabel("Объем СКВ", self)
+            self.skv_volume_edit = QLineEdit(self)
+            self.skv_volume_edit.setText('1')
+            self.skv_volume_edit.setClearButtonEnabled(True)
+            self.skv_proc_label = QLabel("Концентрация СКВ", self)
+            self.skv_proc_edit = QLineEdit(self)
+            self.skv_proc_edit.setClearButtonEnabled(True)
+            self.skv_proc_edit.setText('12')
 
-        self.grid.addWidget(self.skv_acid_label_type, 4, 1)
-        self.grid.addWidget(self.skv_acid_edit, 5, 1)
-        self.grid.addWidget(self.skv_volume_label, 4, 2)
-        self.grid.addWidget(self.skv_volume_edit, 5, 2)
-        self.grid.addWidget(self.skv_proc_label, 4, 3)
-        self.grid.addWidget(self.skv_proc_edit, 5, 3)
+            self.grid.addWidget(self.skv_acid_label_type, 4, 1)
+            self.grid.addWidget(self.skv_acid_edit, 5, 1)
+            self.grid.addWidget(self.skv_volume_label, 4, 2)
+            self.grid.addWidget(self.skv_volume_edit, 5, 2)
+            self.grid.addWidget(self.skv_proc_label, 4, 3)
+            self.grid.addWidget(self.skv_proc_edit, 5, 3)
 
         if index == 'без СКВ':
             self.skv_acid_label_type.setVisible(False)
@@ -736,37 +738,39 @@ class TabPageUnion(QWidget):
             self.skv_proc_edit.setVisible(True)
 
     def update_need_swab(self, index):
-        self.swab_pakerLabel = QLabel("Глубина посадки нижнего пакера при освоении", self)
-        self.swab_paker_depth = QLineEdit(self)
-        if self.paker_depth_edit.text() != '':
-            self.swab_paker_depth.setText(str(float(self.paker_depth_edit.text()) - 50))
-
-        self.swab_type_label = QLabel("задача при освоении", self)
-        self.swab_type_combo = QComboBox(self)
-        self.swab_type_combo.addItems(['Задача №2.1.13', 'Задача №2.1.14', 'Задача №2.1.16', 'Задача №2.1.11',
-                                       'Задача №2.1.16 + герметичность пакера', 'ГРР', 'своя задача'])
-        self.swab_type_combo.setCurrentIndex(data_list.swab_type_comboIndex)
-
-        self.swab_volumeLabel = QLabel("объем освоения", self)
-        self.swab_volume_edit = QLineEdit(self)
-
-        self.grid.addWidget(self.swab_type_label, 12, 1)
-        self.grid.addWidget(self.swab_type_combo, 13, 1)
-        self.grid.addWidget(self.swab_pakerLabel, 12, 2)
-        self.grid.addWidget(self.swab_paker_depth, 13, 2)
-        self.grid.addWidget(self.swab_volumeLabel, 12, 3)
-        self.grid.addWidget(self.swab_volume_edit, 13, 3)
+        if self.check_combobox_in_layout(self.grid, "swab_paker") is False:
+            self.swab_paker_label = QLabel("Глубина посадки нижнего пакера при освоении", self)
+            self.swab_paker_depth = QLineEdit(self)
+            self.swab_paker_depth.setObjectName("swab_paker")
+            if self.paker_depth_edit.text() != '':
+                self.swab_paker_depth.setText(str(float(self.paker_depth_edit.text()) - 50))
+        
+            self.swab_type_label = QLabel("задача при освоении", self)
+            self.swab_type_combo = QComboBox(self)
+            self.swab_type_combo.addItems(['Задача №2.1.13', 'Задача №2.1.14', 'Задача №2.1.16', 'Задача №2.1.11',
+                                           'Задача №2.1.16 + герметичность пакера', 'ГРР', 'своя задача'])
+            self.swab_type_combo.setCurrentIndex(data_list.swab_type_comboIndex)
+        
+            self.swab_volumeLabel = QLabel("объем освоения", self)
+            self.swab_volume_edit = QLineEdit(self)
+        
+            self.grid.addWidget(self.swab_type_label, 12, 1)
+            self.grid.addWidget(self.swab_type_combo, 13, 1)
+            self.grid.addWidget(self.swab_paker_label, 12, 2)
+            self.grid.addWidget(self.swab_paker_depth, 13, 2)
+            self.grid.addWidget(self.swab_volumeLabel, 12, 3)
+            self.grid.addWidget(self.swab_volume_edit, 13, 3)
         if index == 'без освоения':
             self.swab_type_label.setVisible(False)
             self.swab_type_combo.setVisible(False)
-            self.swab_pakerLabel.setVisible(False)
+            self.swab_paker_label.setVisible(False)
             self.swab_paker_depth.setVisible(False)
             self.swab_volumeLabel.setVisible(False)
             self.swab_volume_edit.setVisible(False)
         else:
             self.swab_type_label.setVisible(True)
             self.swab_type_combo.setVisible(True)
-            self.swab_pakerLabel.setVisible(True)
+            self.swab_paker_label.setVisible(True)
             self.swab_paker_depth.setVisible(True)
             self.swab_volumeLabel.setVisible(True)
             self.swab_volume_edit.setVisible(True)

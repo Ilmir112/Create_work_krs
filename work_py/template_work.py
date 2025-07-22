@@ -383,7 +383,7 @@ class TabPageSoWith(TabPageUnion):
                     dictance_template_second = self.dictance_template_second_edit.text()
                 # if dictance_template_second is not None:
                 template_str = f'перо {kot_str} + {skm_type}-{skm} {valve}+ НКТ{nkt_diam}мм ' \
-                               f'{dictance_template_second:.0f}м ' \
+                               f'{dictance_template_second}м ' \
                                f' + шаблон-{template_second}мм L-{length_template_second}м '
                 self.template_depth = math.ceil(current_bottom - int(dictance_template_second))
                 self.data_well.skm_depth = self.template_depth + int(dictance_template_second)
@@ -396,7 +396,7 @@ class TabPageSoWith(TabPageUnion):
                 self.template_first_edit.setText('фильтр направление')
                 template_str = f'фильтр-направление L {length_template_first}м {kot_str} + НКТ{nkt_diam}мм ' \
                                f'{dictance_template_first}м ' \
-                               f'+ {skm_type}-{skm} {valve}+  НКТ{nkt_diam}мм {dictance_template_second:.0f}м + ' \
+                               f'+ {skm_type}-{skm} {valve}+  НКТ{nkt_diam}мм {dictance_template_second}м + ' \
                                f'шаблон-{template_second}мм L-{length_template_second}м '
                 self.template_depth = int(current_bottom - int(dictance_template_first) -
                                                     int(dictance_template_second) - int(length_template_first))
@@ -410,7 +410,7 @@ class TabPageSoWith(TabPageUnion):
                     template_str = f'обточная муфта {kot_str} + ' \
                                    f'НКТ{nkt_pod}  + {dictance_template_first:.0f}м + шаблон-{first_template}мм ' \
                                    f'L-{length_template_first}м + ' \
-                                   f'НКТ{nkt_pod} {dictance_template_second:.0f}м + НКТ{nkt_diam} {dictance_three}м + ' \
+                                   f'НКТ{nkt_pod} {dictance_template_second}м + НКТ{nkt_diam} {dictance_three}м + ' \
                                    f'{skm_type}-{skm} {valve}+ шаблон-{template_second}мм L-{length_template_second}м '
 
                     self.template_depth_addition = current_bottom - int(dictance_template_first)
@@ -430,7 +430,7 @@ class TabPageSoWith(TabPageUnion):
                         length_template_first != '' and first_template != '' and template_second != '' \
                         and length_template_second != '':
                     template_str = f'обточная муфта {kot_str}+ НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
-                                   f'+ {skm_type}-{skm} {valve}+ НКТ{nkt_pod} {dictance_template_second:.0f}м  +' \
+                                   f'+ {skm_type}-{skm} {valve}+ НКТ{nkt_pod} {dictance_template_second}м  +' \
                                    f' шаблон-{first_template}мм ' \
                                    f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_three}м + ' \
                                    f'шаблон-{template_second}мм L-{length_template_second}м '
@@ -454,7 +454,7 @@ class TabPageSoWith(TabPageUnion):
                 if dictance_three != '' and dictance_template_second != '' and dictance_template_first != '' and \
                         length_template_first != '' and first_template != '' and template_second != '' \
                         and length_template_second != '':
-                    template_str = f'обточная муфта {kot_str} + {skm_type}-{skm} {valve}+ НКТ{nkt_pod} {dictance_template_second:.0f} + ' \
+                    template_str = f'обточная муфта {kot_str} + {skm_type}-{skm} {valve}+ НКТ{nkt_pod} {dictance_template_second} + ' \
                                    f' шаблон-{first_template}мм L-{length_template_first}м + ' \
                                    f'НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
                                    f'L-{length_template_second}м '
@@ -475,7 +475,7 @@ class TabPageSoWith(TabPageUnion):
                         length_template_first != '' and first_template != '' and template_second != '' \
                         and length_template_second != '':
                     template_str = f'фильтр направление L-2м {kot_str} + НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
-                                   f'+ {skm_type}-{skm} {valve}+ НКТ{nkt_pod} {dictance_template_second:.0f}м + ' \
+                                   f'+ {skm_type}-{skm} {valve}+ НКТ{nkt_pod} {dictance_template_second}м + ' \
                                    f' шаблон-{first_template}мм ' \
                                    f'L-{length_template_first}м' \
                                    f' + НКТ{nkt_pod} {dictance_three}м + шаблон-{template_second}мм ' \
@@ -572,7 +572,7 @@ class TabPageSoWith(TabPageUnion):
                 template_str = f'перо {kot_str} + шаблон-{first_template}мм L-{length_template_first}м + ' \
                                f'НКТ{nkt_diam}мм ' \
                                f'{dictance_template_first:.0f}м + {skm_type}-{skm} {valve}+ ' \
-                               f'НКТ{nkt_diam}мм {dictance_template_second:.0f}м  +  шаблон-{template_second}мм ' \
+                               f'НКТ{nkt_diam}мм {dictance_template_second}м  +  шаблон-{template_second}мм ' \
                                f'L-{length_template_second}м '
 
                 # print(f'строка шаблона {template_str}')
@@ -593,7 +593,7 @@ class TabPageSoWith(TabPageUnion):
 
 
             elif index == 'ПСШ без хвоста':
-                template_str = f'перо {kot_str} + {skm_type}-{skm} {valve}+ {dictance_template_second:.0f}м ' \
+                template_str = f'перо {kot_str} + {skm_type}-{skm} {valve}+ {dictance_template_second}м ' \
                                f'НКТ{nkt_diam}м + шаблон-{template_second}мм L-{length_template_second}м '
                 self.template_depth = math.ceil(current_bottom - int(dictance_template_second))
                 self.data_well.skm_depth = current_bottom
@@ -612,7 +612,7 @@ class TabPageSoWith(TabPageUnion):
                 dictance_template_second = int(float(self.dictance_template_second_edit.text()))
 
                 template_str = f'фильтр-направление {kot_str} + НКТ{nkt_diam}мм {dictance_template_first:.0f}м ' \
-                               f'+ {skm_type}-{skm} {valve}+ {dictance_template_second:.0f}м НКТ{nkt_diam}мм + ' \
+                               f'+ {skm_type}-{skm} {valve}+ {dictance_template_second}м НКТ{nkt_diam}мм + ' \
                                f'шаблон-{template_second}мм L-{length_template_second}м '
                 self.template_depth = int(float(
                     current_bottom - dictance_template_first - dictance_template_second))
@@ -651,7 +651,7 @@ class TabPageSoWith(TabPageUnion):
                 template_str = f'обточная муфта {kot_str} + ' \
                                f'НКТ{nkt_pod} + {dictance_template_first:.0f}м + шаблон-{first_template}мм ' \
                                f'L-{length_template_first}м + ' \
-                               f'НКТ{nkt_pod} {dictance_template_second:.0f}м +' \
+                               f'НКТ{nkt_pod} {dictance_template_second}м +' \
                                f'{skm_type}-{skm} {valve}+ НКТ{nkt_diam} {dictance_template_three}м + ' \
                                f' шаблон-{template_second}мм L-{length_template_second}м '
 
@@ -691,7 +691,7 @@ class TabPageSoWith(TabPageUnion):
                 self.dictance_three_edit.setText(str(dictance_template_three))
 
                 template_str = f'обточная муфта {kot_str} + НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
-                               f'+ {skm_type}-{skm} {valve}+ НКТ{nkt_pod} {dictance_template_second:.0f}м + шаблон-{first_template}мм ' \
+                               f'+ {skm_type}-{skm} {valve}+ НКТ{nkt_pod} {dictance_template_second}м + шаблон-{first_template}мм ' \
                                f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_template_three}м + ' \
                                f'шаблон-{template_second}мм L-{length_template_second}м '
 
@@ -737,7 +737,7 @@ class TabPageSoWith(TabPageUnion):
 
                 self.dictance_three_edit.setText(str(dictance_template_three))
 
-                template_str = f'обточная муфта {kot_str} + {skm_type}-{skm} {valve}+ НКТ{nkt_pod} {dictance_template_second:.0f} + ' \
+                template_str = f'обточная муфта {kot_str} + {skm_type}-{skm} {valve}+ НКТ{nkt_pod} {dictance_template_second} + ' \
                                f'шаблон-{first_template}мм L-{length_template_first}м + ' \
                                f'НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
                                f'L-{length_template_second}м '
@@ -774,7 +774,7 @@ class TabPageSoWith(TabPageUnion):
                 self.dictance_three_edit.setText(str(dictance_template_three))
 
                 template_str = f'фильтр направление L-2м {kot_str} + НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
-                               f'+ {skm_type}-{skm} {valve}+ НКТ{nkt_pod} {dictance_template_second:.0f}м + ' \
+                               f'+ {skm_type}-{skm} {valve}+ НКТ{nkt_pod} {dictance_template_second}м + ' \
                                f'шаблон-{first_template}мм ' \
                                f'L-{length_template_first}м' \
                                f' + НКТ{nkt_pod} {dictance_template_three}м + шаблон-{template_second}мм ' \
@@ -823,7 +823,7 @@ class TabPageSoWith(TabPageUnion):
                     template_str = f'перо {kot_str} + шаблон-{first_template}мм L-{length_template_first}м + ' \
                                    f'НКТ{nkt_diam}мм ' \
                                    f'{dictance_template_first:.0f}м + {skm_type}-{skm} {valve}+ ' \
-                                   f'НКТ{nkt_diam}мм {dictance_template_second:.0f}м + шаблон-{template_second}мм ' \
+                                   f'НКТ{nkt_diam}мм {dictance_template_second}м + шаблон-{template_second}мм ' \
                                    f'L-{length_template_second}м + НКТ{nkt_diam}мм L-{20}м + пакер ПРОЯМО-{diameter_paker}'
 
                     # print(f'строка шаблона {template_str}')

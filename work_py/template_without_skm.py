@@ -295,7 +295,7 @@ class TabPageSo(TabPageUnion):
                 if dictance_template_second is not None:
                     template_str = f'обточная муфта + {kot_str} НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
                                    f'+ шаблон-{first_template}мм ' \
-                                   f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_template_second:.0f}м + ' \
+                                   f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_template_second}м + ' \
                                    f'шаблон-{template_second}мм L-{length_template_second}м '
 
                     self.template_depth = math.ceil(self.data_well.current_bottom - 2 -
@@ -314,7 +314,7 @@ class TabPageSo(TabPageUnion):
 
                 template_str = f'обточная муфта {kot_str} + ' \
                                f'шаблон-{first_template}мм L-{length_template_first}м + ' \
-                               f'НКТ{nkt_pod} {dictance_template_second:.0f}м + шаблон-{template_second}мм ' \
+                               f'НКТ{nkt_pod} {dictance_template_second}м + шаблон-{template_second}мм ' \
                                f'L-{length_template_second}м '
 
                 self.template_depth = math.ceil(
@@ -484,7 +484,7 @@ class TabPageSo(TabPageUnion):
 
             template_str = f'обточная муфта {kot_str} + НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
                            f' {valve}+ шаблон-{first_template}мм ' \
-                           f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_template_second:.0f}м + ' \
+                           f'L-{length_template_first}м + НКТ{nkt_pod} {dictance_template_second}м + ' \
                            f'шаблон-{template_second}мм L-{length_template_second}м '
             self.template_depth = math.ceil(
                 roof_add_column_plast - 5 - length_template_first - dictance_template_second)
@@ -514,7 +514,7 @@ class TabPageSo(TabPageUnion):
             dictance_template_second = int(self.dictance_template_second_edit.text())
 
             template_str = f'обточная муфта {kot_str} + шаблон-{first_template}мм L-{length_template_first}м {valve}+ ' \
-                           f'НКТ{nkt_pod} {dictance_template_second:.0f}м + шаблон-{template_second}мм ' \
+                           f'НКТ{nkt_pod} {dictance_template_second}м + шаблон-{template_second}мм ' \
                            f'L-{length_template_second}м '
 
             self.template_depth = math.ceil(
@@ -548,7 +548,7 @@ class TabPageSo(TabPageUnion):
 
             template_str = f'фильтр направление {kot_str}+ НКТ{nkt_pod} {dictance_template_first:.0f}м ' \
                            f' {valve}+ шаблон-{first_template}мм L-{length_template_first}м' \
-                           f' + НКТ{nkt_pod} {dictance_template_second:.0f}м + шаблон-{template_second}мм ' \
+                           f' + НКТ{nkt_pod} {dictance_template_second}м + шаблон-{template_second}мм ' \
                            f'L-{length_template_second}м '
             self.template_depth = math.ceil(
                 roof_add_column_plast - 5 - length_template_first - dictance_template_second)
