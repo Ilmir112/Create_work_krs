@@ -119,6 +119,9 @@ class ExcelWorker(QThread):
                     except Exception as e:
                         print(f"Не удалось {file_path}: {e}")
 
+        # Завершение работы потока
+        self.finished.emit()
+
     def check_category(self, well_number, deposit_area, region):
         if data_list.connect_in_base:
             self.params = {
@@ -260,6 +263,7 @@ class MyMainWindow(QMainWindow):
         self.perforation_correct_window2 = None
         self.work_plan = None
         self.gnkt_data = None
+        self.threads = []
 
     def work_podpisant_list(self, region, contractor):
         with open(
@@ -1800,6 +1804,7 @@ class MyMainWindow(QMainWindow):
                     if "Категория скважины" in str(value):
                         self.data_well.cat_well_min = data_list.ProtectedIsDigit(row)
 
+
                     elif "Наименование работ" in str(value):
                         self.data_well.insert_index2 = row - 1
 
@@ -2274,6 +2279,7 @@ class MyWindow(MyMainWindow):
 
         threading.Timer(2.0, self.close_splash).start()
 
+
         # self.log_widget = QPlainTextEditLogger(self)
         # logger.addHandler(self.log_widget)
         # self.setCentralWidget(self.log_widget.widget)
@@ -2284,14 +2290,15 @@ class MyWindow(MyMainWindow):
 
         # # Запускаем обработчик исключений в отдельном потоке
         self.thread = QThread()
-        # self.work_thread = ExcelWorker
-        #
-        # for drive in ExcelWorker.drives:
-        #     self.work_thread.find_and_delete_files(drive)
+        self.threads.append(self.thread)
+
         self.excepthook.moveToThread(self.thread)
 
         # self.thread.started.connect(self.excepthook.handle_exception)
         self.thread.start()
+
+        self.thread.finished.connect(self.thread.deleteLater)
+
 
         try:
 
@@ -3277,10 +3284,26 @@ class MyWindow(MyMainWindow):
         if r > self.data_well.count_row_well and "gnkt" not in self.work_plan:
             data = self.read_clicked_mouse_data(r)
 
+    def closeEvent(self, event):
+        for thread in self.threads:
+            if thread.isRunning():
+                thread.requestInterruption()
+                thread.quit()
+                thread.wait()
+        event.accept()
+
+    def list_threads(self):
+        print("Активные потоки:")
+        asdawada = threading.enumerate()
+        for thread in threading.enumerate():
+            print(f"Поток: {thread.name}, идентификатор: {thread.ident}")
+
     def close_file(self):
         from find import ProtectedIsNonNone, ProtectedIsDigit
 
         temp_folder = r"C:\Windows\Temp"
+
+
 
         self.wb2_prs = None
         self.ws2_prs = None
@@ -3372,6 +3395,8 @@ class MyWindow(MyMainWindow):
             data_list.condition_of_wells = ProtectedIsNonNone(0)
 
             QMessageBox.information(self, "Обновление", "Данные обнулены")
+
+        self.list_threads()
 
     def on_finished(self):
         print("Работа с файлом Excel завершена.")
@@ -3909,13 +3934,13 @@ class MyWindow(MyMainWindow):
                 ]:
                     plast_str += f"{plast[:4]} :{interval[0]}- {interval[1]} (изол)\n"
             try:
-
-                if "давление" in self.data_well.dict_perforation_short[plast].keys():
+                filter_list_pressure = None
+                if "давление" in self.data_well.dict_perforation[plast].keys():
                     filter_list_pressure = list(
                         filter(
                             lambda x: type(x) in [int, float],
                             list(
-                                self.data_well.dict_perforation_short[plast]["давление"]
+                                self.data_well.dict_perforation[plast]["давление"]
                             ),
                         )
                     )
@@ -4351,6 +4376,7 @@ class SaveInExcel(MyWindow):
 
             excel_data_dict = excel_in_json(self, self.ws2)
             self.thread_excel_insert = ExcelWorker(self.data_well)
+            # self.threads.append(self.thread_excel_insert)
             response_answer = self.thread_excel_insert.insert_data_in_database(
                 excel_data_dict
             )

@@ -164,10 +164,12 @@ class CorrectPlanWindow(WindowUnion):
 
 
         self.thread_excel = ExcelWorker(self)
+        self.threads.append(self.thread_excel)
 
         self.without_damping, stop_app = self.thread_excel.check_well_existence(
             self.data_well.well_number.get_value, self.data_well.well_area.get_value,
             self.data_well.region)
+
 
         data_list.pause = False
         if well_number != '' and well_area != '':

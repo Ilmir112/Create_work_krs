@@ -1045,11 +1045,26 @@ class WindowUnion(MyMainWindow):
                        f' Р={self.pressure_edit}атм.'
             acid_sel_short = vt
         elif self.acid_edit == 'HF':
+            massa_hcl = round(13 / 24 * 1059, 1)
+            volume_hcl_metr = massa_hcl / 1118.7
+            volume_hcl = round(self.acid_volume_edit * volume_hcl_metr, 1)
 
-            acid_sel = f'Произвести кислотную обработку пласта {self.plast_combo} в объеме  {self.acid_volume_edit}м3 ' \
-                       f'(концентрация в смеси HF 3% / HCl 13%){iron_str} силами СК Крезол ' \
-                       f'в присутствии представителя заказчика с составлением акта, не превышая давления ' \
-                       f'закачки не более Р={self.pressure_edit}атм.'
+            massa_hf = round(3 / 40 * 1059, 1)
+            volume_hf_metr = massa_hf / 1128.4
+            volume_hf = round(self.acid_volume_edit * volume_hf_metr, 1)
+            volume_wather = round(self.acid_volume_edit - (volume_hcl + volume_hf), 1)
+
+            acid_sel = f'Произвести глинокислотную обработку пласта {self.plast_combo} в объеме ' \
+                       f'{self.acid_volume_edit}м3 ' \
+                       f'(концентрация в смеси HF 3% / HCl 13%) силами Крезол  в' \
+                       f' присутствии представителя ' \
+                       f'Заказчика с составлением акта, не превышая давления закачки не более ' \
+                       f'Р={self.data_well.max_admissible_pressure.get_value}атм.\n' \
+                       f'(для приготовления грязевой кислоты в объеме {self.acid_volume_edit}м3 - ' \
+                       f'необходимо замешать HCL 13% в объеме {volume_hcl}м3 + HF 3% в объеме ' \
+                       f'{volume_hf}м3 в пресной воды ' \
+                       f'{volume_wather}м3)'
+
             acid_sel_short = f'Произвести ГКО пласта {self.plast_combo}  в V- {self.acid_volume_edit}м3  ' \
                              f'не более Р={self.pressure_edit}атм.'
         elif self.acid_edit == 'Нефтекислотка':

@@ -728,7 +728,7 @@ def insert_data_well_dop_plan(self, data_well):
     self.data_well.well_volume_in_pz = [well_volume(self, self.data_well.head_column_additional.get_value)]
     self.data_well.check_data_in_pz = []
     self.data_well.without_damping = False
-    self.thread_excel = ExcelWorker(self)
+    # self.thread_excel = ExcelWorker(self)
 
     # QMessageBox.information(None, 'Данные с базы', "Данные вставлены из базы данных")
 

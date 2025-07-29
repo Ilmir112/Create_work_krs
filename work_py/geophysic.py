@@ -99,8 +99,8 @@ class GeophysicWindow(WindowUnion):
 
     def add_row_table(self):
 
-        edit_type = self.tab_widget.currentWidget().lineedit_type.text().replace(',', '.')
-        edit_type2 = self.tab_widget.currentWidget().lineedit_type2.text().replace(',', '.')
+        edit_type = float(self.tab_widget.currentWidget().lineedit_type.text().replace(',', '.'))
+        edit_type2 = float(self.tab_widget.currentWidget().lineedit_type2.text().replace(',', '.'))
         researchGis = self.geophysicalSelect(str(self.tab_widget.currentWidget().ComboBoxGeophygist.currentText()))
 
         if self.data_well.column_additional is False or \
@@ -137,8 +137,8 @@ class GeophysicWindow(WindowUnion):
         self.tableWidget.insertRow(rows)
 
         self.tableWidget.setItem(rows, 0, QTableWidgetItem(researchGis))
-        self.tableWidget.setItem(rows, 1, QTableWidgetItem(edit_type))
-        self.tableWidget.setItem(rows, 2, QTableWidgetItem(edit_type2))
+        self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(edit_type)))
+        self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(edit_type2)))
         self.tableWidget.setItem(rows, 3, QTableWidgetItem(dop_information))
         self.tableWidget.setSortingEnabled(True)
 

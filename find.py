@@ -72,6 +72,8 @@ class FindIndexPZ(MyMainWindow):
         self.category_gas_factor = 0
 
         self.thread_excel = ExcelWorker(self)
+        self.thread_excel.finished.connect(self.thread_excel.deleteLater)
+        self.threads.append(self.thread_excel)
 
         self.without_damping = False
         self.insert_index = 0
@@ -344,6 +346,8 @@ class FindIndexPZ(MyMainWindow):
 
             if "Категория скважины" in row:
                 cat_well_min.append(row_ind + 1)
+
+                self.category_column = row.index("Категория скважины") + 1
                 self.cat_well_min = ProtectedIsDigit(
                     min(cat_well_min)
                 )  # индекс начала категории
@@ -3330,6 +3334,20 @@ class WellCategory(FindIndexPZ):
             # print(f'категория по давлению {self.category_pressure}')
             self.category_h2s = self.category_h2s_list[0]
             self.category_gas_factor = self.category_gaz_factor_percent[0]
+
+            min_category = min([int(float(self.category_pressure)),
+                                int(float(self.category_h2s)),
+                                int(float(self.category_gas_factor))])
+
+            if min_category == 1:
+                category_text = "Категория скважины:\nПЕРВАЯ"
+            elif min_category == 2:
+                category_text = "Категория скважины:\nВТОРАЯ"
+            elif min_category == 3:
+                category_text = "Категория скважины:\nТРЕТЬЯ"
+
+            self.ws.cell(row=self.cat_well_min.get_value, column=self.category_column).value = category_text
+            self.ws.row_dimensions[self.cat_well_min.get_value].height = 40
 
             self.without_damping, stop_app = self.thread_excel.check_well_existence(
                 self.well_number.get_value, self.well_area.get_value, self.region
