@@ -206,7 +206,7 @@ class TabPageDp(TabPageUnion):
 
     def update_well_data_in_base_combo(self, index):
         if index:
-            if index.split(' ')[3] != 'ПР':
+            if index.split(' ')[3] not in ['ПР', "ПРС"]:
                 number_dp_in_base = [num for num in index.split(' ')[3] if num.isdigit()][0]
                 self.number_DP_Combo.setCurrentIndex(int(number_dp_in_base))
 
