@@ -1149,7 +1149,7 @@ class GnktModel(WindowUnion):
             [None, None, None, None, None, None, None, None, None, None, None, None, 'Результат предыдущей опрес-и ЭК',
              None, None, None, None, self.data_well.result_pressure.get_value, None, '', None, 'гермет.', None],
             [None, None, None, None, None, None, None, None,
-             'Тек.забой' if self.data_well.work_plan != 'gnkt_bopz' else '',
+             'Тек.забой\n(плановый)' if self.data_well.work_plan != 'gnkt_bopz' else '',
              None, None, None,
              'Макс.допустимое Р опр-ки ЭК', None, None, None, None,
              self.data_well.max_admissible_pressure.get_value,

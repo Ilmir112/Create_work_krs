@@ -105,7 +105,7 @@ class GeophysicWindow(WindowUnion):
 
         if self.data_well.column_additional is False or \
                 (
-                        self.data_well.column_additional and self.data_well.current_bottom > self.data_well.head_column_additional.get_value):
+                        self.data_well.column_additional and self.data_well.current_bottom < self.data_well.head_column_additional.get_value):
             if float(edit_type) > self.data_well.shoe_column.get_value:
                 QMessageBox.information(self, 'Внимание', 'глубина исследований ниже башмака колонны')
                 return

@@ -641,7 +641,6 @@ class DopPlanWindow(WindowUnion):
                 return
             if data_list.data_in_base:
                 fluid = current_widget.fluid_edit.text().replace(',', '.')
-
                 current_bottom = current_widget.current_bottom_edit.text()
                 if current_bottom != '':
                     current_bottom = round_cell(current_bottom.replace(',', '.'))
@@ -720,9 +719,10 @@ class DopPlanWindow(WindowUnion):
 
                     self.data_well.skm_interval = skm_interval_new
 
-                except Exception:
+                except Exception as e:
                     QMessageBox.warning(self, 'Ошибка',
-                                        'в интервале скреперования отсутствует корректные интервалы скреперования')
+                                        f'в интервале скреперования отсутствует '
+                                        f'корректные интервалы скреперования \n {e}')
                     return
 
                 try:

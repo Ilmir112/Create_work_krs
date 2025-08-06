@@ -167,7 +167,10 @@ class TabPageUnion(QWidget):
             params = {"well_number": number_well, "contractor": data_list.contractor}
             response = ApiClient.request_params_get(ApiClient.response_find_well_filter_by_number(), params)
             if response:
-                return response["ремонты"]
+                for row in  response["ремонты"]:
+                    asdw = row.split(" ")[:7]
+
+                return [" ".join(row.split(" ")[:7]) for row in response["ремонты"]]
         else:
             db = connection_to_database(decrypt("DB_WELL_DATA"))
             data_well_base = WorkDatabaseWell(db, self.data_well)

@@ -293,132 +293,144 @@ class TabPageSoAcid(TabPageUnion):
         self.sko_true_combo.setCurrentIndex(1)
 
     def update_paker_need(self, index):
-        if index == 'Да' and self.data_well:
-            paker_depth_zumpf = int(self.data_well.perforation_roof + 10)
-            if len(self.data_well.plast_work) != 0:
+        try:
+            if index == 'Да' and self.data_well:
                 paker_depth_zumpf = int(self.data_well.perforation_roof + 10)
-            else:
-                if self.data_well.dict_leakiness:
-                    paker_depth_zumpf = int(max([float(nek.split('-')[0]) + 10
-                                                 for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()]))
+                if len(self.data_well.plast_work) != 0:
+                    paker_depth_zumpf = int(self.data_well.perforation_roof + 10)
+                else:
+                    if self.data_well.dict_leakiness:
+                        paker_depth_zumpf = int(max([float(nek.split('-')[0]) + 10
+                                                     for nek in self.data_well.dict_leakiness['НЭК']['интервал'].keys()]))
 
-            self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
+                self.paker_depth_zumpf_edit.setText(f'{paker_depth_zumpf}')
 
-            self.grid.addWidget(self.paker_depth_zumpf_label, 2, 9)
-            self.grid.addWidget(self.paker_depth_zumpf_edit, 3, 9)
-        elif index == 'Нет':
-            self.paker_depth_zumpf_label.setParent(None)
-            self.paker_depth_zumpf_edit.setParent(None)
+                self.grid.addWidget(self.paker_depth_zumpf_label, 2, 9)
+                self.grid.addWidget(self.paker_depth_zumpf_edit, 3, 9)
+            elif index == 'Нет':
+                self.paker_depth_zumpf_label.setParent(None)
+                self.paker_depth_zumpf_edit.setParent(None)
+        except Exception as e:
+            logger.error(e)
 
     def update_paker_depth(self):
-        paker_depth = self.paker_depth_edit.text()
-        if paker_depth:
-            paker_diameter = int(float(self.paker_diameter_select(paker_depth)))
-            self.diameter_paker_edit.setText(str(paker_diameter))
-        if self.data_well:
-            self.pressure_edit.setText(str(self.data_well.max_admissible_pressure.get_value))
+        try:
+            paker_depth = self.paker_depth_edit.text()
+            if paker_depth:
+                paker_diameter = int(float(self.paker_diameter_select(paker_depth)))
+                self.diameter_paker_edit.setText(str(paker_diameter))
+            if self.data_well:
+                self.pressure_edit.setText(str(self.data_well.max_admissible_pressure.get_value))
+        except Exception as e:
+            logger.error(e)
 
     def update_paker_layout(self, index):
-        self.paker_layout_index = index
+        try:
+            self.paker_layout_index = index
 
-        if index not in ['однопакерная']:
-            self.pressure_zumpf_question_label.setParent(None)
-            self.pressure_zumpf_question_combo.setParent(None)
-        else:
-            self.grid.addWidget(self.pressure_zumpf_question_label, 2, 8)
-            self.grid.addWidget(self.pressure_zumpf_question_combo, 3, 8)
+            if index not in ['однопакерная']:
+                self.pressure_zumpf_question_label.setParent(None)
+                self.pressure_zumpf_question_combo.setParent(None)
+            else:
+                self.grid.addWidget(self.pressure_zumpf_question_label, 2, 8)
+                self.grid.addWidget(self.pressure_zumpf_question_combo, 3, 8)
 
-        if index in ['однопакерная', 'пакер с заглушкой', 'однопакерная, упорный', ]:
-            paker_layout_list_tab = ["Пласт", "хвост", "пакер", "СКВ", "вид кислоты", "процент", "объем", "объем нефти"]
-            self.grid.addWidget(self.pakerLabel, 2, 5)
-            self.grid.addWidget(self.paker_depth_edit, 3, 5)
-            self.paker2Label.setParent(None)
-            self.paker2_depth.setParent(None)
-
-            if index == 'однопакерная, упорный' or 'пакер с заглушкой' == index:
-                paker_depth = self.paker_depth_edit.text()
-                if paker_depth != '':
-                    self.paker_khost.setText(f'{int(self.data_well.current_bottom - int(paker_depth))}')
-        elif index in ['двухпакерная', 'двухпакерная, упорные']:
-            paker_layout_list_tab = ["Пласт", "хвост", "пакер нижний", 'пакер вверхний', "СКВ",
-                                     "вид кислоты", "процент", "объем", "объем нефти"]
-            self.grid.addWidget(self.paker2Label, 2, 6)
-            self.grid.addWidget(self.paker2_depth, 3, 6)
-            self.grid.addWidget(self.pakerLabel, 2, 5)
-            self.grid.addWidget(self.paker_depth_edit, 3, 5)
-            if index == 'двухпакерная, упорные':
-                paker_depth = self.paker_depth_edit.text()
-                if paker_depth != '':
-                    self.paker_khost.setText(f'{int(self.data_well.current_bottom - int(paker_depth))}')
-        elif index in ['воронка', 'без монтажа компоновки на спуск']:
-            if self.data_well:
-                paker_layout_list_tab = ["Пласт", "воронка", "СКВ",
-                                         "вид кислоты", "процент", "объем", "объем нефти"]
-                self.paker_khost.setText(f'{int(self.data_well.perforation_sole)}')
+            if index in ['однопакерная', 'пакер с заглушкой', 'однопакерная, упорный', ]:
+                paker_layout_list_tab = ["Пласт", "хвост", "пакер", "СКВ", "вид кислоты", "процент", "объем", "объем нефти"]
+                self.grid.addWidget(self.pakerLabel, 2, 5)
+                self.grid.addWidget(self.paker_depth_edit, 3, 5)
                 self.paker2Label.setParent(None)
                 self.paker2_depth.setParent(None)
-                self.pakerLabel.setParent(None)
-                self.paker_depth_edit.setParent(None)
-        elif index in ['ГОНС']:
-            paker_layout_list_tab = ["Пласт", "точки", "пом.",
-                                     "вид кислоты", "процент", "объем"]
-        self.tableWidget.setHorizontalHeaderLabels(paker_layout_list_tab)
 
-        self.tableWidget.setSortingEnabled(True)
-        self.tableWidget.setAlternatingRowColors(True)
+                if index == 'однопакерная, упорный' or 'пакер с заглушкой' == index:
+                    paker_depth = self.paker_depth_edit.text()
+                    if paker_depth != '':
+                        self.paker_khost.setText(f'{int(self.data_well.current_bottom - int(paker_depth))}')
+            elif index in ['двухпакерная', 'двухпакерная, упорные']:
+                paker_layout_list_tab = ["Пласт", "хвост", "пакер нижний", 'пакер вверхний', "СКВ",
+                                         "вид кислоты", "процент", "объем", "объем нефти"]
+                self.grid.addWidget(self.paker2Label, 2, 6)
+                self.grid.addWidget(self.paker2_depth, 3, 6)
+                self.grid.addWidget(self.pakerLabel, 2, 5)
+                self.grid.addWidget(self.paker_depth_edit, 3, 5)
+                if index == 'двухпакерная, упорные':
+                    paker_depth = self.paker_depth_edit.text()
+                    if paker_depth != '':
+                        self.paker_khost.setText(f'{int(self.data_well.current_bottom - int(paker_depth))}')
+            elif index in ['воронка', 'без монтажа компоновки на спуск']:
+                if self.data_well:
+                    paker_layout_list_tab = ["Пласт", "воронка", "СКВ",
+                                             "вид кислоты", "процент", "объем", "объем нефти"]
+                    self.paker_khost.setText(f'{int(self.data_well.perforation_sole)}')
+                    self.paker2Label.setParent(None)
+                    self.paker2_depth.setParent(None)
+                    self.pakerLabel.setParent(None)
+                    self.paker_depth_edit.setParent(None)
+            elif index in ['ГОНС']:
+                paker_layout_list_tab = ["Пласт", "точки", "пом.",
+                                         "вид кислоты", "процент", "объем"]
+            self.tableWidget.setHorizontalHeaderLabels(paker_layout_list_tab)
+
+            self.tableWidget.setSortingEnabled(True)
+            self.tableWidget.setAlternatingRowColors(True)
+        except Exception as e:
+            logger.error(e)
 
     def update_plast_edit(self):
-        if self.data_well:
-            dict_perforation = self.data_well.dict_perforation
-            plasts = data_list.texts
-            # print(f'пласты {plasts, len(data_list.texts), len(plasts), data_list.texts}')
-            roof_plast = self.data_well.current_bottom
-            sole_plast = 0
-            for plast in self.data_well.plast_work:
-                for plast_sel in plasts:
-                    if plast_sel == plast:
+        try:
+            if self.data_well:
+                dict_perforation = self.data_well.dict_perforation
+                plasts = data_list.texts
+                # print(f'пласты {plasts, len(data_list.texts), len(plasts), data_list.texts}')
+                roof_plast = self.data_well.current_bottom
+                sole_plast = 0
+                for plast in self.data_well.plast_work:
+                    for plast_sel in plasts:
+                        if plast_sel == plast:
 
-                        if roof_plast >= dict_perforation[plast]['кровля']:
-                            roof_plast = dict_perforation[plast]['кровля']
-                        if sole_plast <= dict_perforation[plast]['подошва']:
-                            sole_plast = dict_perforation[plast]['подошва']
+                            if roof_plast >= dict_perforation[plast]['кровля']:
+                                roof_plast = dict_perforation[plast]['кровля']
+                            if sole_plast <= dict_perforation[plast]['подошва']:
+                                sole_plast = dict_perforation[plast]['подошва']
 
-            if self.paker_layout_combo.currentText() == 'однопакерная':
-                paker_depth = int(roof_plast - 20)
-                self.paker_depth_edit.setText(f"{paker_depth}")
-
-                if paker_depth != '':
-                    self.paker_khost.setText(str(int(sole_plast - paker_depth)))
-                    self.swab_paker_depth.setText(str(int(roof_plast - 40 - int(float(self.paker_khost.text())))))
-            elif self.paker_layout_combo.currentText() in ['однопакерная, упорный', 'пакер с заглушкой']:
-
-                paker_depth = int(roof_plast - 20)
-                self.paker_depth_edit.setText(f"{paker_depth}")
-                if paker_depth != '':
-                    self.paker_khost.setText(str(int(self.data_well.current_bottom - paker_depth)))
-                    self.swab_paker_depth.setText(f'{paker_depth}')
-            elif self.paker_layout_combo.currentText() in ['двухпакерная']:
-                paker_depth = int(sole_plast + 10)
-                if paker_depth != '':
-                    if paker_depth + 10 >= self.data_well.current_bottom:
-                        self.paker_khost.setText(f"{10}")
-                    else:
-                        self.paker_khost.setText(f"{1}")
+                if self.paker_layout_combo.currentText() == 'однопакерная':
+                    paker_depth = int(roof_plast - 20)
                     self.paker_depth_edit.setText(f"{paker_depth}")
-                    self.paker2_depth.setText(f"{int(roof_plast - 10)}")
-                    self.swab_paker_depth.setText(str(paker_depth))
-            elif self.paker_layout_combo.currentText() == 'двухпакерная, упорные':
-                paker_depth = int(sole_plast + 10)
-                if paker_depth != '':
-                    self.paker_khost.setText(f'{self.data_well.current_bottom - paker_depth}')
+
+                    if paker_depth != '':
+                        self.paker_khost.setText(str(int(sole_plast - paker_depth)))
+                        self.swab_paker_depth.setText(str(int(roof_plast - 40 - int(float(self.paker_khost.text())))))
+                elif self.paker_layout_combo.currentText() in ['однопакерная, упорный', 'пакер с заглушкой']:
+
+                    paker_depth = int(roof_plast - 20)
                     self.paker_depth_edit.setText(f"{paker_depth}")
-                    self.paker2_depth.setText(f"{int(roof_plast - 10)}")
-                    self.swab_paker_depth.setText(str(paker_depth))
-            elif self.paker_layout_combo.currentText() == 'без монтажа компоновки на спуск':
-                self.paker_khost.setText(f'')
-                self.paker_depth_edit.setText(f'')
-                self.paker2_depth.setText(f'')
-                self.swab_paker_depth.setText(f'')
+                    if paker_depth != '':
+                        self.paker_khost.setText(str(int(self.data_well.current_bottom - paker_depth)))
+                        self.swab_paker_depth.setText(f'{paker_depth}')
+                elif self.paker_layout_combo.currentText() in ['двухпакерная']:
+                    paker_depth = int(sole_plast + 10)
+                    if paker_depth != '':
+                        if paker_depth + 10 >= self.data_well.current_bottom:
+                            self.paker_khost.setText(f"{10}")
+                        else:
+                            self.paker_khost.setText(f"{1}")
+                        self.paker_depth_edit.setText(f"{paker_depth}")
+                        self.paker2_depth.setText(f"{int(roof_plast - 10)}")
+                        self.swab_paker_depth.setText(str(paker_depth))
+                elif self.paker_layout_combo.currentText() == 'двухпакерная, упорные':
+                    paker_depth = int(sole_plast + 10)
+                    if paker_depth != '':
+                        self.paker_khost.setText(f'{self.data_well.current_bottom - paker_depth}')
+                        self.paker_depth_edit.setText(f"{paker_depth}")
+                        self.paker2_depth.setText(f"{int(roof_plast - 10)}")
+                        self.swab_paker_depth.setText(str(paker_depth))
+                elif self.paker_layout_combo.currentText() == 'без монтажа компоновки на спуск':
+                    self.paker_khost.setText(f'')
+                    self.paker_depth_edit.setText(f'')
+                    self.paker2_depth.setText(f'')
+                    self.swab_paker_depth.setText(f'')
+        except Exception as e:
+            logger.error(e)
 
             # print(f'кровля {roof_plast}, подошва {sole_plast}')
 
@@ -550,113 +562,116 @@ class AcidPakerWindow(WindowUnion):
         self.mtg_count = None
 
     def add_string(self):
-        self.current_widget = self.tab_widget.currentWidget()
-        self.paker_layout_combo = self.current_widget.paker_layout_combo.currentText()
-        self.plast_combo = self.current_widget.plast_combo.combo_box.currentText()
+        try:
+            self.current_widget = self.tab_widget.currentWidget()
+            self.paker_layout_combo = self.current_widget.paker_layout_combo.currentText()
+            self.plast_combo = self.current_widget.plast_combo.combo_box.currentText()
 
-        acid_edit_list = ['HCl', 'HF', 'ВТ', 'Нефтекислотка', 'Противогипсовая обработка']
-        self.acid_edit = self.current_widget.acid_edit.currentText()
-        self.acid_combo = QComboBox(self)
-        self.acid_combo.addItems(acid_edit_list)
-        self.acid_combo.setCurrentIndex(acid_edit_list.index(self.acid_edit))
+            acid_edit_list = ['HCl', 'HF', 'ВТ', 'Нефтекислотка', 'Противогипсовая обработка']
+            self.acid_edit = self.current_widget.acid_edit.currentText()
+            self.acid_combo = QComboBox(self)
+            self.acid_combo.addItems(acid_edit_list)
+            self.acid_combo.setCurrentIndex(acid_edit_list.index(self.acid_edit))
 
-        self.acid_volume_edit = float(self.current_widget.acid_volume_edit.text().replace(',', '.'))
-        self.acid_proc_edit = int(self.current_widget.acid_proc_edit.text().replace(',', '.'))
-        self.svk_true_combo_str = str(self.current_widget.svk_true_combo.currentText())
-        self.acid_oil_proc_edit = self.current_widget.acid_oil_proc_edit.text()
+            self.acid_volume_edit = float(self.current_widget.acid_volume_edit.text().replace(',', '.'))
+            self.acid_proc_edit = int(self.current_widget.acid_proc_edit.text().replace(',', '.'))
+            self.svk_true_combo_str = str(self.current_widget.svk_true_combo.currentText())
+            self.acid_oil_proc_edit = self.current_widget.acid_oil_proc_edit.text()
 
-        self.svk_true_combo = QComboBox(self)
-        svk_true_list = ['Нужно СКВ', 'без СКВ']
-        self.svk_true_combo.addItems(svk_true_list)
-        self.svk_true_combo.setCurrentIndex(svk_true_list.index(self.svk_true_combo_str))
+            self.svk_true_combo = QComboBox(self)
+            svk_true_list = ['Нужно СКВ', 'без СКВ']
+            self.svk_true_combo.addItems(svk_true_list)
+            self.svk_true_combo.setCurrentIndex(svk_true_list.index(self.svk_true_combo_str))
 
-        if not self.plast_combo or not self.acid_edit or not self.acid_volume_edit or not self.acid_proc_edit:
-            QMessageBox.information(self, 'Внимание', 'Заполните данные по объему')
-            return
-
-        self.tableWidget.setSortingEnabled(False)
-        rows = self.tableWidget.rowCount()
-
-        if self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
-            paker_khost = self.check_if_none(self.current_widget.paker_khost.text())
-            paker_depth = self.check_if_none(self.current_widget.paker_depth_edit.text())
-            if self.data_well:
-                if self.data_well.current_bottom < float(paker_khost + paker_depth) or \
-                        0 < paker_khost + paker_depth < self.data_well.current_bottom is False:
-                    QMessageBox.information(self, 'Внимание',
-                                            f'Компоновка ниже {paker_khost + paker_depth}м текущего забоя '
-                                            f'{self.data_well.current_bottom}м')
-                    return
-                if self.check_true_depth_template(paker_depth) is False:
-                    return
-                if self.check_depth_paker_in_perforation(paker_depth) is False:
-                    return
-                if self.check_depth_in_skm_interval(paker_depth) is False:
-                    return
-
-            self.tableWidget.insertRow(rows)
-            self.tableWidget.setItem(rows, 0, QTableWidgetItem(self.plast_combo))
-            self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_khost)))
-            self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(paker_depth)))
-            self.tableWidget.setCellWidget(rows, 3, self.svk_true_combo)
-            self.tableWidget.setCellWidget(rows, 4, self.acid_combo)
-            self.tableWidget.setItem(rows, 5, QTableWidgetItem(str(self.acid_proc_edit)))
-            self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(self.acid_volume_edit)))
-            self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(self.acid_oil_proc_edit)))
-
-            self.tableWidget.setSortingEnabled(False)
-        elif self.paker_layout_combo in ['двухпакерная', 'двухпакерная, упорные']:
-            self.paker_khost = self.check_if_none((self.current_widget.paker_khost.text()))
-            self.paker_depth = int(self.check_if_none(self.current_widget.paker_depth_edit.text()))
-            self.paker2_depth = int(self.check_if_none(self.current_widget.paker2_depth.text()))
-
-            if self.data_well.current_bottom < float(self.paker_khost + self.paker_depth) or \
-                    0 < self.paker_khost + self.paker_depth < self.data_well.current_bottom is False:
-                QMessageBox.information(self, 'Внимание',
-                                        f'Компоновка ниже {self.paker_khost + self.paker_depth}м текущего забоя '
-                                        f'{self.data_well.current_bottom}м')
+            if not self.plast_combo or not self.acid_edit or not self.acid_volume_edit or not self.acid_proc_edit:
+                QMessageBox.information(self, 'Внимание', 'Заполните данные по объему')
                 return
 
-            if self.data_well:
-                if self.check_true_depth_template(self.paker_depth) is False:
-                    return
-                if self.check_depth_paker_in_perforation(self.paker_depth) is False:
-                    return
-                if self.check_depth_in_skm_interval(self.paker_depth) is False:
-                    return
-                if self.check_true_depth_template(self.paker2_depth) is False:
-                    return
-                if self.check_depth_paker_in_perforation(self.paker2_depth) is False:
-                    return
-                if self.check_depth_in_skm_interval(self.paker2_depth) is False:
-                    return
-                if self.data_well.current_bottom < float(self.paker_khost + self.paker2_depth):
+            self.tableWidget.setSortingEnabled(False)
+            rows = self.tableWidget.rowCount()
+
+            if self.paker_layout_combo in ['однопакерная', 'однопакерная, упорный', 'пакер с заглушкой']:
+                paker_khost = self.check_if_none(self.current_widget.paker_khost.text())
+                paker_depth = self.check_if_none(self.current_widget.paker_depth_edit.text())
+                if self.data_well:
+                    if self.data_well.current_bottom < float(paker_khost + paker_depth) or \
+                            0 < paker_khost + paker_depth < self.data_well.current_bottom is False:
+                        QMessageBox.information(self, 'Внимание',
+                                                f'Компоновка ниже {paker_khost + paker_depth}м текущего забоя '
+                                                f'{self.data_well.current_bottom}м')
+                        return
+                    if self.check_true_depth_template(paker_depth) is False:
+                        return
+                    if self.check_depth_paker_in_perforation(paker_depth) is False:
+                        return
+                    if self.check_depth_in_skm_interval(paker_depth) is False:
+                        return
+
+                self.tableWidget.insertRow(rows)
+                self.tableWidget.setItem(rows, 0, QTableWidgetItem(self.plast_combo))
+                self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(paker_khost)))
+                self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(paker_depth)))
+                self.tableWidget.setCellWidget(rows, 3, self.svk_true_combo)
+                self.tableWidget.setCellWidget(rows, 4, self.acid_combo)
+                self.tableWidget.setItem(rows, 5, QTableWidgetItem(str(self.acid_proc_edit)))
+                self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(self.acid_volume_edit)))
+                self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(self.acid_oil_proc_edit)))
+
+                self.tableWidget.setSortingEnabled(False)
+            elif self.paker_layout_combo in ['двухпакерная', 'двухпакерная, упорные']:
+                self.paker_khost = self.check_if_none((self.current_widget.paker_khost.text()))
+                self.paker_depth = int(self.check_if_none(self.current_widget.paker_depth_edit.text()))
+                self.paker2_depth = int(self.check_if_none(self.current_widget.paker2_depth.text()))
+
+                if self.data_well.current_bottom < float(self.paker_khost + self.paker_depth) or \
+                        0 < self.paker_khost + self.paker_depth < self.data_well.current_bottom is False:
                     QMessageBox.information(self, 'Внимание',
                                             f'Компоновка ниже {self.paker_khost + self.paker_depth}м текущего забоя '
                                             f'{self.data_well.current_bottom}м')
                     return
-            self.tableWidget.insertRow(rows)
-            self.tableWidget.setItem(rows, 0, QTableWidgetItem(self.plast_combo))
-            self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(self.paker_khost)))
-            self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(self.paker_depth)))
-            self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(self.paker2_depth)))
-            self.tableWidget.setCellWidget(rows, 4, self.svk_true_combo)
-            self.tableWidget.setCellWidget(rows, 5, self.acid_combo)
-            self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(self.acid_proc_edit)))
-            self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(self.acid_volume_edit)))
-        elif self.paker_layout_combo in ['воронка', 'без монтажа компоновки на спуск']:
-            self.paker_depth = int(self.check_if_none(self.current_widget.paker_depth_edit.text()))
-            self.paker_khost = self.check_if_none((self.current_widget.paker_khost.text()))
-            self.tableWidget.insertRow(rows)
-            self.tableWidget.setItem(rows, 0, QTableWidgetItem(self.plast_combo))
-            if self.paker_layout_combo in ['воронка']:
+
+                if self.data_well:
+                    if self.check_true_depth_template(self.paker_depth) is False:
+                        return
+                    if self.check_depth_paker_in_perforation(self.paker_depth) is False:
+                        return
+                    if self.check_depth_in_skm_interval(self.paker_depth) is False:
+                        return
+                    if self.check_true_depth_template(self.paker2_depth) is False:
+                        return
+                    if self.check_depth_paker_in_perforation(self.paker2_depth) is False:
+                        return
+                    if self.check_depth_in_skm_interval(self.paker2_depth) is False:
+                        return
+                    if self.data_well.current_bottom < float(self.paker_khost + self.paker2_depth):
+                        QMessageBox.information(self, 'Внимание',
+                                                f'Компоновка ниже {self.paker_khost + self.paker_depth}м текущего забоя '
+                                                f'{self.data_well.current_bottom}м')
+                        return
+                self.tableWidget.insertRow(rows)
+                self.tableWidget.setItem(rows, 0, QTableWidgetItem(self.plast_combo))
                 self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(self.paker_khost)))
-            elif self.paker_layout_combo in ['без монтажа компоновки на спуск']:
-                self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(self.paker_khost)))
-            self.tableWidget.setCellWidget(rows, 2, self.svk_true_combo)
-            self.tableWidget.setCellWidget(rows, 3, self.acid_combo)
-            self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(self.acid_proc_edit)))
-            self.tableWidget.setItem(rows, 5, QTableWidgetItem(str(self.acid_volume_edit)))
+                self.tableWidget.setItem(rows, 2, QTableWidgetItem(str(self.paker_depth)))
+                self.tableWidget.setItem(rows, 3, QTableWidgetItem(str(self.paker2_depth)))
+                self.tableWidget.setCellWidget(rows, 4, self.svk_true_combo)
+                self.tableWidget.setCellWidget(rows, 5, self.acid_combo)
+                self.tableWidget.setItem(rows, 6, QTableWidgetItem(str(self.acid_proc_edit)))
+                self.tableWidget.setItem(rows, 7, QTableWidgetItem(str(self.acid_volume_edit)))
+            elif self.paker_layout_combo in ['воронка', 'без монтажа компоновки на спуск']:
+                self.paker_depth = int(self.check_if_none(self.current_widget.paker_depth_edit.text()))
+                self.paker_khost = self.check_if_none((self.current_widget.paker_khost.text()))
+                self.tableWidget.insertRow(rows)
+                self.tableWidget.setItem(rows, 0, QTableWidgetItem(self.plast_combo))
+                if self.paker_layout_combo in ['воронка']:
+                    self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(self.paker_khost)))
+                elif self.paker_layout_combo in ['без монтажа компоновки на спуск']:
+                    self.tableWidget.setItem(rows, 1, QTableWidgetItem(str(self.paker_khost)))
+                self.tableWidget.setCellWidget(rows, 2, self.svk_true_combo)
+                self.tableWidget.setCellWidget(rows, 3, self.acid_combo)
+                self.tableWidget.setItem(rows, 4, QTableWidgetItem(str(self.acid_proc_edit)))
+                self.tableWidget.setItem(rows, 5, QTableWidgetItem(str(self.acid_volume_edit)))
+        except Exception as e:
+            logger.error(e)
 
     def closeEvent(self, event):
         # Закрываем основное окно при закрытии окна входа

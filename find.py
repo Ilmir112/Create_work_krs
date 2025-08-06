@@ -1,6 +1,8 @@
 import re
 from io import BytesIO
 
+from openpyxl.styles import Alignment
+
 import data_list
 import base64
 from datetime import datetime
@@ -3347,6 +3349,10 @@ class WellCategory(FindIndexPZ):
                 category_text = "Категория скважины:\nТРЕТЬЯ"
 
             self.ws.cell(row=self.cat_well_min.get_value, column=self.category_column).value = category_text
+            self.ws.cell(row=self.cat_well_min.get_value, column=self.category_column).alignment = Alignment(
+                    wrap_text=True, horizontal="left", vertical="center"
+                )
+
             self.ws.row_dimensions[self.cat_well_min.get_value].height = 40
 
             self.without_damping, stop_app = self.thread_excel.check_well_existence(
