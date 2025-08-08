@@ -642,6 +642,7 @@ class FindIndexPZ(MyMainWindow):
                 self.cat_well_min = ProtectedIsDigit(
                     min(cat_well_min)
                 )  # индекс начала категории
+                self.category_column = row.index("Категория скважины") + 1
 
             elif (
                     any(
