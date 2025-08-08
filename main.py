@@ -2292,7 +2292,6 @@ class MyWindow(MyMainWindow):
         self.excepthook = UncaughtExceptions(self.data_well)
         self.excepthook._exception_caught.connect(self.excepthook.handle_uncaught_exception)
 
-        adadwa = 1543 / 0
 
         try:
 
