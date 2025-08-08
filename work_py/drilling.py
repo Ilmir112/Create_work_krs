@@ -489,13 +489,13 @@ class DrillWindow(WindowUnion):
                 # print(drill_sole, self.check_pressure(drill_sole))
                 for row in self.reply_drilling(drill_sole, bottomType2, drilling_str, nkt_diam):
                     drilling_list.append(row)
-            drilling_list.append([f'Промыть  {self.data_well.fluid_work} в объеме '
-                                  f'{round(well_volume(self, self.data_well.current_bottom) * 2, 1)}м3', None,
-                                  f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work}  '
-                                  f'в присутствии представителя заказчика в объеме '
-                                  f'{round(well_volume(self, self.data_well.current_bottom) * 2, 1)}м3. Составить акт.',
-                                  None, None, None, None, None, None, None,
-                                  'мастер КРС, предст. заказчика', 1.5])
+        drilling_list.append([f'Промыть  {self.data_well.fluid_work} в объеме '
+                              f'{round(well_volume(self, self.data_well.current_bottom) * 2, 1)}м3', None,
+                              f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work}  '
+                              f'в присутствии представителя заказчика в объеме '
+                              f'{round(well_volume(self, self.data_well.current_bottom) * 2, 1)}м3. Составить акт.',
+                              None, None, None, None, None, None, None,
+                              'мастер КРС, предст. заказчика', 1.5])
 
         drilling_list_end = [
             [None, None,

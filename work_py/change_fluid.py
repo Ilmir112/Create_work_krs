@@ -1,15 +1,14 @@
 from collections import namedtuple
 
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
-from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QTabWidget, QMainWindow, QPushButton, \
+from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QPushButton, \
     QMessageBox
 
 import data_list
 from H2S import calv_h2s
-from main import MyMainWindow
 from work_py.alone_oreration import need_h2s
-from .parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
-from .rationingKRS import well_volume_norm
+from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
+from work_py.rationingKRS import well_volume_norm
 
 
 class TabPageSoChange(TabPageUnion):
@@ -25,7 +24,7 @@ class TabPageSoChange(TabPageUnion):
         self.need_change_zgs_combo.addItems(['Нет', 'Да'])
 
         self.plast_new_label = QLabel('индекс нового пласта', self)
-        aaddf = self.data_well.plast_project
+
         if self.data_well.plast_project:
             self.plast_new_combo = QComboBox(self)
             self.plast_new_combo.addItems(self.data_well.plast_project)
@@ -38,7 +37,7 @@ class TabPageSoChange(TabPageUnion):
 
         self.pressure_new_label = QLabel('Ожидаемое давление', self)
         self.pressure_new_edit = QLineEdit(self)
-        self.pressure_new_edit.setValidator(self.validator_int)
+        self.pressure_new_edit.setValidator(self.validator_float)
 
         self.type_absorbent_label = QLabel('Тип поглотителя')
         self.type_absorbent = QComboBox()
@@ -134,6 +133,8 @@ class TabPageSoChange(TabPageUnion):
 
             self.grid.addWidget(self.pressure_new_label, 9, 4)
             self.grid.addWidget(self.pressure_new_edit, 10, 4)
+            self.pressure_new_edit.setText(
+                f'{self.data_well.dict_category[self.plast_new_combo.currentText()]["по давлению"].data_pressure}')
         else:
             try:
                 self.category_pressure_label.setParent(None)

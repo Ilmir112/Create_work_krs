@@ -57,6 +57,7 @@ from PyQt5.QtGui import QPixmap
 from work_py.rationingKRS import lifting_nkt_norm, descentNKT_norm
 from work_py.data_informations import dict_data_cdng
 
+
 class UncaughtExceptions(QObject):
     _exception_caught = pyqtSignal(object)
 
@@ -65,11 +66,14 @@ class UncaughtExceptions(QObject):
         self.data_well = data_well
 
     @pyqtSlot(object)
-    def handle_exception(self, ex):
+    def handle_uncaught_exception(self, exc_type, exc_value, exc_traceback):
         logger.critical(
-            f"{self.data_well.well_number.get_value}"
-            f" {self.data_well.well_area.get_value} Критическая ошибка: {ex}"
+            "Uncaught exception, application will terminate.",
+            exc_info=(exc_type, exc_value, exc_traceback),
         )
+
+        # Можно отправлять сигнал для отображения ошибки в GUI
+        self._exception_caught.emit((exc_type, exc_value))
 
 
 class ExcelWorker(QThread):
@@ -2286,19 +2290,9 @@ class MyWindow(MyMainWindow):
 
         # Обработка критических ошибок
         self.excepthook = UncaughtExceptions(self.data_well)
-        self.excepthook._exception_caught.connect(self.excepthook.handle_exception)
+        self.excepthook._exception_caught.connect(self.excepthook.handle_uncaught_exception)
 
-        # # Запускаем обработчик исключений в отдельном потоке
-        self.thread = QThread()
-        self.threads.append(self.thread)
-
-        self.excepthook.moveToThread(self.thread)
-
-        # self.thread.started.connect(self.excepthook.handle_exception)
-        self.thread.start()
-
-        self.thread.finished.connect(self.thread.deleteLater)
-
+        adadwa = 1543 / 0
 
         try:
 
@@ -2333,6 +2327,9 @@ class MyWindow(MyMainWindow):
                 "КРИТИЧЕСКАЯ ОШИБКА",
                 f"Критическая ошибка, смотри в лог {type(e).__name__}\n\n{str(e)}",
             )
+
+    def global_excepthook(self, exc_type, exc_value, exc_traceback):
+        self.exception_handler.handle_exception(exc_type, exc_value, exc_traceback)
 
     def insert_data_in_chemistry(self):
 
@@ -3915,32 +3912,34 @@ class MyWindow(MyMainWindow):
             )
         plast_str = ""
         pressur_set = set()
+        adawdawd = self.data_well.data_list
+        dict_perforation = json.loads(self.data_well.data_list[0][2])
         # print(f'После {self.data_well.dict_perforation_short}')
-        for plast in list(self.data_well.dict_perforation_short.keys()):
+        for plast in list(dict_perforation.keys()):
             if (
-                    self.data_well.dict_perforation_short[plast]["отключение"] is False
-                    and plast in self.data_well.dict_perforation_short
+                    dict_perforation[plast]["отключение"] is False
+                    and plast in dict_perforation
             ):
-                for interval in self.data_well.dict_perforation_short[plast][
+                for interval in dict_perforation[plast][
                     "интервал"
                 ]:
                     plast_str += f"{plast[:4]}: {interval[0]}- {interval[1]} \n"
             elif (
-                    self.data_well.dict_perforation_short[plast]["отключение"]
-                    and plast in self.data_well.dict_perforation_short
+                    dict_perforation[plast]["отключение"]
+                    and plast in dict_perforation
             ):
-                for interval in self.data_well.dict_perforation_short[plast][
+                for interval in dict_perforation[plast][
                     "интервал"
                 ]:
                     plast_str += f"{plast[:4]} :{interval[0]}- {interval[1]} (изол)\n"
             try:
                 filter_list_pressure = None
-                if "давление" in self.data_well.dict_perforation[plast].keys():
+                if "давление" in dict_perforation[plast].keys():
                     filter_list_pressure = list(
                         filter(
                             lambda x: type(x) in [int, float],
                             list(
-                                self.data_well.dict_perforation[plast]["давление"]
+                                dict_perforation[plast]["давление"]
                             ),
                         )
                     )
@@ -5254,6 +5253,8 @@ if __name__ == "__main__":
         MyWindow.show_confirmation()
 
     show_splash_screen()
+
+
 
     # window = MyWindow()
     # window.show()

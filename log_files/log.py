@@ -1,4 +1,7 @@
 import logging
+import sys
+import threading
+
 import requests
 
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
@@ -12,27 +15,32 @@ class FastAPILogHandler(logging.Handler):
     def __init__(self, url):
         super().__init__()
         self.url = url
+        self.error_logger = logging.getLogger('FastAPILogHandler')
+        # Можно установить уровень и форматтер при необходимости
 
     def emit(self, record):
         try:
             log_entry = self.format(record)
-            # Отправляем POST-запрос с логом
             payload = {
                 'log': log_entry,
                 'level': record.levelname,
                 'logger': record.name,
-                "filename": record.filename,
-                "line": record.lineno
+                'filename': record.filename,
+                'line': record.lineno
             }
+            # Выполняем отправку в отдельном потоке, чтобы не блокировать основной поток
+            threading.Thread(target=self.send_log, args=(payload,), daemon=True).start()
 
-            response = ApiClient.request_post(self.url, payload)
-
-        except requests.exceptions.RequestException as e:
-            logger.critical(f'Ошибка при отправке логов {e}')
-            return
         except Exception as e:
-            logger.critical(f'Ошибка при обработке исключений при отправке логов {e}')
-            return
+            # Логируем ошибку внутри обработчика без рекурсии
+            self.error_logger.exception(f'Ошибка при подготовке лога: {e}')
+
+    def send_log(self, payload):
+        try:
+            response = ApiClient.request_post(self.url, payload)
+            response.raise_for_status()  # Проверка успешности ответа
+        except requests.exceptions.RequestException as e:
+            self.error_logger.exception(f'Ошибка при отправке лога: {e}')
 
 
 # Настройка логгера
@@ -40,7 +48,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 # Создаем обработчики
-file_handler = logging.FileHandler('my_app.log')
+file_handler = logging.FileHandler('logs.log')
 console_handler = logging.StreamHandler()
 
 # Создаем обработчик для отправки логов на FastAPI
@@ -57,6 +65,17 @@ logger.addHandler(file_handler)
 logger.addHandler(console_handler)
 logger.addHandler(fastapi_handler)
 
+
+def handle_uncaught_exception(exc_type, exc_value, exc_traceback):
+    logger.critical(
+        "Uncaught exception, application will terminate.",
+        exc_info=(exc_type, exc_value, exc_traceback),
+    )
+
+
+sys.excepthook = handle_uncaught_exception
+
+#
 # class QPlainTextEditLogger(logging.Handler, QObject):
 #     appendPlainText = pyqtSignal(str)
 #
@@ -70,3 +89,5 @@ logger.addHandler(fastapi_handler)
 #     def emit(self, record):
 #         msg = self.format(record)
 #         self.appendPlainText.emit(msg)
+
+

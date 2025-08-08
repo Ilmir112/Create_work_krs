@@ -167,9 +167,6 @@ class TabPageUnion(QWidget):
             params = {"well_number": number_well, "contractor": data_list.contractor}
             response = ApiClient.request_params_get(ApiClient.response_find_well_filter_by_number(), params)
             if response:
-                for row in  response["ремонты"]:
-                    asdw = row.split(" ")[:7]
-
                 return [" ".join(row.split(" ")[:7]) for row in response["ремонты"]]
         else:
             db = connection_to_database(decrypt("DB_WELL_DATA"))
@@ -1783,6 +1780,11 @@ class WindowUnion(MyMainWindow):
                     self.data_well.category_pressure_list.append(plast_data['по давлению'][0])
                     self.data_well.category_h2s_list.append(plast_data['по сероводороду'][0])
                     self.data_well.category_gaz_factor_percent.append(plast_data['по газовому фактору'][0])
+                if not self.data_well.plast_project:
+                    self.data_well.plast_project = [plast for plast in self.data_well.dict_category
+                                                    if
+                                                    self.data_well.dict_category[plast]['отключение'] == 'планируемый']
+
 
             else:
                 data_list.data_in_base = False
