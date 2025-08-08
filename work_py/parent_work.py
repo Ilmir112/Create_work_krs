@@ -316,6 +316,7 @@ class TabPageUnion(QWidget):
         self.data_well.max_expected_pressure = ProtectedIsDigit(response["max_expected_pressure"])
         self.data_well.max_admissible_pressure = ProtectedIsDigit(response["max_admissible_pressure"])
 
+
         self.data_well.cdng = data_list.ProtectedIsNonNone(response["cdng"])
         self.data_well.date_commissioning = data_list.ProtectedIsNonNone(
             datetime.strptime(response["date_commissioning"], "%Y-%m-%d"))
@@ -1765,6 +1766,7 @@ class WindowUnion(MyMainWindow):
                 self.data_well.category_pressure_list = []
                 self.data_well.category_h2s_list = []
                 self.data_well.category_gaz_factor_percent = []
+                self.data_well.gaz_factor_percent = []
                 for plast, plast_data in dict_data_well.items():
                     self.data_well.dict_category.setdefault(plast, {}).setdefault(
                         'по давлению',
@@ -1780,6 +1782,9 @@ class WindowUnion(MyMainWindow):
                     self.data_well.category_pressure_list.append(plast_data['по давлению'][0])
                     self.data_well.category_h2s_list.append(plast_data['по сероводороду'][0])
                     self.data_well.category_gaz_factor_percent.append(plast_data['по газовому фактору'][0])
+                    self.data_well.gaz_factor_percent.append(plast_data['по газовому фактору'][1])
+
+
                 if not self.data_well.plast_project:
                     self.data_well.plast_project = [plast for plast in self.data_well.dict_category
                                                     if

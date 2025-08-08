@@ -38,7 +38,8 @@ class FastAPILogHandler(logging.Handler):
     def send_log(self, payload):
         try:
             response = ApiClient.request_post(self.url, payload)
-            response.raise_for_status()  # Проверка успешности ответа
+            if response:
+                response.raise_for_status()  # Проверка успешности ответа
         except requests.exceptions.RequestException as e:
             self.error_logger.exception(f'Ошибка при отправке лога: {e}')
 

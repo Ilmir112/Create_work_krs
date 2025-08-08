@@ -81,7 +81,7 @@ class TabPageDp(TabPageUnion):
         self.table_name = ''
 
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
-        self.fluid_edit = QLineEdit(self)
+        self.fluid_edit = QTextEdit(self)
         self.fluid_edit.setAlignment(Qt.AlignLeft)
 
         self.plast_label = QLabel("пласта")
@@ -640,8 +640,9 @@ class DopPlanWindow(WindowUnion):
                 QMessageBox.warning(self, 'Ошибка', 'Нужно выбрать пункт изменения ПВР')
                 return
             if data_list.data_in_base:
-                fluid = current_widget.fluid_edit.text().replace(',', '.')
+                fluid = current_widget.fluid_edit.toPlainText().replace(',', '.')
                 current_bottom = current_widget.current_bottom_edit.text()
+
                 if current_bottom != '':
                     current_bottom = round_cell(current_bottom.replace(',', '.'))
 
@@ -651,6 +652,7 @@ class DopPlanWindow(WindowUnion):
                 current_bottom_date_edit = current_widget.current_bottom_date_edit.text()
 
                 template_depth_edit = int(float(current_widget.template_depth_edit.text().replace(',', '.')))
+                self.data_well.need_depth = current_bottom
                 if str(template_depth_edit).isdigit() is False:
                     QMessageBox.critical(self, 'Ошибка', 'ошибка в глубине диаметра')
                     return
@@ -688,6 +690,7 @@ class DopPlanWindow(WindowUnion):
                         QMessageBox.critical(self, 'уд.вес', 'нужно добавить значение "г/см3" в уд.вес')
                         return
                     self.data_well.fluid_work = fluid
+                    self.data_well.well_fluid_in_pz = [fluid]
                     self.data_well.fluid_work_short = fluid[:7]
 
                     self.data_well.fluid = float(fluid[:4].replace('г', ''))
@@ -775,30 +778,6 @@ class DopPlanWindow(WindowUnion):
                     QMessageBox.critical(self, 'пункт', 'Необходимо выбрать пункт плана работ')
                     return
 
-
-
-                # db = connection_to_database(decrypt("DB_WELL_DATA"))
-                # data_well_base = WorkDatabaseWell(db, self.data_well)
-                #
-                # data_well = data_well_base.check_in_database_well_data(well_number, well_area,
-                #                                                        work_plan_in_base, data_well_data_in_base_combo)
-                #
-                # if data_well:
-                #     self.data_well.type_kr = data_well[2]
-                #
-                #     if data_well[3]:
-                #         # self.data_well.dict_category = json.loads(data_well[3])
-                #         self.data_well.well_oilfield = ProtectedIsNonNone(data_well[4])
-                #         self.data_well.appointment_well = ProtectedIsNonNone(data_well[5])
-                #         self.data_well.inventory_number = ProtectedIsNonNone(data_well[6])
-                #         self.data_well.wellhead_fittings = data_well[7]
-                #         self.data_well.emergency_well = False
-                #         self.data_well.type_absorbent == "EVASORB марки 121"
-                #         if data_well[8]:
-                #             self.data_well.angle_data = json.loads(data_well[8])
-                #         else:
-                #             self.data_well.angle_data = []
-
                 self.data_well.current_bottom = current_bottom
 
                 if skm_interval_edit not in ['', 0, '0-0'] and '-' in skm_interval_edit:
@@ -856,10 +835,11 @@ class DopPlanWindow(WindowUnion):
                             self.data_well.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
 
             else:
-                fluid = current_widget.fluid_edit.text().replace(',', '.')
+                fluid = current_widget.fluid_edit.toPlainText().replace(',', '.')
                 current_bottom = current_widget.current_bottom_edit.text()
                 if current_bottom != '':
                     current_bottom = round_cell(current_bottom.replace(',', '.'))
+
 
                 work_earlier = current_widget.work_edit.toPlainText()
                 number_dp = current_widget.number_DP_Combo.currentText()

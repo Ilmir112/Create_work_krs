@@ -23,6 +23,7 @@ class TabPageGno(TabPageUnion):
         self.current_bottom_label = QLabel('Забой текущий')
         self.current_bottom_edit = QLineEdit(self)
 
+
         if self.data_well.need_depth:
             self.current_bottom_edit.setText(f'{self.data_well.need_depth}')
         else:
@@ -178,8 +179,9 @@ class TabPageGno(TabPageUnion):
             fluid_p = 1.01
 
         for plast in self.data_well.plast_work:
-            if float(list(self.data_well.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
-                fluid_p = list(self.data_well.dict_perforation[plast]['рабочая жидкость'])[0]
+            if 'рабочая жидкость' in plast:
+                if float(list(self.data_well.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
+                    fluid_p = list(self.data_well.dict_perforation[plast]['рабочая жидкость'])[0]
         fluid_list.append(fluid_p)
         fluid_max = None
         if max(fluid_list) <= 1.16:
@@ -204,6 +206,7 @@ class TabPageGno(TabPageUnion):
                 fluid_max = 1.18
         except Exception as e:
             print(f'Ошибка {e}')
+            return 0
 
         return fluid_max
 
@@ -240,7 +243,6 @@ class GnoWindow(WindowUnion):
         try:
 
             self.lift_key = self.current_widget.gno_combo.currentText()
-
             self.fluid = self.current_widget.fluid_edit.text().replace(',', '.')
             if 0.85 > float(self.fluid) > 1.64:
                 QMessageBox.warning(self, 'Ошибка',
@@ -249,8 +251,9 @@ class GnoWindow(WindowUnion):
 
             current_bottom = round(float(self.current_widget.current_bottom_edit.text().replace(',', '.')),
                                    1)
-            self.data_well.fluid_work, self.data_well.fluid_work_short = \
-                self.calc_work_fluid(self.fluid)
+            if "г/см3" not in str(self.data_well.fluid_work):
+                self.data_well.fluid_work, self.data_well.fluid_work_short = \
+                    self.calc_work_fluid(self.fluid)
 
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')

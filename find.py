@@ -50,7 +50,7 @@ class FindIndexPZ(MyMainWindow):
             self.column_direction_mine_length,
             self.level_cement_direction_mine,
         ) = (None, None, None, None)
-        self.fluid_work = None
+        self.fluid_work = ''
         self.nkt_template = None
         self.nkt_diam = None
         self.perforation_roof = 5000

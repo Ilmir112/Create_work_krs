@@ -673,6 +673,7 @@ def insert_data_well_dop_plan(self, data_well):
         self.data_well.depth_fond_paker_second_before['after'] = self.data_well.depth_fond_paker_second_before['posle']
     self.data_well.static_level = ProtectedIsDigit(well_data_dict["статика"])
     self.data_well.dinamic_level = ProtectedIsDigit(well_data_dict["динамика"])
+
     if 'После' in list(well_data_dict["НКТ"].keys()):
         self.data_well.dict_nkt_after = well_data_dict["НКТ"]['После']
         self.data_well.dict_nkt_before = well_data_dict["НКТ"]["До"]
