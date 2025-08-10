@@ -107,7 +107,8 @@ class VpWindow(WindowUnion):
         need_question_qcombo = self.tab_widget.currentWidget().need_question_qcombo.currentText()
         vp_depth = int(float(self.tab_widget.currentWidget().vp_depth_edit.text()))
         cement_vp = int(float(self.tab_widget.currentWidget().cement_vp_edit.text()))
-
+        if need_question_qcombo == "без ВП":
+            vp_depth = cement_vp
         self.cable_type_text = ''
         self.angle_text = ''
         if self.data_well.angle_data and self.data_well.max_angle.get_value > 45:

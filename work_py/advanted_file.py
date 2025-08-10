@@ -333,7 +333,9 @@ def definition_plast_work(self):
 
                 self.data_well.dict_perforation.setdefault(plast, {}).setdefault('рабочая жидкость',
                                                                                  []).append(zhgs)
-
+    if perforation_roof == 5000:
+        perforation_roof = self.data_well.current_bottom
+        perforation_sole = self.data_well.current_bottom
     self.data_well.perforation_roof = perforation_roof
     self.data_well.perforation_sole = perforation_sole
     self.data_well.dict_perforation = dict(

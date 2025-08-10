@@ -942,6 +942,7 @@ class TabPageUnion(QWidget):
         except Exception as e:
             print(f'отсутствуют данные по голове хвостовика {e}')
         self.data_well.dict_perforation_short = json.loads(result[paragraph_row][2])
+        self.data_well.current_bottom = result[-1][1]
 
         try:
             self.data_well.ribbing_interval = json.loads(result[paragraph_row][15])
@@ -1885,6 +1886,7 @@ class WindowUnion(MyMainWindow):
     @staticmethod
     def calculate_angle(max_depth_pvr, angle_data):
         tuple_angle = ()
+        depth, angle, _ = "", "", ""
         for depth, angle, _ in angle_data:
             if abs(float(depth) - float(max_depth_pvr)) < 10:
                 tuple_angle = depth, angle, f'Зенитный угол на глубине {depth}м равен {angle}гр'

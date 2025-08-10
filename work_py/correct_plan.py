@@ -161,8 +161,6 @@ class CorrectPlanWindow(WindowUnion):
             self.change_pvr_in_bottom(self.data, self.row_heights, self.col_width,
                                                self.boundaries_dict)
 
-
-
         self.thread_excel = ExcelWorker(self)
         self.threads.append(self.thread_excel)
 
