@@ -137,12 +137,7 @@ class ExcelWorker(QThread):
                 self.params,
             )
 
-            result = (
-                result["category_pressure"],
-                result["category_h2s"],
-                result["category_gf"],
-                result["today"],
-            )
+
         else:
             result = self.check_correct_well.check_category(
                 well_number, deposit_area, region

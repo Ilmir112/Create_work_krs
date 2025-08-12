@@ -378,13 +378,14 @@ class ClassifierWell(MyMainWindow):
 
             check_param, well_column, cdng, area_column, oilfield, categoty_pressure, pressure_Gst, \
             date_measurement, pressure_Ppl, categoty_h2s, h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, \
-            gas_factor, area_row, check_file = self.classification_well.read_excel_file_classification(ws)
+            gas_factor, area_row, check_file, wellhead_pressure = self.classification_well.read_excel_file_classification(ws)
 
             for region_name in REGION_LIST:
                 if self.region in region_name:
                     if check_param not in region_name:
                         QMessageBox.warning(self, 'ВНИМАНИЕ ОШИБКА',
                                             f'регион выбрано некорректно  {region_name}')
+                        return
                     if check_param in region_name:
                         # if data_list.connect_in_base is False:
                             # self.classification_well.create_table_classification(region_name)
@@ -392,7 +393,7 @@ class ClassifierWell(MyMainWindow):
                         # response = self.api_client.delete_wells_by_region(self.region, path)
                         try:
                             # Вставка данных в таблицу
-                            for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True, max_col=25)):
+                            for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True, max_col=75)):
                                 if index_row < area_row and check_file:
                                     for col, value in enumerate(row):
                                         if not value is None and col <= 18:
@@ -428,7 +429,8 @@ class ClassifierWell(MyMainWindow):
                                                 "gas_factor": f"{row[gas_factor]}",
                                                 "today": formatted_date,
                                                 "region": self.region,
-                                                "costumer": self.costumer}
+                                                "costumer": self.costumer,
+                                                "wellhead_pressure": str(row[wellhead_pressure])}
 
                                         params_list.append(params)
 

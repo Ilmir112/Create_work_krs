@@ -591,6 +591,7 @@ class CheckWellExistence:
         well_column, cdng, area_column, oilfield, categoty_pressure = None, None, None, None, None
         pressure_Gst, date_measurement, pressure_Ppl, categoty_h2s = None, None, None, None
         h2s_pr, h2s_mg_l, h2s_mg_m, categoty_gf, gas_factor = None, None, None, None, None
+        wellhead_pressure = 0
         area_row = 0
         check_file = False
         check_param = None
@@ -600,21 +601,27 @@ class CheckWellExistence:
                 check_file = True
             elif any(['фонд' in str(value).lower() for col, value in enumerate(row)]):
                 for col, value in enumerate(row):
-                    if 'туймазин' in str(value).lower():
-                        check_param = 'ТГМ'
-                    if 'ишимбай' in str(value).lower():
-                        check_param = 'ИГМ'
-                    if 'чекмагуш' in str(value).lower():
-                        check_param = 'ЧГМ'
-                    if 'красно' in str(value).lower():
-                        check_param = 'КГМ'
-                    if 'арлан' in str(value).lower():
-                        check_param = 'АГМ'
+                    if index_row < 22:
+                        if 'туймазин' in str(value).lower():
+                            check_param = 'ТГМ'
+                            break
+                        elif 'ишимбай' in str(value).lower():
+                            check_param = 'ИГМ'
+                            break
+                        elif 'чекмагуш' in str(value).lower():
+                            check_param = 'ЧГМ'
+                            break
+                        elif 'красно' in str(value).lower():
+                            check_param = 'КГМ'
+                            break
+                        elif 'арлан' in str(value).lower():
+                            check_param = 'АГМ'
+                            break
 
             elif 'Скважина' in row:
                 area_row = index_row + 2
                 for col, value in enumerate(row):
-                    if not value is None and col <= 20:
+                    if not value is None and col <= 75:
                         if 'Скважина' == value:
                             well_column = col
                         elif 'Цех' == value:
@@ -636,9 +643,12 @@ class CheckWellExistence:
                         elif 'Газовый фактор' == value:
                             categoty_gf = col
                             gas_factor = col + 1
+                        elif 'Расчет устьевое давление Рву' in str(value):
+                            wellhead_pressure = col + 3
+
         return check_param, well_column, cdng, area_column, oilfield, categoty_pressure, \
             pressure_Gst, date_measurement, pressure_Ppl, categoty_h2s, h2s_pr, h2s_mg_l, \
-            h2s_mg_m, categoty_gf, gas_factor, area_row, check_file
+            h2s_mg_m, categoty_gf, gas_factor, area_row, check_file, wellhead_pressure
 
     def insert_data_in_classification(self, region_name, cdng, well_number, area_well,
                                       oilfield_str, categoty_pressure, pressure_Ppl, pressure_Gst,

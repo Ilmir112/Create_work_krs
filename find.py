@@ -3364,13 +3364,38 @@ class WellCategory(FindIndexPZ):
                 return
 
             try:
-                category_pressure_well, categoty_h2s_well, categoty_gf, data = (
+                result = (
                     self.thread_excel.check_category(
                         self.well_number, self.well_area, self.region
                     )
                 )
+                if result:
+                    category_pressure_well = result["category_pressure"]
+                    categoty_h2s_well = result['category_h2s']
+                    categoty_gf = result['category_gf']
+                    wellhead_pressure = result['wellhead_pressure']
+                    if wellhead_pressure != '':
+                        wellhead_pressure = float(wellhead_pressure)
+                    else:
+                        wellhead_pressure = 0
+                    data = result["today"]
 
-                if category_pressure_well:
+                    if abs(float(wellhead_pressure) - self.max_expected_pressure.get_value) > 2:
+                        QMessageBox.warning(
+                            None,
+                            "Некорректная ожидаемое давление на устье",
+                            f"согласно классификатора от {data} категория скважина "
+                            f"ожидаемое давление на устье составляет {wellhead_pressure:.1f}атм в план заказе "
+                            f"{self.max_expected_pressure.get_value}атм\n"
+                            f"Нужно вернуть ПЗ на доработку",
+                        )
+                        self.check_data_in_pz.append(
+                            f"согласно классификатора от {data} категория скважина "
+                            f"ожидаемое давление на устье составляет {wellhead_pressure:.1f}атм в план заказе "
+                            f"{self.max_expected_pressure.get_value}атм\n"
+                        )
+
+
                     if str(category_pressure_well) != str(self.category_pressure):
                         QMessageBox.warning(
                             None,
@@ -3382,8 +3407,8 @@ class WellCategory(FindIndexPZ):
                             f"согласно классификатора от {data} категория скважины "
                             f"по давлению {category_pressure_well} категории\n"
                         )
-                if categoty_h2s_well:
-                    if str(self.category_h2s_list[0]) != str(self.category_h2s):
+
+                    if str(categoty_h2s_well) != str(self.category_h2s):
                         # print(str(self.category_h2s_list[0]), self.category_h2s)
                         #
                         QMessageBox.warning(
@@ -3397,7 +3422,7 @@ class WellCategory(FindIndexPZ):
                             f"по сероводороду {categoty_h2s_well} категории\n"
                         )
 
-                if categoty_gf:
+
                     if str(categoty_gf) != str(self.category_gas_factor):
                         QMessageBox.warning(
                             None,

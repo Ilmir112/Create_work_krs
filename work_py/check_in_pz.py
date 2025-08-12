@@ -1,8 +1,7 @@
-import smtplib
 import urllib
 import webbrowser
 
-from PyQt5.QtWidgets import QDialog, QTextEdit, QPushButton, QVBoxLayout, QApplication
+from PyQt5.QtWidgets import QDialog, QTextEdit, QPushButton, QVBoxLayout, QApplication, QMessageBox
 import sys
 
 
@@ -19,7 +18,7 @@ class CustomMessageBox(QDialog):
 
         # Кнопка для закрытия окна
         close_button = QPushButton("Закрыть", self)
-        close_button.clicked.connect(self.close)
+        close_button.clicked.connect(self.close_window)
 
         # Кнопка для отправки текста по электронной почте
         send_button = QPushButton("Отправить по почте", self)
@@ -31,6 +30,11 @@ class CustomMessageBox(QDialog):
         layout.addWidget(send_button)
         layout.addWidget(close_button)
         self.setLayout(layout)
+
+    def close_window(self):
+        mes = QMessageBox.question(self, "Вопрос", "Уверены, что  ПЗ не нужно отправлять заказчику на исправление?")
+        if mes == QMessageBox.StandardButton.Yes:
+            self.close()
 
     def send_email(self):
         # Получаем текст из текстового поля
@@ -46,6 +50,7 @@ class CustomMessageBox(QDialog):
 
         # Открываем почтовый клиент
         webbrowser.open(mailto_link)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
