@@ -61,6 +61,7 @@ class TabPageGnkt(TabPageUnion):
         self.current_bottom_label = QLabel('необходимый текущий забой')
         self.current_bottom_edit = QLineEdit(self)
         self.current_bottom_edit.setText(f'{self.data_well.need_depth}')
+        self.current_bottom_edit.setValidator(self.validator_float)
 
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
         self.fluid_edit = QLineEdit(self)
@@ -1006,7 +1007,6 @@ class GnktModel(WindowUnion):
              None, None,
              'Ø канавки', None, f'{self.data_well.groove_diameter}', None, None,
              None, None, None, None, 'л/п.м.', 'м3'],
-
             [None, None, None, None, None, None, None, None, None, nkt_schema, None, None, 'Направление', None,
              None,
              f'{self.data_well.column_direction_diameter.get_value}',
@@ -1044,15 +1044,15 @@ class GnktModel(WindowUnion):
              column_data_add_wall_thickness, column_data_add_vn_volume, column_add_head, column_add_shoe, None,
              volume_pm_dp, self.well_volume_dp],
             [None, None, None, None, None, None, None, None, None, None, None, None, 'колонна НКТ', None, None, nkt_str,
-             nkt_widht_str, vn_str, length_nkt, None, None, volume_vn_str, volume_str],
+             nkt_widht_str, vn_str, f'0-{self.data_well.depth_fond_paker_before["before"]}', None, None, volume_vn_str, volume_str],
             [None, None, None, None, None, None, None, None, None, None, None, None,
              f'{self.data_well.paker_before["before"]}',
              None, None, None, None,
              50, self.data_well.depth_fond_paker_before["before"],
              round(self.data_well.depth_fond_paker_before["before"] + length_paker, 1),
              length_paker, None, None],
-            [None, None, None, None, None, None, None, None, None, 'пакер', None, None, 'без патрубка', None, None,
-             None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None, None, 'пакер', None, None, 'колонна НКТ', None, None,
+             nkt_str, nkt_widht_str, vn_str, f'{self.data_well.depth_fond_paker_before["before"] + length_paker}-{voronka}', None, None, None, None],
             [None, None, None, None, None, None, None, None, None,
              f'на гл {self.data_well.depth_fond_paker_before["before"]}м',
              None, None,

@@ -988,7 +988,13 @@ class DataWindow(WindowUnion):
             max_angle_depth = (
                 self.current_widget.max_angle_depth_edit_type.text().replace(",", ".").strip()
             )
+            if max_angle_depth in [None, 'отсут']:
+                QMessageBox.warning(self, "Максимальный угол", "глубина максимального угла не корректна")
+                return
             max_angle = self.current_widget.max_angle_edit_type.text().replace(",", ".").strip()
+            if max_angle in [None, '0']:
+                QMessageBox.warning(self, "Максимальный угол", "максимальный угол не корректен")
+                return
             max_expected_pressure = self.current_widget.max_expected_pressure_edit_type.text().replace(",", ".").strip()
 
             max_admissible_pressure = self.current_widget.max_admissible_pressure_edit_type.text().replace(",", ".").strip()
@@ -1642,28 +1648,35 @@ class DataWindow(WindowUnion):
                         and len(self.data_well.dict_sucker_rod) == 0
                 ):
 
-                    QMessageBox.warning(
+                    mes = QMessageBox.question(
                         self,
                         "ОШИБКА",
                         f'при спущенном насосе {self.data_well.dict_pump_shgn["before"]} '
-                        f"не указаны штанги, либо не корректно прочитаны данные ",
+                        f"не указаны штанги, либо не корректно прочитаны данные, продолжить? ",
                     )
-                    self.pause_app()
+                    self.data_well.check_data_in_pz.append(
+                        f"при спущенном насосе {self.data_well.dict_pump_shgn['before']} не указаны штанги\n"
+                    )
+                    if mes == QMessageBox.StandardButton.No:
+                        self.pause_app()
 
-                    return
+                        return
                 if (
                         str(self.data_well.dict_pump_shgn["after"]) != "0"
                         and len(self.data_well.dict_sucker_rod_after) == 0
                 ):
-                    QMessageBox.warning(
+                    mes = QMessageBox.question(
                         self,
                         "ОШИБКА",
-                        f'при плановом насосе {self.data_well.dict_pump_shgn["before"]} '
-                        f"не указаны штанги, либо не корректно прочитаны данные ",
+                        f'при плановом насосе {self.data_well.dict_pump_shgn["after"]} '
+                        f"не указаны штанги, либо не корректно прочитаны данные, продолжить?",
                     )
-                    self.pause_app()
-
-                    return
+                    self.data_well.check_data_in_pz.append(
+                        f"при плановом насосе {self.data_well.dict_pump_shgn['after']} не указаны штанги\n"
+                    )
+                    if mes == QMessageBox.StandardButton.No:
+                        self.pause_app()
+                        return
                 if self.data_well.column_additional is False or (
                         self.data_well.column_additional
                         and self.data_well.current_bottom

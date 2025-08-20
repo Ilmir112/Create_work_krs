@@ -308,7 +308,7 @@ class TabPageUnion(QWidget):
         self.data_well.dict_sucker_rod = response["sucker_pod"]["До"]
 
         self.data_well.inventory_number = response["inventory_number"]
-        self.data_well.angle_data = response["angle_data"]["инклинометрия"],
+        self.data_well.angle_data = response["angle_data"]["инклинометрия"]
         self.data_well.bottom_hole_drill = ProtectedIsDigit(response["bottom_hole_drill"])
         self.data_well.bottom_hole_artificial = ProtectedIsDigit(response["bottom_hole_artificial"])
         self.data_well.max_angle = ProtectedIsDigit(response["max_angle"])
@@ -1519,12 +1519,12 @@ class WindowUnion(MyMainWindow):
 
     @classmethod
     def calculate_time_ozc(cls, roof_rir_edit):
-        if roof_rir_edit >= 1300:
+        # if roof_rir_edit >= 1300:
+        if roof_rir_edit >= 100:
             string = f'ОЗЦ 24 часа: (по качеству пробы) с момента срезки В случае не получения ' \
                      f'технологического "СТОП" ОЗЦ без давления.'
             string_short = 'ОЗЦ 24 часа'
             time = 24
-
         else:
             string = f'ОЗЦ 12-16 часа: (по качеству пробы) с момента срезки В случае не получения ' \
                      f'технологического "СТОП" ОЗЦ без давления.'
@@ -1961,12 +1961,12 @@ class WindowUnion(MyMainWindow):
             return False
 
     def pvo_gno(self, kat_pvo):
-        self.text_pvo = f'{self.data_well.max_admissible_pressure.get_value}атм ' \
-                        f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
+        self.text_pvo = f'{self.data_well.max_expected_pressure.get_value}атм ' \
+                        f'(на максимально ожидаемое давление еа устье в течении 30мин (не менее 30атм), но не выше ' \
                         f'давление опрессовки эксплуатационной колонны) '
         if self.data_well.curator == 'ВНС':
-            self.text_pvo = f'{self.data_well.max_admissible_pressure.get_value * 1.1:.1f}атм. ' \
-                            f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
+            self.text_pvo = f'{self.data_well.max_expected_pressure.get_value * 1.1:.1f}атм. ' \
+                            f'(на максимально ожидаемое давление еа устье в течении 30мин (не менее 30атм), но не выше ' \
                             f' давление опрессовки эксплуатационной колонны) '
 
         date_str = data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]

@@ -4163,19 +4163,7 @@ class SaveInExcel(MyWindow):
             QMessageBox.warning(self, "ошибка", "скважина не добавлена в well_data")
             # return
 
-        # insert_data_base_gnkt(
-        #     self,
-        #     data_list.contractor,
-        #     filenames,
-        #     gnkt_data.gnkt_number_combo,
-        #     int(gnkt_data.length_gnkt_edit),
-        #     float(gnkt_data.diameter_length),
-        #     float(gnkt_data.iznos_gnkt_edit) * 1.014,
-        #     int(gnkt_data.pipe_mileage_edit) + int(gnkt_data.current_bottom_edit * 1.1),
-        #     gnkt_data.pipe_fatigue,
-        #     int(gnkt_data.pvo_number),
-        #     gnkt_data.previous_well_combo,
-        # )
+
 
         if self.data_well.bvo is True:
             ws5 = self.gnkt_data.wb_gnkt.create_sheet("Sheet1")
@@ -4545,7 +4533,7 @@ class SaveInExcel(MyWindow):
                         text_len = len(text)
                         for key, value in text_width_dict.items():
                             if value[0] <= text_len <= value[1]:
-                                ws2.row_dimensions[i + 1].height = min([400, int(key) + text.count("\n") * 3])
+                                ws2.row_dimensions[i + 1].height = min([400, int(key) + text.count("\n") * 4])
 
         if "prs" not in self.data_well.work_plan:
             head = self.head_ind(0, ind_ins)

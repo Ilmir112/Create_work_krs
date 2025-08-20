@@ -591,11 +591,11 @@ class DrillWindow(WindowUnion):
             drilling_str = f'{drill_type_combo}-{drilling_bit_diam} для ЭК ' \
                            f'{self.data_well.column_additional_diameter.get_value}мм х ' \
                            f'{self.data_well.column_additional_wall_thickness.get_value}мм + СБТ{nkt_pod} ' \
-                           f'{self.data_well.current_bottom - self.data_well.head_column_additional.get_value}м'
+                           f'{current_depth - self.data_well.head_column_additional.get_value:.0f}м'
             drilling_short = f'{drill_type_combo}-{drilling_bit_diam}  + СБТ{nkt_pod} ' \
-                             f'{self.data_well.current_bottom - self.data_well.head_column_additional.get_value}м'
+                             f'{current_depth - self.data_well.head_column_additional.get_value}м'
             sbt_length = f'СБТ {nkt_diam} - {self.data_well.head_column_additional.get_value}м и СБТ {nkt_pod}' \
-                         f' {int(current_depth + 100) - self.data_well.head_column_additional.get_value}м'
+                         f' {int(current_depth + 100) - self.data_well.head_column_additional.get_value:.0f}м'
 
         self.data_well.drilling_interval.append([self.data_well.current_bottom, current_depth])
 

@@ -279,12 +279,12 @@ def pvo_cat1(self):
     if need_paker == "Да":
         paker_str = ("Спустить и посадить пакер на глубину 10м.", "сорвать и извлечь пакер.")
 
-    self.text_pvo = f'на давление {self.data_well.max_admissible_pressure.get_value}атм  ' \
-                    f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
+    self.text_pvo = f'на давление {self.data_well.max_expected_pressure.get_value}атм  ' \
+                    f'(на максимально ожидаемое давление на устье в течении 30мин (не менее 30атм), но не выше ' \
                     f'давление опрессовки эксплуатационной колонны) '
 
     if self.data_well.curator == 'ВНС':
-        self.text_pvo = f'{self.data_well.max_admissible_pressure.get_value:.1f}атм  на ' \
+        self.text_pvo = f'{self.data_well.max_expected_pressure.get_value:.1f}атм  на ' \
                         f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
                         f' давление опрессовки эксплуатационной колонны) '
 

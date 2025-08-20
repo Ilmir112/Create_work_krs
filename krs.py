@@ -23,7 +23,6 @@ class TabPageGno(TabPageUnion):
         self.current_bottom_label = QLabel('Забой текущий')
         self.current_bottom_edit = QLineEdit(self)
 
-
         if self.data_well.need_depth:
             self.current_bottom_edit.setText(f'{self.data_well.need_depth}')
         else:
@@ -179,7 +178,8 @@ class TabPageGno(TabPageUnion):
             fluid_p = 1.01
 
         for plast in self.data_well.plast_work:
-            if 'рабочая жидкость' in plast:
+            if 'рабочая жидкость' in self.data_well.dict_perforation[plast]:
+                asdwd = self.data_well.dict_perforation[plast]['рабочая жидкость']
                 if float(list(self.data_well.dict_perforation[plast]['рабочая жидкость'])[0]) > fluid_p:
                     fluid_p = list(self.data_well.dict_perforation[plast]['рабочая жидкость'])[0]
         fluid_list.append(fluid_p)
@@ -365,7 +365,7 @@ class GnoParent(ABC):
             " " if self.without_damping_true is True else f"Приподнять штангу. Произвести глушение в "
                                                           f"трубное пространство в объеме{self.well_jamming_ord}м3 "
                                                           f"(объем колонны от пакера до устья уд.весом"
-                                                          f" {self.data_well.fluid_work}. Техостой 2ч."])
+                                                          f" {self.data_well.fluid_work}. "])
 
         if self.data_well.work_plan == 'krs' or self.data_well.curator == 'ВНС':
             if any([str(cater) == '1' for cater in self.data_well.category_pressure_list]):
@@ -373,15 +373,14 @@ class GnoParent(ABC):
                 self.data_well.category_pvo, _ = QInputDialog.getInt(
                     None, 'Категория скважины', f'Категория скважины № {self.data_well.category_pvo}, корректно?',
                     self.data_well.category_pvo, 1, 2)
-        if self.data_well.max_expected_pressure.get_value < 30:
-            self.data_well.max_expected_pressure = data_list.ProtectedIsDigit(30)
 
-        self.text_pvo = f'на давление {self.data_well.max_admissible_pressure.get_value}атм ' \
-                        f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
+
+        self.text_pvo = f'на давление {self.data_well.max_expected_pressure.get_value}атм ' \
+                        f'(на максимально ожидаемое давление на устье в течении 30мин (не менее 30атм), но не выше ' \
                         f' давление опрессовки эксплуатационной колонны) '
         if self.data_well.curator == 'ВНС':
-            self.text_pvo = f'на давление {self.data_well.max_admissible_pressure.get_value * 1.1:.1f}атм на ' \
-                            f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
+            self.text_pvo = f'на давление {self.data_well.max_expected_pressure.get_value * 1.1:.1f}атм на ' \
+                            f'(на максимально ожидаемое давление на устье в течении 30мин (не менее 30атм), но не выше ' \
                             f' давление опрессовки эксплуатационной колонны)'
             # f'максимально не ниже ожидаемого давления с выдержкой в течении 30 минут ' \
             # f'(+10% на скважинах освоения), но не менее 30атм,  но не выше чем ' \
@@ -656,7 +655,7 @@ class GnoParent(ABC):
             " " if self.without_damping_true is True else f"Приподнять штангу. Произвести глушение в "
                                                           f"трубное пространство в объеме{well_jamming_ord}м3 "
                                                           f"(объем колонны от пакера до устья уд.весом"
-                                                          f" {self.data_well.fluid_work}. Техостой 2ч."])
+                                                          f" {self.data_well.fluid_work}."])
 
         work_hard_fluid_list = self.calculate_hard_fluid()
         if work_hard_fluid_list:
@@ -718,7 +717,8 @@ class GnoParent(ABC):
                                f'{self.data_well.max_admissible_pressure.get_value}атм до выхода чистого раствора.' \
                                f'(при отсутствии на выходе  {self.data_well.fluid_work}г/см3, ' \
                                f'продолжить прокачку до выхода планового раствора). Закрыть ' \
-                               f'затрубное пространство. Тех отстой 1-2 часа. Произвести замер избыточного ' \
+                               f'затрубное пространство. При не получении тех жидкости планового удельного веса - ' \
+                               f'тех отстой 1-2 часа. Произвести замер избыточного ' \
                                f'давления в скважине.' \
                                f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость). ' \
                                f'до выхода чистого раствора.\n' \
@@ -732,7 +732,8 @@ class GnoParent(ABC):
                                f'жидкостью уд.весом {self.data_well.fluid_work}' \
                                f' на циркуляцию. (согласовать глушение в коллектор, ' \
                                f'в случае отсутствия ' \
-                               f'на желобную емкость). '
+                               f'на желобную емкость). При не получении тех жидкости планового удельного веса - ' \
+                               f'тех отстой 1-2 часа'
             well_jamming_short = (f'Глушение в НКТ в объеме {self.volume_well_jamming}м3 уд.весом '
                                   f'{self.data_well.fluid_work_short}')
 
@@ -743,7 +744,9 @@ class GnoParent(ABC):
                                f'в трубное пространство ' \
                                f'тех жидкости в ' \
                                f'объеме {volume_nkt_ustie}м3 на ' \
-                               f'циркуляцию. Закрыть затрубное пространство. Тех отстой 1-2 часа. Произвести ' \
+                               f'циркуляцию. Закрыть затрубное пространство. При не получении тех жидкости ' \
+                               f'планового удельного веса - ' \
+                               f'тех отстой 1-2 часа. Произвести ' \
                                f'замер избыточного давления в скважине.' \
                                f'Произвести закачку на поглощение не более ' \
                                f'{self.data_well.max_admissible_pressure.get_value}атм ' \
@@ -759,13 +762,14 @@ class GnoParent(ABC):
             well_jamming_str = f'Произвести закачку в трубное пространство тех жидкости уд.весом ' \
                                f'{self.data_well.fluid_work} в ' \
                                f'объеме {round(self.volume_well_jamming - volume_pod_nkt_str, 1)}м3 на циркуляцию. ' \
-                               f'Закрыть трубное пространство. Тех отстой 1-2 часа. ' \
+                               f'Закрыть трубное пространство. При не получении тех жидкости планового удельного веса - ' \
+                               f'тех отстой 1-2 часа. ' \
                                f'Произвести замер избыточного давления в скважине.' \
                                f'(согласовать глушение в коллектор, в случае отсутствия на желобную емкость). '
 
             well_jamming_short = f'Глушение в НКТ уд.весом {self.data_well.fluid_work_short} ' \
                                  f'объеме {volume_nkt_str}м3 ' \
-                                 f'на циркуляцию.  Тех отстой 1-2 часа. Произвести замер избыточного давления в скважине.'
+                                 f'на циркуляцию.'
 
 
         elif self.without_damping_true is False and self.lift_key in ['НН', 'НВ']:
@@ -773,7 +777,8 @@ class GnoParent(ABC):
                                f'жидкостью уд.весом {self.data_well.fluid_work}' \
                                f' на циркуляцию в следующим алгоритме: \n Произвести закачку в' \
                                f' затрубное пространство тех жидкости в объеме {volume_nkt_ustie}м3 на ' \
-                               f'циркуляцию. Закрыть трубное пространство. Тех отстой 1-2 часа. ' \
+                               f'циркуляцию. Закрыть трубное пространство. При не получении тех жидкости планового удельного веса - ' \
+                               f'тех отстой 1-2 часа. ' \
                                f'Произвести замер избыточного давления в скважине.' \
                                f'Произвести закачку на поглощение не более ' \
                                f'{self.data_well.max_admissible_pressure.get_value}атм ' \
@@ -1426,7 +1431,7 @@ class LiftPumpNnWithPaker(GnoParent):
              f'инженером {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). Опрессовать ПВО на '
              f'{self.text_pvo} Спуском одной штанги заловить конус. '
-             f'{sucker_jamming}м3. Техостой 2ч. '
+             f'{sucker_jamming}м3. '
              f'Поднять на штангах плунжер с гл. {int(self.data_well.dict_pump_shgn_depth["before"])}м с доливом тех '
              f'жидкости уд.весом {self.data_well.fluid_work} '
              f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве '
@@ -1567,7 +1572,7 @@ class LiftPumpNvWithPaker(GnoParent):
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г при СПО штанг '
              f'(ПМШ 62х21 либо аналог). '
              f'Опрессовать ПВО на {self.text_pvo} '
-             f'{"".join([" " if self.without_damping_true is True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_nkt(self)}м3. Техостой 2ч."])}'
+             f'{"".join([" " if self.without_damping_true is True else f"При наличии Избыточного давления не позволяющее сорвать пакера: Приподнять штангу. Произвести глушение в НКТ в объеме{volume_pod_nkt(self)}м3. "])}'
              f' Поднять на штангах насос с гл. {float(self.data_well.dict_pump_shgn_depth["before"])}м с '
              f'доливом тех жидкости уд.весом {self.data_well.fluid_work} '
              f'Обеспечить не превышение расчетных нагрузок на штанговые колонны при срыве  '

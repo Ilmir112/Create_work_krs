@@ -88,7 +88,7 @@ class GeophysicWindow(WindowUnion):
         vbox.addWidget(self.buttonDel, 2, 1)
         vbox.addWidget(self.buttonadd_work, 3, 0)
 
-    def geophysicalSelect(self, geophysic):
+    def geophysical_select(self, geophysic):
 
         return geophysic
 
@@ -101,7 +101,7 @@ class GeophysicWindow(WindowUnion):
 
         edit_type = float(self.tab_widget.currentWidget().lineedit_type.text().replace(',', '.'))
         edit_type2 = float(self.tab_widget.currentWidget().lineedit_type2.text().replace(',', '.'))
-        researchGis = self.geophysicalSelect(str(self.tab_widget.currentWidget().ComboBoxGeophygist.currentText()))
+        researchGis = self.geophysical_select(str(self.tab_widget.currentWidget().ComboBoxGeophygist.currentText()))
 
         if self.data_well.column_additional is False or \
                 (

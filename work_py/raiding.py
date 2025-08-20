@@ -1,7 +1,5 @@
-
-
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import  QMessageBox, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout,\
+from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, \
     QTableWidget, QHeaderView, QPushButton, QTableWidgetItem
 
 import data_list
@@ -34,7 +32,7 @@ class TabPageSoRaid(TabPageUnion):
         self.downhole_motor_line.setClearButtonEnabled(True)
 
         if self.data_well.column_additional is False or (self.data_well.column_additional and
-                                    self.data_well.head_column_additional.get_value < self.data_well.current_bottom):
+                                                         self.data_well.head_column_additional.get_value < self.data_well.current_bottom):
             self.raid_select_combo.setCurrentIndex(0)
             if self.data_well.column_diameter.get_value > 127:
                 self.downhole_motor_line.setText('Д-106')
@@ -99,7 +97,8 @@ class TabPageSoRaid(TabPageUnion):
         self.raid_select_combo.setCurrentIndex(1)
 
         if self.data_well.column_additional is False or \
-                (self.data_well.column_additional and self.data_well.current_bottom < self.data_well.head_column_additional.get_value):
+                (
+                        self.data_well.column_additional and self.data_well.current_bottom < self.data_well.head_column_additional.get_value):
             self.raid_select_combo.setCurrentIndex(0)
         else:
 
@@ -116,12 +115,12 @@ class TabPageSoRaid(TabPageUnion):
     def update_raid_edit(self, index):
 
         if index == 'райбер в ЭК':
-            self.raid_diameter_line.setText(str(self.raiding_bit_diam_select(self.data_well.head_column_additional.get_value - 10)))
+            self.raid_diameter_line.setText(
+                str(self.raiding_bit_diam_select(self.data_well.head_column_additional.get_value - 10)))
             if self.data_well.column_diameter.get_value > 127:
                 self.downhole_motor_line.setText('Д-106')
             else:
                 self.downhole_motor_line.setText('Д-76')
-
 
         if index == 'райбер в ДП':
             self.raid_diameter_line.setText(str(self.raiding_bit_diam_select(self.data_well.current_bottom)))
@@ -163,10 +162,10 @@ class TabPageSoRaid(TabPageUnion):
             if diam_internal_bit[0] <= diam_internal_ek <= diam_internal_bit[1]:
                 bit_diameter = diam
 
-        if 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and \
-                '122' in str(self.data_well.paker_before["after"]) and \
-                str(self.data_well.column_diameter.get_value) == "146":
-            bit_diameter = 126
+        # if 'ПОМ' in str(self.data_well.paker_before["after"]).upper() and \
+        #         '122' in str(self.data_well.paker_before["after"]) and \
+        #         str(self.data_well.column_diameter.get_value) == "146":
+        #     bit_diameter = 126
 
         return bit_diameter
 
@@ -261,16 +260,16 @@ class Raid(WindowUnion):
             if ryber_key == 'райбер в ЭК' and self.data_well.column_additional and \
                     raiding_interval[0][1] > self.data_well.head_column_additional.get_value:
                 QMessageBox.warning(self, 'Ошибка',
-                                          'Не корректно выбрана компоновка')
+                                    'Не корректно выбрана компоновка')
                 return
             elif ryber_key == 'райбер в ДП' and self.data_well.column_additional and \
                     raiding_interval[0][0] < self.data_well.head_column_additional.get_value:
                 QMessageBox.warning(self, 'Ошибка',
-                                          'Не корректно выбрана компоновка')
+                                    'Не корректно выбрана компоновка')
                 return
         if len(raiding_interval) == 0:
             QMessageBox.warning(self, 'Ошибка',
-                                      'Не выбраны интервалы райбирования')
+                                'Не выбраны интервалы райбирования')
             return
 
         for roof, sole in raiding_interval:
@@ -302,8 +301,8 @@ class Raid(WindowUnion):
                 sole = int(sole_raid.text())
                 if sole > self.data_well.current_bottom:
                     QMessageBox.warning(self, 'Ошибка',
-                                              f'подошвы райбирования {sole}м больше текущего забоя'
-                                              f' {self.data_well.current_bottom}м')
+                                        f'подошвы райбирования {sole}м больше текущего забоя'
+                                        f' {self.data_well.current_bottom}м')
                     return
                 raid_tuple.append((roof, sole))
 
@@ -350,7 +349,7 @@ class Raid(WindowUnion):
         nkt_diam = self.data_well.nkt_diam
         nkt_template = self.data_well.nkt_template
         if raid_type_combo == 'ФКК+фрезер Ф32':
-            raid_type_combo = f'ФКК-{ryber_diam} + фрезер Ф32-{int(float(ryber_diam)+1)}'
+            raid_type_combo = f'ФКК-{ryber_diam} + фрезер Ф32-{int(float(ryber_diam) + 1)}'
         else:
             raid_type_combo = f'{raid_type_combo}-{ryber_diam}'
 
@@ -420,13 +419,14 @@ class Raid(WindowUnion):
 
         if 'ФКК+фрезер Ф32' in raid_type_combo:
             ryber_list.append([None, None,
-             f'При наличии АСПО и необходимости проведения обработки скважины растворителем или при незначительной '
-             f'циркуляции при промывке скважины по согласованию с заказчиком произвести СПО шаблона по '
-             f'дополнительному плану работ',
-             None, None, None, None, None, None, None,
-             'мастер КРС', ])
+                               f'При наличии АСПО и необходимости проведения обработки скважины растворителем или при незначительной '
+                               f'циркуляции при промывке скважины по согласованию с заказчиком произвести СПО шаблона по '
+                               f'дополнительному плану работ',
+                               None, None, None, None, None, None, None,
+                               'мастер КРС', ])
             if self.data_well.column_additional is False or \
-                    (self.data_well.column_additional and self.data_well.head_column_additional.get_value < self.data_well.current_bottom):
+                    (
+                            self.data_well.column_additional and self.data_well.head_column_additional.get_value < self.data_well.current_bottom):
                 self.data_well.template_depth = self.data_well.current_bottom
             else:
                 self.data_well.template_depth_addition = self.data_well.current_bottom
@@ -461,7 +461,6 @@ class Raid(WindowUnion):
                        'райбер в ДП': (ryber_str_DP, ryber_str_short_dp)}
 
         ryber_str, ryber_str_short = rayber_dict[ryber_key]
-
 
         if len(raiding_interval_tuple) != 0:
             krovly_raiding = int(raiding_interval_tuple[0][0])
@@ -518,7 +517,6 @@ class Raid(WindowUnion):
         #         for row in fluid_change(self):
         #             ryber_list.insert(-1, row)
         return ryber_list
-
 
 # if __name__ == "__main__":
 #     import sys

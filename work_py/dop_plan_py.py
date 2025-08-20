@@ -339,7 +339,7 @@ class DopPlanWindow(WindowUnion):
             self.date_pressure_edit = current_widget.date_pressure_edit.text()
             vertical_line = current_widget.vertical_line.text().replace(',', '.')
 
-            if '' in [self.plast_line, self.roof_edit, self.sole_edit, self.count_pvr_edit, self.type_pvr_edit]:
+            if '' in [self.plast_line, self.roof_edit, self.sole_edit, self.count_pvr_edit, self.type_pvr_edit, vertical_line]:
                 QMessageBox.warning(self, 'Ошибка', 'Не введены все данные')
                 return
             udlin = round(float(self.roof_edit) - float(vertical_line), 1)
