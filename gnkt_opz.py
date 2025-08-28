@@ -16,10 +16,9 @@ from PyQt5.QtWidgets import (
 import data_list
 from cdng import events_gnvp_frez
 from find import FindIndexPZ
-from krs import GnoWindow
 from work_py.acid_paker import CheckableComboBox
 from work_py.gnkt_grp_work import GnktModel
-from work_py.parent_work import TabPageUnion, TabWidgetUnion
+from work_py.parent_work import TabWidgetUnion
 
 
 class TabPageGnkt(QWidget):
@@ -258,9 +257,7 @@ class GnktOpz(GnktModel):
         self.tableWidget.removeRow(row)
 
     def add_work(self):
-
         self.current_widget = self.tab_widget.currentWidget()
-
         try:
             self.need_rast_combo = self.current_widget.need_rast_combo.currentText()
             self.volume_rast_edit = float(self.current_widget.volume_rast_edit.text())
@@ -668,8 +665,9 @@ class GnktOpz(GnktModel):
             [
                 None,
                 12,
-                f"Произвести спуск БДТ + насадка 5 каналов до {self.data_well.current_bottom}м (забой) с промывкой скважины "
-                f"мин.водой уд.веса {self.data_well.fluid_work} с фиксацией давления промывки, расход "
+                f"Произвести спуск БДТ + насадка 5 каналов до {self.data_well.bottom} нормализовать до "
+                f"{self.data_well.current_bottom}м (забой) с промывкой скважины "
+                f"мин.водой уд.веса {self.data_well.fluid_work}  с фиксацией давления промывки, расход "
                 f"жидкости не менее 200л\\мин, объем "
                 f"промывки не менее 1 цикла  со скоростью 5м/мин. Убедиться в наличии свободного прохода КНК-2 (при "
                 f"прохождении насадкой лубрикаторной задвижки, пакера, воронки скорость спуска минимальная 2м/мин). При "
@@ -677,9 +675,8 @@ class GnktOpz(GnktModel):
                 f"Произвести продувка (на циркуляции) растворителя АСПО до башмака ГНКТ мин.водой уд.вес "
                 f"{self.data_well.fluid_work} "
                 f"в объёме 2,0м3. Закрыть Кран на тройнике устьевого оборудования. "
-                f"Стоянка на реакции 2 часа."
-                f" Промывка колонны "
-                f"НКТ - не менее1 цикла. Составить Акт. Промывка подвески ФНКТ по согласованию ПТО и ЦДНГ",
+                f"Стоянка на реакции 2 часа. Промывка колонны  НКТ - не менее1 цикла. Составить Акт. "
+                f"Промывка подвески ФНКТ по согласованию ПТО и ЦДНГ",
                 None,
                 None,
                 None,
@@ -772,7 +769,8 @@ class GnktOpz(GnktModel):
             [
                 f"гидросвабирование в инт {interval_sko}м при Рзак={self.data_well.max_admissible_pressure.get_value}атм",
                 23,
-                f"Произвести гидросвабирование пласта в интервале {interval_sko[:-2]}м (закрыть затруб, произвести "
+                f"Установить БДТ на {self.data_well.perforation_sole}м. Произвести гидросвабирование пласта в "
+                f"интервале {interval_sko[:-2]}м (закрыть затруб, произвести "
                 f"задувку в пласт "
                 f"жидкости при не более Рзак={self.data_well.max_admissible_pressure.get_value}атм при установленном "
                 f"герметичном пакере. "

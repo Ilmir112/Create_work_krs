@@ -251,19 +251,31 @@ def events_gnvp_frez(self, distance, fluid):
     if niz_nkt == 0:
         niz_nkt = round(self.data_well.perforation_roof - 100, 0)
 
-    if self.data_well.depth_fond_paker_before["before"] != 0:
+    if self.data_well.current_bottom - self.data_well.perforation_roof > 10:
+        string_speed = f'в интервале {self.data_well.perforation_roof - 10}-' \
+                       f'{self.data_well.perforation_roof + 10}м не более 10 м/мин;\n' \
+                        f'в интервале {self.data_well.perforation_roof + 10}-{self.data_well.current_bottom}м ' \
+                       f'не более 10-15м/мин;'
+        string_speed_up = f'в интервале забой-{self.data_well.perforation_roof + 10}м не более 10-15 м/мин;\n' \
+                          f'в интервале {self.data_well.perforation_roof + 10}-{self.data_well.perforation_roof - 10} ' \
+                          f'не более 10 м/мин;\n'
 
+    else:
+        string_speed = f'в интервале {self.data_well.perforation_roof - 10}-{self.data_well.current_bottom}м ' \
+                       f'не более 10-15м/мин;'
+
+        string_speed_up = f'в интервале забой-{self.data_well.perforation_roof - 10} ' \
+                          f'не более 10 м/мин;\n'
+
+
+    if self.data_well.depth_fond_paker_before["before"] != 0:
         up_gnkt_str = f'Скорость спуска по интервалам:\n' \
                       f'в устьевом оборудовании не более 0.5м/мин;\n' \
                       f'в интервале 2 -{niz_nkt - 20}м не более 10-15м/мин ' \
                       f'(первичный-последующий спуск);\n' \
                       f'в интервале {niz_nkt - 20}-{self.data_well.perforation_roof - 10}м не ' \
-                      f'более 2м/мин;\n' \
-                      f'в интервале {self.data_well.perforation_roof - 10}-{self.data_well.perforation_roof + 10}м не более 10 м/мин;\n' \
-                      f'в интервале {self.data_well.perforation_roof + 10}-{self.data_well.current_bottom}м не более 10-15м/мин;'
-        down_gntk_str = f'Скорость подъёма по интервалам:\n' \
-                        f'в интервале забой-{self.data_well.perforation_roof + 10}м не более 10-15 м/мин;\n' \
-                        f'в интервале {self.data_well.perforation_roof + 10}-{self.data_well.perforation_roof - 10} не более 10 м/мин;\n' \
+                      f'более 2м/мин;\n' + string_speed
+        down_gntk_str = f'Скорость подъёма по интервалам:\n' + string_speed_up +\
                         f'в интервале {self.data_well.perforation_roof - 10}-{niz_nkt - 20} не более 2 м/мин;\n' \
                         f'в интервале {niz_nkt - 20}-2м не более 15-20 м/мин;\n' \
                         f'в устьевом оборудовании не более 0.5 м/мин.'

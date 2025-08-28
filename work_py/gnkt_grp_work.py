@@ -60,8 +60,8 @@ class TabPageGnkt(TabPageUnion):
 
         self.current_bottom_label = QLabel('необходимый текущий забой')
         self.current_bottom_edit = QLineEdit(self)
-        self.current_bottom_edit.setText(f'{self.data_well.need_depth}')
         self.current_bottom_edit.setValidator(self.validator_float)
+        self.current_bottom_edit.setText(f'{self.data_well.need_depth}')
 
         self.fluid_label = QLabel("уд.вес жидкости глушения", self)
         self.fluid_edit = QLineEdit(self)
@@ -769,7 +769,7 @@ class GnktModel(WindowUnion):
                       f'приемистость пласта в трубное пространство при давлении не более '
                       f'{self.data_well.max_admissible_pressure.get_value}атм'
                       f'  (перед определением приемистости произвести закачку тех.воды не менее 6м3 или при установившемся '
-                      f'давлении закачки, но не более 1 часа). Установить БДТ на гл.{self.data_well.current_bottom}м.',
+                      f'давлении закачки, но не более 1 часа).',
                       None, None, None, None, None, None, None,
                       'Мастер ГНКТ, состав бригады, представитель Заказчика', 1.33],
                      ]
@@ -1052,13 +1052,18 @@ class GnktModel(WindowUnion):
              round(self.data_well.depth_fond_paker_before["before"] + length_paker, 1),
              length_paker, None, None],
             [None, None, None, None, None, None, None, None, None, 'пакер', None, None, 'колонна НКТ', None, None,
-             nkt_str, nkt_widht_str, vn_str, f'{self.data_well.depth_fond_paker_before["before"] + length_paker}-{voronka}', None, None, None, None],
+             nkt_str, nkt_widht_str, vn_str,
+             f'{self.data_well.depth_fond_paker_before["before"] + length_paker}-{voronka}', None,
+             None, volume_vn_str,
+             f'{(voronka-self.data_well.depth_fond_paker_before["before"] + length_paker) * volume_vn_str}'],
             [None, None, None, None, None, None, None, None, None,
              f'на гл {self.data_well.depth_fond_paker_before["before"]}м',
              None, None,
              voronka_str, None, None, nkt, None,
              None, voronka, None, None, None, None],
-            [None, None, None, None, None, None, None, None, None, None, None, None, 'Данные о перфорации', None, None,
+            [None, None, None, None, None, None, None, None,
+             f'хв {voronka-self.data_well.depth_fond_paker_before["before"] + length_paker}', None, None, None,
+             'Данные о перфорации', None, None,
              None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None,
              None, None, None, None, None],

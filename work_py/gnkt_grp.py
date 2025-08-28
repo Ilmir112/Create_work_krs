@@ -232,16 +232,18 @@ class GnktOsvWindow(GnktModel):
                           f'(первичный-последующий спуск);\n' \
                           f'в интервале {niz_nkt - 20}-{self.data_well.perforation_roof - 10}м не ' \
                           f'более 2м/мин;\n' \
-                          f'в интервале {self.data_well.perforation_roof - 10}-{self.data_well.perforation_roof + 10}м не более 10 м/мин;\n' \
+                          f'в интервале {self.data_well.perforation_roof - 10}-{self.data_well.perforation_roof + 10}м ' \
+                          f'не более 10 м/мин;\n' \
                           f'в интервале {self.data_well.perforation_roof + 10}-{current_bottom_edit}м не более 2-5 м/мин;'
             down_gntk_str = f'Скорость подъёма по интервалам:\n' \
                             f'в интервале забой-{self.data_well.perforation_roof + 10}м не более 10 м/мин;\n' \
-                            f'в интервале {self.data_well.perforation_roof + 10}-{self.data_well.perforation_roof - 10} не более 2 м/мин;\n' \
+                            f'в интервале {self.data_well.perforation_roof + 10}-{self.data_well.perforation_roof - 10} ' \
+                            f'не более 2 м/мин;\n' \
                             f'в интервале {self.data_well.perforation_roof - 10}-{niz_nkt - 20} не более 10 м/мин;\n' \
                             f'в интервале {niz_nkt - 20}-2м не более 15-20 м/мин;\n' \
                             f'в устьевом оборудовании не более 0.5 м/мин.'
-        elif self.data_well.dict_nkt_before:
 
+        elif self.data_well.dict_nkt_before:
             volume_well_jumping = round(volume_work(self.data_well) * 1.2, 1)
             volume_vn_nkt = round(volume_nkt(self.data_well) * 1.2, 1)
             volume_well_at_shoe = round(volume_jamming_well(self, niz_nkt) * 1.2, 1) - volume_vn_nkt

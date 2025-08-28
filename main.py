@@ -2149,7 +2149,8 @@ class MyMainWindow(QMainWindow):
             check_str = ""
             if len(
                     self.data_well.check_data_in_pz
-            ) != 0 and self.data_well.work_plan in ["krs", "prs"]:
+            ) != 0 and (self.data_well.work_plan in ["krs", "prs"] or
+                        ("gnkt" in self.data_well.work_plan and list_page == 2)):
 
                 for ind, check_data in enumerate(self.data_well.check_data_in_pz):
                     if check_data not in check_str:
@@ -3315,6 +3316,7 @@ class MyWindow(MyMainWindow):
         self.data_well = None
 
         if not self.table_widget is None:
+            self.cdng = ProtectedIsNonNone("")
             self.table_widget.clear()
             self.work_window = None
             self.table_widget.resizeColumnsToContents()

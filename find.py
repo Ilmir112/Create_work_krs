@@ -1957,10 +1957,7 @@ class WellName(FindIndexPZ):
                             a = row[col + 3], row[col + 2], row[col + 1]
                             self.appointment_well = ProtectedIsNonNone(row[col + 2])
                         else:
-                            a = row[col + 3], row[col + 2], row[col + 1]
                             self.appointment_well = ProtectedIsNonNone(row[col + 2])
-                        # well_data.appointment_well = ProtectedIsDigit(row[col + 1])
-                        # print(f' ЦДНГ {self.cdng.get_value}')
 
         if self.cdng.get_value not in list(dict_data_cdng.keys()):
             QMessageBox.warning(
@@ -3171,30 +3168,14 @@ class WellCategory(FindIndexPZ):
                                 "мг/дм",
                                 "мгдм3",
                             ]:
+                                if len(self.category_pressure_list) != len(self.category_h2s_list):
+                                    self.category_h2s = self.ws.cell(row=row, column=col - 2).value
+                                    self.category_h2s_list.append(self.category_h2s)
                                 if str(cell).strip() == "%":
-                                    if (
-                                        self.ws.cell(row=row, column=col - 2).value
-                                        is None
-                                    ):
-                                        self.category_h2s_list.append(3)
-                                    else:
-                                        self.category_h2s_list.append(
-                                            self.ws.cell(row=row, column=col - 2).value
-                                        )
-                                    if (
-                                        str(
-                                            self.ws.cell(row=row, column=col - 1).value
-                                        ).strip()
-                                        in ["", "-", "0", "None"]
-                                        or "отс"
-                                        in str(
-                                            self.ws.cell(row=row, column=col - 1).value
-                                        ).lower()
-                                    ):
+                                    if str(self.ws.cell(row=row, column=col - 1).value).strip() in ["", "-", "0", "None"] or \
+                                            "отс" in str(self.ws.cell(row=row, column=col - 1).value).lower():
                                         self.value_h2s_percent.append(0)
-                                        if self.ws.cell(
-                                            row=row - 1, column=col - 2
-                                        ).value not in ["3", 3]:
+                                        if self.ws.cell(row=row - 1, column=col - 2).value not in ["3", 3]:
                                             self.check_data_in_pz.append(
                                                 "Не указано значение сероводорода в процентах. \nСогласно п.4 "
                                                 "Распоряжения от 11.04.2022г об утверждении методики расчета "
@@ -3203,6 +3184,7 @@ class WellCategory(FindIndexPZ):
                                                 "объемного (в %) и массового в мг/дм3 (мг/л) \n"
                                             )
                                     else:
+
                                         self.value_h2s_percent.append(
                                             float(
                                                 str(
@@ -3218,6 +3200,10 @@ class WellCategory(FindIndexPZ):
                                     "мг/дм",
                                     "мгдм3",
                                 ]:
+                                    if len(self.category_h2s_list) > 0:
+                                        if self.category_h2s_list[0] is None:
+                                            self.category_h2s_list[0] = self.ws.cell(row=row, column=col - 2).value
+
                                     if (
                                         str(
                                             self.ws.cell(row=row, column=col - 1).value
@@ -3364,13 +3350,12 @@ class WellCategory(FindIndexPZ):
             self.category_h2s = self.category_h2s_list[0]
             self.category_gas_factor = self.category_gaz_factor_percent[0]
 
-            min_category = min(
-                [
+            min_category = [
                     int(float(self.category_pressure)),
                     int(float(self.category_h2s)),
                     int(float(self.category_gas_factor)),
                 ]
-            )
+            min_category = min(min_category)
 
             if min_category == 1:
                 category_text = "Категория скважины:\nПЕРВАЯ"
