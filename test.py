@@ -1,12 +1,4 @@
-import subprocess
 
-# Настройки подключения
-HOST = '176.109.106.199'
-USER = 'postgres'  # или ваш пользователь
-PASSWORD = '195375AsD+'  # если требуется
-DB_NAME = 'zima_data'
-PORT_SOURCE = 5432
-PORT_TARGET = 5433
 
 # Пути к утилитам (если не в PATH, укажите полный путь)
 PG_DUMP = r"C:\Program Files\PostgreSQL\15\bin\pg_dump.exe"
