@@ -20,7 +20,7 @@ from openpyxl.utils import get_column_letter, range_boundaries
 from data_base.config_base import connect_to_database, connection_to_database, CheckWellExistence
 from decrypt import decrypt
 
-from main import MyMainWindow, ExcelWorker
+from main import MyMainWindow
 from server_response import ResponseWork, ApiClient
 from work_py.alone_oreration import well_volume
 from work_py.progress_bar_save import ProgressBarWindow

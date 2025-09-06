@@ -15,7 +15,8 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox
 import data_list
 from data_list import ProtectedIsDigit, ProtectedIsNonNone
 from decrypt import decrypt
-from main import ExcelWorker, MyMainWindow, MyWindow
+
+from main import MyMainWindow, MyWindow
 from work_py.data_informations import dict_data_cdng
 
 
@@ -69,6 +70,7 @@ class FindIndexPZ(MyMainWindow):
         self.category_h2s = 0
         self.category_gas_factor = 0
 
+        from excel_worker import ExcelWorker
         self.thread_excel = ExcelWorker(self)
         self.thread_excel.finished.connect(self.thread_excel.deleteLater)
         self.threads.append(self.thread_excel)

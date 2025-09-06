@@ -2,20 +2,17 @@ from datetime import datetime
 
 import psycopg2
 from PyQt5.QtGui import QIntValidator, QDoubleValidator
-from PyQt5.QtWidgets import QInputDialog, QTabWidget, QWidget, QApplication, \
-    QLineEdit, QGridLayout, QComboBox, QMessageBox
+from PyQt5.QtWidgets import QInputDialog,  QWidget, QApplication, QGridLayout
 from openpyxl.workbook import Workbook
 
 from decrypt import decrypt
+from excel_saver import SaveInExcel
 from work_py.calculate_work_parametrs import volume_work, volume_nkt
 
 from data_base.config_base import connect_to_database
 
-
 import data_list
 from gnkt_opz import GnktOpz
-
-from main import SaveInExcel
 
 from openpyxl.styles import Font, Alignment
 from openpyxl.reader.excel import load_workbook
@@ -122,7 +119,6 @@ class GnktOsvWindow(GnktModel):
         self.sheet = sheet
         self.data_gnkt = None
 
-
         self.work_with_excel()
 
         self.work_with_data_gnkt()
@@ -191,8 +187,6 @@ class GnktOsvWindow(GnktModel):
 
         self.ws_schema = self.wb_gnkt.active
 
-
-
         self.wb_gnkt.sheetnames.insert(0, "Титульник")
         self.ws_title = self.wb_gnkt.create_sheet("Титульник", 0)
         self.ws_work = self.wb_gnkt.create_sheet("Ход работ", 2)
@@ -201,7 +195,8 @@ class GnktOsvWindow(GnktModel):
         bvo_int = 0
         # if self.data_well.bvo:
         #     bvo_int += 5
-        head = SaveInExcel.head_ind(self.data_well.cat_well_min.get_value - 1 + bvo_int, self.data_well.cat_well_max.get_value)
+        head = SaveInExcel.head_ind(self.data_well.cat_well_min.get_value - 1 + bvo_int,
+                                    self.data_well.cat_well_max.get_value)
 
         SaveInExcel.copy_true_ws(self.data_well, self.sheet, self.ws_title, head)
 

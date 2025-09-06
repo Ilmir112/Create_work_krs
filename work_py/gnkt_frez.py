@@ -6,15 +6,14 @@ from PyQt5.QtWidgets import QInputDialog, QApplication
 from openpyxl.utils import get_column_letter
 
 import data_list
-from main import SaveInExcel
+from excel_saver import SaveInExcel
+
 from perforation_correct_gnkt_frez import PerforationCorrectGnktFrez
 
-import plan
-from openpyxl.styles import Border, Side, PatternFill, Font, Alignment
+from openpyxl.styles import Border, Side, Font, Alignment
 from openpyxl.workbook import Workbook
 
 from work_py.alone_oreration import well_volume, volume_nkt_metal, volume_nkt
-from work_py.gnkt_grp import GnktOsvWindow
 from work_py.gnkt_grp_work import GnktModel
 
 

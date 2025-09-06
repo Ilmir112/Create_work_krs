@@ -11,43 +11,44 @@ class TabPageSoSand(TabPageUnion):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.validator = QIntValidator(0, 80000)
-
-        self.validator_float = QDoubleValidator(0.0, 1.65, 2)
+        self.INT_VALIDATOR = QIntValidator(0, 80000)
+        self.FLOAT_VALIDATOR = QDoubleValidator(0.0, 1.65, 2)
+        self.PERO_OPTIONS = ['перо + КОТ', 'Перо', 'обточную муфту + КОТ', 'обточную муфту', 'перо-110мм', 'пило-муфту']
+        self.YES_NO_OPTIONS = ['Нет', 'Да']
+        self.DEFAULT_SOLVENT_VOLUME = "2"
 
         self.current_label = QLabel("необходимый забой", self)
         self.current_edit = QLineEdit(self)
-        self.current_edit.setValidator(self.validator)
+        self.current_edit.setValidator(self.INT_VALIDATOR)
         self.current_edit.setText(str(self.data_well.current_bottom))
 
         self.pero_combo_label = QLabel("выбор пера", self)
         self.pero_combo = QComboBox(self)
-        self.pero_combo.addItems(
-            ['перо + КОТ', 'Перо', 'обточную муфту + КОТ', 'обточную муфту', 'перо-110мм', 'пило-муфту'])
+        self.pero_combo.addItems(self.PERO_OPTIONS)
 
         if self.data_well.column_additional or self.data_well.column_diameter.get_value < 120:
             self.pero_combo.setCurrentIndex(2)
 
         self.solvent_question_label = QLabel("необходимость растворителя", self)
         self.solvent_question_combo = QComboBox(self)
-        self.solvent_question_combo.addItems(['Нет', 'Да'])
+        self.solvent_question_combo.addItems(self.YES_NO_OPTIONS)
 
         self.solvent_label = QLabel("объем растворителя", self)
         self.solvent_volume_edit = QLineEdit(self)
-        self.solvent_volume_edit.setValidator(self.validator)
-        self.solvent_volume_edit.setText("2")
+        self.solvent_volume_edit.setValidator(self.INT_VALIDATOR)
+        self.solvent_volume_edit.setText(self.DEFAULT_SOLVENT_VOLUME)
 
         self.need_change_zgs_label = QLabel('Необходимо ли менять ЖГС', self)
         self.need_change_zgs_combo = QComboBox(self)
-        self.need_change_zgs_combo.addItems(['Нет', 'Да'])
+        self.need_change_zgs_combo.addItems(self.YES_NO_OPTIONS)
 
         self.fluid_new_label = QLabel('удельный вес ЖГС', self)
         self.fluid_new_edit = QLineEdit(self)
-        self.fluid_new_edit.setValidator(self.validator_float)
+        self.fluid_new_edit.setValidator(self.FLOAT_VALIDATOR)
 
         self.pressure_new_label = QLabel('Ожидаемое давление', self)
         self.pressure_new_edit = QLineEdit(self)
-        self.pressure_new_edit.setValidator(self.validator)
+        self.pressure_new_edit.setValidator(self.INT_VALIDATOR)
 
         if len(self.data_well.plast_project) != 0:
             self.plast_new_label = QLabel('индекс нового пласта', self)
@@ -57,7 +58,11 @@ class TabPageSoSand(TabPageUnion):
             self.plast_new_label = QLabel('индекс нового пласта', self)
             self.plast_new_combo = QLineEdit(self)
 
-        # self.grid = QGridLayout(self)
+        self.fluid_widgets = [
+            self.plast_new_label, self.plast_new_combo,
+            self.fluid_new_label, self.fluid_new_edit,
+            self.pressure_new_label, self.pressure_new_edit
+        ]
 
         self.grid.addWidget(self.current_label, 4, 3)
         self.grid.addWidget(self.current_edit, 5, 3)
@@ -90,8 +95,12 @@ class TabPageSoSand(TabPageUnion):
             self.need_change_zgs_combo.setCurrentIndex(1)
 
     def update_change_fluid(self, index):
-        if index == 'Да':
+        is_visible = (index == self.YES_NO_OPTIONS[1])
 
+        for widget in self.fluid_widgets:
+            widget.setVisible(is_visible)
+
+        if is_visible:
             category_h2s_list_plan = list(
                 map(int, [self.data_well.dict_category[plast]['по сероводороду'].category for plast in
                           self.data_well.plast_project if self.data_well.dict_category.get(plast) and
@@ -101,21 +110,6 @@ class TabPageSoSand(TabPageUnion):
                 plast = self.data_well.plast_project[0]
                 self.pressure_new_edit.setText(
                     f'{self.data_well.dict_category[plast]["по давлению"].data_pressure}')
-            self.grid.addWidget(self.plast_new_label, 9, 3)
-            self.grid.addWidget(self.plast_new_combo, 10, 3)
-
-            self.grid.addWidget(self.fluid_new_label, 9, 4)
-            self.grid.addWidget(self.fluid_new_edit, 10, 4)
-
-            self.grid.addWidget(self.pressure_new_label, 9, 5)
-            self.grid.addWidget(self.pressure_new_edit, 10, 5)
-        else:
-            self.plast_new_label.setParent(None)
-            self.plast_new_combo.setParent(None)
-            self.fluid_new_label.setParent(None)
-            self.fluid_new_edit.setParent(None)
-            self.pressure_new_label.setParent(None)
-            self.pressure_new_edit.setParent(None)
 
 
 class TabWidget(TabWidgetUnion):
@@ -152,7 +146,12 @@ class PeroWindow(WindowUnion):
     def add_work(self):
         try:
             pero_combo = self.tab_widget.currentWidget().pero_combo.currentText()
-            current_edit = int(float(self.tab_widget.currentWidget().current_edit.text().replace(',', '.')))
+            try:
+                current_edit = int(float(self.tab_widget.currentWidget().current_edit.text().replace(',', '.')))
+            except ValueError:
+                QMessageBox.warning(self, 'Ошибка', 'Некорректное значение в поле "необходимый забой". Введите число.')
+                return
+
             if current_edit >= self.data_well.bottom_hole_artificial.get_value:
                 QMessageBox.warning(self, 'Ошибка',
                                     f'Необходимый забой-{current_edit}м ниже искусственного '
@@ -160,11 +159,18 @@ class PeroWindow(WindowUnion):
                 return
 
             solvent_question_combo = str(self.tab_widget.currentWidget().solvent_question_combo.currentText())
-            solvent_volume_edit = self.tab_widget.currentWidget().solvent_volume_edit.text().replace(',', '.')
-            if solvent_volume_edit != '':
-                solvent_volume_edit = round(float(solvent_volume_edit), 1)
+            solvent_volume_edit_text = self.tab_widget.currentWidget().solvent_volume_edit.text().replace(',', '.')
+            solvent_volume_edit = None
+            if solvent_volume_edit_text != '':
+                try:
+                    solvent_volume_edit = round(float(solvent_volume_edit_text), 1)
+                except ValueError:
+                    QMessageBox.warning(self, 'Ошибка', 'Некорректное значение в поле "объем растворителя". Введите число.')
+                    return
+
         except Exception as e:
             QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
+            return # Добавлен возврат, чтобы предотвратить дальнейшее выполнение в случае общей ошибки
 
         work_list = self.pero(current_edit, pero_combo, solvent_question_combo, solvent_volume_edit)
 
@@ -181,51 +187,79 @@ class PeroWindow(WindowUnion):
         pero_list = RirWindow.pero_select(self, current_edit, pero_combo)
 
         gips_pero_list = [
-            [f'Спустить {pero_list} на тНКТ{self.data_well.nkt_diam}мм', None,
-             f'Спустить {pero_list} на тНКТ{self.data_well.nkt_diam}мм до глубины {self.data_well.current_bottom}м '
-             f'с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. \n'
-             f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)',
-             None, None, None, None, None, None, None,
-             'мастер КРС', 2.5],
-            [None, None, f'Нормализовать забой обратной промывкой тех жидкостью уд.весом '
-                         f'{self.data_well.fluid_work} до глубины {self.data_well.current_bottom}м.',
-             None, None, None, None,
-             None, None, None,
-             'Мастер КРС', None],
-            [f'Очистить колонну от АСПО растворителем - {solvent_volume_edit}м3', None,
-             f'По результатам ревизии ГНО, в случае наличия отложений АСПО:\n'
-             f'Очистить колонну от АСПО растворителем - {solvent_volume_edit}м3. При открытом затрубном '
-             f'пространстве закачать в '
-             f'трубное пространство растворитель в объеме {solvent_volume_edit}м3, продавить в трубное '
-             f'пространство тех.жидкостью '
-             f'в объеме {round(3 * float(current_edit) / 1000, 1)}м3. Приподнять. Закрыть трубное и затрубное '
-             f'пространство. Реагирование 2 часа.',
-             None, None, None, None, None, None, None,
-             'Мастер КРС, предст. заказчика', 4],
-            [
-                f'Промывка уд.весом {self.data_well.fluid_work_short} в объеме {volume_work(self.data_well)* 1.5:.1f}м3 ',
-                None,
-                f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work} при расходе жидкости '
-                f'6-8 л/сек в присутствии представителя Заказчика в объеме {volume_work(self.data_well)* 1.5:.1f}м3. '
-                f'ПРИ ПРОМЫВКЕ НЕ '
-                f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {self.data_well.max_admissible_pressure.get_value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
-                f'НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН',
-                None, None, None, None, None, None, None,
-                'Мастер КРС, представитель ЦДНГ', 1.5],
-            [None, None,
-             f'Приподнять до глубины {round(self.data_well.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя, '
-             f'при необходимости повторная промывка.',
-             None, None, None, None, None, None, None,
-             'Мастер КРС, представитель ЦДНГ', 2.49],
-            [None, None,
-             f'Поднять {pero_list} на НКТ{self.data_well.nkt_diam}мм с глубины {self.data_well.current_bottom}м с доливом скважины в '
-             f'объеме {round(self.data_well.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.data_well.fluid_work}',
-             None, None, None, None, None, None, None,
-             'Мастер КРС',
-             round(
-                 self.data_well.current_bottom / 9.5 * 0.028 * 1.2 * 1.04 + 0.005 * self.data_well.current_bottom / 9.5 + 0.17 + 0.5,
-                 2)],
+            {
+                'short_description': f'Спустить {pero_list} на тНКТ{self.data_well.nkt_diam}мм',
+                'detailed_description': (
+                    f'Спустить {pero_list} на тНКТ{self.data_well.nkt_diam}мм до глубины {self.data_well.current_bottom}м '
+                    f'с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм. Опрессовать НКТ на 200атм. Вымыть шар. \n'
+                    f'(При СПО первых десяти НКТ на спайдере дополнительно устанавливать элеватор ЭХЛ)'
+                ),
+                'executor': 'мастер КРС',
+                'duration': 2.5,
+            },
+            {
+                'short_description': None,
+                'detailed_description': (
+                    f'Нормализовать забой обратной промывкой тех жидкостью уд.весом '
+                    f'{self.data_well.fluid_work} до глубины {self.data_well.current_bottom}м.'
+                ),
+                'executor': 'Мастер КРС',
+                'duration': None,
+            },
+            {
+                'short_description': f'Очистить колонну от АСПО растворителем - {solvent_volume_edit}м3',
+                'detailed_description': (
+                    f'По результатам ревизии ГНО, в случае наличия отложений АСПО:\n'
+                    f'Очистить колонну от АСПО растворителем - {solvent_volume_edit}м3. При открытом затрубном '
+                    f'пространстве закачать в '
+                    f'трубное пространство растворитель в объеме {solvent_volume_edit}м3, продавить в трубное '
+                    f'пространство тех.жидкостью '
+                    f'в объеме {round(3 * float(current_edit) / 1000, 1)}м3. Приподнять. Закрыть трубное и затрубное '
+                    f'пространство. Реагирование 2 часа.'
+                ),
+                'executor': 'Мастер КРС, предст. заказчика',
+                'duration': 4,
+            },
+            {
+                'short_description': f'Промывка уд.весом {self.data_well.fluid_work_short} в объеме {volume_work(self.data_well)* 1.5:.1f}м3 ',
+                'detailed_description': (
+                    f'Промыть скважину круговой циркуляцией  тех жидкостью уд.весом {self.data_well.fluid_work} при расходе жидкости '
+                    f'6-8 л/сек в присутствии представителя Заказчика в объеме {volume_work(self.data_well)* 1.5:.1f}м3. '
+                    f'ПРИ ПРОМЫВКЕ НЕ '
+                    f'ПРЕВЫШАТЬ ДАВЛЕНИЕ {self.data_well.max_admissible_pressure.get_value}АТМ, ДОПУСТИМАЯ ОСЕВАЯ '
+                    f'НАГРУЗКА НА ИНСТРУМЕНТ: 0,5-1,0 ТН'
+                ),
+                'executor': 'Мастер КРС, представитель ЦДНГ',
+                'duration': 1.5,
+            },
+            {
+                'short_description': None,
+                'detailed_description': (
+                    f'Приподнять до глубины {round(self.data_well.current_bottom - 20, 1)}м. Тех отстой 2ч. Определение текущего забоя, '
+                    f'при необходимости повторная промывка.'
+                ),
+                'executor': 'Мастер КРС, представитель ЦДНГ',
+                'duration': 2.49,
+            },
+            {
+                'short_description': None,
+                'detailed_description': (
+                    f'Поднять {pero_list} на НКТ{self.data_well.nkt_diam}мм с глубины {self.data_well.current_bottom}м с доливом скважины в '
+                    f'объеме {round(self.data_well.current_bottom * 1.12 / 1000, 1)}м3 тех. жидкостью  уд.весом {self.data_well.fluid_work}'
+                ),
+                'executor': 'Мастер КРС',
+                'duration': round(
+                    self.data_well.current_bottom / 9.5 * 0.028 * 1.2 * 1.04 + 0.005 * self.data_well.current_bottom / 9.5 + 0.17 + 0.5,
+                    2),
+            },
         ]
-        if solvent_question_combo == "Нет":
-            gips_pero_list.pop(2)
+        if solvent_question_combo == self.YES_NO_OPTIONS[0]:  # 'Нет'
+            # Find the index of the solvent step and remove it
+            solvent_step_index = -1
+            for i, step in enumerate(gips_pero_list):
+                if "Очистить колонну от АСПО растворителем" in step.get('short_description', ''):
+                    solvent_step_index = i
+                    break
+            if solvent_step_index != -1:
+                gips_pero_list.pop(solvent_step_index)
         return gips_pero_list

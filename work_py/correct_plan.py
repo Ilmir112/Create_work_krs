@@ -5,7 +5,8 @@ from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, 
 from PyQt5.QtCore import Qt
 from data_base.config_base import connection_to_database, WorkDatabaseWell
 from decrypt import decrypt
-from main import ExcelWorker
+from excel_worker import ExcelWorker
+
 from server_response import ApiClient
 
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
