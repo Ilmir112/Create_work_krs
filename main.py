@@ -38,7 +38,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
 )
 from PyQt5 import QtCore, QtWidgets
-from block_name import  current_datetime
+from block_name import current_datetime
 
 from datetime import datetime
 from decrypt import decrypt
@@ -49,14 +49,11 @@ from block_name import region_select
 
 from log_files.log import logger
 from openpyxl.drawing.image import Image
-from PyQt5.QtCore import  Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap
 
 from work_py.rationingKRS import lifting_nkt_norm, descentNKT_norm
 from work_py.data_informations import dict_data_cdng
-
-
-
 
 
 class MyMainWindow(QMainWindow):
@@ -82,11 +79,11 @@ class MyMainWindow(QMainWindow):
         power_of_attorney = None
         expedition = ""
         if "Ойл" in contractor:
-            сhief_engineer_post = podpis_dict[data_list.contractor]["Руководство"][
-                "сhief_engineer"
+            chief_engineer_post = podpis_dict[data_list.contractor]["Руководство"][
+                "chief_engineer"
             ]["post"]
-            сhief_engineer_surname = podpis_dict[data_list.contractor]["Руководство"][
-                "сhief_engineer"
+            chief_engineer_surname = podpis_dict[data_list.contractor]["Руководство"][
+                "chief_engineer"
             ]["surname"]
             chief_geologist_post = podpis_dict[data_list.contractor]["Руководство"][
                 "chief_geologist"
@@ -109,15 +106,15 @@ class MyMainWindow(QMainWindow):
             elif self.data_well.region == "КГМ":
                 expedition = f"Экспедиция № 4"
 
-            сhief_engineer_post = podpis_dict[data_list.contractor]["Экспедиция"][
+            chief_engineer_post = podpis_dict[data_list.contractor]["Экспедиция"][
                 expedition
-            ]["сhief_engineer"]["post"]
-            сhief_engineer_surname = podpis_dict[data_list.contractor]["Экспедиция"][
+            ]["chief_engineer"]["post"]
+            chief_engineer_surname = podpis_dict[data_list.contractor]["Экспедиция"][
                 expedition
-            ]["сhief_engineer"]["surname"]
+            ]["chief_engineer"]["surname"]
             power_of_attorney = podpis_dict[data_list.contractor]["Экспедиция"][
                 expedition
-            ]["сhief_engineer"]["power_of_attorney"]
+            ]["chief_engineer"]["power_of_attorney"]
             chief_geologist_post = podpis_dict[data_list.contractor]["Экспедиция"][
                 expedition
             ]["chief_geologist"]["post"]
@@ -134,13 +131,13 @@ class MyMainWindow(QMainWindow):
                 [
                     None,
                     podpis_dict[data_list.costumer][region]["gi"]["post"], None, None, None, None, None,
-                    сhief_engineer_post, None, None, None, None,
+                    chief_engineer_post, None, None, None, None,
                 ],
                 [
                     None,
                     f'____________{podpis_dict[data_list.costumer][region]["gi"]["surname"]}', None, None, None, None,
                     None,
-                    f"_____________{сhief_engineer_surname}", None, None, None, None,
+                    f"_____________{chief_engineer_surname}", None, None, None, None,
                 ],
                 [
                     None,
@@ -263,10 +260,10 @@ class MyMainWindow(QMainWindow):
             geolog_cdng_name = f"{geolog_cdng_name[0]} {geolog_cdng_name[1][0]}.{geolog_cdng_name[1][0]}."
             nach_ctkrs_post = podpis_dict[data_list.contractor]["Экспедиция"][
                 data_list.ctkrs
-            ]["сhief_engineer"]["post"]
+            ]["chief_engineer"]["post"]
             nach_ctkrs_name = podpis_dict[data_list.contractor]["Экспедиция"][
                 data_list.ctkrs
-            ]["сhief_engineer"]["surname"]
+            ]["chief_engineer"]["surname"]
 
             work_podpisant_list = [
                 [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
@@ -299,10 +296,10 @@ class MyMainWindow(QMainWindow):
                 [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
                 [None, "Первый заместитель генерального директора -\n главный инженер ООО 'Башнефть-Добыча'  ",
                  None, None, None, None, None,
-                 сhief_engineer_post, None, None, None, None],
+                 chief_engineer_post, None, None, None, None],
                 [None, f'_________________________Д.А.Чувакин', None, None, None,
                  None, None,
-                 f'_____________{сhief_engineer_surname}', None, None, None,
+                 f'_____________{chief_engineer_surname}', None, None, None,
                  None],
                 [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
                  f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
@@ -351,10 +348,10 @@ class MyMainWindow(QMainWindow):
             work_podpisant_list = [
                 [None, 'СОГЛАСОВАНО:', None, None, None, None, None, 'УТВЕРЖДАЕМ:', None, None, None, None],
                 [None, podpis_dict[data_list.costumer][region]['gi']['post'], None, None, None, None, None,
-                 сhief_engineer_post, None, None, None, None],
+                 chief_engineer_post, None, None, None, None],
                 [None, f'____________{podpis_dict[data_list.costumer][region]["gi"]["surname"]}', None, None, None,
                  None, None,
-                 f'__________________________{сhief_engineer_surname}', None, None, None,
+                 f'__________________________{chief_engineer_surname}', None, None, None,
                  None],
                 [None, f'"____"_____________________{current_datetime.year}г.', None, None, None, None, None,
                  f'"____"_____________________{current_datetime.year}г.', None, None, None, None],
@@ -2088,7 +2085,6 @@ class MyWindow(MyMainWindow):
 
         threading.Timer(2.0, self.close_splash).start()
 
-
         # self.log_widget = QPlainTextEditLogger(self)
         # logger.addHandler(self.log_widget)
         # self.setCentralWidget(self.log_widget.widget)
@@ -2096,7 +2092,6 @@ class MyWindow(MyMainWindow):
         # Обработка критических ошибок
         self.excepthook = UncaughtExceptions(self.data_well)
         self.excepthook._exception_caught.connect(self.excepthook.handle_uncaught_exception)
-
 
         try:
 
@@ -2710,6 +2705,7 @@ class MyWindow(MyMainWindow):
                 self.tab_widget.addTab(self.table_widget, "Ход работ")
 
     def save_to_excel(self):
+        from excel_saver import SaveInExcel
         excel_save_work = SaveInExcel(
             self.data_well,
             self.ws,
@@ -3103,8 +3099,6 @@ class MyWindow(MyMainWindow):
         from find import ProtectedIsNonNone, ProtectedIsDigit
 
         temp_folder = r"C:\Windows\Temp"
-
-
 
         self.wb2_prs = None
         self.ws2_prs = None
@@ -3895,8 +3889,6 @@ class MyWindow(MyMainWindow):
             os.remove(zip_path)  # Удаляет файл Zima.zip
 
 
-
-
 def show_splash_screen():
     # Создаем приложение
     app = QApplication(sys.argv)
@@ -3915,8 +3907,6 @@ if __name__ == "__main__":
         MyWindow.show_confirmation()
 
     show_splash_screen()
-
-
 
     # window = MyWindow()
     # window.show()

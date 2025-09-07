@@ -1,7 +1,7 @@
 import pytest
 from PyQt5 import QtCore, QtTest, QtWidgets
 
-from main import MyMainWindow
+from main import MyMainWindow, MyWindow
 
 
 @pytest.fixture

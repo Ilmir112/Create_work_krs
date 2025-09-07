@@ -42,18 +42,18 @@ class TabPageSO(QWidget):
         self.title_job_label = QLabel("Должность", self)
         self.surname_label = QLabel("Фамилия И.О.", self)
 
-        self.сhief_engineer_edit = QLineEdit(self)
-        self.сhief_engineer_name_edit = QLineEdit(self)
-        # self.сhief_engineer_edit.setReadOnly(True)
+        self.chief_engineer_edit = QLineEdit(self)
+        self.chief_engineer_name_edit = QLineEdit(self)
+        # self.chief_engineer_edit.setReadOnly(True)
 
         self.chief_geologist_edit_type = QLineEdit(self)
         # self.chief_geologist_edit_type.setReadOnly(True)
         self.chief_geologist_name_edit_type = QLineEdit(self)
-        self.сhief_engineer_expedition_edit = QLineEdit(self)
-        self.сhief_engineer_expedition_name_edit = QLineEdit(self)
-        # self.сhief_engineer_expedition_edit.setReadOnly(True)
-        grid.addWidget(self.сhief_engineer_expedition_edit, 14, 0, 1, 2)
-        grid.addWidget(self.сhief_engineer_expedition_name_edit, 14, 2, 1, 2)
+        self.chief_engineer_expedition_edit = QLineEdit(self)
+        self.chief_engineer_expedition_name_edit = QLineEdit(self)
+        # self.chief_engineer_expedition_edit.setReadOnly(True)
+        grid.addWidget(self.chief_engineer_expedition_edit, 14, 0, 1, 2)
+        grid.addWidget(self.chief_engineer_expedition_name_edit, 14, 2, 1, 2)
 
         if 'РН' in data_list.contractor:
             self.chief_geologist_expedition_edit_type = QLineEdit(self)
@@ -74,8 +74,8 @@ class TabPageSO(QWidget):
 
         grid.addWidget(self.title_job_label, 3, 0)
         grid.addWidget(self.surname_label, 3, 2)
-        grid.addWidget(self.сhief_engineer_edit, 4, 0, 1, 2)
-        grid.addWidget(self.сhief_engineer_name_edit, 4, 2, 1, 2)
+        grid.addWidget(self.chief_engineer_edit, 4, 0, 1, 2)
+        grid.addWidget(self.chief_engineer_name_edit, 4, 2, 1, 2)
         grid.addWidget(self.chief_geologist_edit_type, 6, 0, 1, 2)
         grid.addWidget(self.chief_geologist_name_edit_type, 6, 2, 1, 2)
 
@@ -83,18 +83,18 @@ class TabPageSO(QWidget):
         # grid.addWidget(self.geolog_name_edit_type, 9, 2)
 
     def update_line(self, index):
-        self.сhief_engineer_edit.setText(
-            self.podpis_dict[data_list.contractor]['Руководство']['сhief_engineer']['post'])
-        self.сhief_engineer_name_edit.setText(
-            self.podpis_dict[data_list.contractor]['Руководство']['сhief_engineer']["surname"])
+        self.chief_engineer_edit.setText(
+            self.podpis_dict[data_list.contractor]['Руководство']['chief_engineer']['post'])
+        self.chief_engineer_name_edit.setText(
+            self.podpis_dict[data_list.contractor]['Руководство']['chief_engineer']["surname"])
         self.chief_geologist_edit_type.setText(
             self.podpis_dict[data_list.contractor]['Руководство']['chief_geologist']['post'])
         self.chief_geologist_name_edit_type.setText(
             self.podpis_dict[data_list.contractor]['Руководство']['chief_geologist']["surname"])
-        self.сhief_engineer_expedition_edit.setText(
-            self.podpis_dict[data_list.contractor]['Экспедиция'][index]['сhief_engineer']['post'])
-        self.сhief_engineer_expedition_name_edit.setText(
-            self.podpis_dict[data_list.contractor]['Экспедиция'][index]['сhief_engineer']["surname"])
+        self.chief_engineer_expedition_edit.setText(
+            self.podpis_dict[data_list.contractor]['Экспедиция'][index]['chief_engineer']['post'])
+        self.chief_engineer_expedition_name_edit.setText(
+            self.podpis_dict[data_list.contractor]['Экспедиция'][index]['chief_engineer']["surname"])
         if 'РН' in data_list.contractor:
             awdwadw = self.podpis_dict[data_list.contractor]['Экспедиция'][index]['chief_geologist']['post']
 
@@ -148,19 +148,19 @@ class CorrectSignaturesContractor(QMainWindow):
         selected_region = self.current_widget.region_combo_box.currentText()
         self.current_widget = self.tab_widget.currentWidget()
 
-        сhief_engineer_edit = self.current_widget.сhief_engineer_edit.text()
-        сhief_engineer_name_edit = self.current_widget.сhief_engineer_name_edit.text().title()
+        chief_engineer_edit = self.current_widget.chief_engineer_edit.text()
+        chief_engineer_name_edit = self.current_widget.chief_engineer_name_edit.text().title()
         chief_geologist_edit_type = self.current_widget.chief_geologist_edit_type.text()
         chief_geologist_name_edit_type = self.current_widget.chief_geologist_name_edit_type.text().title()
-        сhief_engineer_expedition_edit = self.current_widget.сhief_engineer_expedition_edit.text()
-        сhief_engineer_expedition_name_edit = self.current_widget.сhief_engineer_expedition_name_edit.text()
+        chief_engineer_expedition_edit = self.current_widget.chief_engineer_expedition_edit.text()
+        chief_engineer_expedition_name_edit = self.current_widget.chief_engineer_expedition_name_edit.text()
         if "РН" in data_list.contractor:
             chief_geologist_expedition_edit_type = self.current_widget.chief_geologist_expedition_edit_type.text()
             chief_geologist_expedition_name_edit_type = self.current_widget.chief_geologist_expedition_name_edit_type.text()
         # geolog_edit_type = self.current_widget.geolog_edit_type.text()
         # geolog_name_edit_type = self.current_widget.geolog_name_edit_type.text().title()
 
-        name_list = [сhief_engineer_name_edit, chief_geologist_name_edit_type,  сhief_engineer_expedition_name_edit]
+        name_list = [chief_engineer_name_edit, chief_geologist_name_edit_type,  chief_engineer_expedition_name_edit]
 
         if selected_region is None:
             QMessageBox.information(self, 'Внимание', 'Не все поля соответствуют значениям')
@@ -174,21 +174,21 @@ class CorrectSignaturesContractor(QMainWindow):
         else:
             self.podpis_dict = self.current_widget.podpis_dict
 
-            self.podpis_dict[data_list.contractor]['Руководство']['сhief_engineer'][
-                'post'] = сhief_engineer_edit
-            self.podpis_dict[data_list.contractor]['Руководство']['сhief_engineer'][
-                "surname"] = сhief_engineer_name_edit
+            self.podpis_dict[data_list.contractor]['Руководство']['chief_engineer'][
+                'post'] = chief_engineer_edit
+            self.podpis_dict[data_list.contractor]['Руководство']['chief_engineer'][
+                "surname"] = chief_engineer_name_edit
 
             self.podpis_dict[data_list.contractor]['Руководство']["chief_geologist"][
                 'post'] = chief_geologist_edit_type
             self.podpis_dict[data_list.contractor]['Руководство']["chief_geologist"][
                 'surname'] = chief_geologist_name_edit_type
 
-            self.podpis_dict[data_list.contractor]['Экспедиция'][selected_region]['сhief_engineer'][
-                'post'] = сhief_engineer_expedition_edit
+            self.podpis_dict[data_list.contractor]['Экспедиция'][selected_region]['chief_engineer'][
+                'post'] = chief_engineer_expedition_edit
 
             self.podpis_dict[data_list.contractor]['Экспедиция'][selected_region][
-                'сhief_engineer']['surname'] = сhief_engineer_expedition_name_edit
+                'chief_engineer']['surname'] = chief_engineer_expedition_name_edit
             if 'РН' in data_list.contractor:
                 self.podpis_dict[data_list.contractor]['Экспедиция'][selected_region]["chief_geologist"][
                     'surname'] = chief_geologist_expedition_name_edit_type
