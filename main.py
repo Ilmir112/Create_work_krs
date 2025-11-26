@@ -922,7 +922,7 @@ class MyMainWindow(QMainWindow):
             self.perforation_correct_window2 = None
             # definition_plast_work(self)
 
-            if data_list.operation_window is False:
+            if data_list.operation_window is False or self.data_well is None:
                 return
 
             self.data_well = WellCategory.read_well(

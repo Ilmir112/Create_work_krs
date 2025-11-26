@@ -688,7 +688,6 @@ class CheckWellExistence:
         date_string = self.check_correct_month()
         result = None
         if data_list.connect_in_base is False:
-
             if not self.db_connection:
                 return None
             cursor = self.db_connection.cursor()

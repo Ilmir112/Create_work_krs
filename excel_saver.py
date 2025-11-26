@@ -16,7 +16,7 @@ from data_base.work_with_base import excel_in_json
 from H2S import CalculateH2s
 from block_name import pop_down
 from excel_worker import ExcelWorker
-from main import MyWindow
+from main import MyWindow, MyMainWindow
 from open_pz import CreatePZ
 from server_response import ApiClient
 from work_py.alone_oreration import is_number
@@ -296,13 +296,13 @@ class SaveInExcel(MyWindow):
             excel_data_dict = excel_in_json(self, self.ws2)
             self.thread_excel_insert = ExcelWorker(self.data_well)
             # self.threads.append(self.thread_excel_insert)
-            response_answer = self.thread_excel_insert.insert_data_in_database(
-                excel_data_dict
-            )
-            if response_answer is None:
-                QMessageBox.warning(None, 'Ошибка', 'Ошибка связана с ограничением бесплатного сервера нужно '
-                                                    'повторить через 50 секунд')
-                return
+            # response_answer = MyMainWindow.insert_data_in_database(self,
+            #     excel_data_dict
+            # )
+            # if response_answer is None:
+            #     QMessageBox.warning(None, 'Ошибка', 'Ошибка связана с ограничением бесплатного сервера нужно '
+            #                                         'повторить через 50 секунд')
+            #     return
             if "prs" in self.data_well.work_plan:
                 self.ws2.print_area = f"B1:O{self.ws2.max_row}"
             else:

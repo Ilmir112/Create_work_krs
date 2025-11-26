@@ -289,7 +289,7 @@ class ClassifierWell(MyMainWindow):
                                             elif 'Площадь' == value:
                                                 area_column = col
 
-                            for index_row, row in enumerate(ws.iter_rows(min_row=2, values_only=True)):
+                            for index_row, row in enumerate(ws.iter_rows(min_row=area_row, values_only=True)):
                                 self.progress_bar_window.start_loading(index_row + 1)
                                 if index_row > area_row:
                                     well_number = row[well_column]
