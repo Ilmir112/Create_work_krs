@@ -69,6 +69,7 @@ class MyMainWindow(QMainWindow):
         self.work_plan = None
         self.gnkt_data = None
         self.threads = []
+        self.repair_id = None
 
     def work_podpisant_list(self, region, contractor):
         with open(
@@ -1271,6 +1272,9 @@ class MyMainWindow(QMainWindow):
 
             if self.work_plan == "plan_change":
                 self.data_well.work_plan = self.work_plan
+                # Деактивируем кнопку до загрузки ID
+                if hasattr(self, 'signPlanButton'):
+                    self.signPlanButton.setEnabled(False)
                 self.rir_window = CorrectPlanWindow(self.data_well, self.table_widget)
 
             elif self.work_plan == "dop_plan_in_base":
@@ -2258,6 +2262,12 @@ class MyWindow(MyMainWindow):
         self.correct_curator_Button.clicked.connect(self.correct_curator)
         self.toolbar.addWidget(self.correct_curator_Button)
 
+        self.signPlanButton = QPushButton("План работ подписан")
+        self.signPlanButton.clicked.connect(self.sign_work_plan)
+        # Кнопка будет активна только для корректировки плана
+        self.signPlanButton.setEnabled(False)
+        self.toolbar.addWidget(self.signPlanButton)
+
         self.closeFileButton = QPushButton("Закрыть проект")
         self.closeFileButton.clicked.connect(self.close_file)
         self.toolbar.addWidget(self.closeFileButton)
@@ -3095,6 +3105,63 @@ class MyWindow(MyMainWindow):
         for thread in threading.enumerate():
             print(f"Поток: {thread.name}, идентификатор: {thread.ident}")
 
+    def sign_work_plan(self):
+        """Изменяет статус плана работ на 'подписан' (только для корректировки плана)"""
+        from server_response import ApiClient
+        
+        # Проверяем, что это корректировка плана
+        if self.data_well is None or self.data_well.work_plan != "plan_change":
+            QMessageBox.warning(
+                self,
+                "Ошибка",
+                "Функция доступна только для корректировки плана работ"
+            )
+            return
+        
+        # Проверяем наличие ID ремонта
+        repair_id = self.repair_id
+        if repair_id is None:
+            QMessageBox.warning(
+                self,
+                "Ошибка",
+                "ID ремонта не найден. Загрузите план работ из базы данных."
+            )
+            return
+        
+        # Подготавливаем данные для обновления статуса
+        # StatusWorkPlan.PLAN_IS_SIGNED = "подписан"
+        data = {
+            "id": repair_id,
+            "status_work_plan": "подписан"
+        }
+        
+        # Вызываем API для обновления статуса
+        try:
+            result = ApiClient.request_put_json(
+                ApiClient.update_plan_status_path(),
+                data,
+                answer="param"
+            )
+            
+            if result:
+                QMessageBox.information(
+                    self,
+                    "Успех",
+                    f"Статус плана работ успешно изменен на 'подписан' для ID {repair_id}"
+                )
+            else:
+                QMessageBox.warning(
+                    self,
+                    "Ошибка",
+                    "Не удалось обновить статус плана работ"
+                )
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "Ошибка",
+                f"Произошла ошибка при обновлении статуса: {str(e)}"
+            )
+
     def close_file(self):
         from find import ProtectedIsNonNone, ProtectedIsDigit
 
@@ -3117,6 +3184,11 @@ class MyWindow(MyMainWindow):
             )
         self.rir_window = None
         self.data_well = None
+        self.repair_id = None  # Сбрасываем ID ремонта
+        
+        # Отключаем кнопку "План работ подписан"
+        if hasattr(self, 'signPlanButton'):
+            self.signPlanButton.setEnabled(False)
 
         if not self.table_widget is None:
             self.cdng = ProtectedIsNonNone("")

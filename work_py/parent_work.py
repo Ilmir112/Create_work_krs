@@ -1706,6 +1706,22 @@ class WindowUnion(MyMainWindow):
                 }
                 response = ApiClient.request_params_get(ApiClient.find_wells_repair_well_by_id(), params)
                 if response:
+                    # Сохраняем ID ремонта, если он есть в response
+                    if "id" in response:
+                        self.repair_id = response["id"]
+                        # Активируем кнопку "План работ подписан" только для корректировки плана
+                        if self.data_well.work_plan == 'plan_change':
+                            # Получаем главное окно приложения
+                            from PyQt5.QtWidgets import QApplication
+                            app = QApplication.instance()
+                            if app:
+                                for widget in app.topLevelWidgets():
+                                    if hasattr(widget, 'signPlanButton') and hasattr(widget, 'data_well'):
+                                        # Проверяем, что это главное окно и work_plan совпадает
+                                        if widget.data_well and widget.data_well.work_plan == 'plan_change':
+                                            widget.repair_id = self.repair_id
+                                            widget.signPlanButton.setEnabled(True)
+                                            break
                     data_change_paragraph, dict_category, FindIndexPZ.excel_json = TabPageUnion.insert_repairs_data(
                         self, response)
 

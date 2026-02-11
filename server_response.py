@@ -2,12 +2,16 @@ import json
 import re
 import threading
 from datetime import datetime
+import urllib3
 
 from data_list import ProtectedIsDigit, ProtectedIsNonNone
 import requests
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 
 import data_list
+
+# Отключаем предупреждения SSL
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class ApiClient:
@@ -187,7 +191,7 @@ class ApiClient:
             headers["Authorization"] = f"Bearer {token}"
         url = ApiClient.get_endpoint(path)
         try:
-            response = requests.post(url, json=ApiClient.serialize_datetime(json_data), headers=headers)
+            response = requests.post(url, json=ApiClient.serialize_datetime(json_data), headers=headers, verify=False)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
@@ -202,7 +206,7 @@ class ApiClient:
             headers["Authorization"] = f"Bearer {token}"
         url = ApiClient.get_endpoint(path)
         try:
-            response = requests.get(url, params=json_data, headers=headers)
+            response = requests.get(url, params=json_data, headers=headers, verify=False)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
@@ -218,10 +222,10 @@ class ApiClient:
             headers = {"Authorization": f"Bearer {token}"}
 
             if answer == "param":
-                response = requests.post(url, params=json_data, headers=headers)
+                response = requests.post(url, params=json_data, headers=headers, verify=False)
             else:
                 response = requests.post(
-                    url, params=param, json=json_data, headers=headers
+                    url, params=param, json=json_data, headers=headers, verify=False
                 )
             response.raise_for_status()
             return response.json()
@@ -238,14 +242,28 @@ class ApiClient:
             headers = {"Authorization": f"Bearer {token}"}
 
             if answer == "param":
-                response = requests.put(url, params=json_data, headers=headers)
+                response = requests.put(url, params=json_data, headers=headers, verify=False)
             else:
                 response = requests.put(
-                    url, params=param, json=json_data, headers=headers
+                    url, params=param, json=json_data, headers=headers, verify=False
                 )
             response.raise_for_status()
             return response.json()
+        except requests.exceptions.HTTPError as e:
+            # Логируем детали ошибки для отладки
+            error_detail = ""
+            if hasattr(e.response, 'text'):
+                error_detail = e.response.text
+            print(f"HTTP ошибка при PUT запросе: {e}")
+            print(f"URL: {url}")
+            print(f"Данные: {json_data}")
+            print(f"Детали ошибки: {error_detail}")
+            if e.response.status_code == 422:
+                print(f"Ошибка валидации (422). Ответ сервера: {error_detail}")
+            QMessageBox.warning(None, "Запрос", f"Запрос не удался: {e}")
+            return None
         except requests.exceptions.RequestException as e:
+            print(f"Ошибка при PUT запросе: {e}")
             QMessageBox.warning(None, "Запрос", f"Запрос не удался: {e}")
             return None
 
@@ -253,7 +271,7 @@ class ApiClient:
     def request_get_all(path):
         url = ApiClient.get_endpoint(path)
         try:
-            response = requests.get(url)
+            response = requests.get(url, verify=False)
 
             response.raise_for_status()
 
@@ -421,8 +439,18 @@ class ApiClient:
         params = {"well_number": well_number, "well_area": well_area}
         return cls.request_params_get(api_url, params)
 
+    @classmethod
+    def update_plan_status_path(cls):
+        return "/wells_repair_router/plan_status"
+
+    @classmethod
+    def update_brief_work_plan_path(cls):
+        return "/wells_repair_router/brief_work_plan"
+
 
 class ResponseWork(QMainWindow):
+
+
     def add_wells_data_in_database(self, params_dict, api_url):
         result = ApiClient.add_wells_data_in_database(params_dict, api_url)
         if result:

@@ -9,7 +9,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment
 from openpyxl.utils.cell import get_column_letter
 from PIL import Image
-from PyQt5.QtWidgets import QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QMainWindow
 
 import data_list
 from data_base.work_with_base import excel_in_json
@@ -35,6 +35,11 @@ class SaveInExcel(MyWindow):
             table_schema=None,
             gnkt_data=None,
     ):
+        # ВАЖНО: SaveInExcel используется как вспомогательный класс при сохранении Excel.
+        # Нам НЕ нужна полная инициализация MyWindow (она поднимает UI/логин и дергает connect_to_database).
+        # Но для PyQt-объекта нужно инициализировать базовый QMainWindow, иначе будет RuntimeError.
+        QMainWindow.__init__(self)
+        self.threads = []
         self.data_well = data_well
         self.table_widget = table_widget
         self.table_title = table_title
@@ -286,6 +291,8 @@ class SaveInExcel(MyWindow):
                         break
             if self.data_well.work_plan in ["krs", "plan_change"]:
                 self.create_short_plan(self.wb2, plan_short)
+                # Сохраняем plan_short в data_well для последующего сохранения в БД
+                self.data_well.plan_short = plan_short
             #
             if "Ойл" in data_list.contractor and "prs" not in self.data_well.work_plan:
                 self.insert_image(
@@ -294,15 +301,27 @@ class SaveInExcel(MyWindow):
                 self.insert_image(self.ws2, f'{data_list.path_image}imageFiles/Котиков.png', 'H4')
 
             excel_data_dict = excel_in_json(self, self.ws2)
+
+            # Отправка данных в API и обновление brief_work_plan в одном потоке
+            import threading
+            def send_and_update_brief_plan():
+                # Отправляем данные в API
+                repair_id = self._send_wells_repair_to_api(excel_data_dict)
+                
+                # # Если есть plan_short и получен ID, обновляем brief_work_plan
+                # if repair_id and hasattr(self.data_well, 'plan_short') and self.data_well.plan_short:
+                #     self._update_brief_work_plan(repair_id, self.data_well.plan_short)
+            
+            # Запускаем в отдельном потоке, чтобы не блокировать основной процесс
+            thread = threading.Thread(target=send_and_update_brief_plan)
+            thread.daemon = True
+            thread.start()
             self.thread_excel_insert = ExcelWorker(self.data_well)
-            # self.threads.append(self.thread_excel_insert)
-            # response_answer = MyMainWindow.insert_data_in_database(self,
-            #     excel_data_dict
-            # )
-            # if response_answer is None:
-            #     QMessageBox.warning(None, 'Ошибка', 'Ошибка связана с ограничением бесплатного сервера нужно '
-            #                                         'повторить через 50 секунд')
-            #     return
+            # response_answer = MyMainWindow.insert_data_in_database(self, excel_data_dict)
+            self.threads.append(self.thread_excel_insert)
+
+            
+
             if "prs" in self.data_well.work_plan:
                 self.ws2.print_area = f"B1:O{self.ws2.max_row}"
             else:
@@ -357,6 +376,175 @@ class SaveInExcel(MyWindow):
             if self.wb2:
                 self.wb2.close()
                 self.save_file_dialog(self.wb2, full_path)
+            
+
+
+    def _find_repair_id(self):
+        """
+        Находит ID записи ремонта по параметрам скважины.
+        Возвращает ID или None, если запись не найдена.
+        """
+        try:
+            # Проверяем, что данные доступны
+            if not hasattr(self.data_well, 'well_number') or not hasattr(self.data_well, 'well_area'):
+                return None
+
+            # Важно: backend /wells_repair_router/find_well_id требует обязательный параметр wells_id,
+            # поэтому сначала получаем wells_id через /wells_data_router/find_wells_data.
+            wells_params = {
+                "well_number": self.data_well.well_number.get_value,
+                "well_area": self.data_well.well_area.get_value,
+            }
+            wells_response = ApiClient.request_params_get(
+                ApiClient.find_wells_data_response_filter_well_number_well_area(),
+                wells_params
+            )
+            if not wells_response or "id" not in wells_response:
+                return None
+            wells_id = wells_response["id"]
+            
+            # Подготавливаем данные для поиска записи ремонта
+            params = {
+                "well_number": self.data_well.well_number.get_value,
+                "well_area": self.data_well.well_area.get_value,
+                "wells_id": wells_id,
+            }
+            
+            # Добавляем опциональные параметры, если они доступны
+            if hasattr(self.data_well, 'type_kr') and self.data_well.type_kr:
+                params["type_kr"] = self.data_well.type_kr
+            
+            if hasattr(self.data_well, 'work_plan') and self.data_well.work_plan:
+                params["work_plan"] = self.data_well.work_plan
+            
+            if hasattr(data_list, 'current_date') and data_list.current_date:
+                params["date_create"] = data_list.current_date.strftime("%Y-%m-%d")
+            
+            # Ищем запись ремонта
+            response = ApiClient.request_params_get(
+                ApiClient.find_wells_repair_well_by_id(),
+                params
+            )
+            
+            if response and "id" in response:
+                return response["id"]
+            return None
+        except Exception as e:
+            print(f"Ошибка при поиске ID записи ремонта: {e}")
+            return None
+    
+    def _update_brief_work_plan(self, repair_id, plan_short):
+        """
+        Обновляет поле brief_work_plan для записи ремонта через API.
+        """
+        try:
+            # Убеждаемся, что repair_id - это число
+            if not isinstance(repair_id, int):
+                repair_id = int(repair_id) if repair_id else None
+                if repair_id is None:
+                    print("Ошибка: repair_id не может быть None")
+                    return
+            
+            # Подготавливаем данные для обновления brief_work_plan
+            # Сохраняем plan_short как словарь с ключом "plan_short"
+            if plan_short:
+                brief_work_plan_data = {
+                    "plan_short": str(plan_short)
+                }
+            else:
+                brief_work_plan_data = None
+            
+            update_data = {
+                "id": int(repair_id),
+                "brief_work_plan": brief_work_plan_data
+            }
+            
+            # Логируем данные для отладки
+            print(f"Отправка данных для обновления brief_work_plan: {update_data}")
+            print(f"Тип repair_id: {type(repair_id)}, значение: {repair_id}")
+            print(f"Тип brief_work_plan_data: {type(brief_work_plan_data)}, значение: {brief_work_plan_data}")
+            
+            # Обновляем brief_work_plan через API
+            # Передаем данные в теле запроса (JSON), а не в query параметрах
+            result = ApiClient.request_put_json(
+                ApiClient.update_brief_work_plan_path(),
+                update_data,
+                param=None,
+                answer="json"
+            )
+            
+            if result:
+                print(f"Краткий план работ успешно сохранен для записи ID: {repair_id}")
+            else:
+                print(f"Не удалось сохранить краткий план работ для записи ID: {repair_id}")
+        except Exception as e:
+            print(f"Ошибка при сохранении краткого плана работ: {e}")
+            import traceback
+            traceback.print_exc()
+
+    def _send_wells_repair_to_api(self, excel_data_dict):
+        """
+        Отправляет данные ремонта скважины в API через ручку /wells_repair_router/add_wells_data.
+        Возвращает ID созданной записи или None в случае ошибки.
+        """
+        try:
+            # Проверяем, что необходимые данные доступны
+            if not hasattr(self.data_well, 'well_number') or not hasattr(self.data_well, 'well_area'):
+                print("Недостаточно данных для отправки в API: отсутствуют well_number или well_area")
+                return None
+
+            # Формируем payload согласно схеме SWellsRepair
+            payload = {
+                "id": 0,  # Backend сам присвоит ID при создании
+                "category_dict": getattr(self.data_well, 'dict_category', {}),
+                "type_kr": getattr(self.data_well, 'type_kr', ''),
+                "work_plan": getattr(self.data_well, 'work_plan', ''),
+                "excel_json": excel_data_dict,
+                "data_change_paragraph": getattr(self.data_well, 'data_change_paragraph', {}),
+                "norms_time": getattr(self.data_well, 'norm_of_time', 0.0),
+                "chemistry_need": getattr(self.data_well, 'chemistry_need', {}),
+                "geolog_id": "",  # Backend сам получит из токена пользователя
+                "date_create": data_list.current_date.strftime("%Y-%m-%d") if hasattr(data_list, 'current_date') else datetime.now().strftime("%Y-%m-%d"),
+                "perforation_project": getattr(self.data_well, 'dict_perforation_project', {}),
+                "type_absorbent": getattr(self.data_well, 'type_absorbent', ''),
+                "static_level": self.data_well.static_level.get_value if hasattr(self.data_well, 'static_level') and self.data_well.static_level else None,
+                "dinamic_level": self.data_well.dinamic_level.get_value if hasattr(self.data_well, 'dinamic_level') and self.data_well.dinamic_level else None,
+                "expected_data": getattr(self.data_well, 'expected_data', {}),
+                "curator": getattr(self.data_well, 'curator', ''),
+                "region": getattr(self.data_well, 'region', ''),
+                "contractor": data_list.contractor if hasattr(data_list, 'contractor') else '',
+                "brief_work_plan": getattr(self.data_well, "plan_short", '')
+            }
+
+            # Отправляем данные в API
+            # Backend ожидает well_number и well_area в query параметрах
+            api_url = ApiClient.read_wells_repair_response_for_add()
+            params = {
+                "well_number": self.data_well.well_number.get_value,
+                "well_area": self.data_well.well_area.get_value,
+            }
+            # Используем request_post_json с параметрами
+            result = ApiClient.request_post_json(api_url, payload, param=params, answer="json")
+            
+            if result and isinstance(result, dict) and result.get("status") == "success":
+                repair_id = result.get('data').get("id")
+                print(f"Данные ремонта успешно отправлены в API. ID записи: {repair_id}")
+                return repair_id
+            elif result == 500:
+                print("Ошибка при отправке данных в API: ошибка сервера")
+                return None
+            else:
+                print(f"Данные ремонта отправлены в API. Ответ: {result}")
+                # Пытаемся извлечь ID из ответа, даже если статус не "success"
+                if isinstance(result, dict) and 'id' in result:
+                    return result.get('id')
+                return None
+                
+        except Exception as e:
+            print(f"Ошибка при отправке данных ремонта в API: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
 
     @staticmethod
     def load_last_save_path():
