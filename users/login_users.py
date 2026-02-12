@@ -86,6 +86,7 @@ class LoginWindow(QDialog):
             user_access = ApiClient.get_info_data(params, ApiClient.login_path())
             if user_access and user_access != 401:
                 ApiClient.SETTINGS_TOKEN = QSettings('Zima', 'ZimaApp')
+
                 ApiClient.SETTINGS_TOKEN.setValue('auth_token', user_access["access_token"])
 
                 self.user_dict = user_access
