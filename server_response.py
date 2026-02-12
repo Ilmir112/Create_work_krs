@@ -179,9 +179,12 @@ class ApiClient:
             else:
                 print(f"Ключ '{key}' прошёл проверку.")
 
+    API_VERSION_PREFIX = "/v1"
+
     @staticmethod
     def get_endpoint(path):
-        return f"{ApiClient.SERVER_API}{path}"
+        base = path if path.startswith("/v1") else f"{ApiClient.API_VERSION_PREFIX}{path}"
+        return f"{ApiClient.SERVER_API}{base}"
 
     @staticmethod
     def request_post(path, json_data):

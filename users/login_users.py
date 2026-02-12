@@ -84,7 +84,8 @@ class LoginWindow(QDialog):
             }
 
             user_access = ApiClient.get_info_data(params, ApiClient.login_path())
-            if user_access and user_access != 401:
+            # При ошибке (неверный пароль, 401, 405 и т.д.) возвращается int (status_code), не dict
+            if isinstance(user_access, dict) and user_access.get("access_token"):
                 ApiClient.SETTINGS_TOKEN = QSettings('Zima', 'ZimaApp')
 
                 ApiClient.SETTINGS_TOKEN.setValue('auth_token', user_access["access_token"])
