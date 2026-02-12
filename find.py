@@ -3366,6 +3366,7 @@ class WellCategory(FindIndexPZ):
             elif min_category == 3:
                 category_text = "Категория скважины:\nТРЕТЬЯ"
 
+
             self.ws.cell(
                 row=self.cat_well_min.get_value, column=self.category_column
             ).value = category_text
