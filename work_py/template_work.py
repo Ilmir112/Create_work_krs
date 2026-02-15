@@ -112,7 +112,7 @@ class TabPageSoWith(TabPageUnion):
         # self.grid = QGridLayout(self)
         self.template_combo.currentTextChanged.connect(self.update_template_edit)
         if parent:
-            self.definition_template_work(float(self.current_bottom_edit.text()))
+            self.definition_template_work(float(self.current_bottom_edit.text().replace(',', '.')))
 
         self.grid.addWidget(self.current_bottom_label, 8, 3)
         self.grid.addWidget(self.current_bottom_edit, 9, 3)
@@ -290,19 +290,19 @@ class TabPageSoWith(TabPageUnion):
         skm_type = self.skm_type_combo.currentText()
 
         if self.current_bottom_edit.text() != '':
-            current_bottom = round(float(self.current_bottom_edit.text()), 1)
+            current_bottom = round(float(self.current_bottom_edit.text().replace(',', '.')), 1)
 
         self.roof_plast, self.roof_add_column_plast = self.definition_roof_not_raiding(current_bottom)
         dictance_template_first = int(current_bottom - self.roof_plast + 5)
-        if int(float(self.dictance_template_first_edit.text())) == dictance_template_first:
+        if int(float(self.dictance_template_first_edit.text().replace(',', '.'))) == dictance_template_first:
             self.dictance_template_first_edit.setText(str(int(dictance_template_first)))
         else:
-            dictance_template_first = int(float(self.dictance_template_first_edit.text()))
+            dictance_template_first = int(float(self.dictance_template_first_edit.text().replace(',', '.')))
 
         if self.template_first_edit.text() != '':
             first_template = self.template_first_edit.text()
         if self.length_template_first_edit.text() != '':
-            length_template_first = int(float(self.length_template_first_edit.text()))
+            length_template_first = int(float(self.length_template_first_edit.text().replace(',', '.')))
         if self.template_second_edit.text() != '':
             template_second = self.template_second_edit.text()
         if self.length_template_second_edit.text() != '':
@@ -313,11 +313,11 @@ class TabPageSoWith(TabPageUnion):
         else:
             dictance_template_first = ''
         if self.dictance_template_second_edit.text() != '':
-            dictance_template_second = int(float(self.dictance_template_second_edit.text()))
+            dictance_template_second = int(float(self.dictance_template_second_edit.text().replace(',', '.')))
         else:
             dictance_template_second = ''
         if self.dictance_three_edit.text() != '':
-            dictance_three = int(float(self.dictance_three_edit.text()))
+            dictance_three = int(float(self.dictance_three_edit.text().replace(',', '.')))
         else:
             dictance_three = ''
         nkt_diam = self.data_well.nkt_diam
@@ -371,7 +371,7 @@ class TabPageSoWith(TabPageUnion):
                     self.template_depth = int(
                         current_bottom - int(dictance_template_first) - int(length_template_first)) - int(
                         dictance_template_second)
-                    self.paker_depth = self.template_depth - int(self.dictance_three_edit.text())
+                    self.paker_depth = self.template_depth - int(float(self.dictance_three_edit.text().replace(',', '.')))
 
                     self.data_well.skm_depth = self.template_depth + dictance_template_second
                     skm_teml_str = f'{skm_type}-{skm} до глубины {self.data_well.skm_depth}м, ' \
@@ -385,8 +385,9 @@ class TabPageSoWith(TabPageUnion):
                 template_str = f'перо {kot_str} + {skm_type}-{skm} {valve}+ НКТ{nkt_diam}мм ' \
                                f'{dictance_template_second}м ' \
                                f' + шаблон-{template_second}мм L-{length_template_second}м '
-                self.template_depth = math.ceil(current_bottom - int(dictance_template_second))
-                self.data_well.skm_depth = self.template_depth + int(dictance_template_second)
+                _dict_second = int(float(str(dictance_template_second).replace(',', '.')))
+                self.template_depth = math.ceil(current_bottom - _dict_second)
+                self.data_well.skm_depth = self.template_depth + _dict_second
                 skm_teml_str = f'{skm_type}-{skm} до глубины {self.data_well.skm_depth}м, ' \
                                f'шаблон-{template_second}мм до гл.{self.template_depth}м'
 
@@ -501,7 +502,7 @@ class TabPageSoWith(TabPageUnion):
                 self.skm_teml_str_edit.setText(skm_teml_str)
 
     def update_template_edit(self, index):
-        current_bottom = float(self.current_bottom_edit.text())
+        current_bottom = float(self.current_bottom_edit.text().replace(',', '.'))
         if index != '':
 
             self.diameter_paker_label_type = QLabel("Диаметр пакера", self)
@@ -545,11 +546,11 @@ class TabPageSoWith(TabPageUnion):
             self.length_template_second_edit.setText(str(length_template_second))
 
             first_template = self.template_first_edit.text()
-            template_second = int(self.template_second_edit.text())
-            length_template_first = int(self.length_template_first_edit.text())
+            template_second = int(float(self.template_second_edit.text().replace(',', '.')))
+            length_template_first = int(float(self.length_template_first_edit.text().replace(',', '.')))
 
-            length_template_second = int(self.length_template_second_edit.text())
-            dictance_template_second = int(self.dictance_template_second_edit.text())
+            length_template_second = int(float(self.length_template_second_edit.text().replace(',', '.')))
+            dictance_template_second = int(float(self.dictance_template_second_edit.text().replace(',', '.')))
             skm = self.skm_edit.text()
 
             self.template_first_label.setParent(None)
@@ -608,8 +609,8 @@ class TabPageSoWith(TabPageUnion):
                 self.template_first_edit.setText('фильтр направление')
                 self.dictance_template_first_edit.setText(str(int(dictance_template_first)))
                 self.dictance_template_second_edit.setText(str(1))
-                dictance_template_first = int(float(self.dictance_template_first_edit.text()))
-                dictance_template_second = int(float(self.dictance_template_second_edit.text()))
+                dictance_template_first = int(float(self.dictance_template_first_edit.text().replace(',', '.')))
+                dictance_template_second = int(float(self.dictance_template_second_edit.text().replace(',', '.')))
 
                 template_str = f'фильтр-направление {kot_str} + НКТ{nkt_diam}мм {dictance_template_first:.0f}м ' \
                                f'+ {skm_type}-{skm} {valve}+ {dictance_template_second}м НКТ{nkt_diam}мм + ' \
@@ -631,12 +632,12 @@ class TabPageSoWith(TabPageUnion):
             elif index == 'ПСШ Доп колонна СКМ в основной колонне':
 
                 self.length_template_first_edit.setText(str(length_template_first))
-                length_template_first = int(float(self.length_template_first_edit.text()))
+                length_template_first = int(float(self.length_template_first_edit.text().replace(',', '.')))
                 dictance_template_first1 = int(float(current_bottom - self.roof_add_column_plast + 5))
 
                 self.skm_edit.setText(str(self.data_well.column_diameter.get_value))
                 self.dictance_template_first_edit.setText(str(int(dictance_template_first1)))
-                dictance_template_first = int(float(self.dictance_template_first_edit.text()))
+                dictance_template_first = int(float(self.dictance_template_first_edit.text().replace(',', '.')))
                 dictance_template_second = int(float(current_bottom - dictance_template_first1 - \
                                                      length_template_first - self.data_well.head_column_additional.get_value + 5))
                 self.dictance_template_second_edit.setText(str(int(float(dictance_template_second))))
@@ -829,7 +830,7 @@ class TabPageSoWith(TabPageUnion):
                     # print(f'строка шаблона {template_str}')
                     self.template_depth = template_depth
                     self.dictance_three_edit.setText(str(20))
-                    self.paker_depth = self.template_depth - float(self.dictance_three_edit.text())
+                    self.paker_depth = self.template_depth - float(self.dictance_three_edit.text().replace(',', '.'))
                     self.data_well.skm_depth = self.template_depth + dictance_template_second
                     skm_teml_str = f'{skm_type}-{skm} до глубины {self.data_well.skm_depth}м, ' \
                                    f'шаблон-{template_second}мм до гл.{self.template_depth}м,' \
@@ -1198,12 +1199,12 @@ class TemplateKrs(WindowUnion):
             if mes == QMessageBox.StandardButton.No:
                 return
 
-        distance_second = int(float(self.current_widget.dictance_template_second_edit.text()))
-        distance_first = int(self.current_widget.dictance_template_first_edit.text())
-        template_length = int(float(self.current_widget.length_template_second_edit.text()))
+        distance_second = int(float(self.current_widget.dictance_template_second_edit.text().replace(',', '.')))
+        distance_first = int(float(self.current_widget.dictance_template_first_edit.text().replace(',', '.')))
+        template_length = int(float(self.current_widget.length_template_second_edit.text().replace(',', '.')))
 
         if self.data_well.column_additional:
-            self.template_length_addition = int(float(self.current_widget.length_template_first_edit.text()))
+            self.template_length_addition = int(float(self.current_widget.length_template_first_edit.text().replace(',', '.')))
 
         # if self.data_well.skm_depth > self.data_well.perforation_roof:
         #     question = QMessageBox.question(self, 'Проверка глубины СКМ',
@@ -1225,9 +1226,9 @@ class TemplateKrs(WindowUnion):
         if self.data_well.column_additional is False or \
                 (self.data_well.column_additional is True and
                  float(self.data_well.head_column_additional.get_value) >= self.data_well.current_bottom):
-            template_diameter = int(self.current_widget.template_second_edit.text())
+            template_diameter = int(float(self.current_widget.template_second_edit.text().replace(',', '.')))
         else:
-            template_diameter = int(self.current_widget.template_first_edit.text())
+            template_diameter = int(float(self.current_widget.template_first_edit.text().replace(',', '.')))
             if self.roof_add_column_plast < self.template_depth_addition:
                 mes = QMessageBox.question(self, 'Ошибка',
                                            f'Глубина спуска шаблона-{self.template_depth_addition}м '
@@ -1277,8 +1278,8 @@ class TemplateKrs(WindowUnion):
             roof_skm = self.tableWidget.item(row, 0)
             sole_skm = self.tableWidget.item(row, 1)
             if roof_skm and sole_skm:
-                roof = int(roof_skm.text())
-                sole = int(sole_skm.text())
+                roof = int(float(roof_skm.text().replace(',', '.')))
+                sole = int(float(sole_skm.text().replace(',', '.')))
                 skm_tuple.append((roof, sole))
 
         # print(f'интервалы СКМ {self.data_well.skm_interval}')

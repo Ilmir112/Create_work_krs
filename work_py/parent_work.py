@@ -1687,7 +1687,7 @@ class WindowUnion(MyMainWindow):
         from data_base.work_with_base import insert_data_well_dop_plan
         if len(table_name.split(' ')) > 3:
             date_table = table_name.split(' ')[-2]
-            wells_id = table_name.split(' ')[-1]
+            wells_id_str = table_name.split(' ')[-1]
             well_number = table_name.split(' ')[0]
             well_area = table_name.split(' ')[1]
             type_kr = table_name.split(' ')[2].replace('None', 'null')
@@ -1695,13 +1695,21 @@ class WindowUnion(MyMainWindow):
             work_plan = table_name.split(' ')[-4]
             self.data_well.emergency_well = False
             if data_list.connect_in_base:
+                if not wells_id_str.strip().isdigit():
+                    QMessageBox.warning(
+                        self, 'Ошибка',
+                        'В выбранной записи отсутствует идентификатор ремонта (ожидается число в конце). '
+                        'Выберите скважину из списка или проверьте формат данных.'
+                    )
+                    return None
+                wells_id = int(wells_id_str)
                 params = {
                     "well_number": well_number,
                     "well_area": well_area,
                     "type_kr": type_kr,
                     "work_plan": work_plan,
                     "date_create": date_table,
-                    "wells_id": int(wells_id),
+                    "wells_id": wells_id,
                     "contractor": data_list.contractor
                 }
                 response = ApiClient.request_params_get(ApiClient.find_wells_repair_well_by_id(), params)

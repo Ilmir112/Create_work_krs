@@ -6,6 +6,8 @@ from work_py.calculate_work_parametrs import volume_work
 
 from work_py.parent_work import TabWidgetUnion, TabPageUnion, WindowUnion
 
+YES_NO_OPTIONS = ['Нет', 'Да']
+
 
 class TabPageSoSand(TabPageUnion):
     def __init__(self, parent=None):
@@ -14,7 +16,7 @@ class TabPageSoSand(TabPageUnion):
         self.INT_VALIDATOR = QIntValidator(0, 80000)
         self.FLOAT_VALIDATOR = QDoubleValidator(0.0, 1.65, 2)
         self.PERO_OPTIONS = ['перо + КОТ', 'Перо', 'обточную муфту + КОТ', 'обточную муфту', 'перо-110мм', 'пило-муфту']
-        self.YES_NO_OPTIONS = ['Нет', 'Да']
+        self.YES_NO_OPTIONS = YES_NO_OPTIONS
         self.DEFAULT_SOLVENT_VOLUME = "2"
 
         self.current_label = QLabel("необходимый забой", self)
@@ -253,7 +255,7 @@ class PeroWindow(WindowUnion):
                     2),
             },
         ]
-        if solvent_question_combo == self.YES_NO_OPTIONS[0]:  # 'Нет'
+        if solvent_question_combo == YES_NO_OPTIONS[0]:  # 'Нет'
             # Find the index of the solvent step and remove it
             solvent_step_index = -1
             for i, step in enumerate(gips_pero_list):

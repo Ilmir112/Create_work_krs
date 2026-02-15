@@ -772,6 +772,8 @@ class MyMainWindow(QMainWindow):
             self.data_well.cat_well_max.get_value,
             self.data_well.data_pvr_min.get_value,
         )
+        if self.data_well is None:
+            return None
         if self.data_well.cdng.get_value not in dict_data_cdng:
             return
 
