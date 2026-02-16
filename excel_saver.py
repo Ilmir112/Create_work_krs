@@ -47,6 +47,14 @@ class SaveInExcel(MyWindow):
         self.ws = ws
         self.gnkt_data = gnkt_data
 
+    @staticmethod
+    def _sanitize_sheet_title(title):
+        """Убирает из имени листа символы, недопустимые в Excel (\\ / : * ? [ ])."""
+        invalid = '\\/:*?[]'
+        for char in invalid:
+            title = title.replace(char, ' ')
+        return title.strip()[:31]
+
     def save_to_gnkt(self):
         from gnkt_data.gnkt_data import insert_data_base_gnkt
 
@@ -360,6 +368,7 @@ class SaveInExcel(MyWindow):
                             "по сероводороду"
                         ].category in [1, 2]:
                             name_list = f"Расчет H2S {plast}"
+                            name_list = self._sanitize_sheet_title(name_list)
                             self.ws3 = self.wb2.create_sheet(name_list, 1)
                             calculate = CalculateH2s(self.data_well)
                             calculate.calc_h2s(self.ws3, plast)

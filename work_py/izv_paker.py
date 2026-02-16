@@ -199,13 +199,19 @@ class PakerIzvlek(WindowUnion):
                 # Закрываем основное окно при закрытии окна входа
         data_list.operation_window  = None
         event.accept()  # Принимаем событие закрытия
+
+        
     def add_work(self):
         type_work_combo = self.tab_widget.currentWidget().type_work_combo.currentText()
         pero_diameter_line = self.tab_widget.currentWidget().pero_diameter_line.text()
         nkt_key = self.tab_widget.currentWidget().nkt_select_combo.currentText()
         paker_depth_line = self.tab_widget.currentWidget().paker_depth_line.text()
         nkt_select_combo = self.tab_widget.currentWidget().nkt_select_combo.currentText()
-        roof_sand_edit = int(float(self.tab_widget.currentWidget().roof_sand_edit.text()))
+        roof_sand_edit = self.tab_widget.currentWidget().roof_sand_edit.text()
+        if roof_sand_edit == '':
+            QMessageBox.warning(self, 'Ошибка', 'Введите данные по кровле песчаного моста')
+            return
+        roof_sand_edit = int(float(roof_sand_edit))
 
         paker_type_combo = self.tab_widget.currentWidget().paker_type_combo.currentText()
         sand_question = self.tab_widget.currentWidget().need_sand_filing_combo.currentText()

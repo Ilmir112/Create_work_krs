@@ -66,13 +66,14 @@ class OpressovkaEK(WindowUnion):
 
         self.current_widget = self.tab_widget.currentWidget()
 
-        paker_khost = int(float(self.current_widget.paker_khost_edit.text()))
-        paker_depth = int(float(self.current_widget.paker_depth_edit.text()))
+        paker_khost = self.current_widget.paker_khost_edit.text()
+        paker_depth = self.current_widget.paker_depth_edit.text()
         pressure_zumpf_combo = self.current_widget.pressure_zumpf_question_combo.currentText()
         if not paker_khost or not paker_depth:
             QMessageBox.information(self, 'Внимание', 'Заполните все поля!')
             return
-
+        paker_khost = int(float(paker_khost))
+        paker_depth = int(float(paker_depth))
         if pressure_zumpf_combo == 'Да':
             paker_depth_zumpf = self.current_widget.paker_depth_zumpf_edit.text()
             if paker_depth_zumpf != '':
