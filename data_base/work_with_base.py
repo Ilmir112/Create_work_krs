@@ -752,6 +752,9 @@ def round_cell(data):
 
 
 def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_dict):
+    if not isinstance(data, dict):
+        wb_new = openpyxl.Workbook()
+        return wb_new.active
     wb_new = openpyxl.Workbook()
     sheet_new = wb_new.active
 

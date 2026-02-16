@@ -933,7 +933,7 @@ class DataWindow(WindowUnion):
                 QMessageBox.warning(self, "ОШИБКА", "Не выбран Вид и категория ремонта")
                 return
             else:
-                self.data_well.type_kr = type_kr_combo
+                self.data_well.type_kr = type_kr_combo.split()[0] if type_kr_combo else type_kr_combo
 
             column_type = self.current_widget.column_type.text().replace(",", ".").strip()
             column_wall_thickness = (

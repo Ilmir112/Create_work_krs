@@ -197,7 +197,10 @@ class CalculateH2s:
 
         for row in range(1, max_row_h2s):
             for col in range(1, 7):
-                ws3.cell(row=row, column=col).value = SNPKH[row - 1][col - 1]
+                val = SNPKH[row - 1][col - 1]
+                if isinstance(val, (tuple, list)):
+                    val = val[0] if val else None
+                ws3.cell(row=row, column=col).value = val
 
                 if 5 <= row <= 73 and 1 < col < 6:
                     ws3.cell(row=row, column=col).border = thin_border

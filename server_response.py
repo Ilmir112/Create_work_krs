@@ -193,13 +193,14 @@ class ApiClient:
             token = ApiClient.SETTINGS_TOKEN.value("auth_token", "")
             headers["Authorization"] = f"Bearer {token}"
         url = ApiClient.get_endpoint(path)
+        response = None
         try:
             response = requests.post(url, json=ApiClient.serialize_datetime(json_data), headers=headers, verify=False)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
             print(f"Запрос не удался: {e}")
-            return response.status_code
+            return response.status_code if response is not None else None
 
     @staticmethod
     def request_params_get(path, json_data):
@@ -220,7 +221,7 @@ class ApiClient:
     def request_post_json(path, json_data, param=None, answer="param"):
         url = ApiClient.get_endpoint(path)
         try:
-            token = ApiClient.SETTINGS_TOKEN.value("auth_token", "")
+            token = ApiClient.SETTINGS_TOKEN.value("auth_token", "") if ApiClient.SETTINGS_TOKEN else ""
             json_data = ApiClient.serialize_datetime(json_data)
             headers = {"Authorization": f"Bearer {token}"}
 
@@ -240,7 +241,7 @@ class ApiClient:
     def request_put_json(path, json_data, param=None, answer="param"):
         url = ApiClient.get_endpoint(path)
         try:
-            token = ApiClient.SETTINGS_TOKEN.value("auth_token", "")
+            token = ApiClient.SETTINGS_TOKEN.value("auth_token", "") if ApiClient.SETTINGS_TOKEN else ""
             json_data = ApiClient.serialize_datetime(json_data)
             headers = {"Authorization": f"Bearer {token}"}
 
@@ -423,8 +424,8 @@ class ApiClient:
         return cls.request_post(api_url, params_dict)
 
     @classmethod
-    def find_all(cls, api_url):
-        return cls.request_post(api_url)
+    def find_all(cls, api_url, json_data=None):
+        return cls.request_post(api_url, json_data or {})
 
     @classmethod
     def get_info_data(cls, params_dict, api_url):
@@ -463,8 +464,8 @@ class ResponseWork(QMainWindow):
             QMessageBox.information(self, "Обновление", "Ошибка при добавлении данных")
             return False
 
-    def delete_wells_by_region(self, region):
-        result = ApiClient.delete_wells_by_region(region)
+    def delete_wells_by_region(self, region, path):
+        result = ApiClient.delete_wells_by_region(region, path)
         if result:
             QMessageBox.information(self, "Удаление", "Объекты успешно удалены")
         else:

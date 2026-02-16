@@ -121,6 +121,7 @@ class CorrectPlanWindow(WindowUnion):
             self.data_well = ApiClient.insert_well_data_from_database(self.data_well)
 
         data_well_data_in_base_combo, data_table_in_base_combo = '', ''
+        well_data_in_base = ''
         well_data_in_base_combo = self.current_widget.well_data_in_base_combo.currentText()
         if ' от' in well_data_in_base_combo:
             data_well_data_in_base_combo = well_data_in_base_combo.split(' ')[-2]
@@ -133,7 +134,9 @@ class CorrectPlanWindow(WindowUnion):
                 self.data_well.work_plan_change = 'krs'
 
         if data_list.data_in_base:
-            self.extraction_data(well_data_in_base_combo)
+            extraction_data = self.extraction_data(well_data_in_base_combo)
+            if extraction_data is None:
+                return
         else:
             db = connection_to_database(decrypt("DB_WELL_DATA"))
             data_well_base = WorkDatabaseWell(db, self.data_well)

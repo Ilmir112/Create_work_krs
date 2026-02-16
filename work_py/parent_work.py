@@ -216,17 +216,17 @@ class TabPageUnion(QWidget):
         self.data_well.static_level = data_list.ProtectedIsDigit(response["static_level"])
         self.data_well.dinamic_level = data_list.ProtectedIsDigit(response["dinamic_level"])
         self.data_well.dict_perforation_project = response["perforation_project"]
-        self.data_well.expected_oil = response["expected_data"]["expected_oil"]
-        self.data_well.water_cut = response["expected_data"]["water_cut"]
-        self.data_well.percent_water = response["expected_data"]["percent_water"]
-        self.data_well.expected_pressure = response["expected_data"]["expected_pressure"]
-        self.data_well.expected_pickup = response["expected_data"]["expected_pickup"]
+        self.data_well.expected_oil = response["expected_data"].get("expected_oil", 0)
+        self.data_well.water_cut = response["expected_data"].get("water_cut", 0)
+        self.data_well.percent_water = response["expected_data"].get("percent_water", 0),
+        self.data_well.expected_pressure = response["expected_data"].get("expected_pressure", 0)
+        self.data_well.expected_pickup = response["expected_data"].get("expected_pickup", 0)
         self.data_well.curator = response["curator"]
         self.data_well.region = response["region"]
-        self.data_well.type_kr = response["type_kr"]
-        return json.loads(response["data_change_paragraph"]["данные"]), \
-               response["category_dict"]["данные по категории"], \
-               response['excel_json']["excel"]
+        self.data_well.type_kr = (response.get("type_kr") or "").split()[0] or response.get("type_kr", "")
+        return json.loads(response["data_change_paragraph"].get("данные", [])), \
+               response["category_dict"], \
+               response['excel_json']
 
     def insert_response_data(self, response):
 
@@ -1668,7 +1668,7 @@ class WindowUnion(MyMainWindow):
 
         try:
             col_width = []
-            dict_well = json.loads(data_well)
+            dict_well = data_well
             data = dict_well['data']
             row_heights = dict_well['rowHeights']
             if 'colWidth' in list(dict_well.keys()):
@@ -1782,7 +1782,6 @@ class WindowUnion(MyMainWindow):
                     dict_category = result_table[3]
 
             if dict_category:
-                dict_data_well = json.loads(dict_category)
                 # self.data_well.dict_category
                 pressure = namedtuple("pressure", "category data_pressure")
                 Data_h2s = namedtuple("Data_h2s", "category data_percent data_mg_l poglot")
@@ -1792,17 +1791,17 @@ class WindowUnion(MyMainWindow):
                 self.data_well.category_h2s_list = []
                 self.data_well.category_gaz_factor_percent = []
                 self.data_well.gaz_factor_percent = []
-                for plast, plast_data in dict_data_well.items():
+                for plast, plast_data in dict_category.items():
                     self.data_well.dict_category.setdefault(plast, {}).setdefault(
                         'по давлению',
-                        pressure(*dict_data_well[plast]['по давлению']))
+                        pressure(*dict_category[plast]['по давлению']))
                     self.data_well.dict_category.setdefault(plast, {}).setdefault(
-                        'по сероводороду', Data_h2s(*dict_data_well[plast]['по сероводороду']))
+                        'по сероводороду', Data_h2s(*dict_category[plast]['по сероводороду']))
                     self.data_well.dict_category.setdefault(plast, {}).setdefault(
-                        'по газовому фактору', Data_gaz(*dict_data_well[plast]['по газовому фактору']))
+                        'по газовому фактору', Data_gaz(*dict_category[plast]['по газовому фактору']))
 
                     self.data_well.dict_category.setdefault(plast, {}).setdefault(
-                        'отключение', dict_data_well[plast]['отключение'])
+                        'отключение', dict_category[plast]['отключение'])
 
                     self.data_well.category_pressure_list.append(plast_data['по давлению'][0])
                     self.data_well.category_h2s_list.append(plast_data['по сероводороду'][0])

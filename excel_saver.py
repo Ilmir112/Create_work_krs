@@ -421,7 +421,7 @@ class SaveInExcel(MyWindow):
             
             # Добавляем опциональные параметры, если они доступны
             if hasattr(self.data_well, 'type_kr') and self.data_well.type_kr:
-                params["type_kr"] = self.data_well.type_kr
+                params["type_kr"] = self.data_well.type_kr.split()[0]
             
             if hasattr(self.data_well, 'work_plan') and self.data_well.work_plan:
                 params["work_plan"] = self.data_well.work_plan
@@ -491,6 +491,33 @@ class SaveInExcel(MyWindow):
             import traceback
             traceback.print_exc()
 
+    @staticmethod
+    def _build_expected_data(data_well):
+        """Собирает expected_data из полей data_well для отправки в API."""
+        existing = getattr(data_well, 'expected_data', None)
+        if existing and isinstance(existing, dict) and existing:
+            return existing
+
+        def _val(attr_name, default=0):
+            v = getattr(data_well, attr_name, default)
+            if v is None:
+                return default
+            if isinstance(v, tuple):
+                v = v[0] if v else default
+            if isinstance(v, (int, float, str)):
+                return v
+            if hasattr(v, 'get_value'):
+                return getattr(v, 'get_value')
+            return v
+
+        return {
+            "expected_oil": _val("expected_oil"),
+            "water_cut": _val("water_cut"),
+            "percent_water": _val("percent_water"),
+            "expected_pressure": _val("expected_pressure"),
+            "expected_pickup": _val("expected_pickup"),
+        }
+
     def _send_wells_repair_to_api(self, excel_data_dict):
         """
         Отправляет данные ремонта скважины в API через ручку /wells_repair_router/add_wells_data.
@@ -502,14 +529,24 @@ class SaveInExcel(MyWindow):
                 print("Недостаточно данных для отправки в API: отсутствуют well_number или well_area")
                 return None
 
+            # Формируем data_change_paragraph: API ожидает dict с ключом "данные" (JSON-строка списка)
+            dcp = getattr(self.data_well, 'data_change_paragraph', None)
+            if dcp is None or dcp == "" or (isinstance(dcp, dict) and not dcp):
+                data_list_paragraph = getattr(self.data_well, 'data_list', [])
+                data_change_paragraph = {"данные": json.dumps(data_list_paragraph, ensure_ascii=False)}
+            elif isinstance(dcp, str):
+                data_change_paragraph = {"данные": dcp}
+            else:
+                data_change_paragraph = dcp if isinstance(dcp, dict) else {"данные": "[]"}
+
             # Формируем payload согласно схеме SWellsRepair
             payload = {
                 "id": 0,  # Backend сам присвоит ID при создании
                 "category_dict": getattr(self.data_well, 'dict_category', {}),
-                "type_kr": getattr(self.data_well, 'type_kr', ''),
-                "work_plan": getattr(self.data_well, 'work_plan', ''),
+                "type_kr": getattr(self.data_well, 'type_kr', '').split()[0],
+                "work_plan": getattr(self.data_well, 'work_plan', '').replace('krs', "ПР"),
                 "excel_json": excel_data_dict,
-                "data_change_paragraph": getattr(self.data_well, 'data_change_paragraph', {}),
+                "data_change_paragraph": data_change_paragraph,
                 "norms_time": getattr(self.data_well, 'norm_of_time', 0.0),
                 "chemistry_need": getattr(self.data_well, 'chemistry_need', {}),
                 "geolog_id": "",  # Backend сам получит из токена пользователя
@@ -518,7 +555,7 @@ class SaveInExcel(MyWindow):
                 "type_absorbent": getattr(self.data_well, 'type_absorbent', ''),
                 "static_level": self.data_well.static_level.get_value if hasattr(self.data_well, 'static_level') and self.data_well.static_level else None,
                 "dinamic_level": self.data_well.dinamic_level.get_value if hasattr(self.data_well, 'dinamic_level') and self.data_well.dinamic_level else None,
-                "expected_data": getattr(self.data_well, 'expected_data', {}),
+                "expected_data": self._build_expected_data(self.data_well),
                 "curator": getattr(self.data_well, 'curator', ''),
                 "region": getattr(self.data_well, 'region', ''),
                 "contractor": data_list.contractor if hasattr(data_list, 'contractor') else '',

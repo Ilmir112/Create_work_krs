@@ -899,14 +899,14 @@ class FindIndexPZ(MyMainWindow):
                 "Не указан Вид и категория ремонта, его шифр\n"
             )
 
-        # if self.work_plan != 'plan_change':
-        #     self.row_expected = []
-        #     for j in range(self.data_x_min.get_value,
-        #                    self.data_x_max.get_value):  # Ожидаемые показатели после ремонта
-        #         lst = []
-        #         for i in range(0, 12):
-        #             lst.append(self.ws.cell(row=j + 1, column=i + 1))
-        #         self.row_expected.append(lst)
+        if self.work_plan != 'plan_change':
+            self.row_expected = []
+            for j in range(self.data_x_min.get_value,
+                           self.data_x_max.get_value):  # Ожидаемые показатели после ремонта
+                lst = []
+                for i in range(0, 12):
+                    lst.append(self.ws.cell(row=j + 1, column=i + 1))
+                self.row_expected.append(lst)
 
     def work_with_img(self, image_loader, row):
         for col in range(1, 12):
