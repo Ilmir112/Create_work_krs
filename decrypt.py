@@ -18,7 +18,10 @@ def decrypt(name):
 
     # Загружаем .env файл
     load_dotenv(dotenv_path=os.path.join(ext_data_dir, '.env'))
-    encrypted_value = os.getenv(name).encode()
+    value = os.getenv(name)
+    if value is None:
+        raise ValueError(f"Переменная окружения '{name}' не найдена в .env")
+    encrypted_value = value.encode()
 
     # Дешифруем значение
     decrypted_value = cipher.decrypt(encrypted_value)
