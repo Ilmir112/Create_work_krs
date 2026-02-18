@@ -1,7 +1,7 @@
 import json
 from collections import namedtuple
 from datetime import datetime
-from typing import List
+from typing import List, Optional, Any
 
 import data_list
 from data_base.config_base import connection_to_database, WorkDatabaseWell
@@ -36,6 +36,18 @@ class TabPageUnion(QWidget):
         self.validator_float_wall_thickness = QDoubleValidator(4.0, 16.0, 1)
         self.validator_int = QIntValidator(0, 8000)
         self.data_well = data_well
+        # Attributes set by subclasses (e.g. TabPageDp) and used in update_well_area, update_table_in_base_combo, etc.
+        self.well_number_edit: Any = None
+        self.well_area_edit: Any = None
+        self.well_data_in_base_combo: Any = None
+        self.number_DP_Combo: Any = None
+        self.index_change_line: Any = None
+        self.template_depth_edit: Any = None
+        self.template_length_edit: Any = None
+        self.skm_interval_edit: Any = None
+        self.raiding_interval_edit: Any = None
+        self.current_bottom_edit: Any = None
+        self.fluid_edit: Any = None
 
     def view_paker_work(self):
         self.diameter_paker_label_type = QLabel("Диаметр пакера", self)
@@ -213,12 +225,12 @@ class TabPageUnion(QWidget):
     def insert_repairs_data(self, response):
         self.data_well.distance_from_well_to_sampling_point = 20
         self.data_well.type_absorbent = response["type_absorbent"]
-        self.data_well.static_level = data_list.ProtectedIsDigit(response["static_level"])
-        self.data_well.dinamic_level = data_list.ProtectedIsDigit(response["dinamic_level"])
+        self.data_well.static_level = ProtectedIsNonNone(response["static_level"])
+        self.data_well.dinamic_level = ProtectedIsNonNone(response["dinamic_level"])
         self.data_well.dict_perforation_project = response["perforation_project"]
         self.data_well.expected_oil = response["expected_data"].get("expected_oil", 0)
         self.data_well.water_cut = response["expected_data"].get("water_cut", 0)
-        self.data_well.percent_water = response["expected_data"].get("percent_water", 0),
+        self.data_well.percent_water = response["expected_data"].get("percent_water", 0)
         self.data_well.expected_pressure = response["expected_data"].get("expected_pressure", 0)
         self.data_well.expected_pickup = response["expected_data"].get("expected_pickup", 0)
         self.data_well.curator = response["curator"]
@@ -234,34 +246,34 @@ class TabPageUnion(QWidget):
             self.data_well.column_direction_true = True
         else:
             self.data_well.column_direction_true = False
-        self.data_well.column_direction_diameter = ProtectedIsDigit(response["column_direction"]['diameter'])
-        self.data_well.column_direction_wall_thickness = ProtectedIsDigit(
+        self.data_well.column_direction_diameter = ProtectedIsNonNone(response["column_direction"]['diameter'])
+        self.data_well.column_direction_wall_thickness = ProtectedIsNonNone(
             response["column_direction"]['wall_thickness'])
-        self.data_well.column_direction_length = data_list.ProtectedIsDigit(response["column_direction"]["shoe"])
-        self.data_well.level_cement_direction = ProtectedIsDigit(response["column_direction"]["level_cement"])
-        self.data_well.column_conductor_diameter = ProtectedIsDigit(response["column_conductor"]["diameter"])
-        self.data_well.column_conductor_wall_thickness = ProtectedIsDigit(
+        self.data_well.column_direction_length = ProtectedIsNonNone(response["column_direction"]["shoe"])
+        self.data_well.level_cement_direction = ProtectedIsNonNone(response["column_direction"]["level_cement"])
+        self.data_well.column_conductor_diameter = ProtectedIsNonNone(response["column_conductor"]["diameter"])
+        self.data_well.column_conductor_wall_thickness = ProtectedIsNonNone(
             response["column_conductor"]["wall_thickness"])
-        self.data_well.column_conductor_length = ProtectedIsDigit(response["column_conductor"]["shoe"])
-        self.data_well.level_cement_conductor = ProtectedIsDigit(response["column_conductor"]["level_cement"])
+        self.data_well.column_conductor_length = ProtectedIsNonNone(response["column_conductor"]["shoe"])
+        self.data_well.level_cement_conductor = ProtectedIsNonNone(response["column_conductor"]["level_cement"])
         if self.data_well.column_conductor_diameter.get_value not in ['0', None, 0, '']:
             self.data_well.column_direction_true = True
-        self.data_well.well_oilfield = ProtectedIsDigit(response["well_oilfield"])
-        self.data_well.level_cement_column = ProtectedIsDigit(response["column_production"]["level_cement"])
+        self.data_well.well_oilfield = ProtectedIsNonNone(response["well_oilfield"])
+        self.data_well.level_cement_column = ProtectedIsNonNone(response["column_production"]["level_cement"])
         self.data_well.appointment_well = ProtectedIsNonNone(response["appointment"])
-        self.data_well.column_diameter = ProtectedIsDigit(response["column_production"]["diameter"])
-        self.data_well.column_wall_thickness = ProtectedIsDigit(response["column_production"]["wall_thickness"])
-        self.data_well.shoe_column = ProtectedIsDigit(response["column_production"]["shoe"])
+        self.data_well.column_diameter = ProtectedIsNonNone(response["column_production"]["diameter"])
+        self.data_well.column_wall_thickness = ProtectedIsNonNone(response["column_production"]["wall_thickness"])
+        self.data_well.shoe_column = ProtectedIsNonNone(response["column_production"]["shoe"])
         self.data_well.head_column = ProtectedIsDigit(response["column_production"]["head"])
         self.data_well.diameter_doloto_ek = ProtectedIsDigit(response["diameter_doloto_ek"])
         self.data_well.column_additional = False
-        self.data_well.column_additional_diameter = ProtectedIsDigit(response["column_additional"]["diameter"])
+        self.data_well.column_additional_diameter = ProtectedIsNonNone(response["column_additional"]["diameter"])
         if response["column_additional"]["diameter"] != 0:
             self.data_well.column_additional = True
-        self.data_well.column_additional_wall_thickness = ProtectedIsDigit(
+        self.data_well.column_additional_wall_thickness = ProtectedIsNonNone(
             response["column_additional"]["wall_thickness"])
-        self.data_well.shoe_column_additional = ProtectedIsDigit(response["column_additional"]["shoe"])
-        self.data_well.head_column_additional = ProtectedIsDigit(response["column_additional"]["head"])
+        self.data_well.shoe_column_additional = ProtectedIsNonNone(response["column_additional"]["shoe"])
+        self.data_well.head_column_additional = ProtectedIsNonNone(response["column_additional"]["head"])
         # self.data_well.curator = response["куратор"]
         self.data_well.dict_pump_shgn = response["equipment"]["ШГН"]["тип"]
 
@@ -309,12 +321,12 @@ class TabPageUnion(QWidget):
 
         self.data_well.inventory_number = response["inventory_number"]
         self.data_well.angle_data = response["angle_data"]["инклинометрия"]
-        self.data_well.bottom_hole_drill = ProtectedIsDigit(response["bottom_hole_drill"])
-        self.data_well.bottom_hole_artificial = ProtectedIsDigit(response["bottom_hole_artificial"])
-        self.data_well.max_angle = ProtectedIsDigit(response["max_angle"])
-        self.data_well.max_angle_depth = ProtectedIsDigit(response["max_angle_depth"])
-        self.data_well.max_expected_pressure = ProtectedIsDigit(response["max_expected_pressure"])
-        self.data_well.max_admissible_pressure = ProtectedIsDigit(response["max_admissible_pressure"])
+        self.data_well.bottom_hole_drill = ProtectedIsNonNone(response["bottom_hole_drill"])
+        self.data_well.bottom_hole_artificial = ProtectedIsNonNone(response["bottom_hole_artificial"])
+        self.data_well.max_angle = ProtectedIsNonNone(response["max_angle"])
+        self.data_well.max_angle_depth = ProtectedIsNonNone(response["max_angle_depth"])
+        self.data_well.max_expected_pressure = ProtectedIsNonNone(response["max_expected_pressure"])
+        self.data_well.max_admissible_pressure = ProtectedIsNonNone(response["max_admissible_pressure"])
 
 
         self.data_well.cdng = data_list.ProtectedIsNonNone(response["cdng"])
@@ -348,33 +360,36 @@ class TabPageUnion(QWidget):
             vodoiz_nkt = 0
 
             for nkt_key, nkt_values in self.data_well.dict_nkt_before.items():
-                if '73' in nkt_key:
+                nkt_1 = 0
+                nkt_width = 0.0
+                if '73' in str(nkt_key):
                     nkt_1 = 73
                     nkt_width = 5.5
-                elif '60' in nkt_key:
+                elif '60' in str(nkt_key):
                     nkt_1 = 60
                     nkt_width = 5
-                elif '48' in nkt_key:
+                elif '48' in str(nkt_key):
                     nkt_1 = 48
                     nkt_width = 4
-                elif '89' in nkt_key:
+                elif '89' in str(nkt_key):
                     nkt_1 = 89
                     nkt_width = 6.5
-
-                vodoiz_nkt = round(10 * 3.14 * ((nkt_1 * 0.01) ** 2 - (nkt_1 * 0.01 - nkt_width * 2 * 0.01) ** 2) / 4,
-                                   2)
-                udel_vodoiz_nkt += vodoiz_nkt * nkt_values / 1000
+                if nkt_1 and nkt_width:
+                    vodoiz_nkt = round(10 * 3.14 * ((nkt_1 * 0.01) ** 2 - (nkt_1 * 0.01 - nkt_width * 2 * 0.01) ** 2) / 4,
+                                       2)
+                    udel_vodoiz_nkt += vodoiz_nkt * nkt_values / 1000
 
             sucker_rod_l_25 = 0
             sucker_rod_l_22 = 0
             sucker_rod_l_19 = 0
 
             for sucker_key, sucker_value in self.data_well.dict_sucker_rod.items():
-                if '25' in sucker_key:
+                sk = str(sucker_key)
+                if '25' in sk:
                     sucker_rod_l_25 = sucker_value
-                elif '22' in sucker_key:
+                elif '22' in sk:
                     sucker_rod_l_22 = sucker_value
-                elif '19' in sucker_key:
+                elif '19' in sk:
                     sucker_rod_l_19 = sucker_value
 
             vodoiz_sucker = (10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_25 / 1000) + (
@@ -684,9 +699,10 @@ class TabPageUnion(QWidget):
     def pressure_mode(self, mode, plast):
         if self.data_well:
             mode = int(mode / 10) * 10
+            max_p = self.data_well.max_admissible_pressure.get_value
             if ('d2ps' in plast.lower() or 'дпаш' in plast.lower()) and self.data_well.region == 'ИГМ':
                 mode_str = f'{120}, {140}, {160}'
-            elif mode > self.data_well.max_admissible_pressure.get_value:
+            elif max_p is not None and mode > max_p:
                 mode_str = f'{mode}, {mode - 10}, {mode - 20}'
             else:
                 mode_str = f'{mode - 10}, {mode}, {mode + 10}'
@@ -838,10 +854,11 @@ class TabPageUnion(QWidget):
                     if abs(float(roof) - float(paker_depth)) < 10 or abs(float(sole) - float(paker_depth)) < 10:
                         need_count += 1
 
-            if need_count == 0:
-                self.need_privyazka_q_combo.setCurrentIndex(0)
-            else:
-                self.need_privyazka_q_combo.setCurrentIndex(1)
+            if self.need_privyazka_q_combo:
+                if need_count == 0:
+                    self.need_privyazka_q_combo.setCurrentIndex(0)
+                else:
+                    self.need_privyazka_q_combo.setCurrentIndex(1)
 
     def paker_diameter_select(self, depth_landing):
         paker_diam_dict = {
@@ -864,13 +881,16 @@ class TabPageUnion(QWidget):
         }
         paker_diameter = 0
         try:
+            head_add = self.data_well.head_column_additional.get_value
             if self.data_well.column_additional is False or (
-                    self.data_well.column_additional is True and int(
-                depth_landing) <= self.data_well.head_column_additional.get_value):
-                diam_internal_ek = self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value
+                    self.data_well.column_additional is True and head_add is not None and int(depth_landing) <= head_add):
+                cd = self.data_well.column_diameter.get_value
+                cwt = self.data_well.column_wall_thickness.get_value
+                diam_internal_ek = (cd or 0) - 2 * (cwt or 0)
             else:
-                diam_internal_ek = self.data_well.column_additional_diameter.get_value - \
-                                   2 * self.data_well.column_additional_wall_thickness.get_value
+                cad = self.data_well.column_additional_diameter.get_value
+                cawt = self.data_well.column_additional_wall_thickness.get_value
+                diam_internal_ek = (cad or 0) - 2 * (cawt or 0)
 
             for diam, diam_internal_paker in paker_diam_dict.items():
                 if diam_internal_paker[0] <= diam_internal_ek <= diam_internal_paker[1]:
@@ -971,14 +991,31 @@ class TabWidgetUnion(QTabWidget):
 class WindowUnion(MyMainWindow):
     def __init__(self, data_well: FindIndexPZ):
         super().__init__()
-        self.QplastEdit = None
+        self.QplastEdit: Optional[Any] = None
         self.data_well = data_well
-        self.tableWidget = None
+        self.tableWidget: Optional[Any] = None
+        # Attributes set by subclasses (e.g. AcidPakerWindow, TabPageSo) and used in acid_work, flushing_downhole, etc.
+        self.plast_combo: Optional[Any] = None
+        self.acid_edit: Optional[Any] = None
+        self.acid_volume_edit: Any = 0
+        self.acid_proc_edit: Any = 0
+        self.acid_oil_proc_edit: Any = 0
+        self.iron_volume_edit: Any = 0
+        self.iron_true_combo: Optional[Any] = None
+        self.pressure_edit: Any = 0
+        self.paker_depth: Any = 0
+        self.paker_khost: Any = 0
+        self.paker_layout_combo: Optional[Any] = None
+        self.paker2_depth: Any = 0
+        self.current_widget: Optional[Any] = None
+        self.dict_nkt: Any = None
 
     def select_combo_paker(self, paker_khost, paker_depth, paker_diameter):
         from work_py.opressovka import OpressovkaEK
-        if self.data_well.column_additional is False or self.data_well.column_additional is True \
-                and paker_depth < self.data_well.head_column_additional.get_value:
+        head_add = self.data_well.head_column_additional.get_value if self.data_well.head_column_additional else None
+        cad_val = self.data_well.column_additional_diameter.get_value if self.data_well.column_additional_diameter else None
+        if self.data_well.column_additional is False or (self.data_well.column_additional is True
+                and head_add is not None and paker_depth < head_add):
 
             paker_select = f'воронку + НКТ{self.data_well.nkt_diam}мм {paker_khost}м +' \
                            f' пакер ПРО-ЯМО-{paker_diameter}мм (либо аналог) ' \
@@ -987,30 +1024,33 @@ class WindowUnion(MyMainWindow):
             paker_short = f'в-у + НКТ{self.data_well.nkt_diam}мм {paker_khost}м +' \
                           f' пакер ПРО-ЯМО-{paker_diameter}мм  +' \
                           f' {OpressovkaEK.nkt_opress(self)[0]}'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
-                paker_depth > self.data_well.head_column_additional.get_value:
+        elif self.data_well.column_additional is True and cad_val is not None and cad_val < 110 and \
+                head_add is not None and paker_depth > head_add:
             paker_select = f'воронку + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                            f'{paker_diameter}мм ' \
                            f'(либо аналог)  ' \
                            f'для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
                            f'{self.data_well.column_additional_wall_thickness.get_value}мм  + {OpressovkaEK.nkt_opress(self)[0]} ' \
-                           f'+ НКТ60мм L- {round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
+                           f'+ НКТ60мм L- {round(paker_depth - (head_add or 0), 0)}м'
             paker_short = f'в-у + НКТ{60}мм {paker_khost}м + пакер ПРО-ЯМО-' \
                           f'{paker_diameter}мм ' \
                           f' + {OpressovkaEK.nkt_opress(self)[0]} ' \
-                          f'+ НКТ60мм L- {round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110 and \
-                paker_depth > self.data_well.head_column_additional.get_value:
+                          f'+ НКТ60мм L- {round(paker_depth - (head_add or 0), 0)}м'
+        elif self.data_well.column_additional is True and cad_val is not None and cad_val > 110 and \
+                head_add is not None and paker_depth > head_add:
             paker_select = f'воронку + НКТ{self.data_well.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
                            f'пакер ПРО-ЯМО-{paker_diameter}мм (либо аналог) ' \
                            f'для ЭК {self.data_well.column_additional_diameter.get_value}мм х ' \
                            f'{self.data_well.column_additional_wall_thickness.get_value}мм + {OpressovkaEK.nkt_opress(self)[0]}' \
                            f'+ НКТ{self.data_well.nkt_diam}мм со снятыми фасками L- ' \
-                           f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
+                           f'{round(paker_depth - (head_add or 0), 0)}м'
             paker_short = f'в-у + НКТ{self.data_well.nkt_diam}мм со снятыми фасками {paker_khost}м + ' \
                           f'пакер ПРО-ЯМО-{paker_diameter}мм + {OpressovkaEK.nkt_opress(self)[0]}' \
                           f'+ НКТ{self.data_well.nkt_diam}мм со снятыми фасками L- ' \
-                          f'{round(paker_depth - self.data_well.head_column_additional.get_value, 0)}м'
+                          f'{round(paker_depth - (head_add or 0), 0)}м'
+        else:
+            paker_select = f'воронку + НКТ{self.data_well.nkt_diam}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diameter}мм'
+            paker_short = f'в-у + НКТ{self.data_well.nkt_diam}мм {paker_khost}м + пакер ПРО-ЯМО-{paker_diameter}мм'
 
         nkt_opress_list = OpressovkaEK.nkt_opress(self)
         return paker_select, paker_short, nkt_opress_list
@@ -1018,6 +1058,8 @@ class WindowUnion(MyMainWindow):
     def acid_work(self):
         from work_py.alone_oreration import volume_vn_nkt, well_volume
         paker_list = []
+        acid_sel = ''
+        acid_sel_short = ''
 
         if self.iron_true_combo == 'Да':
             iron_str = f' с добавлением стабилизатор железа (Hi-Iron)  из расчета 10кг на 1тн ({self.iron_volume_edit}кг)'
@@ -1040,8 +1082,8 @@ class WindowUnion(MyMainWindow):
             acid_sel_short = f'Произвести  СКО {self.plast_combo}  в V  {self.acid_volume_edit}м3  ({self.acid_edit} -' \
                              f' {self.acid_proc_edit} %) '
         elif self.acid_edit == 'ВТ':
-
-            vt = self.current_widget.sko_vt_edit.text()
+            sko_vt = getattr(self.current_widget, 'sko_vt_edit', None)
+            vt = sko_vt.text() if sko_vt else ''
             acid_sel = f'Произвести кислотную обработку {self.plast_combo} {vt} в присутствии представителя ' \
                        f'Заказчика с составлением акта, не превышая давления закачки не более' \
                        f' Р={self.pressure_edit}атм.'
@@ -1087,14 +1129,18 @@ class WindowUnion(MyMainWindow):
                              f'{self.acid_volume_edit}м3 - {20}% не ' \
                              f'более Р={self.pressure_edit}атм.\n'
             # print(f'Ожидаемое показатели {self.data_well.expected_pick_up.values()}')
+        else:
+            acid_sel = ''
+            acid_sel_short = ''
         layout_select = f'посадить пакер на глубине {self.paker_depth}м'
 
+        paker_layout = self.paker_layout_combo or ''
         if self.__class__.__name__ == 'AcidPakerWindow':
-            if self.paker_layout_combo in ['воронка', 'пакер с заглушкой', 'без монтажа компоновки на спуск']:
+            if paker_layout in ['воронка', 'пакер с заглушкой', 'без монтажа компоновки на спуск']:
                 layout_select = 'Закрыть затрубное пространство'
-            if 'одно' in self.paker_layout_combo:
+            if 'одно' in paker_layout:
                 layout_select = f'посадить пакер на глубине {self.paker_depth}м'
-            elif 'дву' in self.paker_layout_combo:
+            elif 'дву' in paker_layout:
                 layout_select = f'посадить пакера на глубине {self.paker_depth}/{self.paker2_depth}м'
 
         acid_list_1 = [
@@ -1219,14 +1265,19 @@ class WindowUnion(MyMainWindow):
             data_well_base = WorkDatabaseWell(db)
 
             data_well = data_well_base.read_excel_in_base(well_number, well_area, work_plan, type_kr)
-        self.data, self.row_heights, self.col_width, self.boundaries_dict = \
-            self.read_excel_in_base(data_well)
+        if data_well is None:
+            return
+        read_result = self.read_excel_in_base(data_well)
+        if read_result is None:
+            return
+        self.data, self.row_heights, self.col_width, self.boundaries_dict = read_result
 
         self.target_row_index = 5000
         self.target_row_index_cancel = 5000
         self.bottom_row_index = 5000
         self.perforation_list = []
         self.insert_index2 = None
+        list_row = []
 
         for i, row in self.data.items():
             if i != 'image':
@@ -1290,7 +1341,7 @@ class WindowUnion(MyMainWindow):
         # self.data_well.insert_index2 = self.data_well.data_x_max.get_value -1
         self.data_well.count_template = 1
 
-        if self.data_well.work_plan != 'plan_change':
+        if self.data_well.work_plan != 'plan_change' and self.tableWidget is not None:
             self.tableWidget.setSortingEnabled(False)
             rows = self.tableWidget.rowCount()
             for row_pvr in self.perforation_list[::-1]:
@@ -1305,20 +1356,23 @@ class WindowUnion(MyMainWindow):
         nkt_diam = 73
         nkt_pod = '73мм'
         template_nkt_diam = '59.6мм'
+        head_add_val = None
+        if self.data_well and self.data_well.head_column_additional:
+            head_add_val = self.data_well.head_column_additional.get_value
         if self.data_well:
             if self.data_well.column_additional is True and \
-                    110 > float(self.data_well.column_additional_diameter.get_value) and \
-                    paker_depth > self.data_well.head_column_additional.get_value > 1000:
+                    110 > float(self.data_well.column_additional_diameter.get_value or 0) and \
+                    head_add_val is not None and paker_depth > head_add_val > 1000:
                 nkt_diam = 73
                 nkt_pod = '60'
                 template_nkt_diam = '59.6мм, 47.9мм'
             elif self.data_well.column_additional is True and float(
-                    self.data_well.column_additional_diameter.get_value) > 110 and \
-                    paker_depth > self.data_well.head_column_additional.get_value:
+                    self.data_well.column_additional_diameter.get_value or 0) > 110 and \
+                    head_add_val is not None and paker_depth > head_add_val:
                 nkt_diam = 73
                 nkt_pod = '73мм со снятыми фасками'
                 template_nkt_diam = '59.6'
-            elif self.data_well.column_additional and self.data_well.head_column_additional.get_value <= 1000 and \
+            elif self.data_well.column_additional and head_add_val is not None and head_add_val <= 1000 and \
                     swab_true_edit_type == 'Нужно освоение':
                 nkt_list = ["60", "73"]
                 nkt_diam, ok = QInputDialog.getItem(self, 'выбор диаметра НКТ',
@@ -1326,12 +1380,12 @@ class WindowUnion(MyMainWindow):
                                                     'Выберете диаметр НКТ', nkt_list, 0, False)
                 nkt_pod = '60мм'
                 template_nkt_diam = '59.6мм, 47.9мм'
-            elif self.data_well.column_additional and self.data_well.column_additional_diameter.get_value < 110:
+            elif self.data_well.column_additional and (self.data_well.column_additional_diameter.get_value or 0) < 110:
                 nkt_diam = '73мм'
                 nkt_pod = '60мм'
                 template_nkt_diam = '59.6мм, 47.9мм'
 
-            elif self.data_well.column_additional is False and self.data_well.column_diameter.get_value < 110:
+            elif self.data_well.column_additional is False and (self.data_well.column_diameter.get_value or 0) < 110:
                 nkt_diam = 60
                 nkt_pod = '60мм'
                 template_nkt_diam = '47.9мм'
@@ -1430,12 +1484,17 @@ class WindowUnion(MyMainWindow):
                           f'провести ГДИС (КВДз).'
             swab_short = f'сваб профиль не менее ' \
                          f'{self.swab_volume_edit}'
+        else:
+            swab_short = ''
+            swab_select = ''
 
         return swab_short, swab_select
 
     def flushing_downhole(self, paker_layout):
 
         self.data_well.fluid_work_short = self.data_well.fluid_work[:4]
+        flushing_downhole_list = ''
+        flushing_downhole_short = ''
 
         if 'одно' in paker_layout:
             if (self.data_well.perforation_roof - 5 + self.paker_khost >= self.data_well.current_bottom) or \
@@ -1608,6 +1667,8 @@ class WindowUnion(MyMainWindow):
         return priv_list
 
     def find_item_in_table(self, value):
+        if self.tableWidget is None:
+            return None
         for row in range(self.tableWidget.rowCount()):
             item = self.tableWidget.item(row, 0)  # Проверяем первый столбец
             if item and item.text() == str(value):
@@ -1638,19 +1699,19 @@ class WindowUnion(MyMainWindow):
             press_str += f'Опрессовать НКТ в интервале {n} - {int(nkt)} на давление {pressure}атм \n'
             n = nkt
 
-        return press_str
+        return [press_str]
 
     def select_nkt_grp(self):
-
+        head_add = self.data_well.head_column_additional.get_value if self.data_well.head_column_additional else None
         if self.data_well.column_additional is False or \
-                (self.data_well.column_additional is True and self.data_well.current_bottom >=
-                 self.data_well.head_column_additional.get_value):
+                (self.data_well.column_additional is True and head_add is not None and
+                 self.data_well.current_bottom >= head_add):
             return f'НКТ{self.data_well.nkt_diam}мм'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110:
-            return f'НКТ60мм L- {round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value + 20, 0)}'
-        elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value > 110:
+        elif self.data_well.column_additional is True and (self.data_well.column_additional_diameter.get_value or 0) < 110:
+            return f'НКТ60мм L- {round(self.data_well.current_bottom - (head_add or 0) + 20, 0)}'
+        elif self.data_well.column_additional is True and (self.data_well.column_additional_diameter.get_value or 0) > 110:
             return f'НКТ{self.data_well.nkt_diam}мм со снятыми фасками L- ' \
-                   f'{round(self.data_well.current_bottom - self.data_well.head_column_additional.get_value + 20, 0)}'
+                   f'{round(self.data_well.current_bottom - (head_add or 0) + 20, 0)}'
 
     @staticmethod
     def difference_date_days(date1, today=data_list.current_date):
@@ -1685,6 +1746,7 @@ class WindowUnion(MyMainWindow):
 
     def extraction_data(self, table_name, paragraph_row=0):
         from data_base.work_with_base import insert_data_well_dop_plan
+        dict_category = None
         if len(table_name.split(' ')) > 3:
             date_table = table_name.split(' ')[-2]
             wells_id_str = table_name.split(' ')[-1]
@@ -1825,6 +1887,8 @@ class WindowUnion(MyMainWindow):
             return
 
     def insert_data_plan(self, result):
+        if not result:
+            return None
         self.data_well.data_list = []
         self.data_well.gips_in_well = False
         self.data_well.drilling_interval = []
@@ -1842,6 +1906,7 @@ class WindowUnion(MyMainWindow):
         self.data_well.stabilizator_need = False
         self.data_well.current_bottom_second = 0
 
+        ind = 0
         for ind, row in enumerate(result):
             if ind == 1:
                 self.data_well.bottom = row[1]
@@ -1984,11 +2049,13 @@ class WindowUnion(MyMainWindow):
             return False
 
     def pvo_gno(self, kat_pvo):
-        self.text_pvo = f'{self.data_well.max_expected_pressure.get_value}атм ' \
+        max_exp = self.data_well.max_expected_pressure.get_value if self.data_well.max_expected_pressure else None
+        max_exp_val = (max_exp if max_exp is not None else 0)
+        self.text_pvo = f'{max_exp_val}атм ' \
                         f'(на максимально ожидаемое давление еа устье в течении 30мин (не менее 30атм), но не выше ' \
                         f'давление опрессовки эксплуатационной колонны) '
         if self.data_well.curator == 'ВНС':
-            self.text_pvo = f'{self.data_well.max_expected_pressure.get_value * 1.1:.1f}атм. ' \
+            self.text_pvo = f'{max_exp_val * 1.1:.1f}атм. ' \
                             f'(на максимально ожидаемое давление еа устье в течении 30мин (не менее 30атм), но не выше ' \
                             f' давление опрессовки эксплуатационной колонны) '
 

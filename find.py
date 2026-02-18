@@ -36,7 +36,7 @@ class FindIndexPZ(MyMainWindow):
         self.perforation_sole = 5000
         self.number_dp = 0
         self.skm_interval = []
-        self.head_column = 0
+        self.head_column = ProtectedIsDigit(0)
         self.modal_dialog = None
         self.image_loader = None
         self.water_density = ProtectedIsDigit(1.18)
@@ -3353,10 +3353,18 @@ class WellCategory(FindIndexPZ):
             self.category_h2s = self.category_h2s_list[0]
             self.category_gas_factor = self.category_gaz_factor_percent[0]
 
+            def _safe_category(x, default=3):
+                if x is None:
+                    return default
+                try:
+                    return int(float(x))
+                except (TypeError, ValueError):
+                    return default
+
             min_category = [
-                int(float(self.category_pressure)),
-                int(float(self.category_h2s)),
-                int(float(self.category_gas_factor)),
+                _safe_category(self.category_pressure),
+                _safe_category(self.category_h2s),
+                _safe_category(self.category_gas_factor),
             ]
             min_category = min(min_category)
 
