@@ -15,7 +15,7 @@ def decrypt(name):
     ext_data_dir = os.getcwd()
     if getattr(sys, 'frozen', False):
         ext_data_dir = sys._MEIPASS
-
+    print(f'{ext_data_dir} {name}')
     # Загружаем .env файл
     load_dotenv(dotenv_path=os.path.join(ext_data_dir, '.env'))
     value = os.getenv(name)
