@@ -12,15 +12,27 @@ def decrypt(name):
         key = key_file.read()
     cipher = Fernet(key)
 
-    ext_data_dir = os.getcwd()
+    # В продакшене (frozen) .env лежит рядом с exe (например D:\ZIMA), не в MEIPASS
     if getattr(sys, 'frozen', False):
-        ext_data_dir = sys._MEIPASS
-    print(f'{ext_data_dir} {name}')
-    # Загружаем .env файл
-    load_dotenv(dotenv_path=os.path.join(ext_data_dir, '.env'))
+        base_dir = os.path.dirname(sys.executable)
+        env_path = os.path.join(base_dir, '.env')
+        if not os.path.isfile(env_path):
+            env_path = os.path.join(base_dir, '_internal', '.env')
+        load_dotenv(dotenv_path=env_path)
+    else:
+        ext_data_dir = os.getcwd()
+        load_dotenv(dotenv_path=os.path.join(ext_data_dir, '.env'))
+
     value = os.getenv(name)
     if value is None:
-        raise ValueError(f"Переменная окружения '{name}' не найдена в .env")
+        plain_name = f"{name}_PLAIN"
+        plain_value = os.getenv(plain_name)
+        if plain_value is not None:
+            return plain_value
+        raise ValueError(
+            f"Переменная окружения '{name}' не найдена в .env. "
+            f"Добавьте '{name}' или '{plain_name}' в .env в папке приложения (рядом с exe)."
+        )
     encrypted_value = value.encode()
 
     # Дешифруем значение
