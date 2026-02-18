@@ -15,62 +15,55 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.8.8'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8.8'
 
-    - name: Check database secrets
-      run: |
-        $secrets = @(
-          @{Name='DB_USER'; Value=$Env:DB_USER},
-          @{Name='DB_PASSWORD'; Value=$Env:DB_PASSWORD},
-          @{Name='DB_HOST'; Value=$Env:DB_HOST},
-          @{Name='DB_WELL_DATA'; Value=$Env:DB_WELL_DATA},
-          @{Name='DB_NAME_USER'; Value=$Env:DB_NAME_USER},
-          @{Name='DB_NAME_GNKT'; Value=$Env:DB_NAME_GNKT},
-          @{Name='DB_PORT'; Value=$Env:DB_PORT}
-        )
+      - name: Install, create .env and build
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
 
-        foreach ($secret in $secrets) {
-          if ([string]::IsNullOrEmpty($secret.Value)) {
-            Write-Host "Не подгрузилось данные для базы данных: $($secret.Name)"
-          } else {
-            Write-Host "Данные для базы данных загружены: $($secret.Name)"
+          # Проверка секретов
+          $secrets = @(
+            @{Name='DB_USER'; Value=$env:DB_USER},
+            @{Name='DB_PASSWORD'; Value=$env:DB_PASSWORD},
+            @{Name='DB_HOST'; Value=$env:DB_HOST},
+            @{Name='DB_WELL_DATA'; Value=$env:DB_WELL_DATA},
+            @{Name='DB_NAME_USER'; Value=$env:DB_NAME_USER},
+            @{Name='DB_NAME_GNKT'; Value=$env:DB_NAME_GNKT},
+            @{Name='DB_PORT'; Value=$env:DB_PORT}
+          )
+          foreach ($s in $secrets) {
+            if ([string]::IsNullOrEmpty($s.Value)) { Write-Host "Нет данных: $($s.Name)" } else { Write-Host "OK: $($s.Name)" }
           }
-        }
 
-    - name: Create virtual environment and install dependencies
-      run: |
-        pip install pyinstaller 
-        pip install -r requirements.txt
+          # Зависимости
+          pip install pyinstaller
+          pip install -r requirements.txt
 
-    - name: Create .env files
-      run: |
-        # Путь к файлу .env
-        $envFilePath = ".env"
+          # .env из секретов (явный путь, UTF-8)
+          $envPath = Join-Path $env:GITHUB_WORKSPACE ".env"
+          @(
+            "DB_WELL_DATA=$env:DB_WELL_DATA",
+            "DB_NAME_GNKT=$env:DB_NAME_GNKT",
+            "DB_USER=$env:DB_NAME_USER",
+            "DB_PASSWORD=$env:DB_PASSWORD",
+            "DB_HOST=$env:DB_HOST",
+            "DB_PORT=$env:DB_PORT"
+          ) | Set-Content -Path $envPath -Encoding utf8NoBOM
 
-        Set-Content -Path $envFilePath -Value "DB_WELL_DATA=$($Env:DB_WELL_DATA)"
-        Add-Content -Path $envFilePath -Value "DB_NAME_GNKT=$($Env:DB_NAME_GNKT)"
-        Add-Content -Path $envFilePath -Value "DB_USER=$($Env:DB_NAME_USER)"
-        Add-Content -Path $envFilePath -Value "DB_PASSWORD=$($Env:DB_PASSWORD)"
-        Add-Content -Path $envFilePath -Value "DB_HOST=$($Env:DB_HOST)"
-        Add-Content -Path $envFilePath -Value "DB_PORT=$($Env:DB_PORT)"
-        
-        if (Test-Path ".env") {
-          Get-Content ".env" | Out-Host
-        } else {
-          Write-Host ".env file does not exist."
-        }
+          if (-not (Test-Path $envPath)) { throw ".env не создан" }
+          Get-Content $envPath | ForEach-Object { Write-Host "  $_" }
 
-    - name: Build executable
-      run: |
-        pyinstaller --noconfirm main.spec
+          # Сборка
+          pyinstaller --noconfirm main.spec
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ZIMA
-        path: dist/*
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZIMA
+          path: dist/*
