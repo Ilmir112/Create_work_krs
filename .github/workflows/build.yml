@@ -69,15 +69,8 @@ jobs:
       run: |
         pyinstaller --noconfirm main.spec
 
-    - name: Create ZIP archive
-      shell: pwsh
-      run: |
-        Compress-Archive -Path dist\* -DestinationPath ZIMA.zip -Force
-        Write-Host "ZIP size: $((Get-Item ZIMA.zip).Length / 1MB) MB"
-
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: ZIMA
-        path: ZIMA.zip
-        retention-days: 7
+        path: dist/*
