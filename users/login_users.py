@@ -84,7 +84,7 @@ class LoginWindow(QDialog):
             }
 
             user_access = ApiClient.get_info_data(params, ApiClient.login_path())
-            # При ошибке (неверный пароль, 401, 405 и т.д.) возвращается int (status_code), не dict
+            # При ошибке (неверный пароль 401, доступ запрещён 403, и т.д.) возвращается int (status_code), не dict
             if isinstance(user_access, dict) and user_access.get("access_token"):
                 ApiClient.SETTINGS_TOKEN = QSettings('Zima', 'ZimaApp')
 
@@ -98,6 +98,13 @@ class LoginWindow(QDialog):
 
                 data_list.pause = False
                 self.close()
+            elif user_access == 403:
+                QMessageBox.critical(
+                    self, 'Доступ запрещён',
+                    'Доступ запрещён. Обратитесь к администратору для активации учётной записи.'
+                )
+                data_list.pause = True
+                self.user_dict = None
             else:
                 QMessageBox.critical(self, 'Пароль', 'логин и пароль не совпадает')
                 data_list.pause = True

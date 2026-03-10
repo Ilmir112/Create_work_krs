@@ -17,12 +17,12 @@ class settings:
         if cls._env_path is not None:
             return cls._env_path
         if getattr(sys, "frozen", False):
+            
             base_dir = os.path.dirname(sys.executable)
             path = os.path.join(base_dir, ".env")
+            print(base_dir, path)
             if not os.path.isfile(path):
                 path = os.path.join(base_dir, "_internal", ".env")
-
-            print(base_dir, path)
         else:
             path = os.path.join(os.getcwd(), ".env")
         cls._env_path = path

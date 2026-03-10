@@ -26,6 +26,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          Set-Location $env:GITHUB_WORKSPACE
 
           # Проверка секретов
           $secrets = @(
@@ -41,25 +42,24 @@ jobs:
             if ([string]::IsNullOrEmpty($s.Value)) { Write-Host "Нет данных: $($s.Name)" } else { Write-Host "OK: $($s.Name)" }
           }
 
-          # Зависимости
           pip install pyinstaller
           pip install -r requirements.txt
 
-          # .env из секретов (явный путь, UTF-8)
+          # .env — запись через .NET (надёжно создаёт файл)
           $envPath = Join-Path $env:GITHUB_WORKSPACE ".env"
-          @(
-            "DB_WELL_DATA=$env:DB_WELL_DATA",
-            "DB_NAME_GNKT=$env:DB_NAME_GNKT",
-            "DB_USER=$env:DB_NAME_USER",
-            "DB_PASSWORD=$env:DB_PASSWORD",
-            "DB_HOST=$env:DB_HOST",
-            "DB_PORT=$env:DB_PORT"
-          ) | Set-Content -Path $envPath -Encoding utf8NoBOM
+          $lines = @(
+            "DB_WELL_DATA=$($env:DB_WELL_DATA)",
+            "DB_NAME_GNKT=$($env:DB_NAME_GNKT)",
+            "DB_USER=$($env:DB_NAME_USER)",
+            "DB_PASSWORD=$($env:DB_PASSWORD)",
+            "DB_HOST=$($env:DB_HOST)",
+            "DB_PORT=$($env:DB_PORT)"
+          )
+          [System.IO.File]::WriteAllText($envPath, ($lines -join "`n"))
 
-          if (-not (Test-Path $envPath)) { throw ".env не создан" }
-          Get-Content $envPath | ForEach-Object { Write-Host "  $_" }
+          Write-Host "Файл .env создан: $envPath"
+          Write-Host (Get-Content $envPath -Raw)
 
-          # Сборка
           pyinstaller --noconfirm main.spec
 
       - name: Upload artifact

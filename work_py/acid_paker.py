@@ -723,6 +723,19 @@ class AcidPakerWindow(WindowUnion):
 
         self.mtg_count = None
 
+    @staticmethod
+    def _parse_percent_to_int(raw: str):
+        """Извлекает целое число из строки процента (например '12/3%' -> 12, '12.3%' -> 12)."""
+        if not raw or not raw.strip():
+            return None
+        s = raw.strip().rstrip("%").replace(",", ".").replace("/", ".").strip()
+        if not s:
+            return None
+        try:
+            return int(round(float(s)))
+        except (ValueError, TypeError):
+            return None
+
     def add_string(self):
         try:
             self.current_widget = self.tab_widget.currentWidget()
@@ -743,12 +756,25 @@ class AcidPakerWindow(WindowUnion):
             self.acid_combo.addItems(acid_edit_list)
             self.acid_combo.setCurrentIndex(acid_edit_list.index(self.acid_edit))
 
-            self.acid_volume_edit = float(
-                self.current_widget.acid_volume_edit.text().replace(",", ".")
+            try:
+                self.acid_volume_edit = float(
+                    self.current_widget.acid_volume_edit.text().replace(",", ".")
+                )
+            except (ValueError, TypeError):
+                QMessageBox.information(
+                    self, "Внимание", "Неверный формат объёма кислоты (введите число)."
+                )
+                return
+            self.acid_proc_edit = self._parse_percent_to_int(
+                self.current_widget.acid_proc_edit.text()
             )
-            self.acid_proc_edit = int(
-                self.current_widget.acid_proc_edit.text().replace(",", ".")
-            )
+            if self.acid_proc_edit is None:
+                QMessageBox.information(
+                    self,
+                    "Внимание",
+                    "Неверный формат процента кислоты (введите число, например 12 или 12.3).",
+                )
+                return
             self.svk_true_combo_str = str(
                 self.current_widget.svk_true_combo.currentText()
             )
@@ -765,7 +791,7 @@ class AcidPakerWindow(WindowUnion):
                 not self.plast_combo
                 or not self.acid_edit
                 or not self.acid_volume_edit
-                or not self.acid_proc_edit
+                or self.acid_proc_edit is None
             ):
                 QMessageBox.information(self, "Внимание", "Заполните данные по объему")
                 return
@@ -1166,9 +1192,9 @@ class AcidPakerWindow(WindowUnion):
                         row, 4
                     ).currentText()
                     self.acid_edit = self.tableWidget.cellWidget(row, 5).currentText()
-                    self.acid_proc_edit = int(
-                        float(self.tableWidget.item(row, 6).text())
-                    )
+                    self.acid_proc_edit = self._parse_percent_to_int(
+                        self.tableWidget.item(row, 6).text()
+                    ) or 0
                     self.acid_volume_edit = round(
                         float(self.tableWidget.item(row, 7).text()), 1
                     )
@@ -1223,9 +1249,9 @@ class AcidPakerWindow(WindowUnion):
                         .currentText()
                         .replace(",", ".")
                     )
-                    self.acid_proc_edit = int(
-                        float(self.tableWidget.item(row, 5).text())
-                    )
+                    self.acid_proc_edit = self._parse_percent_to_int(
+                        self.tableWidget.item(row, 5).text()
+                    ) or 0
                     self.acid_volume_edit = round(
                         float(self.tableWidget.item(row, 6).text().replace(",", ".")), 1
                     )
@@ -1276,9 +1302,9 @@ class AcidPakerWindow(WindowUnion):
                         row, 3
                     ).currentText()
                     self.acid_edit = self.tableWidget.cellWidget(row, 4).currentText()
-                    self.acid_proc_edit = int(
-                        float(self.tableWidget.item(row, 5).text().replace(",", "."))
-                    )
+                    self.acid_proc_edit = self._parse_percent_to_int(
+                        self.tableWidget.item(row, 5).text()
+                    ) or 0
                     self.acid_volume_edit = round(
                         float(self.tableWidget.item(row, 6).text().replace(",", ".")), 1
                     )
@@ -1317,9 +1343,9 @@ class AcidPakerWindow(WindowUnion):
                     self.acid_volume_edit = round(
                         float(self.tableWidget.item(row, 5).text().replace(",", ".")), 1
                     )
-                    self.acid_proc_edit = int(
-                        float(self.tableWidget.item(row, 4).text().replace(",", "."))
-                    )
+                    self.acid_proc_edit = self._parse_percent_to_int(
+                        self.tableWidget.item(row, 4).text()
+                    ) or 0
                     if self.acid_edit == "HCl":
                         self.sko_volume_all += self.acid_volume_edit
 

@@ -1628,7 +1628,9 @@ class WindowUnion(MyMainWindow):
                     if interval[0] < self.data_well.current_bottom:
                         interval_list.append(interval)
 
-        if self.data_well.leakiness is True:
+        if (self.data_well.leakiness is True and self.data_well.dict_leakiness
+                and 'НЭК' in self.data_well.dict_leakiness
+                and 'интервал' in self.data_well.dict_leakiness.get('НЭК', {})):
             for nek in self.data_well.dict_leakiness['НЭК']['интервал']:
                 if self.data_well.dict_leakiness['НЭК']['интервал'][nek]['отключение'] is False and float(
                         nek.split('-')[0]) < depth:

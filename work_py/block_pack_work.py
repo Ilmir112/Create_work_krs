@@ -77,7 +77,13 @@ class TabPageSoBlock(TabPageUnion):
         self.block_volume_edit.setText(str(self.calculate_volume_block_pack()))
 
     def update_volume_block_pack(self):
-        self.fluid_new_edit.setText(str(float(self.data_well.fluid_work[:4].replace(",", ".")) + 0.04))
+        raw = (self.data_well.fluid_work or "")[:4].replace(",", ".")
+        try:
+            val = float(raw) if raw.strip() else 0.0
+        except ValueError:
+            QMessageBox.warning(self, "Ошибка", "Объем блокпачки не верен")
+            val = 0.0
+        self.fluid_new_edit.setText(str(val + 0.04))
         if self.block_volume_edit.text() != '':
             self.block_type_volume_edit.setText(
                 f"{round(float(self.block_volume_edit.text().replace(',', '.')) * 0.044, 1)}")
