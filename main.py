@@ -2386,37 +2386,36 @@ class MyWindow(MyMainWindow):
             "&открыть перечень", self.action_clicked
         )
 
-        if getattr(sys, "frozen", True):
-            self.class_well_TGM_reload = self.class_well_TGM.addAction(
-                "&обновить", self.action_clicked
-            )
-            self.class_well_IGM_reload = self.class_well_IGM.addAction(
-                "&обновить", self.action_clicked
-            )
-            self.class_well_CHGM_reload = self.class_well_CHGM.addAction(
-                "&обновить", self.action_clicked
-            )
-            self.class_well_KGM_reload = self.class_well_KGM.addAction(
-                "&обновить", self.action_clicked
-            )
-            self.class_well_AGM_reload = self.class_well_AGM.addAction(
-                "&обновить", self.action_clicked
-            )
-            self.without_jamming_TGM_reload = self.without_jamming_TGM.addAction(
-                "&обновить", self.action_clicked
-            )
-            self.without_jamming_IGM_reload = self.without_jamming_IGM.addAction(
-                "&обновить", self.action_clicked
-            )
-            self.without_jamming_CHGM_reload = self.without_jamming_CHGM.addAction(
-                "&обновить", self.action_clicked
-            )
-            self.without_jamming_KGM_reload = self.without_jamming_KGM.addAction(
-                "&обновить", self.action_clicked
-            )
-            self.without_jamming_AGM_reload = self.without_jamming_AGM.addAction(
-                "&обновить", self.action_clicked
-            )
+        self.class_well_TGM_reload = self.class_well_TGM.addAction(
+            "&обновить", self.action_clicked
+        )
+        self.class_well_IGM_reload = self.class_well_IGM.addAction(
+            "&обновить", self.action_clicked
+        )
+        self.class_well_CHGM_reload = self.class_well_CHGM.addAction(
+            "&обновить", self.action_clicked
+        )
+        self.class_well_KGM_reload = self.class_well_KGM.addAction(
+            "&обновить", self.action_clicked
+        )
+        self.class_well_AGM_reload = self.class_well_AGM.addAction(
+            "&обновить", self.action_clicked
+        )
+        self.without_jamming_TGM_reload = self.without_jamming_TGM.addAction(
+            "&обновить", self.action_clicked
+        )
+        self.without_jamming_IGM_reload = self.without_jamming_IGM.addAction(
+            "&обновить", self.action_clicked
+        )
+        self.without_jamming_CHGM_reload = self.without_jamming_CHGM.addAction(
+            "&обновить", self.action_clicked
+        )
+        self.without_jamming_KGM_reload = self.without_jamming_KGM.addAction(
+            "&обновить", self.action_clicked
+        )
+        self.without_jamming_AGM_reload = self.without_jamming_AGM.addAction(
+            "&обновить", self.action_clicked
+        )
 
         self.signatories_Bnd = self.signatories.addAction(
             "&БашНефть-Добыча", self.action_clicked
