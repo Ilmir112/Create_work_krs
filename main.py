@@ -936,6 +936,8 @@ class MyMainWindow(QMainWindow):
             if data_list.operation_window is False:
                 return
 
+            if self.data_window is None:
+                return
             if self.data_well.leakiness is True:
                 if WellCondition.leakage_window is None:
                     WellCondition.leakage_window = LeakageWindow(self.data_well)
