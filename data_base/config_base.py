@@ -9,7 +9,7 @@ import psycopg2
 
 import data_list
 
-from typing import Dict, List
+from typing import Any, Dict, List, Optional
 from abc import ABC, abstractmethod
 
 from decrypt import decrypt
@@ -17,8 +17,10 @@ from server_response import ApiClient
 
 
 class DatabaseConnection(ABC):
+    path_index: str = "?"
+
     @abstractmethod
-    def connect_to_database(self):
+    def connect_to_database(self) -> Optional[Any]:
         pass
 
     @abstractmethod
@@ -31,11 +33,11 @@ class PostgresConnection(DatabaseConnection):
         self.db_name = db_name
         self.path_index = '%s'
 
-    def connect_to_database(self):
+    def connect_to_database(self) -> Optional[Any]:
         # Определяем путь к файлу .env
         ext_data_dir = os.getcwd()
         if getattr(sys, 'frozen', False):
-            ext_data_dir = sys._MEIPASS
+            ext_data_dir = getattr(sys, '_MEIPASS', ext_data_dir)
 
         load_dotenv(dotenv_path=os.path.join(ext_data_dir, '.env'))
 
@@ -96,7 +98,7 @@ class SqlLiteConnection(DatabaseConnection):
 
         return db_path
 
-    def connect_to_database(self):
+    def connect_to_database(self) -> Optional[Any]:
         try:
             db_path = self.connect_to_db_path(self.db_name)
             connection = sqlite3.connect(f'{db_path}')
@@ -115,11 +117,11 @@ class UserService:
         self.db_connection = connect_to_database.connect_to_database()
         self.path_index = connect_to_database.path_index
 
-    def get_user(self, last_name: str, first_name: str, second_name: str) -> Dict:
-
+    def get_user(self, last_name: str, first_name: str, second_name: str) -> Optional[Dict]:
         if not self.db_connection:
             return None
-        with CursorContext(self.db_connection.cursor()) as cursor:
+        conn = self.db_connection
+        with CursorContext(conn.cursor()) as cursor:
             cursor.execute(
                 f"SELECT last_name, first_name, second_name, password, position_in, organization FROM users "
                 f"WHERE last_name=({self.path_index}) AND first_name=({self.path_index}) "
@@ -137,11 +139,11 @@ class UserService:
 
             return password_base_dict
 
-    def get_users_list(self) -> List:
-
+    def get_users_list(self) -> Optional[List]:
         if not self.db_connection:
             return None
-        with CursorContext(self.db_connection.cursor()) as cursor:
+        conn = self.db_connection
+        with CursorContext(conn.cursor()) as cursor:
             cursor.execute("SELECT last_name, first_name, second_name, position_in, organization  FROM users")
 
             users = cursor.fetchall()
@@ -160,11 +162,11 @@ class RegistrationService:
         self.db_connection = connect_to_database.connect_to_database()
         self.path_index = connect_to_database.path_index
 
-    def check_user_in_database(self, last_name, first_name, second_name) -> List:
-
+    def check_user_in_database(self, last_name, first_name, second_name) -> Optional[List]:
         if not self.db_connection:
             return None
-        with CursorContext(self.db_connection.cursor()) as cursor:
+        conn = self.db_connection
+        with CursorContext(conn.cursor()) as cursor:
             # Проверяем, существует ли пользователь с таким именем
             cursor.execute(f"SELECT last_name, first_name, second_name  FROM users "
                            f"WHERE last_name=({self.path_index}) AND first_name=({self.path_index}) "
@@ -200,7 +202,8 @@ class WorkDatabaseWell:
     def get_tables_starting_with(self, well_number, well_area, work_plan, type_kr):
         if not self.db_connection:
             return None
-        with CursorContext(self.db_connection.cursor()) as cursor:
+        conn = self.db_connection
+        with CursorContext(conn.cursor()) as cursor:
             query = f"""SELECT well_number, area_well, type_kr, work_plan
                                 FROM wells
                                 WHERE well_number={self.path_index} AND area_well={self.path_index} 
@@ -237,7 +240,7 @@ class WorkDatabaseWell:
         well_number = data_well.well_number.get_value
         well_area = data_well.well_area.get_value
 
-        data_well_dict = json.dumps(ApiClient.serialize_datetime(data_well.data_well_dict), ensure_ascii=False)
+        data_well_dict = json.dumps(ApiClient.serialize_datetime(getattr(data_well, 'data_well_dict', {})), ensure_ascii=False)
         excel_json = json.dumps(excel, ensure_ascii=False)
         date_today = datetime.now().strftime('%Y-%m-%d')
 
@@ -255,22 +258,27 @@ class WorkDatabaseWell:
 
         # print(row, self.dict_data_well["count_row_well"])
 
-        if 'dop_plan' in work_plan:
+        if work_plan == 'plan_change':
+            if getattr(data_well, 'work_plan_change', None) == 'krs':
+                work_plan_str = 'ПР'
+            else:
+                work_plan_str = f'ДП№{data_well.number_dp}'
+        elif work_plan == 'dop_plan_in_base':
+            work_plan_str = 'ДП№'
+        elif 'dop_plan' in work_plan:
             work_plan_str = f'ДП№{data_well.number_dp}'
         elif 'krs' in work_plan:
             work_plan_str = 'ПР'
         elif 'prs' in work_plan:
             work_plan_str = 'ПР_ТРС'
-        elif work_plan == 'plan_change':
-            if data_well.work_plan_change == 'krs':
-                work_plan_str = 'ПР'
-            else:
-                work_plan_str = f'ДП№{data_well.number_dp}'
+        else:
+            work_plan_str = work_plan
 
         try:
             if not self.db_connection:
                 return None
-            with CursorContext(self.db_connection.cursor()) as cursor:
+            conn = self.db_connection
+            with CursorContext(conn.cursor()) as cursor:
                 row_exists = self.determining_well_in_database(cursor, well_number, well_area,
                                                                contractor, costumer, work_plan_str)
                 if row_exists:
@@ -293,10 +301,10 @@ class WorkDatabaseWell:
                         QMessageBox.information(None, 'Успешно', 'Данные в базе обновлены')
                     else:
                         # Не забудьте сделать коммит
-                        self.db_connection.commit()
+                        conn.commit()
 
                         # Закрытие соединения после завершения всех операций
-                        self.db_connection.close()
+                        conn.close()
                         return
 
                 # Подготовленный запрос для вставки данных с параметрами
@@ -316,7 +324,7 @@ class WorkDatabaseWell:
                 # Выполнение запроса с использованием параметров
                 cursor.execute(query, data_values)
                 # Не забудьте сделать коммит
-                self.db_connection.commit()
+                conn.commit()
                 # # Закрытие соединения после завершения всех операций
                 # self.db_connection.close()
 
@@ -332,12 +340,14 @@ class WorkDatabaseWell:
                                                 f' {type(e).__name__}\n\n{str(e)}')
 
     def insert_data_in_chemistry(self, data_well: FindIndexPZ) -> None:
+        if not self.db_connection:
+            return
         if data_well.work_plan in ['dop_plan', 'dop_plan_in_base']:
             string_work = f' ДП№ {data_well.number_dp}'
         elif data_well.work_plan == 'krs':
             string_work = 'ПР'
         elif data_well.work_plan == 'plan_change':
-            if data_well.work_plan_change == 'krs':
+            if getattr(data_well, 'work_plan_change', None) == 'krs':
                 string_work = 'ПР изм'
             else:
                 string_work = f'ДП№{data_well.number_dp} изм '
@@ -379,7 +389,8 @@ class WorkDatabaseWell:
                      data_well.fluid
                      )
 
-        cursor = self.db_connection.cursor()
+        conn = self.db_connection
+        cursor = conn.cursor()
         query = f"""SELECT * FROM chemistry
            WHERE well_number={self.path_index} AND well_area={self.path_index} AND region={self.path_index}
             AND costumer={self.path_index} AND contractor={self.path_index} AND work_plan={self.path_index} 
@@ -415,16 +426,15 @@ class WorkDatabaseWell:
                     f" {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
                     f"{self.path_index}, {self.path_index})"
             cursor.execute(query, data_work)
-        self.db_connection.commit()
-        if cursor:
-            cursor.close()
-        if self.db_connection:
-            self.db_connection.close()
+        conn.commit()
+        cursor.close()
+        conn.close()
 
     def read_excel_in_base(self, number_well, area_well, work_plan, type_kr):
         if not self.db_connection:
             return None
-        with CursorContext(self.db_connection.cursor()) as cursor:
+        conn = self.db_connection
+        with CursorContext(conn.cursor()) as cursor:
             cursor.execute(f"SELECT excel_json "
                            f"FROM wells "
                            f"WHERE well_number = {self.path_index} AND area_well = {self.path_index} "
@@ -437,7 +447,8 @@ class WorkDatabaseWell:
     def extraction_data(self, well_number, well_area, type_kr, work_plan, date_table, contractor):
         if not self.db_connection:
             return None
-        with CursorContext(self.db_connection.cursor()) as cursor:
+        conn = self.db_connection
+        with CursorContext(conn.cursor()) as cursor:
             query = f'''
                     SELECT data_change_paragraph, data_well, type_kr, category_dict, angle_data FROM wells 
                     WHERE well_number={self.path_index} AND area_well={self.path_index} AND type_kr={self.path_index} 
@@ -449,10 +460,11 @@ class WorkDatabaseWell:
             result_table = cursor.fetchone()
             return result_table
 
-    def check_well_in_database_well_data(self, number_well: str) -> List:
+    def check_well_in_database_well_data(self, number_well: str) -> Optional[List]:
         if not self.db_connection:
             return None
-        with CursorContext(self.db_connection.cursor()) as cursor:
+        conn = self.db_connection
+        with CursorContext(conn.cursor()) as cursor:
             cursor.execute(
                 f"SELECT well_number, area_well, type_kr, today, work_plan FROM wells "
                 f"WHERE well_number={self.path_index} AND contractor={self.path_index} AND costumer ={self.path_index}",
@@ -465,7 +477,8 @@ class WorkDatabaseWell:
     def check_in_database_well_data(self, number_well, area_well, work_plan, today):
         if not self.db_connection:
             return None
-        with CursorContext(self.db_connection.cursor()) as cursor:
+        conn = self.db_connection
+        with CursorContext(conn.cursor()) as cursor:
             cursor.execute(f"SELECT data_well, today, type_kr, category_dict, well_oilfield, "
                            f"appointment, inv_number, wellhead_fittings, angle_data "
                            f"FROM wells "
@@ -482,7 +495,8 @@ class WorkDatabaseWell:
     def check_in_database_dp_data(self, number_well, area_well, work_plan):
         if not self.db_connection:
             return None
-        with CursorContext(self.db_connection.cursor()) as cursor:
+        conn = self.db_connection
+        with CursorContext(conn.cursor()) as cursor:
             cursor.execute(f"SELECT data_well, today, type_kr, category_dict "
                            f"FROM wells "
                            f"WHERE well_number = {self.path_index} AND area_well = {self.path_index} "
@@ -523,10 +537,10 @@ class CheckWellExistence:
         return date_string
 
     def create_table_without_juming(self, region_name: str):
-
         if not self.db_connection:
             return None
-        with CursorContext(self.db_connection.cursor()) as cursor:
+        conn = self.db_connection
+        with CursorContext(conn.cursor()) as cursor:
             self.drop_table(cursor, region_name)
 
             # Создание таблицы в базе данных
@@ -541,7 +555,8 @@ class CheckWellExistence:
                                             version_year: str, region_name: str, costumer: str):
         if not self.db_connection:
             return None
-        with CursorContext(self.db_connection.cursor()) as cursor:
+        conn = self.db_connection
+        with CursorContext(conn.cursor()) as cursor:
             query = f"INSERT INTO {region_name} (well_number, deposit_area, today, region, costumer) " \
                     f"VALUES ({self.path_index}, {self.path_index}, {self.path_index}, {self.path_index}, " \
                     f"{self.path_index})"
@@ -550,13 +565,13 @@ class CheckWellExistence:
                            (well_number, area_well, version_year, region_name, costumer))
             # print(well_number, version_year)
             # Не забудьте сделать коммит
-            self.db_connection.commit()
+            conn.commit()
 
     def create_table_classification(self, region_name: str):
-
         if not self.db_connection:
             return None
-        with CursorContext(self.db_connection.cursor()) as cursor:
+        conn = self.db_connection
+        with CursorContext(conn.cursor()) as cursor:
             self.drop_table(cursor, region_name)
             # Создание таблицы, если она не существует
             cursor.execute(f"""
@@ -582,7 +597,7 @@ class CheckWellExistence:
                             );
                         """)
             # Не забудьте сделать коммит
-            self.db_connection.commit()
+            conn.commit()
 
     @staticmethod
     def read_excel_file_classification(ws):
@@ -657,7 +672,8 @@ class CheckWellExistence:
                                       gas_factor, version_year, region, costumer):
         if not self.db_connection:
             return None
-        with CursorContext(self.db_connection.cursor()) as cursor:
+        conn = self.db_connection
+        with CursorContext(conn.cursor()) as cursor:
             query = f"""INSERT INTO {region_name} (
                                 cdng, well_number, deposit_area, oilfield,
                                 categoty_pressure, pressure_Ppl, pressure_Gst, date_measurement,
@@ -679,7 +695,7 @@ class CheckWellExistence:
 
             cursor.execute(query, data)
 
-            self.db_connection.commit()
+            conn.commit()
 
     def drop_table(self, cursor, region_name):
         cursor.execute(f"DROP TABLE IF EXISTS {region_name}")
@@ -690,7 +706,8 @@ class CheckWellExistence:
         if data_list.connect_in_base is False:
             if not self.db_connection:
                 return None
-            cursor = self.db_connection.cursor()
+            conn = self.db_connection
+            cursor = conn.cursor()
             query = f"SELECT *  FROM {region} WHERE today=({self.path_index})"
             cursor.execute(query, (date_string,))
 
@@ -702,7 +719,7 @@ class CheckWellExistence:
             region_json = {"region": region}
             data = ApiClient.request_post(ApiClient.read_wells_silencing_response_first(), region_json)
 
-            if data:
+            if data and isinstance(data, dict) and "today" in data:
                 date_in_base = data["today"]
                 date_in_base = datetime.strptime(date_in_base, "%Y-%m-%d").strftime('%d.%m.%Y')
                 if date_in_base == date_string:
@@ -725,7 +742,8 @@ class CheckWellExistence:
         if data_list.connect_in_base is False:
             if not self.db_connection:
                 return None
-            with CursorContext(self.db_connection.cursor()) as cursor:
+            conn = self.db_connection
+            with CursorContext(conn.cursor()) as cursor:
                 # Проверка наличия записи в базе данных
                 cursor.execute(f"SELECT * "
                                f"FROM {region} "
@@ -752,25 +770,35 @@ class CheckWellExistence:
             return True, stop_app
         return False, stop_app
 
-    def check_category(self, well_number: str, deposit_area: str, region: str) -> List:
+    def check_category(self, well_number: Any, deposit_area: Any, region: str) -> Optional[List]:
         try:
             if not self.db_connection:
                 return None
-            with CursorContext(self.db_connection.cursor()) as cursor:
+            conn = self.db_connection
+            with CursorContext(conn.cursor()) as cursor:
                 # Проверка наличия записи в базе данных
                 query = f"SELECT categoty_pressure, categoty_h2s, categoty_gf, today FROM {region}_классификатор " \
                         f"WHERE well_number =({self.path_index}) and deposit_area =({self.path_index})"
-                data = (str(well_number.get_value), str(deposit_area.get_value).replace("_", " "))
+                wn_val = getattr(well_number, 'get_value', well_number)
+                da_val = getattr(deposit_area, 'get_value', deposit_area)
+                if callable(wn_val):
+                    wn_val = wn_val()
+                if callable(da_val):
+                    da_val = da_val()
+                data = (str(wn_val), str(da_val).replace("_", " "))
                 cursor.execute(query, data)
 
                 result = cursor.fetchone()
                 return result
         except Exception as e:
-            QMessageBox.warning(self, 'Ошибка', f'Ошибка работы с базой данных {e}')
+            QMessageBox.warning(None, 'Ошибка', f'Ошибка работы с базой данных {e}')
 
     def get_data_from_class_well_db(self, region) -> List:
+        if not self.db_connection:
+            return []
+        conn = self.db_connection
         # Выполнение SQL-запроса для получения данных
-        with CursorContext(self.db_connection.cursor()) as cur:
+        with CursorContext(conn.cursor()) as cur:
             cur.execute(f"""
                         SELECT cdng, well_number, deposit_area, oilfield, categoty_pressure,
                                pressure_Ppl, pressure_Gst, date_measurement, categoty_h2s,
@@ -781,15 +809,17 @@ class CheckWellExistence:
             return data
 
     def get_data_from_db(self, region: str) -> List:
+        if not self.db_connection:
+            return []
+        conn = self.db_connection
         # Выполнение SQL-запроса для получения данных
-        with CursorContext(self.db_connection.cursor()) as cur:
+        with CursorContext(conn.cursor()) as cur:
             cur.execute(f"""
                                 SELECT well_number, deposit_area, today
                                 FROM {region};
                             """)
             data = cur.fetchall()
             return data
-        return None
 
 
 class GnktDatabaseWell:
@@ -871,8 +901,8 @@ def connection_to_database(DB_NAME):
 
     else:
         DB_NAME = f'{DB_NAME}.db'
+        db = SqlLiteConnection(DB_NAME)
         try:
-            db = SqlLiteConnection(DB_NAME)
             db.connect_to_database()
         except sqlite3.Error as e:
             QMessageBox.warning(None, 'Ошибка',

@@ -936,8 +936,6 @@ class MyMainWindow(QMainWindow):
             if data_list.operation_window is False:
                 return
 
-            if self.data_window is None:
-                return
             if self.data_well.leakiness is True:
                 if WellCondition.leakage_window is None:
                     WellCondition.leakage_window = LeakageWindow(self.data_well)
@@ -3173,18 +3171,6 @@ class MyWindow(MyMainWindow):
         self.wb2_prs = None
         self.ws2_prs = None
 
-        try:
-            if "Зуфаров" in data_list.user[1]:
-                for filename in os.listdir(temp_folder):
-                    file_path = os.path.join(temp_folder, filename)
-                    # Удаляем только файлы, а не директории
-                    if os.path.isfile(file_path):
-                        os.remove(file_path)
-
-        except Exception as e:
-            QMessageBox.critical(
-                self, "Ошибка", f"Не удалось очистить папку с временными файлами: {e}"
-            )
         self.rir_window = None
         self.data_well = None
         self.repair_id = None  # Сбрасываем ID ремонта
@@ -3671,6 +3657,14 @@ class MyWindow(MyMainWindow):
 
     def correctData(self):
         from data_correct import DataWindow
+
+        if self.data_well is None:
+            QMessageBox.warning(
+                self,
+                "Внимание",
+                "Сначала откройте или загрузите скважину (план работ)."
+            )
+            return
 
         if self.work_window is None:
             self.work_window = DataWindow(self.data_well)

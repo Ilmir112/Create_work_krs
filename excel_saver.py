@@ -58,11 +58,14 @@ class SaveInExcel(MyWindow):
     def save_to_gnkt(self):
         from gnkt_data.gnkt_data import insert_data_base_gnkt
 
+        if self.gnkt_data is None:
+            return
+        gnkt = self.gnkt_data
         sheets = ["Титульник", "СХЕМА", "Ход работ"]
         tables = [self.table_title, self.table_schema, self.table_widget]
 
         for i, sheet_name in enumerate(sheets):
-            worksheet = self.gnkt_data.wb_gnkt[sheet_name]
+            worksheet = gnkt.wb_gnkt[sheet_name]
             table = tables[i]
 
             work_list = []
@@ -79,9 +82,9 @@ class SaveInExcel(MyWindow):
                     else:
                         row_lst.append("")
                 work_list.append(row_lst)
-            self.gnkt_data.count_row_height(worksheet, work_list, sheet_name)
-        if "СХЕМЫ КНК_38,1" not in self.gnkt_data.wb_gnkt.sheetnames:
-            ws7 = self.gnkt_data.wb_gnkt.create_sheet(title="СХЕМЫ КНК_38,1")
+            gnkt.count_row_height(worksheet, work_list, sheet_name)
+        if "СХЕМЫ КНК_38,1" not in gnkt.wb_gnkt.sheetnames:
+            ws7 = gnkt.wb_gnkt.create_sheet(title="СХЕМЫ КНК_38,1")
             self.insert_image(
                 ws7,
                 f"{data_list.path_image}imageFiles/schema_well/СХЕМЫ КНК_38,1.png",
@@ -93,8 +96,8 @@ class SaveInExcel(MyWindow):
         path = self.load_last_save_path()
 
         filenames = self.definition_filenames()
-        full_path = path + "/" + filenames
-        gnkt_data = self.gnkt_data.data_gnkt
+        full_path = (path + "/" + filenames) if path else filenames
+        gnkt_data = gnkt.data_gnkt
         params = {
             "gnkt_number": gnkt_data.gnkt_number_combo,
             "well_number": self.data_well.well_number.get_value,
@@ -117,19 +120,19 @@ class SaveInExcel(MyWindow):
 
 
         if self.data_well.bvo is True:
-            ws5 = self.gnkt_data.wb_gnkt.create_sheet("Sheet1")
+            ws5 = gnkt.wb_gnkt.create_sheet("Sheet1")
             ws5.title = "Схемы ПВО"
-            ws5 = self.gnkt_data.wb_gnkt["Схемы ПВО"]
-            self.gnkt_data.wb_gnkt.move_sheet(ws5, offset=-1)
+            ws5 = gnkt.wb_gnkt["Схемы ПВО"]
+            gnkt.wb_gnkt.move_sheet(ws5, offset=-1)
             schema_list = self.check_pvo_schema(ws5, 2)
 
-        if self.gnkt_data.wb_gnkt:
-            self.save_file_dialog(self.gnkt_data.wb_gnkt, full_path)
+        if gnkt.wb_gnkt:
+            self.save_file_dialog(gnkt.wb_gnkt, full_path)
 
-            self.gnkt_data.wb_gnkt.close()
+            gnkt.wb_gnkt.close()
             print(f"Table data saved to Excel {full_path}")
-        if self.gnkt_data.wb_gnkt:
-            self.gnkt_data.wb_gnkt.close()
+        if gnkt.wb_gnkt:
+            gnkt.wb_gnkt.close()
 
     def save_to_krs(self):
 
@@ -139,6 +142,8 @@ class SaveInExcel(MyWindow):
         if not self.table_widget is None:
             self.wb2 = Workbook()
             self.ws2 = self.wb2.active
+            if self.ws2 is None:
+                return
             self.ws2.title = "План работ"
 
             insert_index = self.data_well.insert_index2 + 2
@@ -341,7 +346,9 @@ class SaveInExcel(MyWindow):
             # зададим размер листа
             self.ws2.page_setup.paperSize = self.ws2.PAPERSIZE_A4
             # содержимое по ширине страницы
-            self.ws2.sheet_properties.pageSetUpPr.fitToPage = True
+            page_set_up_pr = getattr(self.ws2.sheet_properties, "pageSetUpPr", None)
+            if page_set_up_pr is not None:
+                page_set_up_pr.fitToPage = True
             self.ws2.page_setup.fitToHeight = False
 
             path = self.load_last_save_path()
@@ -424,7 +431,7 @@ class SaveInExcel(MyWindow):
                 params["type_kr"] = self.data_well.type_kr.split()[0]
             
             if hasattr(self.data_well, 'work_plan') and self.data_well.work_plan:
-                params["work_plan"] = self.data_well.work_plan
+                params["work_plan"] = self._work_plan_for_db(self.data_well.work_plan)
             
             if hasattr(data_list, 'current_date') and data_list.current_date:
                 params["date_create"] = data_list.current_date.strftime("%Y-%m-%d")
@@ -492,6 +499,17 @@ class SaveInExcel(MyWindow):
             traceback.print_exc()
 
     @staticmethod
+    def _work_plan_for_db(work_plan: str) -> str:
+        """Преобразует work_plan для отправки в БД/API: plan_change → ПРизм, dop_plan_in_base → ДП№."""
+        if not work_plan:
+            return work_plan or ""
+        if work_plan == "plan_change":
+            return "ПРизм"
+        if work_plan == "dop_plan_in_base":
+            return "ДП"
+        return work_plan.replace("krs", "ПР").replace("dop_plan", "ДП").replace("prs", "ПР_ТРС")
+
+    @staticmethod
     def _build_expected_data(data_well):
         """Собирает expected_data из полей data_well для отправки в API."""
         existing = getattr(data_well, 'expected_data', None)
@@ -544,7 +562,7 @@ class SaveInExcel(MyWindow):
                 "id": 0,  # Backend сам присвоит ID при создании
                 "category_dict": getattr(self.data_well, 'dict_category', {}),
                 "type_kr": getattr(self.data_well, 'type_kr', '').split()[0],
-                "work_plan": getattr(self.data_well, 'work_plan', '').replace('krs', "ПР"),
+                "work_plan": self._work_plan_for_db(getattr(self.data_well, 'work_plan', '')),
                 "excel_json": excel_data_dict,
                 "data_change_paragraph": data_change_paragraph,
                 "norms_time": getattr(self.data_well, 'norm_of_time', 0.0),
@@ -573,8 +591,10 @@ class SaveInExcel(MyWindow):
             result = ApiClient.request_post_json(api_url, payload, param=params, answer="json")
             
             if result and isinstance(result, dict) and result.get("status") == "success":
-                repair_id = result.get('data').get("id")
-                print(f"Данные ремонта успешно отправлены в API. ID записи: {repair_id}")
+                data = result.get("data")
+                repair_id = data.get("id") if isinstance(data, dict) else None
+                if repair_id is not None:
+                    print(f"Данные ремонта успешно отправлены в API. ID записи: {repair_id}")
                 return repair_id
             elif result == 500:
                 print("Ошибка при отправке данных в API: ошибка сервера")
@@ -722,6 +742,8 @@ class SaveInExcel(MyWindow):
         self.copy_true_ws(self.data_well, ws, ws2, head)
         boundaries_dict_index = 1000
         stop_str = 1500
+        row_center = 1
+        col_center = 1
         for i in range(1, len(work_list) + 1):  # Добавлением работ
             self.progress_bar_window.start_loading(i)
             if "Наименование работ" in work_list[i - 1][2]:
@@ -914,7 +936,7 @@ class SaveInExcel(MyWindow):
             end_row=row_center - 1,
             end_column=merge_column,
         )
-        ws2.cell(row=row_center - 2, column=j).font = Font(
+        ws2.cell(row=row_center - 2, column=col_center).font = Font(
             name=font_type, size=size_font, bold=False
         )
         ws2.cell(row=row_center - 1, column=col_center).alignment = Alignment(
@@ -1245,6 +1267,7 @@ class SaveInExcel(MyWindow):
             "gnkt_bopz",
         ]:
             itog_list = self.add_itog_string()
+            j = 1
             for i in range(
                     insert_index, len(itog_list) + insert_index
             ):  # Добавлением итогов
