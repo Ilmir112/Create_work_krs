@@ -146,7 +146,7 @@ class SaveInExcel(MyWindow):
                 return
             self.ws2.title = "План работ"
 
-            insert_index = self.data_well.insert_index2 + 2
+            insert_index = (self.data_well.insert_index2 + 2) if self.data_well.insert_index2 is not None else 0
 
             merged_cells = []  # Список индексов объединения ячеек
 
@@ -895,6 +895,9 @@ class SaveInExcel(MyWindow):
                             )
                             if "Наименование работ" == cell.value:
                                 cell_num = i - 1
+                            elif self.data_well.work_plan == "dop_plan" and "Планируемый объём работ" in str(cell.value).upper():
+                                cell_num = i - 1
+
 
                         else:
                             ws2.cell(row=i, column=j).font = Font(

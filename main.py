@@ -1914,6 +1914,23 @@ class MyMainWindow(QMainWindow):
                         item = QTableWidgetItem("")
 
             if data_list.dop_work_list:
+                if work_plan == "dop_plan":
+                    krs_begin = [
+                        [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None, None,
+                         None, None, None],
+                        [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
+                         'Ответственный',
+                         'Нормы времени \n мин/час.'],
+                    ]
+                    # Проверяем, нет ли уже заголовка "Порядок работы" в списке
+                    has_header = any(
+                        isinstance(row, (list, tuple))
+                        and len(row) > 1
+                        and str(row[1]).strip().lower() == 'порядок работы'
+                        for row in data_list.dop_work_list
+                    )
+                    if not has_header:
+                        data_list.dop_work_list.extend(krs_begin)
                 self.populate_row(
                     table_widget.rowCount(),
                     data_list.dop_work_list,
@@ -2060,6 +2077,7 @@ class MyWindow(MyMainWindow):
         self.operation_window = None
         self.skm_depth = 0
         self.new_window = None
+        self.classifier_well = None
         self.raid_window = None
         self.leakage_window = None
         self.correct_window = None
@@ -2601,6 +2619,8 @@ class MyWindow(MyMainWindow):
 
     def reload_class_well(self, costumer, region):
         self.open_parent_class(costumer, region)
+        if not self.fname or self.classifier_well is None:
+            return
         self.classifier_well.export_to_database_class_well(self.fname)
 
     def close_splash(self):
@@ -2681,10 +2701,15 @@ class MyWindow(MyMainWindow):
         )
         if self.fname:
             self.classifier_well = ClassifierWell(costumer, region)
+        else:
+            self.classifier_well = None
 
     def reload_without_damping(self, costumer, region):
         self.open_parent_class(costumer, region)
+        if not self.fname or self.classifier_well is None:
+            return
         self.classifier_well.export_to_sqlite_without_juming(self.fname)
+
 
     def table_widget_open(self, work_plan="krs"):
 

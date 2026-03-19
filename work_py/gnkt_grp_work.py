@@ -19,8 +19,8 @@ from PyQt5.QtGui import QIntValidator, QDoubleValidator
 
 
 class TabPageGnkt(TabPageUnion):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, data_well, parent=None):
+        super().__init__(data_well)
 
         self.iznos_gnkt_edit = None
         self.gnkt = None
@@ -132,8 +132,8 @@ class TabPageGnkt(TabPageUnion):
             self.grid.addWidget(self.acids_work_label, 6, 2)
             self.grid.addWidget(self.acids_work_combo, 7, 2)
         else:
-            self.acids_work_label.setParent(None)
-            self.acids_work_combo.setParent(None)
+            self.acids_work_label.setParent(None)  # type: ignore[arg-type]
+            self.acids_work_combo.setParent(None)  # type: ignore[arg-type]
 
         self.acids_work_combo.currentTextChanged.connect(self.update_acids_work)
         self.gnkt_number_combo.currentTextChanged.connect(self.update_number_gnkt)
@@ -142,22 +142,22 @@ class TabPageGnkt(TabPageUnion):
     def update_acids_work(self, index):
         if index == 'Нет':
             try:
-                self.acids_type_label.setParent(None)
-                self.acid_edit.setParent(None)
-                self.acid_volume_label.setParent(None)
-                self.acid_volume_edit.setParent(None)
-                self.acid_proc_label.setParent(None)
-                self.acid_proc_edit.setParent(None)
-                self.pressure_label.setParent(None)
-                self.pressure_edit.setParent(None)
-                self.roof_label.setParent(None)
-                self.roof_edit.setParent(None)
+                self.acids_type_label.setParent(None)  # type: ignore[arg-type]
+                self.acid_edit.setParent(None)  # type: ignore[arg-type]
+                self.acid_volume_label.setParent(None)  # type: ignore[arg-type]
+                self.acid_volume_edit.setParent(None)  # type: ignore[arg-type]
+                self.acid_proc_label.setParent(None)  # type: ignore[arg-type]
+                self.acid_proc_edit.setParent(None)  # type: ignore[arg-type]
+                self.pressure_label.setParent(None)  # type: ignore[arg-type]
+                self.pressure_edit.setParent(None)  # type: ignore[arg-type]
+                self.roof_label.setParent(None)  # type: ignore[arg-type]
+                self.roof_edit.setParent(None)  # type: ignore[arg-type]
 
-                self.sole_label.setParent(None)
-                self.sole_edit.setParent(None)
+                self.sole_label.setParent(None)  # type: ignore[arg-type]
+                self.sole_edit.setParent(None)  # type: ignore[arg-type]
 
-                self.plast_label.setParent(None)
-                self.plast_combo.setParent(None)
+                self.plast_label.setParent(None)  # type: ignore[arg-type]
+                self.plast_combo.setParent(None)  # type: ignore[arg-type]
             except:
                 pass
 
@@ -216,7 +216,7 @@ class TabPageGnkt(TabPageUnion):
         previus_well = self.previous_well_combo.currentText()
         try:
             if previus_well:
-                db = connection_to_database(decrypt("DB_NAME_GNKT"))
+                db = connection_to_database(decrypt("DB_NAME_GNKT"))  # type: ignore[assignment]
                 data_gnkt = GnktDatabaseWell(db)
 
                 if 'ойл-сервис' in data_list.contractor.lower():
@@ -266,14 +266,14 @@ class GnktModel(WindowUnion):
         super().__init__(parent)
 
         self.fluid_work_edit = None
-        self.centralWidget = QWidget()
-        self.setCentralWidget(self.centralWidget)
+        self._central_widget = QWidget()
+        self.setCentralWidget(self._central_widget)
 
         self.tab_widget = TabWidget(self.data_well)
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
         self.buttonAdd.clicked.connect(self.add_work)
-        vbox = QGridLayout(self.centralWidget)
+        vbox = QGridLayout(self._central_widget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
 
@@ -609,13 +609,13 @@ class GnktModel(WindowUnion):
         if question == QMessageBox.StandardButton.No:
             return
 
-        self.data_well.gnkt_number_combo = self.gnkt_number_combo
-        self.data_well.length_gnkt_edit = float(self.length_gnkt_edit.replace(',', '.'))
-        self.data_well.iznos_gnkt_edit = float(self.iznos_gnkt_edit.replace(',', '.'))
-        self.data_well.fluid_edit = self.fluid_edit.replace(',', '.')
-        self.data_well.fluid_work_edit = self.fluid_work_edit.replace(',', '.')
-        self.data_well.pvo_number = self.pvo_number
-        self.data_well.pipe_mileage_edit = self.pipe_mileage_edit.replace(',', '.')
+        self.data_well.gnkt_number_combo = self.gnkt_number_combo  # type: ignore[attr-defined]
+        self.data_well.length_gnkt_edit = float(self.length_gnkt_edit.replace(',', '.'))  # type: ignore[attr-defined]
+        self.data_well.iznos_gnkt_edit = float(self.iznos_gnkt_edit.replace(',', '.'))  # type: ignore[attr-defined]
+        self.data_well.fluid_edit = self.fluid_edit.replace(',', '.')  # type: ignore[attr-defined]
+        self.data_well.fluid_work_edit = self.fluid_work_edit.replace(',', '.')  # type: ignore[attr-defined]
+        self.data_well.pvo_number = self.pvo_number  # type: ignore[attr-defined]
+        self.data_well.pipe_mileage_edit = self.pipe_mileage_edit.replace(',', '.')  # type: ignore[attr-defined]
 
         self.well_volume_ek, self.well_volume_dp = self.check_volume_well(self.data_well)
 
@@ -625,6 +625,8 @@ class GnktModel(WindowUnion):
         # return work_list
 
     def select_text_acid(self, plast_combo, roof, sole, acid_edit, acid_proc_edit, acid_volume_edit):
+        acid_sel = ''
+        acid_sel_short = ''
 
         if acid_edit == 'HCl':
             acid_24 = round(acid_volume_edit * acid_proc_edit / 24 * 1.118, 1)
@@ -697,6 +699,8 @@ class GnktModel(WindowUnion):
 
         opz = []
         volume_sko = 0
+        acid_edit = ''
+        acid_proc_edit = 0
         for plast_combo, skv_como, roof, sole, acid_edit, acid_proc_edit, acid_volume_edit in acid_info:
             acid_sel, acid_sel_short = self.select_text_acid(plast_combo, roof, sole, acid_edit, acid_proc_edit,
                                                              acid_volume_edit)
@@ -788,15 +792,19 @@ class GnktModel(WindowUnion):
             well_volume_ek = well_volume(self, data_well.head_column_additional.get_value)
         else:
             well_volume_ek = well_volume(self, data_well.current_bottom)
-        if abs(float(data_well.well_volume_in_pz[0]) - well_volume_ek) > 0.2:
+        if abs(float(data_well.well_volume_in_pz[0] or 0.0) - well_volume_ek) > 0.2:
             QMessageBox.warning(None, 'Некорректный объем скважины',
                                 f'Объем скважины указанный в ПЗ -{data_well.well_volume_in_pz}м3 не совпадает '
                                 f'с расчетным {well_volume_ek}м3')
-            well_volume_ek, _ = QInputDialog.getDouble(None,
-                                                       "корректный объем",
-                                                       'Введите корректный объем',
-                                                       data_well.well_volume_in_pz[0], 1,
-                                                       80, 1)
+            well_volume_ek, _ = QInputDialog.getDouble(  # type: ignore[arg-type]
+                None,
+                "корректный объем",
+                'Введите корректный объем',
+                data_well.well_volume_in_pz[0],
+                1,
+                80,
+                1,
+            )
             well_volume_dp = round(well_volume(self, data_well.current_bottom) - well_volume_ek, 1)
         else:
             well_volume_dp = well_volume(self, data_well.current_bottom) - well_volume_ek
@@ -892,25 +900,29 @@ class GnktModel(WindowUnion):
         volume_str = '\n'.join(volume_str)
         volume_vn_str = volume_vn_str.split('\n')[:-1]
         volume_vn_str = '\n'.join(volume_vn_str)
+        try:
+            # используем первое значение объёма как базовое для участка с пакером
+            volume_vn_value = float(volume_vn_str.split('\n')[0].replace(',', '.')) if volume_vn_str else 0.0
+        except ValueError:
+            volume_vn_value = 0.0
         nkt_str = nkt_str[:-1]
         vn_str = vn_str[:-1]
 
         length_nkt = '\n'.join(length_str)
 
-        volume_pm_ek = round(
-            3.14 * (
-                    self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value) ** 2 / 4 / 1000,
-            2)
-        volume_pm_dp = round(3.14 * (self.data_well.column_additional_diameter.get_value - 2 *
-                                     self.data_well.column_additional_wall_thickness.get_value) ** 2 / 4 / 1000, 2)
+        col_diam = float(self.data_well.column_diameter.get_value or 0.0)
+        col_wall = float(self.data_well.column_wall_thickness.get_value or 0.0)
+        volume_pm_ek = round(3.14 * (col_diam - 2 * col_wall) ** 2 / 4 / 1000, 2)
+
+        add_diam = float(self.data_well.column_additional_diameter.get_value or 0.0)
+        add_wall = float(self.data_well.column_additional_wall_thickness.get_value or 0.0)
+        volume_pm_dp = round(3.14 * (add_diam - 2 * add_wall) ** 2 / 4 / 1000, 2)
 
         if self.data_well.column_additional:
             column_data_add_diam = self.data_well.column_additional_diameter.get_value
             column_data_add_wall_thickness = self.data_well.column_additional_wall_thickness.get_value
 
-            column_data_add_vn_volume = round(
-                self.data_well.column_additional_diameter.get_value - 2 * self.data_well.column_additional_wall_thickness.get_value,
-                1)
+            column_data_add_vn_volume = round(add_diam - 2 * add_wall, 1)
             column_add_head = self.data_well.head_column_additional.get_value
             column_add_shoe = self.data_well.shoe_column_additional.get_value
 
@@ -1055,7 +1067,7 @@ class GnktModel(WindowUnion):
              nkt_str, nkt_widht_str, vn_str,
              f'{self.data_well.depth_fond_paker_before["before"] + length_paker}-{voronka}', None,
              None, volume_vn_str,
-             f'{(voronka-self.data_well.depth_fond_paker_before["before"] + length_paker) * volume_vn_str}'],
+             f'{(voronka - self.data_well.depth_fond_paker_before["before"] + length_paker) * volume_vn_value}'],
             [None, None, None, None, None, None, None, None, None,
              f'на гл {self.data_well.depth_fond_paker_before["before"]}м',
              None, None,
@@ -1203,9 +1215,10 @@ class GnktModel(WindowUnion):
                                          f'{self.data_well.column_direction_mine_diameter.get_value}',
                                          self.data_well.column_direction_mine_wall_thickness.get_value,
                                          round(
-                                             float(self.data_well.column_direction_mine_diameter.get_value) - 2 * float(
-                                                 self.data_well.column_direction_mine_wall_thickness.get_value),
-                                             1),
+                                             float(self.data_well.column_direction_mine_diameter.get_value or 0.0)
+                                             - 2 * float(self.data_well.column_direction_mine_wall_thickness.get_value or 0.0),
+                                             1,
+                                         ),
                                          f'0-', self.data_well.column_direction_mine_length.get_value,
                                          f'{self.data_well.level_cement_direction_mine.get_value}-{self.data_well.column_direction_mine_length.get_value}',
                                          None,
@@ -1271,7 +1284,7 @@ class GnktModel(WindowUnion):
                          None, interval[0],
                          None, interval[1], None, izol, pressure_1,
                          zamer_1, None])
-                self.data_well.dict_perforation[plast]['счет_объединение'] = count_interval
+                self.data_well.dict_perforation[plast]['счет_объединение'] = count_interval  # type: ignore[index]
 
             for index, pvr in enumerate(pvr_list):
                 schema_well_list[26 + index] = pvr
@@ -1372,14 +1385,9 @@ class GnktModel(WindowUnion):
 
     def date_dmy(self, date_str):
 
-        if '-' in str(date_str):
-            return date_str
-        elif type(date_str) is datetime:
-            date_obj = datetime.strftime('%d.%m.%Y')
-        else:
-            date_obj = date_str
-
-        return date_obj
+        if isinstance(date_str, datetime):
+            return date_str.strftime('%d.%m.%Y')
+        return str(date_str)
 
     # Функция для получения глубины начала интервала
     def get_start_depth(self, interval):

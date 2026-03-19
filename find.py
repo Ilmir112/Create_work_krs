@@ -52,7 +52,8 @@ class FindIndexPZ(MyMainWindow):
         self.nkt_diam = None
         self.perforation_roof = 5000
         self.old_version = False
-        self.region = None
+        # Регион скважины (строка, чтобы не конфликтовать с присвоениями в других модулях)
+        self.region: str = ""
         self.fluid = None
         self.insert_index = 0
         self.curator = None
@@ -77,7 +78,8 @@ class FindIndexPZ(MyMainWindow):
 
         self.without_damping = False
         self.insert_index = 0
-        self.bottom = 5000
+        # Текущий и расчётный забой — работаем с ними как с float
+        self.bottom: float = 5000.0
         self.work_plan = work_plan
         self.row_expected = []
         self.column_direction_true = False
@@ -125,7 +127,8 @@ class FindIndexPZ(MyMainWindow):
         self.first_pressure = ProtectedIsNonNone("не корректно")
         self.static_level = ProtectedIsNonNone("не корректно")
         self.dinamic_level = ProtectedIsNonNone("не корректно")
-        self.well_volume_in_pz = []
+        # Объём скважины из ПЗ (список чисел)
+        self.well_volume_in_pz: list[float] = []
         self.well_fluid_in_pz = []
         self.pressure_mkp = ProtectedIsNonNone("не корректно")
         self.column_direction_true = False
@@ -193,11 +196,23 @@ class FindIndexPZ(MyMainWindow):
         self.category_h2s_second = ""
         self.category_pressure_well = []
         self.gaz_factor_pr_second = ""
-        self.current_bottom_second = 0
-        self.current_bottom = 5000
+        self.current_bottom_second: float = 0.0
+        self.current_bottom: float = 5000.0
         self.template_length = 0
         self.template_depth_addition = 0
         self.template_length_addition = 0
+
+        # Поля, которые заполняются модулями ГНКТ (gnkt_grp_work.py и др.)
+        self.gnkt_number_combo: str | None = None
+        self.length_gnkt_edit: float = 0.0
+        self.iznos_gnkt_edit: float = 0.0
+        self.fluid_edit: str = ""
+        self.fluid_work_edit: str = ""
+        self.pvo_number: str = ""
+        self.pipe_mileage_edit: str = ""
+
+        # Служебные структуры для схем/перфорации
+        self.img_pvr_list: list = []
 
         self.type_kr = ""
         self.konte_true = False
