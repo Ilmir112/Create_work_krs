@@ -174,7 +174,19 @@ class PeroWindow(WindowUnion):
             QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
             return # Добавлен возврат, чтобы предотвратить дальнейшее выполнение в случае общей ошибки
 
-        work_list = self.pero(current_edit, pero_combo, solvent_question_combo, solvent_volume_edit)
+        gips_pero_list = self.pero(current_edit, pero_combo, solvent_question_combo, solvent_volume_edit)
+        # populate_row ожидает list[list], а pero() возвращает list[dict]
+        work_list = [
+            [
+                row.get("short_description"),
+                None,
+                row.get("detailed_description"),
+                None, None, None, None, None, None, None, None,
+                row.get("executor"),
+                row.get("duration"),
+            ]
+            for row in gips_pero_list
+        ]
 
         self.data_well.current_bottom = current_edit
         self.populate_row(self.insert_index, work_list, self.table_widget)

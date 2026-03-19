@@ -39,8 +39,10 @@ class PzInDatabase(WorkWithPZ):
         if self.data_well is None:
             return ws
         if self.data_well.work_plan == "plan_change":
-            DopPlanWindow.extraction_data(self, str(self.data_well.well_number.get_value) + " " +
-                                          self.data_well.well_area.get_value + " " + "krs" + " " + contractor, 1)  # type: ignore[misc]
+            DopPlanWindow.extraction_data(
+                self,  # type: ignore[arg-type]
+                str(self.data_well.well_number.get_value) + " " +
+                self.data_well.well_area.get_value + " " + "krs" + " " + contractor, 1)
             if self.ws is not None:
                 plan_idx = data_list.plan_correct_index.get_value  # type: ignore[union-attr]
                 self.ws.delete_rows(int(plan_idx), self.ws.max_row)
@@ -325,6 +327,8 @@ class CreatePZ(MyMainWindow):
                 return ws2
 
             elif 'prs' in self.data_well.work_plan:
+                if ws2 is None:
+                    return ws
                 self.append_podpisant_up(ws2)
                 self.data_well.insert_index = ws2.max_row
 
