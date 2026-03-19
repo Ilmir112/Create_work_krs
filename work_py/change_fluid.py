@@ -41,7 +41,7 @@ class TabPageSoChange(TabPageUnion):
 
         self.type_absorbent_label = QLabel('Тип поглотителя')
         self.type_absorbent = QComboBox()
-        self.type_absorbent.addItems(['ХИМТЕХНО 101 Марка А', 'EVASORB марки 121', 'СНПХ-1200', 'ПСВ-3401 марка Б',
+        self.type_absorbent.addItems(['ХИМТЕХНО 101 Марка А', 'EVASORB марки 123', 'СНПХ-1200', 'ПСВ-3401 марка Б',
                                       'Гастрит-К131М марка Н'])
 
         # self.grid = QGridLayout(self)

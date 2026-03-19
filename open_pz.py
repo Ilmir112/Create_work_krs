@@ -1,7 +1,9 @@
 import json
 from abc import ABC, abstractmethod
+from typing import Optional, cast
 
 from openpyxl import styles
+from openpyxl.worksheet.worksheet import Worksheet
 
 import data_list
 from datetime import datetime
@@ -10,7 +12,7 @@ from openpyxl.styles import Font, Alignment, Border, Side
 
 from cdng import events_gnvp, add_itog, events_gnvp_gnkt
 from main import MyMainWindow
-
+from find import FindIndexPZ
 from block_name import curator_sel, pop_down, current_datetime
 from work_py.dop_plan_py import DopPlanWindow
 
@@ -23,26 +25,32 @@ class WorkWithPZ(ABC):
 
 class PzInDatabase(WorkWithPZ):
     def __init__(self, parent=None):
-        super(self).__init__()
+        super().__init__()
         self.data_well = parent
+        self.ws = getattr(parent, "ws", None) if parent else None
 
-    def open_excel_file(self):
-        if 'Ойл' in data_list.contractor:
-            contractor = 'ОЙЛ'
-        elif 'РН' in data_list.contractor:
-            contractor = 'РН'
+    def open_excel_file(self, ws: Worksheet, work_plan: str, ws2: Worksheet = None):  # type: ignore[override]
+        contractor = "РН"
+        if data_list.contractor and "Ойл" in data_list.contractor:
+            contractor = "ОЙЛ"
+        elif data_list.contractor and "РН" in data_list.contractor:
+            contractor = "РН"
 
-        if self.data_well.work_plan == 'plan_change':
+        if self.data_well is None:
+            return ws
+        if self.data_well.work_plan == "plan_change":
             DopPlanWindow.extraction_data(self, str(self.data_well.well_number.get_value) + " " +
-                                          self.data_well.well_area.get_value + " " + 'krs' + " " + contractor, 1)
-            self.ws.delete_rows(data_list.plan_correct_index.get_value, self.ws.max_row)
-            return self.ws
+                                          self.data_well.well_area.get_value + " " + "krs" + " " + contractor, 1)  # type: ignore[misc]
+            if self.ws is not None:
+                plan_idx = data_list.plan_correct_index.get_value  # type: ignore[union-attr]
+                self.ws.delete_rows(int(plan_idx), self.ws.max_row)
+            return self.ws  # type: ignore[return-value]
 
 
 class CreatePZ(MyMainWindow):
-    def __init__(self, data_well, ws, parent=None):
+    def __init__(self, data_well: FindIndexPZ, ws: Worksheet, parent=None):
         super(CreatePZ, self).__init__()
-        self.wb = parent.wb
+        self.wb = parent.wb if parent is not None else None
         self.ws = ws
         self.data_well = data_well
 
@@ -215,7 +223,7 @@ class CreatePZ(MyMainWindow):
 
         ws.row_dimensions[2].height = 30
 
-    def open_excel_file(self, ws, work_plan, ws2=None):
+    def open_excel_file(self, ws: Worksheet, work_plan: str, ws2: Optional[Worksheet] = None):
 
         # print(f' индекс вставки ГНВП{self.data_well.insert_index}')
         dict_events_gnvp = {}
@@ -232,21 +240,23 @@ class CreatePZ(MyMainWindow):
                     ws.row_dimensions[row_ind].hidden = False
                     if 'ПЛАН РАБОТ' in str(row[1]) \
                             and work_plan == 'dop_plan':
-                        ws.cell(row=row_ind + 1, column=2).value = \
-                            f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {self.data_well.number_dp}'
+                        ws.cell(row=row_ind + 1, column=2).value = (  # type: ignore[assignment]
+                            f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {self.data_well.number_dp}')
                         aswdw = ws.cell(row=row_ind + 1, column=2).value
                     elif 'План-заказ' in str(row[1]):
                         if work_plan != 'dop_plan':
-                            ws.cell(row=row_ind + 1, column=2).value = 'ПЛАН РАБОТ'
+                            ws.cell(row=row_ind + 1, column=2).value = 'ПЛАН РАБОТ'  # type: ignore[assignment]
                         else:
-                            ws.cell(row=row_ind + 1, column=2).value = \
-                                f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {self.data_well.number_dp}'
+                            ws.cell(row=row_ind + 1, column=2).value = (  # type: ignore[assignment]
+                                f'ДОПОЛНИТЕЛЬНЫЙ ПЛАН РАБОТ № {self.data_well.number_dp}')
 
             if self.data_well.work_plan not in ['gnkt_frez', 'application_pvr',
                                                 'application_gis', 'gnkt_after_grp', 'gnkt_opz', 'gnkt_bopz',
                                                 'plan_change', 'prs']:
+                if ws2 is None:
+                    return ws
                 # print(f'план работ {self.data_well.work_plan}')
-                self.append_podpisant_up(ws2)
+                self.append_podpisant_up(cast(Worksheet, ws2))
 
                 self.copy_data_excel_in_excel(
                     ws, ws2, self.data_well.cat_well_min.get_value, self.data_well.data_well_max.get_value, 1, 16,
@@ -262,157 +272,55 @@ class CreatePZ(MyMainWindow):
                     ws, ws2, self.data_well.data_x_min.get_value, self.data_well.data_x_max.get_value, 1, 16,
                     ws2.max_row + 1)
 
+                # Для доп. плана КРС добавляем блок заголовков "Порядок работы" / "п/п" в конец ws2,
+                # если его там ещё нет. С границами как у основной таблицы.
+                if self.data_well.work_plan == "dop_plan":
+                    header_exists = False
+                    for row in range(1, ws2.max_row + 1):
+                        cell = ws2.cell(row=row, column=2)  # колонка B
+                        if cell.value and str(cell.value).strip().lower() == "порядок работы":
+                            header_exists = True
+                            break
 
+                    if not header_exists:
+                        krs_begin = [
+                            [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None, None,
+                             None, None, None],
+                            [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
+                             'Ответственный',
+                             'Нормы времени \n мин/час.'],
+                        ]
+                        start_row = ws2.max_row + 1
+                        for i, row_vals in enumerate(krs_begin):
+                            for j, val in enumerate(row_vals, start=1):
+                                cell = ws2.cell(row=start_row + i, column=j)
+                                cell.value = val
+                                if j != 1:  # как в других местах: рамка для всех, кроме первой колонки
+                                    cell.border = data_list.thin_border
+                                cell.alignment = Alignment(
+                                    wrap_text=True,
+                                    horizontal='center' if j in (2, 11, 12) else 'left',
+                                    vertical='center',
+                                )
 
+                        # Объединения:
+                        # 1-я строка ("Порядок работы") — со 2 по 13 колонку
+                        ws2.merge_cells(
+                            start_row=start_row,
+                            start_column=2,
+                            end_row=start_row,
+                            end_column=13,
+                        )
+                        # 2-я строка ("Наименование работ") — с 3 по 11 колонку
+                        ws2.merge_cells(
+                            start_row=start_row + 1,
+                            start_column=3,
+                            end_row=start_row + 1,
+                            end_column=10,
+                        )
+
+                # фиксируем индекс вставки для дальнейшей работы в таблице
                 self.data_well.insert_index = ws2.max_row
-
-                # # if work_plan != 'dop_plan':
-                # text_width_dict = {20: (0, 100), 30: (101, 200), 40: (201, 300), 60: (301, 400), 70: (401, 500),
-                #                    90: (501, 600), 110: (601, 700), 120: (701, 800), 130: (801, 900),
-                #                    150: (901, 1500), 270: (1500, 2300)}
-
-                # # Устанавливаем параметры границы
-                # red = 'FF0000'  # Красный цвет в формате HEX
-                # thin_border = Border(left=Side(style='thin', color=red),
-                #                      right=Side(style='thin', color=red),
-                #                      top=Side(style='thin', color=red),
-                #                      bottom=Side(style='thin', color=red))
-                #
-                # if work_plan != 'normir':
-                #     if 'Ойл' in data_list.contractor:
-                #         for i in range(self.data_well.insert_index,
-                #                        self.data_well.insert_index + len(dict_events_gnvp[work_plan])):
-                #             ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
-                #             data = ws.cell(row=i, column=2)
-                #             data.value = dict_events_gnvp[work_plan][i - self.data_well.insert_index][1]
-                #
-                #             if 'Мероприятия' in str(data.value) or \
-                #                     'Меры по предупреждению' in str(data.value) or \
-                #                     ' ТЕХНОЛОГИЧЕСКИЕ ПРОЦЕССЫ' in str(data.value) or \
-                #                     'Признаки отравления сернистым водородом' in str(data.value) or \
-                #                     'Контроль воздушной среды проводится:' in str(data.value) or \
-                #                     'Требования безопасности при выполнении работ:' in str(data.value) or \
-                #                     'Меры по предупреждению' in str(data.value) or \
-                #                     'Меры по предупреждению' in str(data.value) or \
-                #                     'Меры по предупреждению' in str(data.value) or \
-                #                     "о недопустимости нецелевого расхода" in str(data.value):
-                #                 data.alignment = Alignment(wrap_text=True, horizontal='center',
-                #                                            vertical='center')
-                #                 data.fill = data_list.yellow_fill
-                #                 data.font = Font(name='Arial Cyr', size=13, bold=True)
-                #
-                #             else:
-                #                 data.alignment = Alignment(wrap_text=True, horizontal='left',
-                #                                            vertical='center')
-                #
-                #                 data.font = Font(name='Arial Cyr', size=12)
-                #             if not data.value is None:
-                #                 text = data.value
-                #                 for key, value in text_width_dict.items():
-                #                     if value[0] <= len(text) <= value[1]:
-                #                         ws.row_dimensions[i].height = int(key * 1.1)
-                #
-                #     elif 'РН' in data_list.contractor:
-                #
-                #         # Устанавливаем красный цвет для текста
-                #         red_font = Font(name='Arial Cyr', size=13, color='FF0000', bold=True)
-                #         for i in range(self.data_well.insert_index,
-                #                        self.data_well.insert_index + len(dict_events_gnvp[work_plan])):
-                #             for col in range(12):
-                #                 data = ws.cell(row=i, column=col + 1)
-                #                 data.border = thin_border
-                #                 data.value = dict_events_gnvp[work_plan][i - self.data_well.insert_index][col]
-                #
-                #                 data_2 = ws.cell(row=i, column=3).value
-                #                 data_1 = ws.cell(row=i, column=2).value
-                #                 ws.cell(row=i, column=col + 1).font = Font(name='Arial Cyr', size=13, bold=False)
-                #
-                #             if 'Мероприятия ' in str(data_1):
-                #                 ws.merge_cells(start_row=i, start_column=2, end_row=i, end_column=12)
-                #                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                #                                                                vertical='center')
-                #
-                #                 ws.cell(row=i, column=2).font = Font(name='Arial Cyr', size=13, bold=True)
-                #             elif 'При работе с вертлюгами обеспечить' in str(data_2) \
-                #                     or 'На основании приказа' in str(data_2) \
-                #                     or 'Согласно мероприятий по снижению а' in str(data_2) \
-                #                     or 'Во время нештатных ' in str(data_2) \
-                #                     or 'Для предотвращения падения ' in str(data_2) \
-                #                     or 'После герметизации устья' in str(data_2) \
-                #                     or 'При свинчивании и развинчивании' in str(data_2) \
-                #                     or 'Сборку фрезерующего, ' in str(data_2) \
-                #                     or 'При нулевых и отрицательных' in str(data_2):
-                #                 ws.merge_cells(start_row=i, start_column=3, end_row=i, end_column=11)
-                #                 ws.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
-                #                                                                vertical='center')
-                #                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='left',
-                #                                                                vertical='center')
-                #                 ws.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
-                #                                                                 vertical='center')
-                #                 ws.cell(row=i, column=3).font = Font(name='Arial Cyr', size=13, bold=True)
-                #                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                #                                                                vertical='center')
-                #             else:
-                #                 ws.merge_cells(start_row=i, start_column=3, end_row=i, end_column=11)
-                #                 ws.cell(row=i, column=3).alignment = Alignment(wrap_text=True, horizontal='left',
-                #                                                                vertical='center')
-                #
-                #                 ws.cell(row=i, column=2).alignment = Alignment(wrap_text=True, horizontal='center',
-                #                                                                vertical='center')
-                #                 ws.cell(row=i, column=12).alignment = Alignment(wrap_text=True, horizontal='center',
-                #                                                                 vertical='center')
-                #                 ws.cell(row=i, column=3).font = Font(name='Arial Cyr', size=13, bold=False)
-                #
-                #             if 'ВЫ ДОЛЖНЫ ОТКАЗАТЬСЯ' in str(data_2):
-                #                 ws.cell(row=i, column=3).font = red_font
-                #
-                #             if not data_2 is None:
-                #                 text = data_2
-                #                 for key, value in text_width_dict.items():
-                #                     text_length = len(text)
-                #                     if value[0] <= text_length <= value[1]:
-                #                         if '\n' in text:
-                #                             row_dimension_value = int(len(text) / 4 + text.count('\n') * 3)
-                #
-                #                         else:
-                #                             row_dimension_value = int(len(text) / 4)
-                #                         ws.row_dimensions[i].height = row_dimension_value
-                #
-                #     self.data_well.insert_index += len(dict_events_gnvp[work_plan]) - 1
-                #
-                #     ws.row_dimensions[2].height = 30
-                #
-                #     if len(self.data_well.row_expected) != 0 and self.data_well.work_plan not in ['prs']:
-                #         for i in range(1, len(self.data_well.row_expected) + 1):  # Добавление показатели после ремонта
-                #             ws.row_dimensions[self.data_well.insert_index + i - 1].height = None
-                #             for j in range(1, 12):
-                #                 if i == 1:
-                #                     ws.cell(row=i + self.data_well.insert_index, column=j).font = Font(
-                #                         name='Arial Cyr', size=13,
-                #                         bold=False)
-                #                     ws.cell(row=i + self.data_well.insert_index, column=j).alignment = Alignment(
-                #                         wrap_text=False,
-                #                         horizontal='center',
-                #                         vertical='center')
-                #                     ws.cell(row=i + self.data_well.insert_index, column=j).value = \
-                #                         self.data_well.row_expected[i - 1][
-                #                             j - 1]
-                #                 else:
-                #                     ws.cell(row=i + self.data_well.insert_index, column=j).font = Font(
-                #                         name='Arial Cyr', size=13,
-                #                         bold=False)
-                #                     ws.cell(row=i + self.data_well.insert_index, column=j).alignment = Alignment(
-                #                         wrap_text=False,
-                #                         horizontal='left',
-                #                         vertical='center')
-                #                     ws.cell(row=i + self.data_well.insert_index, column=j).value = \
-                #                         self.data_well.row_expected[i - 1][
-                #                             j - 1]
-                #         ws.merge_cells(start_column=2, start_row=self.data_well.insert_index + 1, end_column=12,
-                #                        end_row=self.data_well.insert_index + 1)
-                #         self.data_well.insert_index += len(self.data_well.row_expected)
-                #
-                #     self.insert_index_border = self.data_well.insert_index
 
                 return ws2
 
@@ -430,9 +338,13 @@ class CreatePZ(MyMainWindow):
 
                 self.insert_events_gnvp(ws2, dict_events_gnvp, 3)
 
+                data_x_min = self.data_well.data_x_min.get_value
+                start_row_x = data_x_min if data_x_min is not None else 1
+                end_row_x = (data_x_min + 2) if data_x_min is not None else 2
                 self.copy_data_excel_in_excel(
-                    ws, ws2, self.data_well.data_x_min.get_value, self.data_well.data_x_min.get_value + 2, 1, 17,
-                                                                  ws2.max_row + 1)
+                    ws, ws2, start_row_x, end_row_x, 1, 17,
+                    ws2.max_row + 1,
+                )
 
                 self.data_well.insert_index = ws2.max_row
 
@@ -465,6 +377,7 @@ class CreatePZ(MyMainWindow):
                     row_list.insert(-8, None)
                     row_list.insert(-8, None)
                     row_list.insert(-8, None)
+                j = 1
                 if i < insert_index + 6:
                     for j in range(1, len(itog_list[i - insert_index]) + 1):
                         awded = row_list[j - 1]
@@ -533,17 +446,23 @@ class CreatePZ(MyMainWindow):
                 self.data_well.ws, ws, self.data_well.condition_of_wells.get_value, self.data_well.ws.max_row, 1, 17,
                 ws.max_row + 1)
 
-    def is_valid_date(date):
+    @staticmethod
+    def is_valid_date(date_string: str):
         try:
-            datetime.strptime(date, '%Y-%m-%d')
+            datetime.strptime(date_string, "%Y-%m-%d")
             return True
-        except ValueError:
+        except (ValueError, TypeError):
             return False
 
 
-def work_pz_excel_file(work_plan, parent):
-    if work_plan in ['krs', 'dop_plan']:
-        open_class = CreatePZ(parent)
+def work_pz_excel_file(work_plan, parent, ws=None):
+    if work_plan in ["krs", "dop_plan"] and parent is not None:
+        data_well = getattr(parent, "data_well", parent)
+        ws_sheet = ws if ws is not None else getattr(parent, "ws", None)
+        if data_well is not None and ws_sheet is not None:
+            open_class = CreatePZ(data_well, ws_sheet, parent)
+        else:
+            open_class = PzInDatabase(parent)
     else:
         open_class = PzInDatabase(parent)
 

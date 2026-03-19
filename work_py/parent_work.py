@@ -349,7 +349,7 @@ class TabPageUnion(QWidget):
 
     def calculate_h2s(self, type_absorbent, category_h2s, h2s_mg, h2s_pr):
         if '2' in str(category_h2s) or '1' in str(category_h2s):
-            if type_absorbent == 'EVASORB марки 121':
+            if type_absorbent == 'EVASORB марки 123':
                 koeff_zapas = 1.05
             else:
                 koeff_zapas = 1
@@ -1821,7 +1821,7 @@ class WindowUnion(MyMainWindow):
                 if result_table[0]:
                     result = json.loads(result_table[0])
 
-                    self.data_well.type_absorbent = 'EVASORB марки 121'
+                    self.data_well.type_absorbent = 'EVASORB марки 123'
                     if 'ХИМТЕХНО 101' in str(result[paragraph_row][7]):
                         self.data_well.type_absorbent = 'ХИМТЕХНО 101 Марка А'
                     elif 'СНПХ-1200' in str(result[paragraph_row][7]):

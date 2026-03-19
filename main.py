@@ -1913,30 +1913,7 @@ class MyMainWindow(QMainWindow):
                     else:
                         item = QTableWidgetItem("")
 
-            if data_list.dop_work_list:
-                if work_plan == "dop_plan":
-                    krs_begin = [
-                        [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None, None,
-                         None, None, None],
-                        [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
-                         'Ответственный',
-                         'Нормы времени \n мин/час.'],
-                    ]
-                    # Проверяем, нет ли уже заголовка "Порядок работы" в списке
-                    has_header = any(
-                        isinstance(row, (list, tuple))
-                        and len(row) > 1
-                        and str(row[1]).strip().lower() == 'порядок работы'
-                        for row in data_list.dop_work_list
-                    )
-                    if not has_header:
-                        data_list.dop_work_list.extend(krs_begin)
-                self.populate_row(
-                    table_widget.rowCount(),
-                    data_list.dop_work_list,
-                    self.table_widget,
-                    self.work_plan,
-                )
+
             if "gnkt" not in work_plan and self.data_well.insert_index2:
                 for row in range(table_widget.rowCount()):
                     if row >= self.data_well.insert_index2 + 2:

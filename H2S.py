@@ -40,13 +40,13 @@ class CalculateH2s:
             sucker_rod_l_19 = 0
         self.data_well.fluid_work = 'EVASORB'
         if 'EVASORB' in self.data_well.fluid_work:
-            self.data_well.type_absorbent = 'EVASORB марки 121'
+            self.data_well.type_absorbent = 'EVASORB марки 123'
         elif 'ХИМТЕХНО' in self.data_well.fluid_work:
             self.data_well.type_absorbent = 'ХИМТЕХНО 101 Марка А'
         elif 'СНПХ-1200' in self.data_well.fluid_work:
             self.data_well.type_absorbent = 'СНПХ-1200'
 
-        if self.data_well.type_absorbent == 'EVASORB марки 121':
+        if self.data_well.type_absorbent == 'EVASORB марки 123':
             koeff_zapas = 1.05
         else:
             koeff_zapas = 1
@@ -218,7 +218,7 @@ class CalculateH2s:
 
 def calv_h2s(self, category_h2s, h2s_mg, h2s_pr):
     if '2' in str(category_h2s) or '1' in str(category_h2s):
-        if self.data_well.type_absorbent == 'EVASORB марки 121':
+        if self.data_well.type_absorbent == 'EVASORB марки 123':
             koeff_zapas = 1.05
         else:
             koeff_zapas = 1
