@@ -2269,6 +2269,28 @@ class MyWindow(MyMainWindow):
         self.closeFileButton.clicked.connect(self.close_file)
         self.toolbar.addWidget(self.closeFileButton)
 
+    def open_user_profile(self):
+        if not data_list.connect_in_base:
+            QMessageBox.information(
+                self,
+                "Профиль",
+                "Редактирование профиля доступно только при работе через сервер.",
+            )
+            return
+        me = ApiClient.request_get_auth(ApiClient.me_info())
+        if not isinstance(me, dict):
+            QMessageBox.warning(
+                self,
+                "Ошибка",
+                "Не удалось загрузить профиль. Возможно, сессия истекла — выполните вход снова."
+                if me in (401, 403, None)
+                else f"Ошибка запроса (код {me}).",
+            )
+            return
+        from users.user_profile import EditProfileDialog
+
+        EditProfileDialog(self, me).exec_()
+
     def create_menu_bar(self):
         self.menuBar = QMenuBar(self)
         self.setMenuBar(self.menuBar)
@@ -2280,6 +2302,10 @@ class MyWindow(MyMainWindow):
         self.menuBar.addMenu(self.application_geophysical)
         self.menuBar.addMenu(self.classifierMenu)
         self.menuBar.addMenu(self.signatories)
+
+        if data_list.connect_in_base:
+            self.fileMenu.addSeparator()
+            self.fileMenu.addAction("Профиль пользователя…", self.open_user_profile)
 
         self.application_pvr = self.application_geophysical.addAction(
             "Заявка на ПВР", self.action_clicked

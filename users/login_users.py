@@ -98,6 +98,13 @@ class LoginWindow(QDialog):
 
                 data_list.pause = False
                 self.close()
+            elif user_access == 402:
+                QMessageBox.critical(
+                    self, 'Подписка',
+                    'Срок подписки истёк. Обратитесь к администратору для продления доступа.'
+                )
+                data_list.pause = True
+                self.user_dict = None
             elif user_access == 403:
                 QMessageBox.critical(
                     self, 'Доступ запрещён',

@@ -203,6 +203,22 @@ class ApiClient:
             return response.status_code if response is not None else None
 
     @staticmethod
+    def request_get_auth(path):
+        headers = {}
+        if ApiClient.SETTINGS_TOKEN:
+            token = ApiClient.SETTINGS_TOKEN.value("auth_token", "")
+            headers["Authorization"] = f"Bearer {token}"
+        url = ApiClient.get_endpoint(path)
+        response = None
+        try:
+            response = requests.get(url, headers=headers, verify=False)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Запрос не удался: {e}")
+            return response.status_code if response is not None else None
+
+    @staticmethod
     def request_params_get(path, json_data):
         headers = {}
         if ApiClient.SETTINGS_TOKEN:
@@ -322,6 +338,10 @@ class ApiClient:
     @classmethod
     def register_auth(cls):
         return "/auth/register"
+
+    @classmethod
+    def update_user_path(cls):
+        return "/auth/update"
 
     @classmethod
     def find_gnkt_data_all(cls):
