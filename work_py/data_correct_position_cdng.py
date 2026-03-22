@@ -2,7 +2,7 @@ import json
 import data_list
 
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.Qt import *
+from PyQt5.QtWidgets import QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, QMessageBox, QPushButton, QMainWindow
 
 from main import MyMainWindow
 from work_py.parent_work import TabWidgetUnion, WindowUnion
@@ -125,7 +125,7 @@ class CorrectSignaturesCdng(QMainWindow):
         # self.labels_nkt = labels_nkt
 
         self.buttonAdd = QPushButton('сохранить данные')
-        self.buttonAdd.clicked.connect(self.add_row_table)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_row_table())
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)

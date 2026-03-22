@@ -303,9 +303,9 @@ class TabPageSoAcid(TabPageUnion):
         self.grid.addWidget(self.skv_true_label_type, 4, 0)
         self.grid.addWidget(self.svk_true_combo, 5, 0)
 
-        self.paker_depth_edit.textChanged.connect(self.update_paker_depth)
-        self.paker_depth_edit.textChanged.connect(self.update_paker_edit)
-        self.paker2_depth.textChanged.connect(self.update_paker_edit)
+        self.paker_depth_edit.textChanged[str].connect(self.update_paker_depth)
+        self.paker_depth_edit.textChanged[str].connect(self.update_paker_edit)
+        self.paker2_depth.textChanged[str].connect(self.update_paker_edit)
 
         self.sko_true_combo.currentTextChanged.connect(self.update_sko_true)
 
@@ -706,11 +706,11 @@ class AcidPakerWindow(WindowUnion):
                 )
 
         self.buttonDel = QPushButton("Удалить записи из таблице")
-        self.buttonDel.clicked.connect(self.del_row_table)
+        self.buttonDel.clicked[bool].connect(lambda _checked: self.del_row_table())
         self.buttonadd_work = QPushButton("Добавить в план работ")
-        self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
+        self.buttonadd_work.clicked[bool].connect(lambda _checked: self.add_work(), Qt.QueuedConnection)
         self.buttonadd_string = QPushButton("Добавить обработку")
-        self.buttonadd_string.clicked.connect(self.add_string)
+        self.buttonadd_string.clicked[bool].connect(lambda _checked: self.add_string())
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)

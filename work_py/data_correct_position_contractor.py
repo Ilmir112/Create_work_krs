@@ -135,7 +135,7 @@ class CorrectSignaturesContractor(QMainWindow):
         # self.labels_nkt = labels_nkt
 
         self.buttonAdd = QPushButton('сохранить данные')
-        self.buttonAdd.clicked.connect(self.add_row_table)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_row_table())
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)

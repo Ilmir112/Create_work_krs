@@ -18,7 +18,7 @@ class TabPageSoGpp(TabPageUnion):
         self.paker_depth_label = QLabel("Глубина ГПП", self)
         self.paker_depth_edit = QLineEdit(self)
         self.paker_depth_edit.setValidator(self.validator_int)
-        self.paker_depth_edit.textChanged.connect(self.update_paker)
+        self.paker_depth_edit.textChanged[str].connect(self.update_paker)
         self.paker_depth_edit.setText(str(int(self.data_well.perforation_roof)))
 
         self.current_depth_label = QLabel("Глубина нормализации", self)
@@ -75,7 +75,7 @@ class GppWindow(WindowUnion):
         self.paker_select = None
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.add_work)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_work())
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)

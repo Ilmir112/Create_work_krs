@@ -73,11 +73,20 @@ class TabPageSoBlock(TabPageUnion):
         self.grid.addWidget(self.fluid_new_label, 9, 4)
         self.grid.addWidget(self.fluid_new_edit, 10, 4)
 
-        self.block_volume_edit.textChanged.connect(self.update_volume_block_pack)
+        # QLineEdit.textChanged is an overloaded signal; specify the `str` signature
+        # so type checkers can resolve `connect` and the slot gets the text argument.
+        self.block_volume_edit.textChanged[str].connect(self.update_volume_block_pack)
         self.block_volume_edit.setText(str(self.calculate_volume_block_pack()))
 
-    def update_volume_block_pack(self):
-        raw = (self.data_well.fluid_work or "")[:4].replace(",", ".")
+    def update_volume_block_pack(self, _text: str):
+        fw = self.data_well.fluid_work
+        if fw is None:
+            fluid_text = ""
+        elif isinstance(fw, str):
+            fluid_text = fw
+        else:
+            fluid_text = str(fw)
+        raw = fluid_text[:4].replace(",", ".")
         try:
             val = float(raw) if raw.strip() else 0.0
         except ValueError:
@@ -148,7 +157,7 @@ class BlockPackWindow(WindowUnion):
         self.table_widget = table_widget
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.add_work)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_work())
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)

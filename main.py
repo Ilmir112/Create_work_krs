@@ -2274,7 +2274,7 @@ class MyWindow(MyMainWindow):
             QMessageBox.information(
                 self,
                 "Профиль",
-                "Редактирование профиля доступно только при работе через сервер.",
+                "Редактирование профиля доступно только при работе через через сайт zima-krs.ru.",
             )
             return
         me = ApiClient.request_get_auth(ApiClient.me_info())

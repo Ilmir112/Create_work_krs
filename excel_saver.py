@@ -240,13 +240,7 @@ class SaveInExcel(MyWindow):
                             coordinate,
                         )
 
-                    elif "Закиев И.Э." in str(value):
-                        coordinate = f"{get_column_letter(col - 1)}{row_ind - 1}"
-                        self.insert_image(
-                            self.ws2,
-                            f"{data_list.path_image}imageFiles/Закиев.png",
-                            coordinate,
-                        )
+
                     elif " - коэффициент усадки песка" in str(value):
                         coordinate = f"I{row_ind + 1}"
                         self.insert_image(
@@ -263,13 +257,7 @@ class SaveInExcel(MyWindow):
                             f"{data_list.path_image}imageFiles/Алиев махир.png",
                             coordinate,
                         )
-                    # elif "И.А. Котиков" in str(value):
-                    #     coordinate = f"{get_column_letter(col - 3)}{row_ind - 2}"
-                    #     self.insert_image(
-                    #         self.ws2,
-                    #         f"{data_list.path_image}imageFiles/Котиков.png",
-                    #         coordinate,
-                    #     )
+
                     elif "З.К. Алиев" in str(value):
                         coordinate = f"{get_column_letter(col - 2)}{row_ind - 2}"
                         self.insert_image(

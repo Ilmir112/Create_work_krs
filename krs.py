@@ -81,7 +81,7 @@ class TabPageGno(TabPageUnion):
                 self.surfactant_hydrofabizer_combo.setCurrentIndex(1)
         self.gno_combo.currentTextChanged.connect(self.update_select_gno)
 
-        self.fluid_edit.textChanged.connect(self.update_fluid_edit)
+        self.fluid_edit.textChanged[str].connect(self.update_fluid_edit)
         self.fluid_edit.setText(f'{self.calc_fluid(self.work_plan, self.data_well.current_bottom)}')
 
     def update_fluid_edit(self):

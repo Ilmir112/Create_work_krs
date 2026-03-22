@@ -89,9 +89,9 @@ class TabPageSoChange(TabPageUnion):
                 self.gf_label = QLabel('Газовый фактор')
                 self.gf_edit = QLineEdit(self)
                 self.gf_edit.setValidator(self.validator_float_five)
-                self.h2s_mg_edit.textChanged.connect(self.update_calculate_h2s)
-                self.h2s_pr_edit.textChanged.connect(self.update_calculate_h2s)
-                self.gf_edit.textChanged.connect(self.update_calculate_h2s)
+                self.h2s_mg_edit.textChanged[str].connect(self.update_calculate_h2s)
+                self.h2s_pr_edit.textChanged[str].connect(self.update_calculate_h2s)
+                self.gf_edit.textChanged[str].connect(self.update_calculate_h2s)
 
                 self.calc_h2s_label = QLabel('расчет поглотителя H2S по вскрываемому пласту')
                 self.calc_plast_h2s = QLineEdit(self)
@@ -196,7 +196,7 @@ class ChangeFluidWindow(WindowUnion):
         self.dict_nkt = {}
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.add_work)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_work())
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)
@@ -298,7 +298,7 @@ class ChangeFluidWindow(WindowUnion):
         data_list.operation_window = None
         event.accept()  # Принимаем событие закрытия
 
-    def fluid_change_old_plast(self, fluid_new_edit):
+    def fluid_change_old_plast(self, fluid_new_edit: float) -> list:
         from work_py.alone_oreration import well_volume, update_fluid
         fluid_work = str(fluid_new_edit) + self.data_well.fluid_work[4:]
         self.data_well.fluid_work_short = str(fluid_new_edit) + self.data_well.fluid_work[4:]
@@ -320,7 +320,7 @@ class ChangeFluidWindow(WindowUnion):
         self.data_well.fluid_work = fluid_work
         return fluid_change_list
 
-    def fluid_change(self, plast_new, fluid_new, pressure_new):
+    def fluid_change(self, plast_new: str, fluid_new: float, pressure_new: float) -> list:
         from work_py.alone_oreration import well_volume, update_fluid
 
         fluid_work, self.data_well.fluid_work_short, plast, expected_pressure = need_h2s(self, fluid_new,

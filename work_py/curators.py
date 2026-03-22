@@ -36,7 +36,7 @@ class SelectCurator(WindowUnion):
         self.tab_widget = TabWidget(parent)
 
         self.buttonadd_work = QPushButton('Изменить')
-        self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
+        self.buttonadd_work.clicked[bool].connect(lambda _checked: self.add_work(), Qt.QueuedConnection)
 
         vbox = QGridLayout(self.centralWidget)
 

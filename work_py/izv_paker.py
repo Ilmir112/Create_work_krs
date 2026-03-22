@@ -106,7 +106,7 @@ class TabPageSoPakerIzv(TabPageUnion):
         else:
             self.type_work_combo.setCurrentIndex(0)
 
-        self.paker_depth_line.textChanged.connect(self.update_depth_paker)
+        self.paker_depth_line.textChanged[str].connect(self.update_depth_paker)
 
 
 
@@ -188,7 +188,7 @@ class PakerIzvlek(WindowUnion):
         self.table_widget = table_widget
 
         self.buttonadd_work = QPushButton('Добавить в план работ')
-        self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
+        self.buttonadd_work.clicked[bool].connect(lambda _checked: self.add_work(), Qt.QueuedConnection)
 
         vbox = QGridLayout(self.centralWidget)
 

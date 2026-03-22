@@ -226,13 +226,13 @@ class TemplateKrs(WindowUnion):
         self.tableWidget.setAlternatingRowColors(True)
 
         self.buttonAdd = QPushButton('Добавить записи в таблицу')
-        self.buttonAdd.clicked.connect(self.add_row_table)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_row_table())
         self.buttonDel = QPushButton('Удалить записи из таблице')
-        self.buttonDel.clicked.connect(self.del_row_table)
+        self.buttonDel.clicked[bool].connect(lambda _checked: self.del_row_table())
         self.buttonadd_work = QPushButton('Добавить в план работ')
-        self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
+        self.buttonadd_work.clicked[bool].connect(lambda _checked: self.add_work(), Qt.QueuedConnection)
         self.buttonadd_string = QPushButton('Добавить интервалы скреперования')
-        self.buttonadd_string.clicked.connect(self.add_string)
+        self.buttonadd_string.clicked[bool].connect(lambda _checked: self.add_string())
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)

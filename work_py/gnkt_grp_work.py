@@ -272,7 +272,7 @@ class GnktModel(WindowUnion):
         self.tab_widget = TabWidget(self.data_well)
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.add_work)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_work())
         vbox = QGridLayout(self._central_widget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)

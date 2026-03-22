@@ -87,8 +87,8 @@ class TabPageDp(TabPageUnion):
         self.grid.addWidget(self.pressure_label, 6, 5)
         self.grid.addWidget(self.pressure_edit, 7, 5)
 
-        self.acid_calcul_edit.textChanged.connect(self.update_volume_points)
-        self.points_sko_edit.textChanged.connect(self.update_volume_points)
+        self.acid_calcul_edit.textChanged[str].connect(self.update_volume_points)
+        self.points_sko_edit.textChanged[str].connect(self.update_volume_points)
 
     def update_volume_points(self):
         acid_calcul = self.acid_calcul_edit.text()
@@ -125,7 +125,7 @@ class GonsWindow(WindowUnion):
 
         self.table_widget = table_widget
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.add_work)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_work())
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)

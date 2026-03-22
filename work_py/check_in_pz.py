@@ -18,11 +18,11 @@ class CustomMessageBox(QDialog):
 
         # Кнопка для закрытия окна
         close_button = QPushButton("Закрыть", self)
-        close_button.clicked.connect(self.close_window)
+        close_button.clicked[bool].connect(lambda _checked: self.close_window())
 
         # Кнопка для отправки текста по электронной почте
         send_button = QPushButton("Отправить по почте", self)
-        send_button.clicked.connect(self.send_email)
+        send_button.clicked[bool].connect(lambda _checked: self.send_email())
 
         # Устанавливаем вертикальный layout
         layout = QVBoxLayout()

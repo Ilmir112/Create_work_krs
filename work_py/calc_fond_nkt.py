@@ -15,6 +15,7 @@ class CalcFond:
     def calc_nkt_dict(self):
         distance_between_nkt = self.distance_between_nkt
         n = distance_between_nkt
+
         calc_nkt_list = []
         while n <= self.len_nkt:
             calc_nkt_list.append(n)

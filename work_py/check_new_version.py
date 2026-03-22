@@ -48,7 +48,7 @@ class UpdateChecker(QWidget):
 
         # Кнопка для обновления
         self.update_button = QPushButton("Обновить")
-        self.update_button.clicked.connect(self.start_update)
+        self.update_button.clicked[bool].connect(lambda _checked: self.start_update())
         self.update_button.setEnabled(False)
 
         # ProgressBar
@@ -61,7 +61,7 @@ class UpdateChecker(QWidget):
         self.progress_zip_bar.setVisible(False)
 
         self.complete_prog = QPushButton("Продолжить")
-        self.complete_prog.clicked.connect(self.def_complete_prog)
+        self.complete_prog.clicked[bool].connect(lambda _checked: self.def_complete_prog())
 
         # Вертикальный layout
         layout = QVBoxLayout()

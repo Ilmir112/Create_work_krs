@@ -1,7 +1,7 @@
 import json
 from collections import namedtuple
 from datetime import datetime
-from typing import List, Optional, Any
+from typing import  Optional, Any
 
 import data_list
 from data_base.config_base import connection_to_database, WorkDatabaseWell
@@ -60,7 +60,7 @@ class TabPageUnion(QWidget):
         self.paker_depth_label = QLabel("Глубина посадки", self)
         self.paker_depth_edit = QLineEdit(self)
         self.paker_depth_edit.setValidator(self.validator_int)
-        self.paker_depth_edit.textChanged.connect(self.update_paker)
+        self.paker_depth_edit.textChanged[str].connect(self.update_paker)
 
         self.paker_depth_zumpf_label = QLabel("Глубина посадки для ЗУМПФа", self)
         self.paker_depth_zumpf_edit = QLineEdit(self)
@@ -218,7 +218,7 @@ class TabPageUnion(QWidget):
                 well_list = sorted(well_list, key=lambda x: x.split(' ')[-2], reverse=True)
                 self.well_data_in_base_combo.clear()
                 if well_list:
-                    self.well_area_edit.textChanged.connect(self.update_well_area)
+                    self.well_area_edit.textChanged[str].connect(self.update_well_area)
                     self.well_area_edit.setText(well_list[0].split(' ')[1])
                     self.well_data_in_base_combo.addItems(well_list)
 
@@ -393,8 +393,8 @@ class TabPageUnion(QWidget):
                     sucker_rod_l_19 = sucker_value
 
             vodoiz_sucker = (10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_25 / 1000) + (
-                    10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_22 / 1000) + (
-                                    10 * 3.14 * ((25 * 0.01) ** 2 / 4) * sucker_rod_l_19 / 1000)
+                    10 * 3.14 * ((22 * 0.01) ** 2 / 4) * sucker_rod_l_22 / 1000) + (
+                                    10 * 3.14 * ((19 * 0.01) ** 2 / 4) * sucker_rod_l_19 / 1000)
 
             oil_mass = round(float(udel_vodoiz_nkt * (100 - self.data_well.percent_water) * 0.9 / 100), 2)
 
@@ -475,7 +475,7 @@ class TabPageUnion(QWidget):
             self.expected_pressure_label = QLabel('Ожидаемое давление закачки')
             self.expected_pressure_edit = QLineEdit(self)
 
-            self.expected_pressure_edit.textChanged.connect(self.update_pressure)
+            self.expected_pressure_edit.textChanged[str].connect(self.update_pressure)
             self.pressure_three_label = QLabel('в трех режимам давлений')
             self.pressure_three_edit = QLineEdit(self)
             self.expected_pressure_edit.setValidator(self.validator_int)
@@ -548,7 +548,7 @@ class TabPageUnion(QWidget):
                         self.paker_layout_combo.setCurrentIndex(1)
 
             self.iron_volume_edit.setText(f'{round(float(self.acid_volume_edit.text()), 1) * 10}')
-            self.acid_volume_edit.textChanged.connect(self.change_volume_acid)
+            self.acid_volume_edit.textChanged[str].connect(self.change_volume_acid)
             self.acid_edit.currentTextChanged.connect(self.update_sko_type)
             self.Qplast_after_edit.setCurrentIndex(1)
             self.Qplast_after_edit.setCurrentIndex(0)
@@ -1677,7 +1677,7 @@ class WindowUnion(MyMainWindow):
                 return item
         return None
 
-    def calc_fond_nkt(self, len_nkt: str, distance_between_nkt: str) -> List:
+    def calc_fond_nkt(self, len_nkt: str, distance_between_nkt: str) -> str:
 
         # расчет необходимого давления опрессовки НКТ при спуске
         static_level = self.data_well.static_level.get_value
@@ -1701,7 +1701,7 @@ class WindowUnion(MyMainWindow):
             press_str += f'Опрессовать НКТ в интервале {n} - {int(nkt)} на давление {pressure}атм \n'
             n = nkt
 
-        return [press_str]
+        return press_str
 
     def select_nkt_grp(self):
         head_add = self.data_well.head_column_additional.get_value if self.data_well.head_column_additional else None

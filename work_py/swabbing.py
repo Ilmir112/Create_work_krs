@@ -174,9 +174,9 @@ class TabPageSoSwab(TabPageUnion):
                 self.swab_true_edit_type.setCurrentIndex(0)
             else:
                 self.swab_true_edit_type.setCurrentIndex(1)
-        self.pakerEdit.textChanged.connect(self.update_paker_edit)
-        self.paker2Edit.textChanged.connect(self.update_paker_edit)
-        self.pakerEdit.textChanged.connect(self.update_paker_diameter)
+        self.pakerEdit.textChanged[str].connect(self.update_paker_edit)
+        self.paker2Edit.textChanged[str].connect(self.update_paker_edit)
+        self.pakerEdit.textChanged[str].connect(self.update_paker_diameter)
         self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
 
         self.pressure_zumpf_question_combo.currentTextChanged.connect(self.update_paker_need)
@@ -229,9 +229,9 @@ class TabPageSoSwab(TabPageUnion):
             self.gf_label = QLabel('Газовый фактор')
             self.gf_edit = QLineEdit(self)
             self.gf_edit.setValidator(self.validator_float)
-            self.h2s_mg_edit.textChanged.connect(self.update_calculate_h2s)
-            self.h2s_pr_edit.textChanged.connect(self.update_calculate_h2s)
-            self.gf_edit.textChanged.connect(self.update_calculate_h2s)
+            self.h2s_mg_edit.textChanged[str].connect(self.update_calculate_h2s)
+            self.h2s_pr_edit.textChanged[str].connect(self.update_calculate_h2s)
+            self.gf_edit.textChanged[str].connect(self.update_calculate_h2s)
 
             self.calc_h2s_label = QLabel('расчет поглотителя H2S по вскрываемому пласту')
             self.calc_plast_h2s = QLineEdit(self)
@@ -627,13 +627,13 @@ class SwabWindow(WindowUnion):
         self.tab_widget = TabWidget(self.tableWidget, self.data_well)
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.add_work)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_work())
         self.buttonDel = QPushButton('Удалить записи из таблице')
-        self.buttonDel.clicked.connect(self.del_row_table)
+        self.buttonDel.clicked[bool].connect(lambda _checked: self.del_row_table())
         self.buttonadd_work = QPushButton('Добавить в план работ')
-        self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
+        self.buttonadd_work.clicked[bool].connect(lambda _checked: self.add_work(), Qt.QueuedConnection)
         self.buttonadd_string = QPushButton('Добавить освоение')
-        self.buttonadd_string.clicked.connect(self.add_string)
+        self.buttonadd_string.clicked[bool].connect(lambda _checked: self.add_string())
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)

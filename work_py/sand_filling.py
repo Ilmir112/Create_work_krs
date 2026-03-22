@@ -102,9 +102,9 @@ class TabPageSoSand(TabPageUnion):
         self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
         self.need_change_zgs_combo.setCurrentIndex(1)
 
-        self.roof_rir_edit.textChanged.connect(self.update_volume_cement)
-        self.sole_rir_edit.textChanged.connect(self.update_volume_cement)
-        self.roof_sand_edit.textChanged.connect(self.update_roof)
+        self.roof_rir_edit.textChanged[str].connect(self.update_volume_cement)
+        self.sole_rir_edit.textChanged[str].connect(self.update_volume_cement)
+        self.roof_sand_edit.textChanged[str].connect(self.update_roof)
         self.rir_question_qcombo.currentTextChanged.connect(self.update_rir)
         self.rir_question_qcombo.setCurrentIndex(1)
         self.rir_question_qcombo.setCurrentIndex(0)
@@ -199,7 +199,7 @@ class SandWindow(WindowUnion):
         self.table_widget = table_widget
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.add_work)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_work())
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)

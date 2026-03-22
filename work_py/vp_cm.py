@@ -46,7 +46,7 @@ class TabPageVp(TabPageUnion):
         self.grid.addWidget(self.cement_vp_label, 6, 4)
         self.grid.addWidget(self.cement_vp_edit, 7, 4)
 
-        self.vp_depth_edit.textChanged.connect(self.update_vp_depth)
+        self.vp_depth_edit.textChanged[str].connect(self.update_vp_depth)
         self.need_question_qcombo.currentTextChanged.connect(self.update_vp)
         self.need_question_qcombo.setCurrentIndex(1)
 
@@ -97,7 +97,7 @@ class VpWindow(WindowUnion):
         self.table_widget = table_widget
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.add_work)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_work())
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)

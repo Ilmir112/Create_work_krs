@@ -1,12 +1,34 @@
 from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QLineEdit, QComboBox, QGridLayout, \
     QTableWidget, QHeaderView, QPushButton, QTableWidgetItem
 
+import re
+
 import data_list
 from PyQt5.QtCore import Qt
 
 from log_files.log import logger
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm, well_volume_norm
+
+
+def _parse_diameter_mm(raw: str) -> float:
+    """
+    Диаметр из поля ввода: '118', '118,5', '122*105', '122 x 105'.
+    Для сравнения с внутренним диаметром ЭК берём max — по наибольшему размеру долота.
+    """
+    s = (raw or "").strip().replace(",", ".")
+    if not s:
+        raise ValueError("пустая строка")
+    parts = re.split(r"[\*xXхХ]\s*", s)
+    nums = []
+    for p in parts:
+        p = p.strip()
+        if not p:
+            continue
+        nums.append(float(p))
+    if not nums:
+        raise ValueError(s)
+    return max(nums)
 
 
 class TabPageSoDrill(TabPageUnion):
@@ -112,7 +134,7 @@ class TabPageSoDrill(TabPageUnion):
         self.grid.addWidget(self.drill_cm_combo, 8, 2, 2, 1)
 
         self.drill_select_combo.currentTextChanged.connect(self.update_drill_edit)
-        self.sole_drill_line.textChanged.connect(self.update_drill_sole)
+        self.sole_drill_line.textChanged[str].connect(self.update_drill_sole)
 
     def update_drill_sole(self):
         sole_drill_line = self.sole_drill_line.text()
@@ -200,13 +222,13 @@ class DrillWindow(WindowUnion):
         self.tableWidget.setAlternatingRowColors(True)
 
         self.buttonAdd = QPushButton('Добавить записи в таблицу')
-        self.buttonAdd.clicked.connect(self.add_row_table)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_row_table())
         self.buttonDel = QPushButton('Удалить записи из таблице')
-        self.buttonDel.clicked.connect(self.del_row_table)
+        self.buttonDel.clicked[bool].connect(lambda _checked: self.del_row_table())
         self.buttonadd_work = QPushButton('Добавить в план работ')
-        self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
+        self.buttonadd_work.clicked[bool].connect(lambda _checked: self.add_work(), Qt.QueuedConnection)
         self.buttonadd_string = QPushButton('Добавить интервалы бурения')
-        self.buttonadd_string.clicked.connect(self.add_string)
+        self.buttonadd_string.clicked[bool].connect(lambda _checked: self.add_string())
         vbox = QGridLayout(self.centralWidget)
 
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
@@ -344,6 +366,19 @@ class DrillWindow(WindowUnion):
             return
         drill_tuple = []
 
+        bit_mm = None
+        if (self.drilling_bit_diam or "").strip():
+            try:
+                bit_mm = _parse_diameter_mm(self.drilling_bit_diam)
+            except (ValueError, TypeError):
+                QMessageBox.warning(
+                    self,
+                    'ОШИБКА',
+                    f'Некорректный формат диаметра долота: {self.drilling_bit_diam!r}. '
+                    f'Укажите число или два числа через * (например 122*105).',
+                )
+                return
+
         for row in range(rows):
             roof_drill = self.tableWidget.item(row, 0)
             sole_drill = self.tableWidget.item(row, 1)
@@ -352,16 +387,14 @@ class DrillWindow(WindowUnion):
                 roof = int(float(roof_drill.text()))
                 sole = int(float(sole_drill.text()))
                 drill_True = drill_type_combo.currentText()
-                if self.drilling_bit_diam != '':
+                if bit_mm is not None:
                     if self.data_well.column_additional is False or (
                             self.data_well.column_additional and sole < self.data_well.head_column_additional.get_value):
-                        if self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value <= float(
-                                self.drilling_bit_diam):
+                        if self.data_well.column_diameter.get_value - 2 * self.data_well.column_wall_thickness.get_value <= bit_mm:
                             QMessageBox.warning(self, 'ОШИБКА', 'Не корректный диаметр долото')
                             return
                     else:
-                        if self.data_well.column_additional_diameter.get_value - 2 * self.data_well.column_additional_wall_thickness.get_value <= float(
-                                self.drilling_bit_diam):
+                        if self.data_well.column_additional_diameter.get_value - 2 * self.data_well.column_additional_wall_thickness.get_value <= bit_mm:
                             QMessageBox.warning(self, 'ОШИБКА', 'Не корректный диаметр долото')
                             return
 

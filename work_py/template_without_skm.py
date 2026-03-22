@@ -170,12 +170,12 @@ class TabPageSo(TabPageUnion):
 
         self.length_template_first_edit.setText(str(4))
 
-        self.template_first_edit.textChanged.connect(self.update_template)
-        self.length_template_second_edit.textChanged.connect(self.update_template)
-        self.template_second_edit.textChanged.connect(self.update_template)
-        self.dictance_template_second_edit.textChanged.connect(self.update_template)
-        self.dictance_template_first_edit.textChanged.connect(self.update_template)
-        self.length_template_first_edit.textChanged.connect(self.update_template)
+        self.template_first_edit.textChanged[str].connect(self.update_template)
+        self.length_template_second_edit.textChanged[str].connect(self.update_template)
+        self.template_second_edit.textChanged[str].connect(self.update_template)
+        self.dictance_template_second_edit.textChanged[str].connect(self.update_template)
+        self.dictance_template_first_edit.textChanged[str].connect(self.update_template)
+        self.length_template_first_edit.textChanged[str].connect(self.update_template)
         self.kot_question_qcombo.currentTextChanged.connect(self.update_template)
         if self.data_well:
             if self.data_well.plast_work and 'Ойл' in data_list.contractor and \
@@ -606,7 +606,7 @@ class TemplateWithoutSkm(WindowUnion):
         self.table_widget = table_widget
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.add_work)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_work())
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)

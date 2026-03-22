@@ -49,7 +49,7 @@ class TabPageCorrect(TabPageUnion):
         self.index_change_line.setVisible(False)
 
         # self.well_area_edit.setText(f'{self.data_well.well_area.value}')
-        # self.well_area_edit.textChanged.connect(self.update_well)
+        # self.well_area_edit.textChanged[str].connect(self.update_well)
         self.well_number_edit.editingFinished.connect(self.update_well)
         # self.change_pvr_combo.currentTextChanged.connect(self.update_change_pvr)
         # self.change_pvr_combo.setCurrentIndex(1)
@@ -99,7 +99,7 @@ class CorrectPlanWindow(WindowUnion):
         self.old_index = 0
 
         self.buttonadd_work = QPushButton('Загрузить план работ')
-        self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
+        self.buttonadd_work.clicked[bool].connect(lambda _checked: self.add_work(), Qt.QueuedConnection)
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)

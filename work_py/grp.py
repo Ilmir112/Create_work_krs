@@ -23,7 +23,7 @@ class TabPageSoGrp(TabPageUnion):
         self.paker_depth_label = QLabel("Глубина посадки", self)
         self.paker_depth_edit = QLineEdit(self)
         self.paker_depth_edit.setValidator(self.validator_int)
-        self.paker_depth_edit.textChanged.connect(self.update_paker)
+        self.paker_depth_edit.textChanged[str].connect(self.update_paker)
         asaw = self.data_well.perforation_roof
         self.paker_depth_edit.setText(str(int(float(self.data_well.perforation_roof)) - 50))
 
@@ -113,7 +113,7 @@ class GrpWindow(WindowUnion):
         self.table_widget = table_widget
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.add_work)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_work())
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)

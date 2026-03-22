@@ -142,7 +142,7 @@ class TabPageSo(TabPageUnion):
             self.grid.addWidget(self.diameter_paker_label_type, 0, 9)
             self.grid.addWidget(self.diameter_paker_edit, 1, 9)
 
-            self.paker_depth_edit.textChanged.connect(self.update_paker_depth_edit)
+            self.paker_depth_edit.textChanged[str].connect(self.update_paker_depth_edit)
 
             self.tableWidget.min_roof = min(
                 [float(self.tableWidget.item(row, 0).text()) for row in range(self.tableWidget.rowCount())])
@@ -221,13 +221,13 @@ class PerforationWindow(WindowUnion):
         self.tab_widget = TabWidget(self.tableWidget, self.data_well)
 
         self.buttonAdd = QPushButton('Добавить интервалы перфорации в таблицу')
-        self.buttonAdd.clicked.connect(self.add_row_table)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_row_table())
         self.buttonDel = QPushButton('Удалить интервалы перфорации в таблице')
-        self.buttonDel.clicked.connect(self.del_row_table)
+        self.buttonDel.clicked[bool].connect(lambda _checked: self.del_row_table())
         self.buttonadd_work = QPushButton('Добавить в план работ')
-        self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
+        self.buttonadd_work.clicked[bool].connect(lambda _checked: self.add_work(), Qt.QueuedConnection)
         self.buttonAddProject = QPushButton('Добавить проектные интервалы перфорации')
-        self.buttonAddProject.clicked.connect(self.add_perforation_project)
+        self.buttonAddProject.clicked[bool].connect(lambda _checked: self.add_perforation_project())
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)

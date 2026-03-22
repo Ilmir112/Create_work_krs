@@ -76,7 +76,7 @@ class ClassifierWell(MyMainWindow):
         self.edit_well_number = QLineEdit()
         self.edit_well_number.setPlaceholderText("Ввести номер скважины для фильтрации")
 
-        self.edit_well_number.textChanged.connect(self.filter)
+        self.edit_well_number.textChanged[str].connect(self.filter)
         self.edit_well_number.setText(self.number_well)
         layout.addWidget(self.edit_well_number)
 
@@ -124,13 +124,13 @@ class ClassifierWell(MyMainWindow):
         self.edit_well_number = QLineEdit()
         self.edit_well_number.setPlaceholderText("Ввести номер скважины для фильтрации")
 
-        self.edit_well_number.textChanged.connect(self.filter_class)
+        self.edit_well_number.textChanged[str].connect(self.filter_class)
         self.edit_well_number.setText(self.number_well)
         layout.addWidget(self.edit_well_number)
 
         self.edit_well_area = QLineEdit()
         self.edit_well_area.setPlaceholderText("Ввести площадь для фильтрации")
-        self.edit_well_area.textChanged.connect(self.filter_class_area)
+        self.edit_well_area.textChanged[str].connect(self.filter_class_area)
         layout.addWidget(self.edit_well_area)
         region = f'{self.region}_классификатор'
         # print(region)

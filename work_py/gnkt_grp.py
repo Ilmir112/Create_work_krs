@@ -69,7 +69,7 @@ class TabPageDp(QWidget):
         self.grid.addWidget(self.distance_pntzh_line, 5, 5)
         self.grid.addWidget(self.fluid_project_label, 8, 1)
         self.grid.addWidget(self.fluid_project_edit, 9, 1)
-        self.gnkt_number_combo.textChanged.connect(self.update_number_gnkt)
+        self.gnkt_number_combo.textChanged[str].connect(self.update_number_gnkt)
 
     def update_number_gnkt(self, number_gnkt):
         try:

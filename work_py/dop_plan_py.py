@@ -36,7 +36,7 @@ class TabPageDp(TabPageUnion):
 
         self.well_area_label = QLabel('площадь скважины')
         self.well_area_edit = QLineEdit(self)
-        self.well_area_edit.textChanged.connect(self.update_well_area)
+        self.well_area_edit.textChanged[str].connect(self.update_well_area)
 
         self.number_DP_label = QLabel('номер \nдополнительного плана')
         self.number_DP_Combo = QComboBox(self)
@@ -177,7 +177,7 @@ class TabPageDp(TabPageUnion):
                 self.grid.addWidget(self.template_length_addition_label, 6, 5)
                 self.grid.addWidget(self.template_length_addition_edit, 7, 5)
 
-        # self.well_area_edit.textChanged.connect(self.update_well)
+        # self.well_area_edit.textChanged[str].connect(self.update_well)
 
         self.change_pvr_combo.currentTextChanged.connect(self.update_change_pvr)
         self.change_pvr_combo.setCurrentIndex(1)
@@ -307,13 +307,13 @@ class DopPlanWindow(WindowUnion):
         self.tableWidget.setAlternatingRowColors(True)
 
         self.buttonAdd = QPushButton('Добавить интервалы перфорации в таблицу')
-        self.buttonAdd.clicked.connect(self.add_row_table)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_row_table())
         self.buttonDel = QPushButton('Удалить интервалы перфорации в таблице')
-        self.buttonDel.clicked.connect(self.del_row_table)
+        self.buttonDel.clicked[bool].connect(lambda _checked: self.del_row_table())
         self.buttonadd_work = QPushButton('Создать доп план работ')
-        self.buttonadd_work.clicked.connect(self.add_work, Qt.QueuedConnection)
+        self.buttonadd_work.clicked[bool].connect(lambda _checked: self.add_work(), Qt.QueuedConnection)
         self.buttonAddProject = QPushButton('Добавить проектные интервалы перфорации')
-        self.buttonAddProject.clicked.connect(self.add_perforation_project)
+        self.buttonAddProject.clicked[bool].connect(lambda _checked: self.add_perforation_project())
 
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)

@@ -136,9 +136,9 @@ class TabPageSoRir(TabPageUnion):
         self.need_change_zgs_combo.setCurrentIndex(1)
         self.rir_type_combo.currentTextChanged.connect(self.update_rir_type)
 
-        # self.paker_depth_edit.textChanged.connect(self.update_depth_paker)
-        self.roof_rir_edit.textChanged.connect(self.update_volume_cement)
-        self.sole_rir_edit.textChanged.connect(self.update_volume_cement)
+        # self.paker_depth_edit.textChanged[str].connect(self.update_depth_paker)
+        self.roof_rir_edit.textChanged[str].connect(self.update_volume_cement)
+        self.sole_rir_edit.textChanged[str].connect(self.update_volume_cement)
 
         self.paker_need_combo.setCurrentIndex(1)
         self.paker_need_combo.setCurrentIndex(0)
@@ -350,7 +350,7 @@ class RirWindow(WindowUnion):
         self.table_widget = table_widget
 
         self.buttonAdd = QPushButton('Добавить данные в план работ')
-        self.buttonAdd.clicked.connect(self.add_work)
+        self.buttonAdd.clicked[bool].connect(lambda _checked: self.add_work())
         vbox = QGridLayout(self.centralWidget)
         vbox.addWidget(self.tab_widget, 0, 0, 1, 2)
         vbox.addWidget(self.buttonAdd, 2, 0)

@@ -21,7 +21,7 @@ class FloatLineEdit(QLineEdit):
         self.setValidator(p_validator)
 
         # Можно связать изменение текста с проверкой
-        self.textChanged.connect(self.check_text)
+        self.textChanged[str].connect(self.check_text)
 
     def focusOutEvent(self, event):
         super().focusOutEvent(event)
