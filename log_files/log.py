@@ -1,12 +1,14 @@
 import logging
 import sys
 import threading
+import traceback
 
 import requests
 
 from PyQt5.QtCore import Qt, QObject, pyqtSignal
 from PyQt5.QtWidgets import QPlainTextEdit
 
+import data_list
 from server_response import ApiClient
 
 
@@ -21,12 +23,27 @@ class FastAPILogHandler(logging.Handler):
     def emit(self, record):
         try:
             log_entry = self.format(record)
+            # Пытаемся достать full traceback даже если в вызове логгера не передали exc_info=True.
+            # В момент emit() мы обычно находимся внутри except-блока, поэтому sys.exc_info() доступен.
+            exc_info = record.exc_info
+            if not exc_info or exc_info[0] is None:
+                exc_info = sys.exc_info()
+            error_reason = None
+            if exc_info and exc_info[0] is not None:
+                error_reason = "".join(traceback.format_exception(*exc_info))
             payload = {
                 'log': log_entry,
                 'level': record.levelname,
                 'logger': record.name,
                 'filename': record.filename,
-                'line': record.lineno
+                'line': record.lineno,
+                # Контекст, необходимый для быстрого поиска причины на backend
+                'well_number': getattr(data_list, 'current_well_number', None),
+                'well_area': getattr(data_list, 'current_well_area', None),
+                'well_region': getattr(data_list, 'current_well_region', None),
+                'operation_type': getattr(data_list, 'current_operation_type', None),
+                # Полная причина ошибки (traceback)
+                'error_reason': error_reason or record.getMessage(),
             }
             # Выполняем отправку в отдельном потоке, чтобы не блокировать основной поток
             threading.Thread(target=self.send_log, args=(payload,), daemon=True).start()

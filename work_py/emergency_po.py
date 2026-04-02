@@ -155,10 +155,18 @@ class EmergencyPo(WindowUnion):
                                       'Не корректно выбрана компоновка для основной колонны')
             return
 
+        norm_depth = self.data_well.current_bottom
         raid_list = self.emergency_sticking(po_str_combo, nkt_key, emergency_bottom_line, bottom_line)
         self.data_well.current_bottom = bottom_line
 
-        self.populate_row(self.insert_index, raid_list, self.table_widget)
+        emergency_params = {
+            "emergence_type": po_str_combo,
+            "nkt_key": nkt_key,
+            "emergency_bottom": emergency_bottom_line,
+            "bottom_after_lar": bottom_line,
+            "norm_depth": norm_depth,
+        }
+        self.populate_work_rows_with_remote_fallback("emergency_po", emergency_params, self.table_widget, raid_list)
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()

@@ -147,7 +147,16 @@ class VpWindow(WindowUnion):
         #     return
 
         if work_list:
-            self.populate_row(self.insert_index, work_list, self.table_widget)
+            remote_params = {
+                "mode": "czh" if need_question_qcombo == "без ВП" else "vp",
+                "need_question": need_question_qcombo,
+                "vp_type": vp_type_qcombo,
+                "vp_depth": float(vp_depth),
+                "cement_vp": float(cement_vp),
+                "cable_type_text": getattr(self, "cable_type_text", "") or "",
+                "angle_text": getattr(self, "angle_text", "") or "",
+            }
+            self.populate_work_rows_with_remote_fallback("vp_cm", remote_params, self.table_widget, work_list)
             data_list.pause = False
             self.close()
         self.close_modal_forcefully()

@@ -148,7 +148,17 @@ class GnktOsvWindow(GnktModel):
         work_well = self.select_work_plan_opz()
 
         if work_well:
-            self.populate_row(0, work_well, table_widget, self.work_plan)
+            if self.work_plan in ("gnkt_opz", "gnkt_bopz", "gnkt_after_grp"):
+                self.populate_work_rows_with_remote_fallback(
+                    self.work_plan,
+                    {"client_rows": work_well},
+                    table_widget,
+                    work_well,
+                    work_plan=self.work_plan,
+                    insert_index=0,
+                )
+            else:
+                self.populate_row(0, work_well, table_widget, self.work_plan)
             CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
 
     def select_work_plan_opz(self):
@@ -351,7 +361,7 @@ class GnktOsvWindow(GnktModel):
             [None, 10,
              f'Произвести монтаж 4-х секционного превентора БП 80-70.00.00.000 (700атм) {self.data_gnkt.pvo_number} '
              f'и инжектора н'
-             f'а устье скважины согласно «Схемы обвязки № 5 устья противовыбросовым оборудованием при '
+             f'а устье скважины согласно «Схемы обвязки №15 устья противовыбросовым оборудованием при '
              f'производстве работ по промывке скважины с установкой «ГНКТ» утвержденная главным '
              f'инженером  {data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. Произвести обвязку '
              f'установки ГНКТ, насосно-компрессорного '

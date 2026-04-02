@@ -242,6 +242,7 @@ class GeophysicWindow(WindowUnion):
              'Мастер КРС, подрядчик по ГИС', 1.2]
         ]
 
+        surveys = []
         for row in range(rows):
             research_gis_list = []
             item = self.tableWidget.item(row, 0)
@@ -254,6 +255,7 @@ class GeophysicWindow(WindowUnion):
                 geo_sel = self.geophysic_sel(value, edit1_1, edit2_1)
                 research_gis_list.extend([geo_sel[1], None, geo_sel[0], None, None, None, None, None, None, None,
                                           'подряд по ГИС', 4])
+                surveys.append({"type": value, "roof": edit1_1, "sole": edit2_1})
 
             if len(research_gis_list) == 0:
                 QMessageBox.critical(self, 'Ошибка', 'Исследования не добавлены')
@@ -263,15 +265,24 @@ class GeophysicWindow(WindowUnion):
             # print(geophysical_research)
 
         ori = QMessageBox.question(self, 'ОРИ', 'Нужна ли интерпретация?')
-        if ori == QMessageBox.StandardButton.Yes:
+        include_ori = ori == QMessageBox.StandardButton.Yes
+        if include_ori:
             geophysical_research.append(
                 [f'ОРИ', None,
                  f'Интерпретация данных ГИС, согласовать с ПТО и Ведущим инженером ЦДНГ опрессовку фНКТ ',
                  None, None, None, None, None, None, None,
                  'Мастер КРС, подрядчик по ГИС', 8])
 
+        remote_params = {
+            "surveys": surveys,
+            "include_ori": include_ori,
+            "cable_type_text": cable_type_text,
+            "angle_text": angle_text,
+        }
+
         if geophysical_research:
-            self.populate_row(self.insert_index, geophysical_research, self.table_widget)
+            self.populate_work_rows_with_remote_fallback(
+                "geophysic", remote_params, self.table_widget, geophysical_research)
             data_list.pause = False
 
         self.close()

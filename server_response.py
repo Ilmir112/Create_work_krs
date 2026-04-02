@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QMainWindow, QMessageBox
 
 import data_list
 
+
 # Отключаем предупреждения SSL
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -470,6 +471,26 @@ class ApiClient:
     @classmethod
     def update_brief_work_plan_path(cls):
         return "/wells_repair_router/brief_work_plan"
+
+    @classmethod
+    def work_plan_rows_generate_path(cls):
+        return "/work_plan_rows/generate"
+
+    @staticmethod
+    def request_post_json_silent(path, json_body):
+        """POST JSON с Bearer; без QMessageBox при ошибке (для фоновых/опциональных вызовов)."""
+        url = ApiClient.get_endpoint(path)
+        try:
+            token = ApiClient.SETTINGS_TOKEN.value("auth_token", "") if ApiClient.SETTINGS_TOKEN else ""
+            headers = {"Authorization": f"Bearer {token}"}
+            body = ApiClient.serialize_datetime(json_body)
+            response = requests.post(url, json=body, headers=headers, verify=False)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            from log_files.log import logger
+            logger.error(f"request_post_json_silent: {e}")
+            return None
 
 
 class ResponseWork(QMainWindow):

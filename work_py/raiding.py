@@ -314,7 +314,15 @@ class Raid(WindowUnion):
 
         self.data_well.ribbing_interval.extend(raid_tuple)
 
-        self.populate_row(self.insert_index, raid_list, self.table_widget)
+        remote_params = {
+            "raid_intervals": [list(t) for t in raid_tuple],
+            "ryber_key": ryber_key,
+            "nkt_str": nkt_str_combo,
+            "raid_diameter": self.tab_widget.currentWidget().raid_diameter_line.text().strip(),
+            "raid_type_combo": self.tab_widget.currentWidget().raid_type_combo.currentText(),
+            "downhole_motor": self.tab_widget.currentWidget().downhole_motor_line.text(),
+        }
+        self.populate_work_rows_with_remote_fallback("raiding", remote_params, self.table_widget, raid_list)
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()

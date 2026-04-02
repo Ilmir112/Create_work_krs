@@ -3,12 +3,14 @@ from PyQt5.QtWidgets import QMessageBox
 import data_list
 from work_py.descent_gno import GnoDescentWindow
 
+
 def select_ovtr(self):
     ovtr = 'ОВТР 4ч' if self.data_well.region == 'ЧГМ' else 'ОВТР 6ч'
     return ovtr
 
 
-def rgd_without_paker(self):
+def rgd_without_paker_build_rows(self, ori_yes: bool):
+    """Строки РГД по колонне без пакера (ответ ОРИ задаётся снаружи — для API и main)."""
     rgd_list = [
         [f'СП НКТ 300м', None,
          f'Спустить с замером воронку на НКТ до глубины 300м с замером, шаблонированием шаблоном '
@@ -48,9 +50,7 @@ def rgd_without_paker(self):
          f'при открытой затрубной задвижке',
          None, None, None, None, None, None, None,
          'Мастер КРС, подрядчик по ГИС', 20]]
-    ori = QMessageBox.question(None, 'ОРИ', 'Нужна ли интерпретация?')
-    if ori == QMessageBox.StandardButton.Yes:
-
+    if ori_yes:
         ori = f'Интерпретация данных ГИС'
         rgd_list.append([f'ОРИ', None, ori,
                          None, None, None, None, None, None, None,
@@ -59,14 +59,19 @@ def rgd_without_paker(self):
                          f'Поднять компоновку с доливом скважины в объеме 0.3м3 тех. жидкостью  уд.весом'
                          f' {self.data_well.fluid_work}',
                          None, None, None, None, None, None, None,
-                         'Мастер КРС', 1.3])
+                         'мастер КРС', 1.3])
     else:
         rgd_list.append([None, None,
                          f'Поднять компоновку с доливом скважины в объеме 0.3м3 тех. жидкостью  уд.весом '
                          f'{self.data_well.fluid_work}',
                          None, None, None, None, None, None, None,
-                         'Мастер КРС', 1.3])
+                         'мастер КРС', 1.3])
     return rgd_list
+
+
+def rgd_without_paker(self):
+    ori = QMessageBox.question(None, 'ОРИ', 'Нужна ли интерпретация?')
+    return rgd_without_paker_build_rows(self, ori == QMessageBox.StandardButton.Yes)
 
 
 def rgd_with_paker(self):

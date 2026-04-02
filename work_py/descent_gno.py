@@ -233,6 +233,7 @@ class GnoDescentWindow(WindowUnion):
         return True
 
     def add_work(self):
+        work_list = []
         try:
             self.current_widget = self.tab_widget.currentWidget()
             self.lift_key = self.current_widget.gno_combo.currentText()
@@ -258,11 +259,61 @@ class GnoDescentWindow(WindowUnion):
                 'консервация': Conservation(self),
                 'пакер': DescentPaker(self)
             }
-            work_list = self.on_execute_strategy(self.lift_key)
+            work_list = self.on_execute_strategy(self.lift_key) or []
         except Exception as e:
             logger.critical(e)
         if work_list:
-            self.populate_row(self.insert_index, work_list, self.table_widget)
+            cw = self.current_widget
+            len_nkt = sum(list(self.data_well.dict_nkt_after.values()))
+            dist_raw = cw.distance_between_nkt_edit.text()
+            try:
+                dist_n = int(float(dist_raw)) if dist_raw != '' else 300
+            except (TypeError, ValueError):
+                dist_n = 300
+            calc_fond_nkt_str = self.calc_fond_nkt(len_nkt, str(dist_n))
+            privyazka_angle_text = ''
+            if self.data_well.angle_data and self.data_well.max_angle.get_value > 60:
+                privyazka_angle_text = self.calculate_angle_grad(self.data_well.angle_data)
+            need_jump = 'Нет'
+            if self.data_well.region == 'КГМ':
+                need_jump = cw.need_juming_after_sko_combo.currentText()
+            rgd_q = 'Нет'
+            if self.lift_key == 'пакер':
+                rgd_q = cw.rgd_question_combo.currentText()
+            rgd_include_ori = False
+            if (
+                self.lift_key == 'пакер'
+                and rgd_q == 'Да'
+                and self.data_well.column_additional
+                and self.data_well.depth_fond_paker_before['after']
+                >= self.data_well.head_column_additional.get_value
+            ):
+                ori_ans = QMessageBox.question(self, 'ОРИ', 'Нужна ли интерпретация?')
+                rgd_include_ori = ori_ans == QMessageBox.StandardButton.Yes
+            remote_params = {
+                'lift_key': self.lift_key,
+                'nkt_edit': cw.nkt_edit.text(),
+                'sucker_edit': cw.sucker_edit.text(),
+                'distance_between_nkt': dist_n,
+                'need_juming_after_sko': need_jump,
+                'rgd_question': rgd_q,
+                'calc_fond_nkt_str': calc_fond_nkt_str,
+                'privyazka_angle_text': privyazka_angle_text,
+                'rgd_include_ori': rgd_include_ori,
+            }
+            if (
+                self.data_well.region == 'КГМ'
+                and need_jump == 'Да'
+                and self.lift_key not in ('НВ', 'НН')
+                and getattr(self.data_well, 'gips_in_well', False)
+            ):
+                from work_py.template_work import TemplateKrs
+
+                strategy_for_pero = self.lift_dict_strategies[self.lift_key]
+                remote_params['pero_jump_rows'] = TemplateKrs.pero(strategy_for_pero)
+            self.populate_work_rows_with_remote_fallback(
+                "descent_gno", remote_params, self.table_widget, work_list
+            )
             data_list.pause = False
             self.close()
             self.close_modal_forcefully()

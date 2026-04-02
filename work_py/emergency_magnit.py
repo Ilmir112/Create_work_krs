@@ -182,7 +182,18 @@ class EmergencyMagnit(WindowUnion):
         raid_list = self.emergency_magnit(print_diameter_line, nkt_str_combo, print_type_combo, nkt_key,
                                           emergency_bottom_line)
 
-        self.populate_row(self.insert_index, raid_list, self.table_widget)
+        self.populate_work_rows_with_remote_fallback(
+            "emergency_magnit",
+            {
+                "nkt_key": nkt_key,
+                "print_diameter_line": str(print_diameter_line),
+                "nkt_str_combo": nkt_str_combo,
+                "print_type_combo": print_type_combo,
+                "emergency_bottom": emergency_bottom_line,
+            },
+            self.table_widget,
+            raid_list,
+        )
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()

@@ -1,4 +1,5 @@
 import json
+import copy
 from openpyxl.styles import Font, Alignment
 import data_list
 
@@ -22,256 +23,313 @@ from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 class TabPageDp(TabPageUnion):
     def __init__(self, data_well, tableWidget, old_index, parent=None):
         super().__init__(data_well)
-
-        self.tableWidget = tableWidget
-        self.old_index = old_index
-
-        self.validator_int = QIntValidator(0, 8000)
-        self.validator_float = QDoubleValidator(0, 8000, 1)
-        self.work_plan = data_well.work_plan
-
-        self.well_number_label = QLabel('номер скважины')
-        self.well_number_edit = QLineEdit(self)
-        # self.well_number_edit.setValidator(self.validator_int)
-
-        self.well_area_label = QLabel('площадь скважины')
-        self.well_area_edit = QLineEdit(self)
-        self.well_area_edit.textChanged[str].connect(self.update_well_area)
-
-        self.number_DP_label = QLabel('номер \nдополнительного плана')
-        self.number_DP_Combo = QComboBox(self)
-
-        self.number_DP_Combo.addItems(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'])
-        if self.data_well.number_dp != 0:
-            self.number_DP_Combo.setCurrentIndex(int(self.data_well.number_dp) - 1)
-
-        self.current_bottom_label = QLabel('Забой текущий')
-        self.current_bottom_edit = QLineEdit(self)
-        self.current_bottom_edit.setValidator(self.validator_float)
-        # self.current_bottom_edit.setText(f'{self.data_well.current_bottom}')
-
-        self.current_bottom_date_label = QLabel('дата определения забоя')
-        self.current_bottom_date_edit = QDateEdit(self)
-        self.current_bottom_date_edit.setDisplayFormat("dd.MM.yyyy")
-        self.current_bottom_date_edit.setDate(datetime.now())
-
-        self.method_bottom_label = QLabel('Метод определения \nзабоя')
-        self.method_bottom_combo = QComboBox(self)
-        self.method_bottom_combo.addItems(['', 'ГИС', 'НКТ'])
-
-        self.template_depth_label = QLabel('Глубина \nшаблонирования ЭК')
-        self.template_depth_edit = QLineEdit(self)
-        self.template_depth_edit.setValidator(self.validator_float)
-        # self.template_depth_edit.setText(str(self.data_well.template_depth))
-
-        self.template_length_label = QLabel('Длина шаблона')
-        self.template_length_edit = QLineEdit(self)
-        self.template_length_edit.setValidator(self.validator_float)
-
-        self.change_pvr_combo_label = QLabel('Были ли изменения \nв интервале перфорации')
-        self.change_pvr_combo = QComboBox(self)
-        self.change_pvr_combo.addItems(['', 'Нет', 'Да'])
-
-        self.skm_interval_label = QLabel('интервалы \nскреперования')
-        self.skm_interval_edit = QLineEdit(self)
-
-        self.raiding_interval_label = QLabel('интервалы \n райбирования')
-        self.raiding_interval_edit = QLineEdit(self)
-
-        self.table_name = ''
-
-        self.fluid_label = QLabel("уд.вес жидкости глушения", self)
-        self.fluid_edit = QTextEdit(self)
-        self.fluid_edit.setAlignment(Qt.AlignLeft)
-
-        self.plast_label = QLabel("пласта")
-        self.plast_line = QLineEdit(self)
-        self.vertical_label = QLabel("по вертикале")
-        self.vertical_line = QLineEdit(self)
-        self.roof_label = QLabel("Кровля")
-        self.roof_edit = QLineEdit(self)
-        self.sole_label = QLabel("Подошва")
-        self.sole_edit = QLineEdit(self)
-        self.date_pvr_label = QLabel("Дата")
-        self.date_pvr_edit = QDateEdit(self)
-        self.date_pvr_edit.setDisplayFormat("dd.MM.yyyy")
-        self.count_pvr_label = QLabel("Кол-во отв")
-        self.count_pvr_edit = QLineEdit(self)
-        self.type_pvr_label = QLabel("Тип перфоратора")
-        self.type_pvr_edit = QLineEdit(self)
-        self.pressure_pvr_label = QLabel("Давление")
-        self.pressure_pvr_edit = QLineEdit(self)
-        self.date_pressure_label = QLabel("Дата замера")
-        self.date_pressure_edit = QDateEdit(self)
-        self.date_pressure_edit.setDisplayFormat("dd.MM.yyyy")
-
-        # if self.data_well.fluid_work == '':
-        #     self.fluid_edit.setText(f'{TabPageGno.calc_fluid(self.work_plan, self.data_well.current_bottom)}')
-        # else:
-        #     self.fluid_edit.setText(f'{self.data_well.fluid_work}')
-
-        self.work_label = QLabel("Ранее проведенные работы:", self)
-        self.work_edit = QTextEdit(self)
-
-        # self.work_edit.setFixedWidth(300)
-        self.work_edit.setAlignment(Qt.AlignLeft)
-
-        # self.grid = QGridLayout(self)
-
-        self.grid.addWidget(self.well_number_label, 2, 1)
-        self.grid.addWidget(self.well_number_edit, 3, 1)
-
-        self.grid.addWidget(self.well_area_label, 2, 2)
-        self.grid.addWidget(self.well_area_edit, 3, 2)
-
-        self.grid.addWidget(self.well_area_label, 2, 3)
-        self.grid.addWidget(self.well_area_edit, 3, 3)
-
-        self.grid.addWidget(self.number_DP_label, 2, 4)
-        self.grid.addWidget(self.number_DP_Combo, 3, 4)
-
-        self.grid.addWidget(self.current_bottom_label, 4, 1)
-        self.grid.addWidget(self.current_bottom_edit, 5, 1)
-        self.grid.addWidget(self.current_bottom_date_label, 4, 2)
-        self.grid.addWidget(self.current_bottom_date_edit, 5, 2)
-        self.grid.addWidget(self.method_bottom_label, 4, 3)
-        self.grid.addWidget(self.method_bottom_combo, 5, 3)
-
-        self.grid.addWidget(self.fluid_label, 4, 4, 1, 6)
-        self.grid.addWidget(self.fluid_edit, 5, 4, 1, 6)
-        self.grid.addWidget(self.template_depth_label, 6, 1)
-        self.grid.addWidget(self.template_depth_edit, 7, 1)
-        self.grid.addWidget(self.template_length_label, 6, 2)
-        self.grid.addWidget(self.template_length_edit, 7, 2)
-        self.grid.addWidget(self.skm_interval_label, 8, 1, 1, 2)
-        self.grid.addWidget(self.skm_interval_edit, 9, 1, 1, 2)
-        self.grid.addWidget(self.raiding_interval_label, 8, 3, 1, 3)
-        self.grid.addWidget(self.raiding_interval_edit, 9, 3, 1, 3)
-        self.grid.addWidget(self.change_pvr_combo_label, 10, 1)
-        self.grid.addWidget(self.change_pvr_combo, 11, 1)
-
-        self.grid.addWidget(self.work_label, 25, 1)
-        self.grid.addWidget(self.work_edit, 26, 1, 2, 4)
-
-        self.well_number_edit.editingFinished.connect(self.update_well)
         try:
-            self.well_area_edit.setText(f'{self.data_well.well_area.get_value}')
-            self.well_number_edit.setText(f'{self.data_well.well_number.get_value}')
-            self.well_area_edit.setEnabled(False)
-            # self.well_number_edit.setEnabled(False)
-        except Exception:
-            pass
-        if self.work_plan in 'dop_plan':
-            if self.data_well.column_additional:
-                self.template_depth_addition_label = QLabel('Глубина спуска шаблона в доп колонне')
-                self.template_depth_addition_edit = QLineEdit(self)
-                self.template_depth_addition_edit.setValidator(self.validator_float)
-                self.template_depth_addition_edit.setText(str(self.data_well.template_depth_addition))
+            self.tableWidget = tableWidget
+            self.old_index = old_index
 
-                self.template_length_addition_label = QLabel('Длина шаблона в доп колонне')
-                self.template_length_addition_edit = QLineEdit(self)
-                self.template_length_addition_edit.setValidator(self.validator_float)
-                self.template_length_addition_edit.setText(str(self.data_well.template_length_addition))
-                self.grid.addWidget(self.template_depth_addition_label, 6, 4)
-                self.grid.addWidget(self.template_depth_addition_edit, 7, 4)
-                self.grid.addWidget(self.template_length_addition_label, 6, 5)
-                self.grid.addWidget(self.template_length_addition_edit, 7, 5)
+            self.validator_int = QIntValidator(0, 8000)
+            self.validator_float = QDoubleValidator(0, 8000, 1)
+            self.work_plan = data_well.work_plan
 
-        # self.well_area_edit.textChanged[str].connect(self.update_well)
+            self.well_number_label = QLabel('номер скважины')
+            self.well_number_edit = QLineEdit(self)
+            # self.well_number_edit.setValidator(self.validator_int)
 
-        self.change_pvr_combo.currentTextChanged.connect(self.update_change_pvr)
-        self.change_pvr_combo.setCurrentIndex(1)
-        self.change_pvr_combo.setCurrentIndex(0)
+            self.well_area_label = QLabel('площадь скважины')
+            self.well_area_edit = QLineEdit(self)
+            self.well_area_edit.textChanged[str].connect(self.update_well_area)
 
-        if data_list.data_in_base:
-            # self.table_in_base_label = QLabel('данные по скважине')
-            # self.table_in_base_combo = QComboBox()
-            # self.table_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
+            self.number_DP_label = QLabel('номер \nдополнительного плана')
+            self.number_DP_Combo = QComboBox(self)
 
-            self.well_data_label = QLabel('файл excel в базе')
-            self.well_data_in_base_combo = QComboBox()
-            self.well_data_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
-            self.well_data_in_base_combo.currentTextChanged.connect(self.update_well_data_in_base_combo)
+            self.number_DP_Combo.addItems(["", '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'])
+            if self.data_well.number_dp != 0:
+                self.number_DP_Combo.setCurrentIndex(int(self.data_well.number_dp) - 1)
 
-            self.index_change_label = QLabel('пункт после которого происходят изменения')
-            self.index_change_line = QLineEdit(self)
-            self.index_change_line.setValidator(self.validator_int)
+            self.current_bottom_label = QLabel('Забой текущий')
+            self.current_bottom_edit = QLineEdit(self)
+            self.current_bottom_edit.setValidator(self.validator_float)
+            # self.current_bottom_edit.setText(f'{self.data_well.current_bottom}')
 
-            self.grid.addWidget(self.well_data_label, 2, 6)
-            self.grid.addWidget(self.well_data_in_base_combo, 3, 6)
-            self.grid.addWidget(self.index_change_label, 2, 7)
-            self.grid.addWidget(self.index_change_line, 3, 7)
+            self.current_bottom_date_label = QLabel('дата определения забоя')
+            self.current_bottom_date_edit = QDateEdit(self)
+            self.current_bottom_date_edit.setDisplayFormat("dd.MM.yyyy")
+            self.current_bottom_date_edit.setDate(datetime.now())
 
-            self.index_change_line.editingFinished.connect(self.update_table_in_base_combo)
+            self.method_bottom_label = QLabel('Метод определения \nзабоя')
+            self.method_bottom_combo = QComboBox(self)
+            self.method_bottom_combo.addItems(['', 'ГИС', 'НКТ'])
+
+            self.template_depth_label = QLabel('Глубина \nшаблонирования ЭК')
+            self.template_depth_edit = QLineEdit(self)
+            self.template_depth_edit.setValidator(self.validator_float)
+            # self.template_depth_edit.setText(str(self.data_well.template_depth))
+
+            self.template_length_label = QLabel('Длина шаблона')
+            self.template_length_edit = QLineEdit(self)
+            self.template_length_edit.setValidator(self.validator_float)
+
+            self.change_pvr_combo_label = QLabel('Были ли изменения \nв интервале перфорации')
+            self.change_pvr_combo = QComboBox(self)
+            self.change_pvr_combo.addItems(['', 'Нет', 'Да'])
+
+            self.skm_interval_label = QLabel('интервалы \nскреперования')
+            self.skm_interval_edit = QLineEdit(self)
+
+            self.raiding_interval_label = QLabel('интервалы \n райбирования')
+            self.raiding_interval_edit = QLineEdit(self)
+
+            self.table_name = ''
+
+            self.fluid_label = QLabel("уд.вес жидкости глушения", self)
+            self.fluid_edit = QTextEdit(self)
+            self.fluid_edit.setAlignment(Qt.AlignLeft)
+
+            self.plast_label = QLabel("пласта")
+            self.plast_line = QLineEdit(self)
+            self.vertical_label = QLabel("по вертикале")
+            self.vertical_line = QLineEdit(self)
+            self.roof_label = QLabel("Кровля")
+            self.roof_edit = QLineEdit(self)
+            self.sole_label = QLabel("Подошва")
+            self.sole_edit = QLineEdit(self)
+            self.date_pvr_label = QLabel("Дата")
+            self.date_pvr_edit = QDateEdit(self)
+            self.date_pvr_edit.setDisplayFormat("dd.MM.yyyy")
+            self.count_pvr_label = QLabel("Кол-во отв")
+            self.count_pvr_edit = QLineEdit(self)
+            self.type_pvr_label = QLabel("Тип перфоратора")
+            self.type_pvr_edit = QLineEdit(self)
+            self.pressure_pvr_label = QLabel("Давление")
+            self.pressure_pvr_edit = QLineEdit(self)
+            self.date_pressure_label = QLabel("Дата замера")
+            self.date_pressure_edit = QDateEdit(self)
+            self.date_pressure_edit.setDisplayFormat("dd.MM.yyyy")
+
+            # if self.data_well.fluid_work == '':
+            #     self.fluid_edit.setText(f'{TabPageGno.calc_fluid(self.work_plan, self.data_well.current_bottom)}')
+            # else:
+            #     self.fluid_edit.setText(f'{self.data_well.fluid_work}')
+
+            self.work_label = QLabel("Ранее проведенные работы:", self)
+            self.work_edit = QTextEdit(self)
+
+            # self.work_edit.setFixedWidth(300)
+            self.work_edit.setAlignment(Qt.AlignLeft)
+
+            # self.grid = QGridLayout(self)
+
+            self.grid.addWidget(self.well_number_label, 2, 1)
+            self.grid.addWidget(self.well_number_edit, 3, 1)
+
+            self.grid.addWidget(self.well_area_label, 2, 2)
+            self.grid.addWidget(self.well_area_edit, 3, 2)
+
+            self.grid.addWidget(self.well_area_label, 2, 3)
+            self.grid.addWidget(self.well_area_edit, 3, 3)
+
+            self.grid.addWidget(self.number_DP_label, 2, 4)
+            self.grid.addWidget(self.number_DP_Combo, 3, 4)
+
+            self.grid.addWidget(self.current_bottom_label, 4, 1)
+            self.grid.addWidget(self.current_bottom_edit, 5, 1)
+            self.grid.addWidget(self.current_bottom_date_label, 4, 2)
+            self.grid.addWidget(self.current_bottom_date_edit, 5, 2)
+            self.grid.addWidget(self.method_bottom_label, 4, 3)
+            self.grid.addWidget(self.method_bottom_combo, 5, 3)
+
+            self.grid.addWidget(self.fluid_label, 4, 4, 1, 6)
+            self.grid.addWidget(self.fluid_edit, 5, 4, 1, 6)
+            self.grid.addWidget(self.template_depth_label, 6, 1)
+            self.grid.addWidget(self.template_depth_edit, 7, 1)
+            self.grid.addWidget(self.template_length_label, 6, 2)
+            self.grid.addWidget(self.template_length_edit, 7, 2)
+            self.grid.addWidget(self.skm_interval_label, 8, 1, 1, 2)
+            self.grid.addWidget(self.skm_interval_edit, 9, 1, 1, 2)
+            self.grid.addWidget(self.raiding_interval_label, 8, 3, 1, 3)
+            self.grid.addWidget(self.raiding_interval_edit, 9, 3, 1, 3)
+            self.grid.addWidget(self.change_pvr_combo_label, 10, 1)
+            self.grid.addWidget(self.change_pvr_combo, 11, 1)
+
+            self.grid.addWidget(self.work_label, 25, 1)
+            self.grid.addWidget(self.work_edit, 26, 1, 2, 4)
+
+            self.well_number_edit.editingFinished.connect(self.update_well)
+            try:
+                self.well_area_edit.setText(f'{self.data_well.well_area.get_value}')
+                self.well_number_edit.setText(f'{self.data_well.well_number.get_value}')
+                self.well_area_edit.setEnabled(False)
+                # self.well_number_edit.setEnabled(False)
+            except Exception:
+                pass
+            if self.work_plan in 'dop_plan':
+                if self.data_well.column_additional:
+                    self.template_depth_addition_label = QLabel('Глубина спуска шаблона в доп колонне')
+                    self.template_depth_addition_edit = QLineEdit(self)
+                    self.template_depth_addition_edit.setValidator(self.validator_float)
+                    self.template_depth_addition_edit.setText(str(self.data_well.template_depth_addition))
+
+                    self.template_length_addition_label = QLabel('Длина шаблона в доп колонне')
+                    self.template_length_addition_edit = QLineEdit(self)
+                    self.template_length_addition_edit.setValidator(self.validator_float)
+                    self.template_length_addition_edit.setText(str(self.data_well.template_length_addition))
+                    self.grid.addWidget(self.template_depth_addition_label, 6, 4)
+                    self.grid.addWidget(self.template_depth_addition_edit, 7, 4)
+                    self.grid.addWidget(self.template_length_addition_label, 6, 5)
+                    self.grid.addWidget(self.template_length_addition_edit, 7, 5)
+
+            # self.well_area_edit.textChanged[str].connect(self.update_well)
+
+            self.change_pvr_combo.currentTextChanged.connect(self.update_change_pvr)
+            self.change_pvr_combo.setCurrentIndex(1)
+            self.change_pvr_combo.setCurrentIndex(0)
+
+            if data_list.data_in_base:
+                # self.table_in_base_label = QLabel('данные по скважине')
+                # self.table_in_base_combo = QComboBox()
+                # self.table_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
+
+                self.well_data_label = QLabel('файл excel в базе')
+                self.well_data_in_base_combo = QComboBox()
+                self.well_data_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
+                self.well_data_in_base_combo.currentTextChanged.connect(self.update_well_data_in_base_combo)
+
+                self.index_change_label = QLabel('пункт после которого происходят изменения')
+                self.index_change_line = QLineEdit(self)
+                self.index_change_line.setValidator(self.validator_int)
+
+                self.grid.addWidget(self.well_data_label, 2, 6)
+                self.grid.addWidget(self.well_data_in_base_combo, 3, 6)
+                self.grid.addWidget(self.index_change_label, 2, 7)
+                self.grid.addWidget(self.index_change_line, 3, 7)
+
+                self.index_change_line.editingFinished.connect(self.update_table_in_base_combo)
+        except Exception as e:
+            # Главное: не падать всей вкладкой при проблемах с данными/виджетами.
+            logger.exception("TabPageDp initialization failed")
+            try:
+                QMessageBox.critical(
+                    self,
+                    'Ошибка',
+                    f'Ошибка инициализации вкладки доп. плана работ: {e}'
+                )
+            except Exception:
+                pass
+            if hasattr(self, "tableWidget"):
+                try:
+                    self.tableWidget.hide()
+                except Exception:
+                    pass
 
     def update_well_data_in_base_combo(self, index):
-        if index:
-            if index.split(' ')[3] not in ['ПР', "ПРС"]:
-                number_dp_in_base = [num for num in index.split(' ')[3] if num.isdigit()][0]
-                self.number_DP_Combo.setCurrentIndex(int(number_dp_in_base))
+        try:
+            if index:
+                if index.split(' ')[3] not in ['ПР', "ПРС"]:
+                    number_dp_in_base = [num for num in index.split(' ')[3] if num.isdigit()]
+                    if number_dp_in_base:
+                        self.number_DP_Combo.setCurrentIndex(int(number_dp_in_base[0]))
+                    else:
+                        QMessageBox.warning(
+                            self,
+                            'Внимание',
+                            'В данных из базы не найден номер дополнительного плана. Нужно выбрать номер дополнительного плана вручную.'
+                        )
+                        self.number_DP_Combo.setCurrentIndex(0)
+        except Exception as e:
+            logger.exception("update_well_data_in_base_combo failed")
+            try:
+                QMessageBox.warning(
+                    self,
+                    'Ошибка',
+                    f'Не удалось обновить номер доп. плана из базы: {e}'
+                )
+            except Exception:
+                pass
 
     def update_change_pvr(self, index):
-        if self.old_index == 0:
-            self.tableWidget.setHorizontalHeaderLabels(
-                ["Пласт/\nГоризонт", "по вертикали", "кровля,\n м", "подошва, \nм",
-                 "Дата\n вскрытия", "Дата \nотключения", "кол-во \nотвер", "Тип \nперф", 'Удлинение,\nм',
-                 "Рпл, \nатм", "Дата \nзамера"])
-            for i in range(11):
-                self.tableWidget.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
-        else:
-            self.tableWidget.setHorizontalHeaderLabels(
-                ["Пласт/\nГоризонт", "по вертикали", "кровля,\n м", "подошва, \nм",
-                 "Дата\n вскрытия\отключения", "кол-во \nотвер", "Тип \nперф", 'Удлинение,\nм',
-                 "Рпл, \nатм", "Дата \nзамера"])
-            for i in range(10):
-                self.tableWidget.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
+        try:
+            if self.old_index == 0:
+                self.tableWidget.setHorizontalHeaderLabels(
+                    ["Пласт/\nГоризонт", "по вертикали", "кровля,\n м", "подошва, \nм",
+                     "Дата\n вскрытия", "Дата \nотключения", "кол-во \nотвер", "Тип \nперф", 'Удлинение,\nм',
+                     "Рпл, \nатм", "Дата \nзамера"])
+                for i in range(11):
+                    self.tableWidget.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
+            else:
+                self.tableWidget.setHorizontalHeaderLabels(
+                    ["Пласт/\nГоризонт", "по вертикали", "кровля,\n м", "подошва, \nм",
+                     "Дата\n вскрытия\отключения", "кол-во \nотвер", "Тип \nперф", 'Удлинение,\nм',
+                     "Рпл, \nатм", "Дата \nзамера"])
+                for i in range(10):
+                    self.tableWidget.horizontalHeader().setSectionResizeMode(i, QHeaderView.Stretch)
 
-        if index == 'Да':
-            self.grid.addWidget(self.plast_label, 12, 1)
-            self.grid.addWidget(self.plast_line, 13, 1)
-            self.grid.addWidget(self.vertical_label, 12, 2)
-            self.grid.addWidget(self.vertical_line, 13, 2)
-            self.grid.addWidget(self.roof_label, 12, 3)
-            self.grid.addWidget(self.roof_edit, 13, 3)
-            self.grid.addWidget(self.sole_label, 12, 4)
-            self.grid.addWidget(self.sole_edit, 13, 4)
-            self.grid.addWidget(self.date_pvr_label, 12, 5)
-            self.grid.addWidget(self.date_pvr_edit, 13, 5)
-            self.grid.addWidget(self.count_pvr_label, 12, 6)
-            self.grid.addWidget(self.count_pvr_edit, 13, 6)
-            self.grid.addWidget(self.type_pvr_label, 12, 7)
-            self.grid.addWidget(self.type_pvr_edit, 13, 7)
-            self.grid.addWidget(self.pressure_pvr_label, 12, 8)
-            self.grid.addWidget(self.pressure_pvr_edit, 13, 8)
-            self.grid.addWidget(self.date_pressure_label, 12, 9)
-            self.grid.addWidget(self.date_pressure_edit, 13, 9)
-            self.tableWidget.show()
-        else:
-            self.pressure_pvr_label.setParent(None)
-            self.date_pressure_label.setParent(None)
-            self.pressure_pvr_edit.setParent(None)
-            self.date_pressure_edit.setParent(None)
-            self.vertical_line.setParent(None)
-            self.plast_label.setParent(None)
-            self.plast_line.setParent(None)
-            self.vertical_label.setParent(None)
+            if index == 'Да':
+                self.grid.addWidget(self.plast_label, 12, 1)
+                self.grid.addWidget(self.plast_line, 13, 1)
+                self.grid.addWidget(self.vertical_label, 12, 2)
+                self.grid.addWidget(self.vertical_line, 13, 2)
+                self.grid.addWidget(self.roof_label, 12, 3)
+                self.grid.addWidget(self.roof_edit, 13, 3)
+                self.grid.addWidget(self.sole_label, 12, 4)
+                self.grid.addWidget(self.sole_edit, 13, 4)
+                self.grid.addWidget(self.date_pvr_label, 12, 5)
+                self.grid.addWidget(self.date_pvr_edit, 13, 5)
+                self.grid.addWidget(self.count_pvr_label, 12, 6)
+                self.grid.addWidget(self.count_pvr_edit, 13, 6)
+                self.grid.addWidget(self.type_pvr_label, 12, 7)
+                self.grid.addWidget(self.type_pvr_edit, 13, 7)
+                self.grid.addWidget(self.pressure_pvr_label, 12, 8)
+                self.grid.addWidget(self.pressure_pvr_edit, 13, 8)
+                self.grid.addWidget(self.date_pressure_label, 12, 9)
+                self.grid.addWidget(self.date_pressure_edit, 13, 9)
+                self.tableWidget.show()
+            else:
+                self.pressure_pvr_label.setParent(None)
+                self.date_pressure_label.setParent(None)
+                self.pressure_pvr_edit.setParent(None)
+                self.date_pressure_edit.setParent(None)
+                self.vertical_line.setParent(None)
+                self.plast_label.setParent(None)
+                self.plast_line.setParent(None)
+                self.vertical_label.setParent(None)
 
-            self.roof_label.setParent(None)
-            self.roof_edit.setParent(None)
-            self.sole_label.setParent(None)
-            self.sole_edit.setParent(None)
-            self.date_pvr_label.setParent(None)
-            self.date_pvr_edit.setParent(None)
-            self.count_pvr_label.setParent(None)
-            self.count_pvr_edit.setParent(None)
-            self.type_pvr_label.setParent(None)
-            self.type_pvr_edit.setParent(None)
-            self.tableWidget.hide()
+                self.roof_label.setParent(None)
+                self.roof_edit.setParent(None)
+                self.sole_label.setParent(None)
+                self.sole_edit.setParent(None)
+                self.date_pvr_label.setParent(None)
+                self.date_pvr_edit.setParent(None)
+                self.count_pvr_label.setParent(None)
+                self.count_pvr_edit.setParent(None)
+                self.type_pvr_label.setParent(None)
+                self.type_pvr_edit.setParent(None)
+                self.tableWidget.hide()
 
-            # self.table_in_base_combo.currentTextChanged.connect(self.update_table_in_base_combo)
+                # self.table_in_base_combo.currentTextChanged.connect(self.update_table_in_base_combo)
+        except Exception as e:
+            logger.exception("update_change_pvr failed")
+            try:
+                QMessageBox.warning(
+                    self,
+                    'Ошибка',
+                    f'Не удалось обновить блок ПВР (перфорация): {e}'
+                )
+            except Exception:
+                pass
 
     def update_table_name(self):
-        self.index_change_line.setText('0')
+        try:
+            self.index_change_line.setText('0')
+        except Exception as e:
+            logger.exception("update_table_name failed")
+            try:
+                QMessageBox.warning(
+                    self,
+                    'Ошибка',
+                    f'Не удалось сбросить поле индекса изменения: {e}'
+                )
+            except Exception:
+                pass
 
 
 class TabWidget(TabWidgetUnion):
@@ -637,7 +695,7 @@ class DopPlanWindow(WindowUnion):
 
             change_pvr_combo = current_widget.change_pvr_combo.currentText()
             if change_pvr_combo == '':
-                QMessageBox.warning(self, 'Ошибка', 'Нужно выбрать пункт изменения ПВР')
+                QMessageBox.warning(self, 'Ошибка', 'Нужно выбрать пункт изменен ли интервалы ПВР')
                 return
             if data_list.data_in_base:
                 fluid = current_widget.fluid_edit.toPlainText().replace(',', '.')
@@ -679,6 +737,9 @@ class DopPlanWindow(WindowUnion):
 
                 if number_dp != '':
                     self.data_well.number_dp = int(float(number_dp))
+                else:
+                    QMessageBox.warning(self, 'Внимание', 'Нужно выбрать номер дополнительного плана вручную.')
+                    return
 
                 if (0.87 <= float(fluid[:3].replace(',', '.')) <= 1.64) == False:
                     QMessageBox.critical(self, 'рабочая жидкость',
@@ -815,24 +876,44 @@ class DopPlanWindow(WindowUnion):
                     data_list.data, data_list.row_heights, data_list.col_width, data_list.boundaries_dict = \
                         self.change_pvr_in_bottom(self.data, self.row_heights, self.col_width, self.boundaries_dict,
                                                   current_bottom, current_bottom_date_edit, method_bottom_combo)
+                work_list = self.work_list(work_earlier)
+                data_list.dop_work_list = work_list
+
+                # Для `dop_plan_in_base` итоговый Excel собирается из `data_list.data`
+                # (см. `main.py` → `insert_data_new_excel_file(...)`), поэтому нужно вставлять строки
+                # и в Excel-JSON, а не только в UI-таблицу.
                 if data_list.data_in_base:
-                    data_list.dop_work_list = self.work_list(work_earlier)
+                    data_list.data, data_list.row_heights, data_list.boundaries_dict = (
+                        self._insert_rows_into_excel_json(
+                            data_list.data,
+                            data_list.row_heights,
+                            data_list.boundaries_dict,
+                            insert_row=self.data_well.insert_index2,
+                            rows_values=work_list,
+                        )
+                    )
                 else:
-                    work_list = self.work_list(work_earlier)
-                    self.populate_row(self.insert_index + 3, work_list, self.table_widget, self.work_plan)
+                    self.populate_work_rows_with_remote_fallback(
+                        "dop_plan_py",
+                        {},
+                        self.table_widget,
+                        work_list,
+                        work_plan=self.work_plan,
+                        insert_index=self.insert_index + 3,
+                    )
 
-                    if len(self.data_well.dict_perforation) != 0:
-                        for plast, vertical_line, roof_int, sole_int, date_pvr_edit, count_pvr_edit, \
-                                type_pvr_edit, pressure_pvr_edit, date_pressure_edit in self.data_well.dict_perforation:
-                            self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
-                            self.data_well.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+                if len(self.data_well.dict_perforation) != 0:
+                    for plast, vertical_line, roof_int, sole_int, date_pvr_edit, count_pvr_edit, \
+                            type_pvr_edit, pressure_pvr_edit, date_pressure_edit in self.data_well.dict_perforation:
+                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
+                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
 
-                            self.data_well.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append(
-                                (float(roof_int), float(sole_int)))
-                            self.data_well.dict_perforation_short.setdefault(plast, {}).setdefault('интервал', []).append(
-                                (float(roof_int), float(sole_int)))
-                            self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
-                            self.data_well.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
+                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append(
+                            (float(roof_int), float(sole_int)))
+                        self.data_well.dict_perforation_short.setdefault(plast, {}).setdefault('интервал', []).append(
+                            (float(roof_int), float(sole_int)))
+                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
+                        self.data_well.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
 
             else:
                 fluid = current_widget.fluid_edit.toPlainText().replace(',', '.')
@@ -897,7 +978,9 @@ class DopPlanWindow(WindowUnion):
 
                 work_list = self.work_list(work_earlier)
                 # self.data_well.insert_index2 = self.insert_index
-                self.populate_row(self.insert_index, work_list, self.table_widget, self.work_plan)
+                self.populate_work_rows_with_remote_fallback(
+                    "dop_plan_py", {}, self.table_widget, work_list, work_plan=self.work_plan
+                )
                 definition_plast_work(self)
         except Exception as e:
             logger.critical(e)
@@ -905,6 +988,174 @@ class DopPlanWindow(WindowUnion):
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()
+
+    @staticmethod
+    def _insert_rows_into_excel_json(data: dict, row_heights: list, boundaries_dict: dict, insert_row: int,
+                                    rows_values: list):
+        """
+        Вставляет строки (rows_values) в Excel-JSON `data` со сдвигом индексов, высот строк и merged-cells.
+        `insert_row` — 1-based номер строки Excel, куда вставляем (до существующей строки).
+        """
+        if not isinstance(data, dict) or not rows_values:
+            return data, row_heights, boundaries_dict
+
+        # Сначала пытаемся найти строку "Порядок работы" и вставить ПЕРЕД ней
+        order_row = None
+        for k, row in data.items():
+            if k == "image" or not str(k).isdigit():
+                continue
+            try:
+                v = row[1]["value"] if len(row) > 1 else None
+            except Exception:
+                v = None
+            if "Порядок работы" in str(v):
+                order_row = int(k)
+                break
+        if order_row is not None:
+            insert_row = order_row
+
+        # Если insert_row неизвестен — пытаемся найти первый блок работ по "Наименование работ"
+        if not isinstance(insert_row, int) or insert_row <= 0:
+            insert_row = None
+            for k, row in data.items():
+                if k == "image":
+                    continue
+                try:
+                    row2 = row[2]["value"] if len(row) > 2 else None
+                except Exception:
+                    row2 = None
+                if "Наименование работ" in str(row2):
+                    insert_row = int(k) + 1
+                    break
+            if insert_row is None:
+                # fallback: в конец
+                numeric_keys = [int(k) for k in data.keys() if str(k).isdigit()]
+                insert_row = (max(numeric_keys) + 1) if numeric_keys else 1
+
+        n_new = len(rows_values)
+
+        # Подготовим шаблон строки (стили), чтобы новые строки не были "пустыми" по форматам.
+        template_key = str(insert_row) if str(insert_row) in data else None
+        if template_key is None:
+            numeric_keys_sorted = sorted(int(k) for k in data.keys() if str(k).isdigit())
+            # ближайшая существующая строка сверху
+            prev = max([k for k in numeric_keys_sorted if k < insert_row], default=None)
+            template_key = str(prev) if prev is not None else (str(numeric_keys_sorted[0]) if numeric_keys_sorted else None)
+
+        template_row = copy.deepcopy(data.get(template_key, [])) if template_key else []
+
+        def _make_row(values):
+            if template_row:
+                row_copy = copy.deepcopy(template_row)
+                for idx, v in enumerate(values):
+                    if idx < len(row_copy) and isinstance(row_copy[idx], dict):
+                        row_copy[idx]["value"] = v
+                return row_copy
+            # Минимальный fallback: только значения
+            return [{"value": v, "font": {"name": "Calibri", "size": 11.0, "bold": False, "italic": False, "color": "RGB(00000000)"},
+                     "fill": {"color": "RGB(00000000)"},
+                     "borders": {"left": None, "right": None, "top": None, "bottom": None},
+                     "alignment": {"horizontal": None, "vertical": None, "wrap_text": None}} for v in values]
+
+        # 1) Сдвигаем строки в data
+        new_data = {}
+        for k, row in data.items():
+            if k == "image":
+                new_data[k] = row
+                continue
+            if not str(k).isdigit():
+                new_data[k] = row
+                continue
+            rk = int(k)
+            if rk >= insert_row:
+                new_data[str(rk + n_new)] = row
+            else:
+                new_data[str(rk)] = row
+
+        # 2) Вставляем новые строки
+        for i, values in enumerate(rows_values):
+            new_data[str(insert_row + i)] = _make_row(values)
+
+        # 3) Сдвигаем row_heights (если список)
+        if isinstance(row_heights, list) and row_heights:
+            idx0 = max(insert_row - 1, 0)
+            default_h = row_heights[idx0 - 1] if idx0 - 1 >= 0 and idx0 - 1 < len(row_heights) else (row_heights[0] if row_heights else 15)
+            row_heights = row_heights[:idx0] + [default_h] * n_new + row_heights[idx0:]
+
+        # 4) Сдвигаем merged cells
+        if isinstance(boundaries_dict, dict) and boundaries_dict:
+            for key, val in boundaries_dict.items():
+                try:
+                    start_col, start_row, end_col, end_row = val
+                except Exception:
+                    continue
+                if start_row >= insert_row:
+                    start_row += n_new
+                if end_row >= insert_row:
+                    end_row += n_new
+                boundaries_dict[key] = [start_col, start_row, end_col, end_row]
+
+        def _next_merge_key(bdict: dict) -> str:
+            try:
+                keys_int = [int(k) for k in bdict.keys() if str(k).isdigit()]
+                return str(max(keys_int) + 1) if keys_int else "1"
+            except Exception:
+                return "1"
+
+        def _add_merge(bdict: dict, start_col: int, row_num: int, end_col: int):
+            if row_num is None or row_num <= 0:
+                return
+            # Не добавляем дубль (иначе могут быть конфликты/накладки merge)
+            try:
+                for _k, v in bdict.items():
+                    if not isinstance(v, (list, tuple)) or len(v) != 4:
+                        continue
+                    if int(v[0]) == start_col and int(v[1]) == row_num and int(v[2]) == end_col and int(v[3]) == row_num:
+                        return
+            except Exception:
+                pass
+            key = _next_merge_key(bdict)
+            bdict[key] = [start_col, row_num, end_col, row_num]
+
+        # 5) Добавляем merge для строки "Ранее проведенные работы" (B:L)
+        if isinstance(boundaries_dict, dict):
+            _add_merge(boundaries_dict, 2, insert_row, 12)
+
+        # 6) Фиксируем merge заголовков:
+        # - "Порядок работы" объединение B:K (2..11)
+        # - "Наименование работ" объединение C:J (3..10)
+        if isinstance(boundaries_dict, dict):
+            order_row_new = None
+            name_row_new = None
+            for k, row in new_data.items():
+                if k == "image" or not str(k).isdigit():
+                    continue
+                rk = int(k)
+                # По договоренности: "Порядок работы" находится в B, "Наименование работ" — в C
+                v_b = None
+                v_c = None
+                try:
+                    if len(row) > 1 and isinstance(row[1], dict):
+                        v_b = row[1].get("value")
+                except Exception:
+                    v_b = None
+                try:
+                    if len(row) > 2 and isinstance(row[2], dict):
+                        v_c = row[2].get("value")
+                except Exception:
+                    v_c = None
+
+                if order_row_new is None and "Порядок работы" in str(v_b):
+                    order_row_new = rk
+                if name_row_new is None and "Наименование работ" in str(v_c):
+                    name_row_new = rk
+                if order_row_new is not None and name_row_new is not None:
+                    break
+
+            _add_merge(boundaries_dict, 2, order_row_new, 11)
+            _add_merge(boundaries_dict, 3, name_row_new, 10)
+
+        return new_data, row_heights, boundaries_dict
 
     def add_work_excel(self, ws2, work_list, ind_ins):
         for i in range(1, len(work_list) + 1):  # Добавлением работ

@@ -168,6 +168,7 @@ class ClayWindow(WindowUnion):
         self.roof_rir_edit, self.sole_rir_edit, self.volume_cement = '', '', ''
 
     def add_work(self):
+        strategy = None
         try:
             self.current_widget = self.tab_widget.currentWidget()
             self.purpose_of_clay = self.current_widget.purpose_of_clay_combo.currentText()
@@ -180,8 +181,73 @@ class ClayWindow(WindowUnion):
             strategy = self.strategies.get(self.purpose_of_clay)
         except Exception as e:
             logger.critical(e)
-        if strategy:
-            work_list = strategy.add_work_clay()
+        if not strategy:
+            return
+
+        purpose = self.purpose_of_clay
+        rir_q = None
+        if purpose == 'в колонне':
+            rir_q = self.current_widget.rir_question_combo.currentText()
+
+        # clay_solution: ветка "в колонне + РИР" теперь поддерживается на сервере.
+        try_api = True
+        if try_api:
+            params = {"purpose": purpose}
+            if purpose == 'сбитие приемистости':
+                cb = self.current_widget.current_bottom_edit.text()
+                vc = self.current_widget.volume_clay_edit.text()
+                if cb == '' or vc == '':
+                    QMessageBox.warning(self, 'Ошибка', 'Не введены все значения')
+                    return
+                params["current_bottom"] = float(cb)
+                params["volume_clay"] = float(vc)
+            elif purpose == 'в колонне':
+                rc = self.current_widget.roof_clay_edit.text()
+                sc = self.current_widget.sole_clay_edit.text()
+                if rc == '' or sc == '':
+                    QMessageBox.warning(self, 'Ошибка', 'Не введены все значения')
+                    return
+                roof_i = int(float(rc))
+                sole_i = int(float(sc))
+                if roof_i > sole_i:
+                    QMessageBox.warning(self, 'Ошибка', 'Не корректные интервалы ')
+                    return
+                params["roof_clay"] = roof_i
+                params["sole_clay"] = sole_i
+                params["rir_question"] = rir_q or 'Нет'
+                if rir_q == 'Да':
+                    rr = self.current_widget.roof_rir_edit.text()
+                    sr = self.current_widget.sole_rir_edit.text()
+                    vc = self.current_widget.cement_volume_line.text().replace(',', '.')
+                    info = self.current_widget.info_rir_edit.text()
+                    if rr == '' or sr == '' or vc == '':
+                        QMessageBox.warning(self, 'Ошибка', 'Не введены данные РИР (кровля/подошва/объем цемента)')
+                        return
+                    params["rir_roof"] = int(float(rr))
+                    params["rir_sole"] = int(float(sr))
+                    params["volume_cement"] = float(vc)
+                    params["info_rir_edit"] = info
+            if self.try_populate_work_rows_from_api("clay_solution", params, self.table_widget):
+                if purpose == 'сбитие приемистости':
+                    self.calculate_chemistry(
+                        'глина', float(self.current_widget.volume_clay_edit.text()) * 0.45
+                    )
+                    self.data_well.current_bottom = float(
+                        self.current_widget.current_bottom_edit.text()
+                    )
+                elif purpose == 'в колонне':
+                    from work_py.calculate_work_parametrs import volume_calculate_roof_of_sole
+
+                    roof_c = int(float(self.current_widget.roof_clay_edit.text()))
+                    sole_c = int(float(self.current_widget.sole_clay_edit.text()))
+                    vol_c = round(volume_calculate_roof_of_sole(self.data_well, roof_c, sole_c), 1)
+                    self.calculate_chemistry('глина', vol_c * 0.45)
+                    self.data_well.current_bottom = roof_c
+                self.finish_add_work_from_api()
+                return
+
+        work_list = strategy.add_work_clay()
+        if work_list:
             self.populate_row(self.insert_index, work_list, self.table_widget)
             data_list.pause = False
             self.close()

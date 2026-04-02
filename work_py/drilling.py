@@ -429,7 +429,18 @@ class DrillWindow(WindowUnion):
                  float(self.data_well.current_bottom)])
 
         if drill_list:
-            self.populate_row(self.insert_index, drill_list, self.table_widget)
+            remote_params = {
+                "nkt_str": self.nkt_str,
+                "drill_type_combo": self.drill_type_combo,
+                "drilling_bit_diam": self.drilling_bit_diam,
+                "downhole_motor": self.downhole_motor,
+                "cutter_calibrator": self.cutter_calibrator,
+                "need_privyazka_q_combo": need_privyazka_q_combo,
+                "drill_tuple": drill_tuple,
+            }
+            self.populate_work_rows_with_remote_fallback(
+                "drilling", remote_params, self.table_widget, drill_list
+            )
             data_list.pause = False
 
             self.close()
@@ -736,6 +747,12 @@ class DrillWindow(WindowUnion):
         max_port = max([self.data_well.dict_perforation[plast]['подошва'] for plast in self.data_well.plast_work]) - 2
         min_port = max([self.data_well.dict_perforation[plast]['кровля'] for plast in self.data_well.plast_work])
 
+        icb = self.data_well.current_bottom
+        if hasattr(icb, "get_value"):
+            initial_current_bottom = float(icb.get_value)
+        else:
+            initial_current_bottom = float(icb)
+
         current_depth, ok = QInputDialog.getInt(None, 'Нормализация забоя',
                                                 'Введите глубину необходимого забоя при нормализации',
                                                 int(max_port), 0,
@@ -841,4 +858,10 @@ class DrillWindow(WindowUnion):
 
         # print(f'забой {self.data_well.current_bottom }')
 
-        return kot_list
+        remote_params = {
+            "current_depth": float(current_depth),
+            "kot_before_frez": kot_question == QMessageBox.StandardButton.Yes,
+            "drilling_bit_diam": float(drilling_bit_diam),
+            "initial_current_bottom": initial_current_bottom,
+        }
+        return kot_list, remote_params

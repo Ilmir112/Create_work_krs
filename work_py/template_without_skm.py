@@ -673,7 +673,94 @@ class TemplateWithoutSkm(WindowUnion):
                                     f'Нельзя спускать шаблон ниже глубины башмака кондуктора '
                                     f'{self.data_well.column_conductor_length.get_value}м')
 
+        tw = self.tab_widget.currentWidget()
+        kot_inner = tw.kot_question_qcombo.currentText()
+        if kot_inner == 'Да':
+            mes = QMessageBox.question(
+                self,
+                'вопрос',
+                'В компоновке будет использоваться система обратных клапанов, продолжить?',
+            )
+            if mes == QMessageBox.StandardButton.No:
+                return
+
+        if kot_inner == 'Нет':
+            mes = QMessageBox.question(
+                self,
+                'КОТ',
+                'Согласно мероприятий по сокращению продолжительности ТКРС от 31.01.2025 п.20 '
+                'при первичном СПО ПСШ необходимо использовать в компоновке систему КОТ за исключением '
+                'необходимости прямой или комбинированной промывки, продолжить?',
+            )
+            if mes == QMessageBox.StandardButton.No:
+                return
+        template_combo_txt = str(tw.template_combo.currentText())
+        if kot_inner == 'Да' and 'открытый' in template_combo_txt:
+            mes = QMessageBox.question(
+                self,
+                'КОТ',
+                'Необходимо уточнить необходимость применения системы КОТ в открытом стволе, продолжить?',
+            )
+            if mes == QMessageBox.StandardButton.No:
+                return
+
+        from work_plan_rows_client import try_generate_work_rows
+
+        solvent_volume_edit = tw.solvent_volume_edit.text()
+        if solvent_volume_edit != '':
+            solvent_volume_edit = round(float(solvent_volume_edit), 1)
+
+        cb_text = tw.current_bottom_edit.text()
+        current_bottom_num = round(float(cb_text), 1) if cb_text.strip() != '' else 0.0
+
+        remote_params: dict = {
+            "template_str": template_str,
+            "template": template,
+            "template_diameter": template_diameter,
+            "current_bottom": current_bottom_num,
+            "privyazka_question": self.privyazka_question,
+            "note_question": tw.note_question_qcombo.currentText(),
+            "kot_question": tw.kot_question_qcombo.currentText(),
+            "solvent_question": tw.solvent_question_combo.currentText(),
+            "solvent_volume": solvent_volume_edit if solvent_volume_edit != '' else None,
+            "count_template": int(self.data_well.count_template),
+            "perforation_sole": float(self.data_well.perforation_sole),
+        }
+        gips_prepend_rows = None
+        if self.data_well.gips_in_well and self.data_well.count_template == 0:
+            gips_prepend_rows = TemplateKrs.pero(self)
+            remote_params["gips_prepend_rows"] = gips_prepend_rows
+
+        rows_remote = try_generate_work_rows("template_without_skm", self.data_well, remote_params)
+        if rows_remote:
+            if tw.note_question_qcombo.currentText() == 'Да':
+                self.data_well.count_template += 1
+            if tw.solvent_question_combo.currentText() == 'Да':
+                self.calculate_chemistry('растворитель', solvent_volume_edit)
+            if self.data_well.head_column.get_value != 0 and cb_text.strip() != '':
+                self.data_well.current_bottom = current_bottom_num
+            self.data_well.template_length = template_length
+            if self.template_depth > self.data_well.template_depth:
+                self.data_well.template_depth = self.template_depth
+            if self.data_well.column_additional or (
+                self.data_well.column_additional is False
+                and self.data_well.head_column_additional.get_value > self.data_well.current_bottom
+            ):
+                if self.template_depth_addition > self.data_well.template_depth_addition:
+                    self.data_well.template_depth_addition = self.template_depth_addition
+                    self.data_well.template_length_addition = self.template_length_addition
+            self.update_template(self.data_well.insert_index)
+            self.populate_row(
+                self.data_well.insert_index, rows_remote, self.table_widget, self.data_well.work_plan
+            )
+            data_list.pause = False
+            self.close()
+            self.close_modal_forcefully()
+            return
+
+        self._template_gips_prepend_rows = gips_prepend_rows
         work_list = self.template_ek(template_str, template, template_diameter)
+        self._template_gips_prepend_rows = None
 
         self.data_well.template_length = template_length
 
@@ -689,7 +776,9 @@ class TemplateWithoutSkm(WindowUnion):
                         self.data_well.template_length_addition = self.template_length_addition
 
             self.update_template(self.data_well.insert_index)
-            self.populate_row(self.insert_index, work_list, self.table_widget)
+            self.populate_work_rows_with_remote_fallback(
+                "template_without_skm", remote_params, self.table_widget, work_list
+            )
 
             data_list.pause = False
             self.close()
@@ -724,25 +813,6 @@ class TemplateWithoutSkm(WindowUnion):
         self.note_question_qcombo = self.tab_widget.currentWidget().note_question_qcombo.currentText()
         self.kot_question_qcombo = self.tab_widget.currentWidget().kot_question_qcombo.currentText()
         self.template_combo = self.tab_widget.currentWidget().template_combo.currentText()
-
-        if self.kot_question_qcombo == 'Да':
-            mes = QMessageBox.question(self, 'вопрос', 'В компоновке будет использоваться система обратных клапанов,'
-                                                       ' продолжить?')
-            if mes == QMessageBox.StandardButton.No:
-                return
-
-        if self.kot_question_qcombo == 'Нет':
-            mes = QMessageBox.question(self, 'КОТ', 'Согласно мероприятий по сокращению продолжительности '
-                                                    'ТКРС от 31.01.2025 п.20 '
-                                                    'при первичном СПО ПСШ необходимо использовать в компоновке систему '
-                                                    'КОТ за исключением необходимости прямой или комбинированной промывки, продолжить?')
-            if mes == QMessageBox.StandardButton.No:
-                return
-        if self.kot_question_qcombo == 'Да' and 'открытый' in self.template_combo:
-            mes = QMessageBox.question(self, 'КОТ', 'Необходимо уточнить необходимость применения системы КОТ в '
-                                                    'открытом стволе, продолжить?')
-            if mes == QMessageBox.StandardButton.No:
-                return
 
         current_bottom = self.tab_widget.currentWidget().current_bottom_edit.text()
         if current_bottom != '':
@@ -889,8 +959,9 @@ class TemplateWithoutSkm(WindowUnion):
             list_template_ek.insert(-1, privyazka_nkt)
 
         if self.data_well.gips_in_well is True and self.data_well.count_template == 0:
-            # Добавление работ при наличии Гипсово-солевых отложений
-            gips = TemplateKrs.pero(self)
+            gips = getattr(self, "_template_gips_prepend_rows", None)
+            if gips is None:
+                gips = TemplateKrs.pero(self)
             for row in gips[::-1]:
                 list_template_ek.insert(0, row)
 

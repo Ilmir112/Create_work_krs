@@ -348,12 +348,27 @@ class TemplateKrs(WindowUnion):
         # print(f'интервалы СКМ {self.data_well.skm_interval}')
         skm_list = sorted(skm_tuple, key=lambda x: x[0])
 
+        cw = self.tab_widget.currentWidget()
+        cb_raw = cw.current_bottom_edit.text()
+        if cb_raw != "":
+            current_bottom_param = round(float(str(cb_raw).replace(",", ".")), 1)
+        else:
+            current_bottom_param = float(self.data_well.current_bottom)
+        remote_params = {
+            "template_str": template_str,
+            "template_key": template_key,
+            "skm_intervals": [[float(a), float(b)] for a, b in skm_list],
+            "privyazka_question": cw.privyazka_question_QCombo.currentText(),
+            "current_bottom": current_bottom_param,
+        }
 
         work_template_list = self.template_ek(template_str, skm_list)
         if skm_tuple not in  self.data_well.skm_interval:
             self.data_well.skm_interval.extend(skm_list)
 
-        self.populate_row(self.insert_index, work_template_list, self.table_widget)
+        self.populate_work_rows_with_remote_fallback(
+            "sgm_work", remote_params, self.table_widget, work_template_list
+        )
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()

@@ -60,6 +60,23 @@ class TorpedoWindow(WindowUnion):
         self.roof_torpedo = int(float(self.roof_torpedo))
         self.diameter_doloto_ek = float(self.diameter_doloto_ek)
 
+        params = {
+            "roof_torpedo": self.roof_torpedo,
+            "diameter_doloto_ek": self.diameter_doloto_ek,
+        }
+        if self.try_populate_work_rows_from_api("torpedo", params, self.table_widget):
+            self.data_well.head_column = data_list.ProtectedIsDigit(self.roof_torpedo)
+            self.data_well.max_admissible_pressure = data_list.ProtectedIsDigit(50)
+            self.data_well.data_well_dict["данные"]["диаметр долото при бурении"] = (
+                self.diameter_doloto_ek
+            )
+            self.data_well.data_well_dict["данные"]["максимальное допустимое давление"] = 50
+            self.data_well.diameter_doloto_ek = data_list.ProtectedIsDigit(
+                self.diameter_doloto_ek
+            )
+            self.finish_add_work_from_api()
+            return
+
         work_list = self.torpedo_work()
         if work_list:
             self.populate_row(self.insert_index, work_list, self.table_widget)

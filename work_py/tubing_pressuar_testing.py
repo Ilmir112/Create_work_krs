@@ -116,7 +116,16 @@ class TubingPressureWindow(WindowUnion):
 
         work_list = self.pressure_nkt_work()
         if work_list:
-            self.populate_row(self.insert_index, work_list, self.table_widget)
+            remote_params = {
+                "select_nkt_combo": self.select_nkt_combo,
+                "current_bottom": self.current_bottom,
+                "distance_between_nkt": self.distance_between_nkt,
+                "length_nkt": self.length_nkt,
+                "pressure_data": self.pressure_data,
+            }
+            self.populate_work_rows_with_remote_fallback(
+                "tubing_pressuar_testing", remote_params, self.table_widget, work_list
+            )
             data_list.pause = False
             self.close()
         self.close_modal_forcefully()

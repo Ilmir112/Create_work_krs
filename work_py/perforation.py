@@ -694,7 +694,70 @@ class PerforationWindow(WindowUnion):
         if len(perforation) < 6:
             QMessageBox.information(self, 'Внимание', 'Не добавлены интервалы перфорации!!!')
         else:
-            self.populate_row(self.insert_index, perforation, self.table_widget)
+            interval_params = []
+            for row in range(rows):
+                interval_params.append(
+                    {
+                        "roof": self.tableWidget.item(row, 0).text().replace(',', '.'),
+                        "sole": self.tableWidget.item(row, 1).text().replace(',', '.'),
+                        "type_charge": self.tableWidget.item(row, 2).text(),
+                        "count_otv": self.tableWidget.item(row, 3).text(),
+                        "count_charge": self.tableWidget.item(row, 4).text(),
+                        "plast": self.tableWidget.item(row, 5).text(),
+                        "dop_information": self.tableWidget.item(row, 6).text(),
+                    }
+                )
+
+            remote_params = {
+                "type_perforation": self.type_perforation,
+                "angle_text": angle_text,
+                "intervals": interval_params,
+                "need_skv": self.svk_true_combo == 'Нужно СКВ' if self.type_perforation in ['Трубная перфорация', 'Трубная перфорация на депрессии'] else False,
+                "need_sko": self.sko_true_combo == 'Да' if self.type_perforation in ['Трубная перфорация', 'Трубная перфорация на депрессии'] else False,
+                "need_swab": self.swab_true_edit_type == 'Нужно освоение' if self.type_perforation in ['Трубная перфорация', 'Трубная перфорация на депрессии'] else False,
+                "question_need_paker": self.question_need_paker_combo if self.type_perforation in ['Трубная перфорация', 'Трубная перфорация на депрессии'] else 'Нет',
+                "paker_depth": self.paker_depth if self.type_perforation in ['Трубная перфорация', 'Трубная перфорация на депрессии'] and self.question_need_paker_combo == 'Да' else None,
+                "diameter_paker": self.diameter_paker if self.type_perforation in ['Трубная перфорация', 'Трубная перфорация на депрессии'] and self.question_need_paker_combo == 'Да' else None,
+                "swab_true_edit_type": self.swab_true_edit_type if self.type_perforation in ['Трубная перфорация', 'Трубная перфорация на депрессии'] else 'без освоения',
+                # При dinamическом уровне ниже головы хвостовика Qt интерактивно выбирает 60/73.
+                # Для API этот выбор передаём напрямую.
+                "swab_nkt_diam": self.nkt_diam if self.swab_true_edit_type == 'Нужно освоение' else None,
+            }
+            if remote_params["need_skv"]:
+                remote_params.update(
+                    {
+                        "skv_acid_edit": self.skv_acid_edit,
+                        "skv_volume_edit": self.skv_volume_edit,
+                        "skv_proc_edit": self.skv_proc_edit,
+                    }
+                )
+            if remote_params["need_sko"]:
+                sko_vt_widget = getattr(self.current_widget, "sko_vt_edit", None)
+                remote_params.update(
+                    {
+                        "acid_edit": self.acid_edit,
+                        "acid_volume_edit": self.acid_volume_edit,
+                        "acid_proc_edit": self.acid_proc_edit,
+                        "acid_oil_proc_edit": self.acid_oil_proc_edit,
+                        "iron_volume_edit": self.iron_volume_edit,
+                        "pressure_edit": self.pressure_edit,
+                        "Qplast_after_edit": self.Qplast_after_edit,
+                        "iron_true_combo": self.iron_true_combo,
+                        "expected_pickup": self.expected_pickup,
+                        "expected_pressure": self.expected_pressure,
+                        "pressure_three": self.pressure_three,
+                        "sko_vt_text": sko_vt_widget.text() if sko_vt_widget else "",
+                    }
+                )
+            if remote_params["need_swab"]:
+                remote_params.update(
+                    {
+                        "swab_type_combo": self.swab_type_combo,
+                        "swab_paker_depth": self.swab_paker_depth,
+                        "swab_volume_edit": self.swab_volume_edit,
+                    }
+                )
+            self.populate_work_rows_with_remote_fallback("perforation", remote_params, self.table_widget, perforation)
             data_list.pause = False
             self.close()
         self.close_modal_forcefully()

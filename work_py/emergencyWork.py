@@ -103,16 +103,7 @@ def emergency_hook(self):
 
 
 
-def emergency_sticking(self, lar_diameter_line, nkt_key, lar_type_combo,
-                      emergency_bottom_line, bottom_line):
-
-
-    emergence_type_list = ['ЭЦН', 'пакер', 'НКТ']
-    emergence_type, ok = QInputDialog.getItem(self, 'Вид прихватченного оборудования',
-                                              'введите вид прихваченного оборудования:', emergence_type_list, 0, False)
-    if ok and emergence_type_list:
-        self.le.setText(emergence_type)
-
+def emergency_sticking_build_rows(self, emergence_type):
     emergency_list = [
         [None, None,
          f'При отрицательных результатах по срыву {emergence_type}, по согласованию с '
@@ -179,8 +170,18 @@ def emergency_sticking(self, lar_diameter_line, nkt_key, lar_type_combo,
     for row in seal_list:
         emergency_list.append(row)
 
-
     return emergency_list
+
+
+def emergency_sticking(self, lar_diameter_line=None, nkt_key=None, lar_type_combo=None,
+                       emergency_bottom_line=None, bottom_line=None):
+    emergence_type_list = ['ЭЦН', 'пакер', 'НКТ']
+    emergence_type, ok = QInputDialog.getItem(self, 'Вид прихватченного оборудования',
+                                              'введите вид прихваченного оборудования:', emergence_type_list, 0, False)
+    if ok and emergence_type_list and hasattr(self, 'le'):
+        self.le.setText(emergence_type)
+
+    return emergency_sticking_build_rows(self, emergence_type)
 
 
 def lapel_tubing(self):

@@ -1294,7 +1294,75 @@ class TemplateKrs(WindowUnion):
                                                          'Нужна привязка, корректно ли?')
             if mes == QMessageBox.StandardButton.No:
                 return
+
+        kot_inner = self.current_widget.kot_question_qcombo.currentText()
+        if kot_inner == 'Да':
+            mes = QMessageBox.question(
+                self,
+                'вопрос',
+                'В компоновке будет использоваться система обратных клапанов, продолжить?',
+            )
+            if mes == QMessageBox.StandardButton.No:
+                return
+
+        from work_plan_rows_client import try_generate_work_rows
+
+        solvent_volume_edit = self.current_widget.solvent_volume_edit.text()
+        if solvent_volume_edit != '':
+            solvent_volume_edit = round(float(solvent_volume_edit), 1)
+
+        cb_text = self.current_widget.current_bottom_edit.text()
+        current_bottom_num = round(float(cb_text), 1) if cb_text.strip() != '' else 0.0
+
+        remote_params: dict = {
+            "template_str": template_str,
+            "template_diameter": template_diameter,
+            "skm_intervals": [[float(a), float(b)] for a, b in skm_list],
+            "template_key": self.template_key,
+            "current_bottom": current_bottom_num,
+            "template_depth": float(self.template_depth),
+            "privyazka_question": self.privyazka_question,
+            "note_question": self.current_widget.note_question_qcombo.currentText(),
+            "kot_question": self.current_widget.kot_question_qcombo.currentText(),
+            "solvent_question": self.current_widget.solvent_question_combo.currentText(),
+            "solvent_volume": solvent_volume_edit if solvent_volume_edit != '' else None,
+            "count_template": int(self.data_well.count_template),
+            "perforation_sole": float(self.data_well.perforation_sole),
+        }
+        if self.template_key == 'ПСШ + пакер':
+            remote_params["paker_depth"] = float(self.current_widget.paker_depth)
+        gips_prepend_rows = None
+        if self.data_well.gips_in_well and self.data_well.count_template == 0:
+            gips_prepend_rows = TemplateKrs.pero(self)
+            remote_params["gips_prepend_rows"] = gips_prepend_rows
+
+        rows_remote = try_generate_work_rows("template_work", self.data_well, remote_params)
+        if rows_remote:
+            if cb_text.strip() != '':
+                self.data_well.current_bottom = current_bottom_num
+            if self.current_widget.note_question_qcombo.currentText() == 'Да':
+                self.data_well.count_template += 1
+            if self.current_widget.solvent_question_combo.currentText() == 'Да':
+                self.calculate_chemistry('растворитель', solvent_volume_edit)
+            if skm_tuple not in self.data_well.skm_interval:
+                self.data_well.skm_interval.extend(skm_list)
+            if self.template_depth > self.data_well.template_depth:
+                self.data_well.template_depth = self.template_depth
+            if self.data_well.column_additional and \
+                    self.data_well.head_column_additional.get_value < self.data_well.current_bottom:
+                if self.template_depth_addition > self.data_well.template_depth_addition:
+                    self.data_well.template_depth_addition = self.template_depth_addition
+                    self.data_well.template_length_addition = self.template_length_addition
+            self.update_skm_interval(self.data_well.insert_index, skm_list)
+            self.populate_row(self.data_well.insert_index, rows_remote, self.table_widget, self.data_well.work_plan)
+            data_list.pause = False
+            self.close()
+            self.close_modal_forcefully()
+            return
+
+        self._template_gips_prepend_rows = gips_prepend_rows
         work_template_list = self.template_ek(template_str, template_diameter, skm_list)
+        self._template_gips_prepend_rows = None
         if skm_tuple not in self.data_well.skm_interval:
             self.data_well.skm_interval.extend(skm_list)
         if work_template_list:
@@ -1309,7 +1377,9 @@ class TemplateKrs(WindowUnion):
 
             self.update_skm_interval(self.data_well.insert_index, skm_list)
 
-            self.populate_row(self.insert_index, work_template_list, self.table_widget)
+            self.populate_work_rows_with_remote_fallback(
+                "template_work", remote_params, self.table_widget, work_template_list
+            )
             data_list.pause = False
             self.close()
             self.close_modal_forcefully()
@@ -1333,11 +1403,6 @@ class TemplateKrs(WindowUnion):
 
         self.note_question_qcombo = self.current_widget.note_question_qcombo.currentText()
         self.kot_question_qcombo = self.current_widget.kot_question_qcombo.currentText()
-        if self.kot_question_qcombo == 'Да':
-            mes = QMessageBox.question(self, 'вопрос', 'В компоновке будет использоваться система обратных клапанов,'
-                                                       ' продолжить?')
-            if mes == QMessageBox.StandardButton.No:
-                return
 
         current_bottom = self.current_widget.current_bottom_edit.text()
         if current_bottom != '':
@@ -1517,7 +1582,9 @@ class TemplateKrs(WindowUnion):
 
 
         if self.data_well.gips_in_well is True and self.data_well.count_template == 0:
-            gips = TemplateKrs.pero(self)
+            gips = getattr(self, "_template_gips_prepend_rows", None)
+            if gips is None:
+                gips = TemplateKrs.pero(self)
             for row in gips[::-1]:
                 list_template_ek.insert(0, row)
         if self.note_question_qcombo == "Да":

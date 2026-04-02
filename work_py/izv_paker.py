@@ -275,7 +275,15 @@ class PakerIzvlek(WindowUnion):
         else:
             raid_list = PakerIzvlek.izvlech_paker(self, pero_diameter_line, paker_depth_line, current_bottom)
 
-        self.populate_row(self.insert_index, raid_list, self.table_widget)
+        remote_params = {
+            "mode": "install" if type_work_combo == "установка" else "extract",
+            "paker_depth": float(paker_depth_line) if paker_depth_line != "" else None,
+            "pero_diameter": str(pero_diameter_line),
+            "paker_type": paker_type_combo,
+            "sand_question": sand_question,
+            "roof_sand": float(roof_sand_edit),
+        }
+        self.populate_work_rows_with_remote_fallback("izv_paker", remote_params, self.table_widget, raid_list)
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()

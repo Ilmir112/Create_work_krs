@@ -152,7 +152,7 @@ class EmergencyLarWork(WindowUnion):
         self.nkt_str_combo = self.tab_widget.currentWidget().nkt_str_combo.currentText()
         self.lar_diameter_line = self.tab_widget.currentWidget().lar_diameter_line.text()
         self.udlinitelel = self.tab_widget.currentWidget().udlinitelel.currentText()
-        self.udlinitelel = self.tab_widget.currentWidget().udlinitelel_length.text()
+        self.udlinitelel_length = self.tab_widget.currentWidget().udlinitelel_length.text()
         if self.lar_diameter_line == '':
             QMessageBox.warning(self, 'Ошибка',
                                       'Выберете диаметр ловильного оборудования')
@@ -201,7 +201,18 @@ class EmergencyLarWork(WindowUnion):
         self.data_well.current_bottom = float(self.bottom_line)
 
         if raid_list:
-            self.populate_row(self.insert_index, raid_list, self.table_widget)
+            remote_params = {
+                "nkt_str": self.nkt_str_combo,
+                "lar_type": self.lar_type_combo,
+                "lar_diameter": str(self.lar_diameter_line),
+                "gidroayss": self.gidroayss_combo,
+                "ubt": self.ubt_combo,
+                "udlinitelel": self.udlinitelel,
+                "udlinitelel_length": self.udlinitelel_length,
+                "emergency_bottom": float(emergency_bottom_line),
+            }
+            self.populate_work_rows_with_remote_fallback(
+                "emergency_lar", remote_params, self.table_widget, raid_list)
             data_list.pause = False
             self.close()
             self.close_modal_forcefully()

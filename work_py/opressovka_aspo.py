@@ -109,7 +109,16 @@ class PakerAspo(WindowUnion):
             return
 
         work_list = PakerAspo.paker_list(self, diameter_paker, paker_khost, paker_depth)
-        self.populate_row(self.insert_index, work_list, self.table_widget)
+        self.populate_work_rows_with_remote_fallback(
+            "opressovka_aspo",
+            {
+                "paker_diameter": diameter_paker,
+                "paker_khost": paker_khost,
+                "paker_depth": paker_depth,
+            },
+            self.table_widget,
+            work_list,
+        )
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()

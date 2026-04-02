@@ -153,9 +153,22 @@ class GonsWindow(WindowUnion):
 
             work_list = self.acid_gons(plast_combo, acid_edit, acid_volume_edit, acid_proc_edit, points_sko_edit, bottom_point,
                                       acid_calcul_edit, pressure_edit, iron_true_combo, iron_volume_edit)
+            remote_params = {
+                "plast_combo": plast_combo,
+                "acid_edit": acid_edit,
+                "acid_volume_edit": acid_volume_edit,
+                "acid_proc_edit": acid_proc_edit,
+                "points_sko_edit": points_sko_edit,
+                "bottom_point": bottom_point,
+                "acid_calcul_edit": acid_calcul_edit,
+                "pressure_edit": pressure_edit,
+                "iron_true_combo": iron_true_combo,
+                "iron_volume_edit": iron_volume_edit,
+            }
         except Exception as e:
             logger.critical(e)
-        self.populate_row(self.insert_index, work_list, self.table_widget)
+            return
+        self.populate_work_rows_with_remote_fallback("acids", remote_params, self.table_widget, work_list)
         self.calculate_chemistry(acid_edit, acid_volume_edit)
         data_list.pause = False
         self.close()

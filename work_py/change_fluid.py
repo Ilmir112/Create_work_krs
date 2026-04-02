@@ -288,7 +288,8 @@ class ChangeFluidWindow(WindowUnion):
             work_list = self.fluid_change(plast_new_combo, fluid_new_edit, pressure_new_edit)
         else:
             work_list = self.fluid_change_old_plast(fluid_new_edit)
-        self.populate_row(self.insert_index, work_list, self.table_widget)
+        fluid_params = getattr(self, "_last_fluid_change_api", {})
+        self.populate_work_rows_with_remote_fallback("change_fluid", fluid_params, self.table_widget, work_list)
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()
@@ -318,6 +319,13 @@ class ChangeFluidWindow(WindowUnion):
 
         update_fluid(self, self.data_well.insert_index, fluid_work, self.table_widget)
         self.data_well.fluid_work = fluid_work
+        self._last_fluid_change_api = {
+            "mode": "old_plast",
+            "fluid_new": fluid_new_edit,
+            "fluid_work": fluid_work,
+            "fluid_work_short": self.data_well.fluid_work_short,
+            "expected_pressure": None,
+        }
         return fluid_change_list
 
     def fluid_change(self, plast_new: str, fluid_new: float, pressure_new: float) -> list:
@@ -342,4 +350,11 @@ class ChangeFluidWindow(WindowUnion):
 
         update_fluid(self, self.data_well.insert_index, fluid_work, self.table_widget)
         self.data_well.fluid_work = fluid_work
+        self._last_fluid_change_api = {
+            "mode": "new_plast",
+            "fluid_new": fluid_new,
+            "fluid_work": fluid_work,
+            "fluid_work_short": self.data_well.fluid_work_short,
+            "expected_pressure": expected_pressure,
+        }
         return fluid_change_list

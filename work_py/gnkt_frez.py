@@ -77,7 +77,14 @@ class WorkWithGnkt(GnktModel):
         self.copy_pz(self.ws_schema, table_schema, 'gnkt_frez', 47, 2)
         self.copy_pz(self.ws_work, table_widget, 'gnkt_frez', 12, 3)
         work_well = self.work_gnkt_frez(self.data_gnkt)
-        self.populate_row(0, work_well, table_widget, self.work_plan)
+        self.populate_work_rows_with_remote_fallback(
+            "gnkt_frez",
+            {"client_rows": work_well},
+            table_widget,
+            work_well,
+            work_plan=self.work_plan,
+            insert_index=0,
+        )
 
         CreatePZ.add_itog(self, self.ws_work, self.table_widget.rowCount() + 1, self.work_plan)
 
@@ -677,7 +684,7 @@ class WorkWithGnkt(GnktModel):
             [None, 15,
              f'Произвести монтаж 4-х секционного превентора БП 80-70.00.00.000 (700атм) № {self.data_gnkt.pvo_number} '
              f'и инжектора на устье '
-             f'скважины согласно «Схемы обвязки №5 устья противовыбросовым оборудованием при производстве работ по '
+             f'скважины согласно «Схемы обвязки №16 устья противовыбросовым оборудованием при производстве работ по '
              f'промывке скважины с установкой «ГНКТ» утвержденная главным инженером от '
              f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}г. Произвести обвязку установки ГНКТ, '
              f'насосно-компрессорного агрегата, желобной циркуляционной системы.',

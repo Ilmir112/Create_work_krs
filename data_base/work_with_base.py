@@ -866,6 +866,38 @@ def insert_data_new_excel_file(self, data, row_heights, col_width, boundaries_di
             index_delete = index_row
             data_list.gns_ind2 = index_row
 
+            # Гарантируем объединения шапок (иногда в исходном шаблоне merge отсутствует/теряется).
+            # - "Порядок работы" (строка выше): B:K (2..11)
+            # - "Наименование работ" (текущая строка): C:J (3..10)
+            def _ensure_merge(range_ref: str) -> None:
+                try:
+                    if range_ref not in {str(r) for r in sheet_new.merged_cells.ranges}:
+                        sheet_new.merge_cells(range_ref)
+                except Exception:
+                    pass
+
+            current_row_num = index_row + 1
+            _ensure_merge(f"C{current_row_num}:J{current_row_num}")
+
+            prev_row_num = current_row_num - 1
+            if prev_row_num >= 1:
+                try:
+                    if "Порядок работы" in str(sheet_new.cell(row=prev_row_num, column=2).value):
+                        _ensure_merge(f"B{prev_row_num}:K{prev_row_num}")
+                except Exception:
+                    pass
+
+            # "Ранее проведенные работы" обычно строкой выше "Порядок работы"
+            prev_prev_row_num = current_row_num - 2
+            if prev_prev_row_num >= 1:
+                try:
+                    b_val = sheet_new.cell(row=prev_prev_row_num, column=2).value
+                    c_val = sheet_new.cell(row=prev_prev_row_num, column=3).value
+                    if "Ранее проведенные работы" in str(b_val) or "Ранее проведенные работы" in str(c_val):
+                        _ensure_merge(f"B{prev_prev_row_num}:L{prev_prev_row_num}")
+                except Exception:
+                    pass
+
         elif any(['ПЛАН РАБОТ' in str(col.value).upper() for col in row[:4]]) and self.data_well.work_plan not in [
             'plan_change']:
             sheet_new.cell(row=index_row + 1,

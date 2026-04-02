@@ -717,6 +717,45 @@ class MyMainWindow(QMainWindow):
     def add_window(self, window):
         if self.operation_window is None:
             data_list.pause = True
+            # Сохраняем тип операции для логов (используется log_files/log.py).
+            # Если окно не сопоставлено явно — кладём class_name в lower().
+            try:
+                window_name = getattr(window, "__name__", str(window))
+                operation_map = {
+                    "TorpedoWindow": "torpedo",
+                    "ClayWindow": "clay_solution",
+                    "DrillWindow": "drilling",
+                    "SandWindow": "sand_filling",
+                    "GppWindow": "gpp",
+                    "GrpWindow": "grp",
+                    "Raid": "raiding",
+                    "VpWindow": "vp_cm",
+                    "OpressovkaEK": "opressovka",
+                    "GeophysicWindow": "geophysic",
+                    "PakerIzvlek": "izv_paker",
+                    "EmergencyLarWork": "emergency_lar",
+                    "EmergencyPrintWork": "emergency_printing",
+                    "BlockPackWindow": "block_pack_work",
+                    "PerforationWindow": "perforation",
+                    "GonsWindow": "acids",
+                    "ChangeFluidWindow": "change_fluid",
+                    "RirWindow": "rir",
+                    "EmergencyMagnit": "emergency_magnit",
+                    "EmergencyPo": "emergency_po",
+                    "SwabWindow": "swabbing",
+                    "KompressWindow": "kompress",
+                    "GnoDescentWindow": "descent_gno",
+                    "PakerAspo": "opressovka_aspo",
+                    "TemplateKrs": "template_work",
+                    "TemplateWithoutSkm": "template_without_skm",
+                    "AcidPakerWindow": "acid_paker",
+                    "PeroWindow": "pero_work",
+                }
+                data_list.current_operation_type = operation_map.get(
+                    window_name, (window_name or "").lower()
+                )
+            except Exception:
+                data_list.current_operation_type = None
             self.operation_window = window(self.data_well, self.table_widget)
             self.operation_window.move(100, 100)
             self.set_modal_window(self.operation_window)
@@ -745,6 +784,13 @@ class MyMainWindow(QMainWindow):
             self.data_well.modal_dialog.close()  # Закрытие модального окна
 
     def read_excel_file(self):
+        # Сбрасываем контекст перед чтением.
+        # Это нужно, чтобы в логах всегда приходили актуальные well/area.
+        data_list.current_well_number = None
+        data_list.current_well_area = None
+        data_list.current_well_region = None
+        data_list.current_operation_type = None
+
         from find import FindIndexPZ
         from work_py.leakage_column import LeakageWindow
 
@@ -778,6 +824,21 @@ class MyMainWindow(QMainWindow):
             return
 
         self.data_well.region = region_select(self.data_well.cdng.get_value)
+
+        # Заполняем контекст текущей скважины/месторождения.
+        # Используется логгером при отправке ошибок на backend.
+        try:
+            data_list.current_well_number = str(self.data_well.well_number.get_value)
+        except Exception:
+            data_list.current_well_number = None
+        try:
+            data_list.current_well_area = str(self.data_well.well_area.get_value)
+        except Exception:
+            data_list.current_well_area = None
+        try:
+            data_list.current_well_region = str(self.data_well.region)
+        except Exception:
+            data_list.current_well_region = None
 
         date_str2 = datetime.strptime("2024-09-19", "%Y-%m-%d")
 
@@ -1584,6 +1645,45 @@ class MyMainWindow(QMainWindow):
             )
 
         return check_true
+
+    def try_populate_work_rows_from_api(
+        self, operation: str, params: dict, table_widget, work_plan=None
+    ) -> bool:
+        """Если операция обслуживается API fastApiZima — вставляет строки и возвращает True."""
+        from work_plan_rows_client import try_generate_work_rows
+
+        data_list.current_operation_type = str(operation)
+        wp = work_plan if work_plan is not None else getattr(self.data_well, "work_plan", "krs")
+        rows = try_generate_work_rows(operation, self.data_well, params, work_plan=wp)
+        if rows is None:
+            return False
+        self.populate_row(self.insert_index, rows, table_widget, wp)
+        return True
+
+    def finish_add_work_from_api(self):
+        data_list.pause = False
+        self.close()
+        self.close_modal_forcefully()
+
+    def populate_work_rows_with_remote_fallback(
+        self,
+        operation: str,
+        params: dict,
+        table_widget,
+        local_rows,
+        work_plan=None,
+        insert_index=None,
+    ):
+        """Сначала пробует API (если операция в REMOTE_OPERATIONS), иначе вставляет local_rows."""
+        from work_plan_rows_client import try_generate_work_rows
+
+        data_list.current_operation_type = str(operation)
+        wp = work_plan if work_plan is not None else getattr(self.data_well, "work_plan", "krs")
+        rows = try_generate_work_rows(operation, self.data_well, params, work_plan=wp)
+        if rows is None:
+            rows = local_rows
+        idx = self.insert_index if insert_index is None else insert_index
+        self.populate_row(idx, rows, table_widget, wp)
 
     def populate_row(self, insert_index, work_list, table_widget, work_plan="krs"):
         text_width_dict = {
@@ -3339,8 +3439,10 @@ class MyWindow(MyMainWindow):
     def frezering_port_action(self):
         from work_py.drilling import DrillWindow
 
-        drilling_work_list = DrillWindow.frezer_ports(self)
-        self.populate_row(self.insert_index, drilling_work_list, self.table_widget)
+        drilling_work_list, frezer_params = DrillWindow.frezer_ports(self)
+        self.populate_work_rows_with_remote_fallback(
+            "main_frezering_port", frezer_params, self.table_widget, drilling_work_list
+        )
 
     def drilling_action_nkt(self):
         from work_py.drilling import DrillWindow
@@ -3353,22 +3455,38 @@ class MyWindow(MyMainWindow):
         self.add_window(EmergencyMagnit)
 
     def emergency_sticking_action(self):
-        from work_py.emergencyWork import emergency_sticking
+        from PyQt5.QtWidgets import QInputDialog
+        from work_py.emergencyWork import emergency_sticking_build_rows
 
-        emergency_sticking_list = emergency_sticking(self)
-        self.populate_row(self.insert_index, emergency_sticking_list, self.table_widget)
+        emergence_type, _ok = QInputDialog.getItem(
+            self,
+            "Вид прихватченного оборудования",
+            "введите вид прихваченного оборудования:",
+            ["ЭЦН", "пакер", "НКТ"],
+            0,
+            False,
+        )
+        if hasattr(self, "le"):
+            self.le.setText(emergence_type)
+        emergency_sticking_list = emergency_sticking_build_rows(self, emergence_type)
+        self.populate_work_rows_with_remote_fallback(
+            "main_emergency_sticking",
+            {"emergence_type": emergence_type},
+            self.table_widget,
+            emergency_sticking_list,
+        )
 
     def hook_action(self):
         from work_py.emergencyWork import emergency_hook
 
         hook_work_list = emergency_hook(self)
-        self.populate_row(self.insert_index, hook_work_list, self.table_widget)
+        self.populate_work_rows_with_remote_fallback("main_hook", {}, self.table_widget, hook_work_list)
 
     def lapel_tubing_func(self):
         from work_py.emergencyWork import lapel_tubing
 
         emergency_sbt_list = lapel_tubing(self)
-        self.populate_row(self.insert_index, emergency_sbt_list, self.table_widget)
+        self.populate_work_rows_with_remote_fallback("main_lapel_tubing", {}, self.table_widget, emergency_sbt_list)
 
     def lar_sbt_action(self):
         from work_py.emergency_lar import EmergencyLarWork
@@ -3386,30 +3504,36 @@ class MyWindow(MyMainWindow):
         self.add_window(EmergencyPrintWork)
 
     def rgd_without_paker_action(self):
-        from work_py.rgdVcht import rgd_without_paker
+        from PyQt5.QtWidgets import QMessageBox
+        from work_py.rgdVcht import rgd_without_paker_build_rows
 
-        rgd_without_paker_list = rgd_without_paker(self)
-        self.populate_row(self.insert_index, rgd_without_paker_list, self.table_widget)
+        ori = QMessageBox.question(self, "ОРИ", "Нужна ли интерпретация?")
+        ori_yes = ori == QMessageBox.StandardButton.Yes
+        rgd_without_paker_list = rgd_without_paker_build_rows(self, ori_yes)
+        self.populate_work_rows_with_remote_fallback(
+            "main_rgd_without_paker",
+            {"ori_yes": ori_yes},
+            self.table_widget,
+            rgd_without_paker_list,
+        )
 
     def rgd_with_paker_action(self):
         from work_py.rgdVcht import rgd_with_paker
 
         rgd_with_paker_list = rgd_with_paker(self)
-        self.populate_row(self.insert_index, rgd_with_paker_list, self.table_widget)
+        self.populate_work_rows_with_remote_fallback("main_rgd_with_paker", {}, self.table_widget, rgd_with_paker_list)
 
     def pressure_gis(self):
         from work_py.alone_oreration import pressure_gis
 
         pressure_gis_list = pressure_gis(self)
-        self.populate_row(self.insert_index, pressure_gis_list, self.table_widget)
+        self.populate_work_rows_with_remote_fallback("main_pressure_gis", {}, self.table_widget, pressure_gis_list)
 
     def definition_bottom_gklm(self):
         from work_py.alone_oreration import definition_bottom_gklm
 
         definition_bottom_gklm_list = definition_bottom_gklm(self)
-        self.populate_row(
-            self.insert_index, definition_bottom_gklm_list, self.table_widget
-        )
+        self.populate_work_rows_with_remote_fallback("main_definition_bottom_gklm", {}, self.table_widget, definition_bottom_gklm_list)
 
     def privyazka_nkt_work(self):
 
@@ -3436,44 +3560,68 @@ class MyWindow(MyMainWindow):
 
     def privyazka_nkt(self):
         privyazka_nkt_list = self.privyazka_nkt_work()
-        self.populate_row(self.insert_index, privyazka_nkt_list, self.table_widget)
+        self.populate_work_rows_with_remote_fallback("main_privyazka_nkt", {}, self.table_widget, privyazka_nkt_list)
 
     def definition_q(self):
         from work_py.alone_oreration import definition_q
 
         definition_q_list = definition_q(self)
-        self.populate_row(self.insert_index, definition_q_list, self.table_widget)
+        self.populate_work_rows_with_remote_fallback(
+            "main_definition_q", {}, self.table_widget, definition_q_list
+        )
 
     def definition_q_nek(self):
-        from work_py.alone_oreration import definition_q_nek
+        from work_py.alone_oreration import definition_q_nek_build_rows, open_checkbox_dialog
 
-        definition_q_list = definition_q_nek(self)
-        self.populate_row(self.insert_index, definition_q_list, self.table_widget)
+        import data_list
+
+        open_checkbox_dialog(self.data_well)
+        plast = data_list.plast_select
+        definition_q_list = definition_q_nek_build_rows(self, plast)
+        self.populate_work_rows_with_remote_fallback(
+            "main_definition_q_nek",
+            {"plast": plast},
+            self.table_widget,
+            definition_q_list,
+        )
 
     def kot_work(self):
+        from work_plan_rows_context import previous_current_bottom_for_kot
         from work_py.alone_oreration import kot_work
 
+        previous_bottom = previous_current_bottom_for_kot(self.data_well)
         kot_work_list = kot_work(self)
-        self.populate_row(self.insert_index, kot_work_list, self.table_widget)
+        self.populate_work_rows_with_remote_fallback(
+            "main_kot_work",
+            {"previous_bottom": previous_bottom},
+            self.table_widget,
+            kot_work_list,
+        )
 
     def konte_action(self):
         from work_py.alone_oreration import konte
 
         konte_work_list = konte(self)
-        self.populate_row(self.insert_index, konte_work_list, self.table_widget)
+        self.populate_work_rows_with_remote_fallback(
+            "main_konte_action", {}, self.table_widget, konte_work_list
+        )
 
     def mkp_revision(self):
         from work_py.mkp import mkp_revision
 
         mkp_work_list = mkp_revision(self)
-        self.populate_row(self.insert_index, mkp_work_list, self.table_widget)
+        self.populate_work_rows_with_remote_fallback(
+            "main_mkp_revision", {}, self.table_widget, mkp_work_list
+        )
 
     def resuscitation_work(self):
         from work_py.descent_gno import DescentParent
 
         mkp_work_list = DescentParent.append_note_6(self)
         mkp_work_list[0][2] = mkp_work_list[0][2].replace("ПРИМЕЧАНИЕ №6: ", "")
-        self.populate_row(self.insert_index, mkp_work_list, self.table_widget)
+        self.populate_work_rows_with_remote_fallback(
+            "main_resuscitation_work", {}, self.table_widget, mkp_work_list
+        )
 
     def acid_action_gons(self):
         from work_py.acids import GonsWindow
@@ -3486,10 +3634,31 @@ class MyWindow(MyMainWindow):
         self.add_window(PakerIzvlek)
 
     def pvo_cat1(self):
-        from work_py.alone_oreration import pvo_cat1
+        from PyQt5.QtWidgets import QInputDialog
+        from work_py.alone_oreration import pvo_cat1_build_rows, pvo_cat1_side_effects
 
-        pvo_cat1_work_list = pvo_cat1(self)
-        self.populate_row(self.insert_index, pvo_cat1_work_list, self.table_widget)
+        pvo_text, _ok = QInputDialog.getItem(
+            self,
+            "Категория ПВО",
+            "Выберете категорию ПВО",
+            ["1", "2", "3"],
+            1,
+            2,
+        )
+        need_paker, _ok2 = QInputDialog.getItem(
+            self,
+            "Категория ПВО",
+            "Нужно ли спускать пакер?",
+            ["Да", "Нет"],
+        )
+        pvo_cat1_work_list = pvo_cat1_build_rows(self, pvo_text, need_paker)
+        pvo_cat1_side_effects(self)
+        self.populate_work_rows_with_remote_fallback(
+            "main_pvo_cat1",
+            {"pvo_scheme": pvo_text, "need_paker": need_paker},
+            self.table_widget,
+            pvo_cat1_work_list,
+        )
 
     def fluid_change_action(self):
         from work_py.change_fluid import ChangeFluidWindow
@@ -3522,10 +3691,22 @@ class MyWindow(MyMainWindow):
         self.add_window(SandWindow)
 
     def washing_sand(self):
+        from work_plan_rows_context import previous_current_bottom_for_kot
         from work_py.sand_filling import SandWindow
 
+        spo_depth = previous_current_bottom_for_kot(self.data_well)
         washing_work_list = SandWindow.sandWashing(self)
-        self.populate_row(self.insert_index, washing_work_list, self.table_widget)
+        washing_depth = float(
+            self.data_well.current_bottom.get_value
+            if hasattr(self.data_well.current_bottom, "get_value")
+            else self.data_well.current_bottom
+        )
+        self.populate_work_rows_with_remote_fallback(
+            "main_washing_sand",
+            {"washing_depth": washing_depth, "spo_depth": spo_depth},
+            self.table_widget,
+            washing_work_list,
+        )
 
     def deleteString(self):
         selected_ranges = self.table_widget.selectedRanges()
@@ -3552,7 +3733,9 @@ class MyWindow(MyMainWindow):
             ryber_work_list = [
                 [None, None, None, None, None, None, None, None, None, None, None, None]
             ]
-            self.populate_row(self.insert_index, ryber_work_list, self.table_widget)
+            self.populate_work_rows_with_remote_fallback(
+                "main_empty_string_row", {}, self.table_widget, ryber_work_list
+            )
 
     def vp_action(self):
         from work_py.vp_cm import VpWindow
@@ -3710,7 +3893,9 @@ class MyWindow(MyMainWindow):
         from work_py.emergencyWork import emergencyECN
 
         template_pero_list = emergencyECN(self)
-        self.populate_row(self.insert_index, template_pero_list, self.table_widget)
+        self.populate_work_rows_with_remote_fallback(
+            "main_po_emergency_ecn", {}, self.table_widget, template_pero_list
+        )
 
     def perforation_new_window(self):
         from work_py.perforation import PerforationWindow

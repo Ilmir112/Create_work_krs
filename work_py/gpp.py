@@ -97,7 +97,18 @@ class GppWindow(WindowUnion):
             return
         work_list = self.grp_gpp_work(paker_depth, current_depth, diameter_paker, gis_otz_after_true_quest)
         if work_list:
-            self.populate_row(self.insert_index, work_list, self.table_widget)
+            angle_text = ""
+            if self.data_well.angle_data:
+                if self.data_well.max_angle.get_value > 60:
+                    angle_text = self.calculate_angle_grad(self.data_well.angle_data)
+            remote_params = {
+                "gpp_depth": paker_depth,
+                "current_depth": current_depth,
+                "diameter_paker": diameter_paker,
+                "otz_after_question": gis_otz_after_true_quest,
+                "angle_grad_text": angle_text or None,
+            }
+            self.populate_work_rows_with_remote_fallback("gpp", remote_params, self.table_widget, work_list)
             data_list.pause = False
             self.close()
             self.close_modal_forcefully()

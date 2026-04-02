@@ -623,6 +623,9 @@ class SwabWindow(WindowUnion):
         self.table_widget = table_widget
         self.dict_nkt = {}
         self.table_widget = table_widget
+        self._opy_volume_change = "Нет"
+        self._opy_volume_change_fluid = None
+        self._opy_zgs_fluid = None
         self.tableWidget = QTableWidget(0, 8)
         self.tab_widget = TabWidget(self.tableWidget, self.data_well)
 
@@ -782,6 +785,9 @@ class SwabWindow(WindowUnion):
 
     def add_work(self):
         self.current_widget = self.tab_widget.currentWidget()
+        self._opy_volume_change = "Нет"
+        self._opy_volume_change_fluid = None
+        self._opy_zgs_fluid = None
 
         try:
             self.need_privyazka_q_combo = self.current_widget.need_privyazka_q_combo.currentText()
@@ -884,6 +890,8 @@ class SwabWindow(WindowUnion):
                 QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
                 return
 
+        segments_swab: list = []
+
         work_list = []
         if self.depth_gauge_combo == 'Да':
             work_list = [[f'Заявить глубинные манометры', None,
@@ -908,6 +916,17 @@ class SwabWindow(WindowUnion):
                 self.paker2_depth = int(float(self.tableWidget.item(row, 3).text()))
                 self.swab_type_combo = self.tableWidget.cellWidget(row, 4).currentText()
                 self.swab_volume_edit = int(float(self.tableWidget.item(row, 5).text()))
+                segments_swab.append(
+                    {
+                        "plast": self.plast_combo,
+                        "paker_khost": float(self.paker_khost),
+                        "swab_paker_depth": float(self.swab_paker_depth),
+                        "paker2_depth": float(self.paker2_depth),
+                        "swab_type_combo": self.swab_type_combo,
+                        "swab_volume_edit": float(self.swab_volume_edit),
+                        "diameter_paker": float(self.diameter_paker),
+                    }
+                )
                 if row == 0:
                     work_list.extend(self.swabbing_with_2paker())
                 elif rows == row + 1:
@@ -930,6 +949,16 @@ class SwabWindow(WindowUnion):
                 self.swab_paker_depth = int(float(self.tableWidget.item(row, 2).text()))
                 self.swab_type_combo = self.tableWidget.cellWidget(row, 3).currentText()
                 self.swab_volume_edit = int(float(self.tableWidget.item(row, 4).text()))
+                segments_swab.append(
+                    {
+                        "plast": self.plast_combo,
+                        "paker_khost": float(self.paker_khost),
+                        "swab_paker_depth": float(self.swab_paker_depth),
+                        "swab_type_combo": self.swab_type_combo,
+                        "swab_volume_edit": float(self.swab_volume_edit),
+                        "diameter_paker": float(self.diameter_paker),
+                    }
+                )
 
                 for plast in self.plast_combo.split(','):
                     if plast in self.data_well.plast_work:
@@ -959,6 +988,16 @@ class SwabWindow(WindowUnion):
                 self.swab_paker_depth = int(float(self.tableWidget.item(row, 1).text()))
                 self.swab_type_combo = self.tableWidget.cellWidget(row, 2).currentText()
                 self.swab_volume_edit = int(float(self.tableWidget.item(row, 3).text()))
+                segments_swab.append(
+                    {
+                        "plast": self.plast_combo,
+                        "paker_khost": 0.0,
+                        "swab_paker_depth": float(self.swab_paker_depth),
+                        "swab_type_combo": self.swab_type_combo,
+                        "swab_volume_edit": float(self.swab_volume_edit),
+                        "diameter_paker": float(self.diameter_paker),
+                    }
+                )
 
                 work_list = self.swabbing_with_voronka()
 
@@ -976,9 +1015,20 @@ class SwabWindow(WindowUnion):
                 self.swab_paker_depth = int(float(self.tableWidget.item(row, 2).text()))
                 self.swab_type_combo = self.tableWidget.cellWidget(row, 3).currentText()
                 self.swab_volume_edit = int(float(self.tableWidget.item(row, 4).text()))
+                segments_swab.append(
+                    {
+                        "plast": self.plast_combo,
+                        "paker_khost": float(self.paker_khost),
+                        "swab_paker_depth": float(self.swab_paker_depth),
+                        "swab_type_combo": self.swab_type_combo,
+                        "swab_volume_edit": float(self.swab_volume_edit),
+                        "diameter_paker": float(self.diameter_paker),
+                    }
+                )
 
                 work_list = self.swabbing_with_paker_stub()
             elif self.swab_true_edit_type == 'Опрессовка снижением уровня на шаблоне':
+                self.depth_opy = int(float(self.tableWidget.item(row, 1).text()))
                 self.template_second_need_combo = self.current_widget.template_second_need_combo.currentText()
                 if self.need_change_zgs_combo == 'Да':
                     category_h2s_list_plan = list(
@@ -997,14 +1047,66 @@ class SwabWindow(WindowUnion):
                 self.template_second = self.current_widget.template_second_edit.text()
                 self.length_template_second = self.current_widget.length_template_second_edit.text()
 
-                self.paker2_depth = int(float(self.tableWidget.item(row, 1).text()))
-
                 work_list = self.swabbing_opy()
+                segments_swab.append(
+                    {
+                        "depth_opy": float(self.depth_opy),
+                        "template_second_need": self.template_second_need_combo,
+                        "template_second": self.template_second,
+                        "length_template_second": self.length_template_second,
+                        "diameter_paker": float(self.diameter_paker),
+                    }
+                )
             elif self.swab_true_edit_type == 'Опрессовка снижением уровня на пакере с заглушкой':
-                self.paker2_depth = int(float(self.tableWidget.item(row, 3).text()))
+                self.depth_opy = int(float(self.tableWidget.item(row, 3).text()))
                 self.paker_khost = int(float(self.tableWidget.item(row, 1).text()))
                 self.swab_paker_depth = int(float(self.tableWidget.item(row, 2).text()))
                 work_list = self.swabbing_opy_with_paker()
+                segments_swab.append(
+                    {
+                        "depth_opy": float(self.depth_opy),
+                        "paker_khost": float(self.paker_khost),
+                        "swab_paker_depth": float(self.swab_paker_depth),
+                        "diameter_paker": float(self.diameter_paker),
+                    }
+                )
+
+        fluid_work_after_change = None
+        change_fluid_swab = None
+        if self.need_change_zgs_combo == "Да":
+            fluid_work_after_change = str(self.data_well.fluid_work)
+            fshort = getattr(self.data_well, "fluid_work_short", None) or fluid_work_after_change[:16]
+            change_fluid_swab = {
+                "mode": "new_plast",
+                "fluid_new": float(self.fluid_new),
+                "fluid_work": fluid_work_after_change,
+                "fluid_work_short": str(fshort),
+                "expected_pressure": self.pressure_new,
+            }
+
+        try:
+            pz_sw = (
+                int(float(self.paker_depth_zumpf))
+                if self.pressure_zumph_combo == "Да" and self.paker_depth_zumpf != ""
+                else None
+            )
+        except (TypeError, ValueError):
+            pz_sw = None
+        remote_params_swab = {
+            "swab_true_edit_type": self.swab_true_edit_type,
+            "segments": segments_swab,
+            "diameter_paker": float(self.diameter_paker),
+            "need_privyazka_q_combo": self.need_privyazka_q_combo,
+            "depth_gauge_combo": self.depth_gauge_combo,
+            "pressure_zumph_combo": self.pressure_zumph_combo,
+            "paker_depth_zumpf": pz_sw,
+            "need_change_zgs_combo": self.need_change_zgs_combo,
+            "fluid_work_after_change": fluid_work_after_change,
+            "change_fluid": change_fluid_swab,
+            "opy_volume_change": getattr(self, "_opy_volume_change", "Нет"),
+            "opy_volume_change_fluid": getattr(self, "_opy_volume_change_fluid", None),
+            "opy_zgs_fluid": getattr(self, "_opy_zgs_fluid", None),
+        }
 
         if self.need_privyazka_q_combo == 'Да':
             work_list.insert(1, self.privyazka_nkt_work()[0])
@@ -1042,7 +1144,9 @@ class SwabWindow(WindowUnion):
                                    None, None, None, None, None, None, None,
                                    'мастер КРС', None]])
 
-            self.populate_row(self.insert_index, work_list, self.table_widget)
+            self.populate_work_rows_with_remote_fallback(
+                "swabbing", remote_params_swab, self.table_widget, work_list
+            )
             data_list.pause = False
             self.close()
         self.close_modal_forcefully()
@@ -1152,11 +1256,20 @@ class SwabWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'Мастер КРС, подрядчик по ГИС', None]]
 
+        self._opy_volume_change = "Нет"
+        self._opy_volume_change_fluid = None
         fluid_change_quest = QMessageBox.question(self, 'Смена объема',
                                                   'Нужна ли смена удельного веса рабочей жидкости?')
         if fluid_change_quest == QMessageBox.StandardButton.Yes:
+            self._opy_volume_change = "Да"
             self.data_well.fluid_work, self.data_well.fluid_work_short, plast, expected_pressure = \
                 need_h2s(self, self.fluid_new, self.plast_new, self.pressure_new)
+            self._opy_volume_change_fluid = {
+                "fluid_work": str(self.data_well.fluid_work),
+                "fluid_work_short": str(self.data_well.fluid_work_short),
+                "plast": str(plast),
+                "expected_pressure": expected_pressure,
+            }
 
             fluid_change_list = [
                 [None, None,
@@ -1194,6 +1307,7 @@ class SwabWindow(WindowUnion):
         return paker_list
 
     def swabbing_opy(self):
+        self._opy_zgs_fluid = None
 
         template_second_str = ''
         if self.template_second_need_combo == 'Да':
@@ -1302,6 +1416,12 @@ class SwabWindow(WindowUnion):
 
             self.data_well.fluid_work, self.data_well.fluid_work_short, plast, expected_pressure = need_h2s(
                 self, self.fluid_new, self.plast_new, self.pressure_new)
+            self._opy_zgs_fluid = {
+                "fluid_work": str(self.data_well.fluid_work),
+                "fluid_work_short": str(self.data_well.fluid_work_short),
+                "plast": str(plast),
+                "expected_pressure": expected_pressure,
+            }
 
             fluid_change_list = [
                 [

@@ -2,7 +2,7 @@ from PyQt5.QtGui import QDoubleValidator
 
 import data_list
 
-from PyQt5.QtWidgets import QMessageBox, QWidget, QLabel, QComboBox, QLineEdit, QGridLayout, \
+from PyQt5.QtWidgets import QMessageBox, QWidget, QGridLayout, \
     QPushButton, QHeaderView, QTableWidget, QTableWidgetItem
 
 
@@ -122,6 +122,7 @@ class OpressovkaEK(WindowUnion):
         paker_khost = int(float(self.tab_widget.currentWidget().paker_khost_edit.text()))
         diameter_paker = int(float(self.tab_widget.currentWidget().diameter_paker_edit.text()))
         pressure_zumpf_question_combo = self.tab_widget.currentWidget().pressure_zumpf_question_combo.currentText()
+        depth_paker_list = []
         if pressure_zumpf_question_combo == 'Да':
             paker_depth_zumpf = int(float(self.tab_widget.currentWidget().paker_depth_zumpf_edit.text()))
             if paker_khost + paker_depth_zumpf >= self.data_well.current_bottom:
@@ -139,11 +140,11 @@ class OpressovkaEK(WindowUnion):
             for row in range(rows):
                 paker_depth = self.tableWidget.item(row, 0)
                 paker_depth = int(float(paker_depth.text()))
+                depth_paker_list.append(paker_depth)
 
             work_list = self.paker_list(diameter_paker, paker_khost, paker_depth,
                                                 pressure_zumpf_question_combo, paker_depth_zumpf)
         else:
-            depth_paker_list = []
             for row in range(rows):
 
                 paker_depth = float(self.tableWidget.item(row, 0).text().replace(',', '.'))
@@ -166,7 +167,15 @@ class OpressovkaEK(WindowUnion):
                                                                depth_paker_list, pressure_zumpf_question_combo,
                                                                paker_depth_zumpf)
 
-        self.populate_row(self.insert_index, work_list, self.table_widget)
+        remote_params = {
+            "paker_khost": float(paker_khost),
+            "diameter_paker": float(diameter_paker),
+            "pressure_zumpf_question": pressure_zumpf_question_combo,
+            "paker_depth_zumpf": float(paker_depth_zumpf),
+            "need_privyazka": self.need_privyazka_q_combo,
+            "depth_paker_list": [float(depth) for depth in depth_paker_list],
+        }
+        self.populate_work_rows_with_remote_fallback("opressovka", remote_params, self.table_widget, work_list)
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()

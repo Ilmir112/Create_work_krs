@@ -174,6 +174,7 @@ class PeroWindow(WindowUnion):
             QMessageBox.warning(self, 'Ошибка', f'Не корректное сохранение параметра: {type(e).__name__}\n\n{str(e)}')
             return # Добавлен возврат, чтобы предотвратить дальнейшее выполнение в случае общей ошибки
 
+        text_bottom = self.data_well.current_bottom
         gips_pero_list = self.pero(current_edit, pero_combo, solvent_question_combo, solvent_volume_edit)
         # populate_row ожидает list[list], а pero() возвращает list[dict]
         work_list = [
@@ -189,7 +190,14 @@ class PeroWindow(WindowUnion):
         ]
 
         self.data_well.current_bottom = current_edit
-        self.populate_row(self.insert_index, work_list, self.table_widget)
+        pero_params = {
+            "current_edit": current_edit,
+            "pero_combo": pero_combo,
+            "include_solvent_step": solvent_question_combo == "Да",
+            "solvent_volume_m3": solvent_volume_edit,
+            "text_bottom": text_bottom,
+        }
+        self.populate_work_rows_with_remote_fallback("pero_work", pero_params, self.table_widget, work_list)
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()

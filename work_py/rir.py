@@ -359,11 +359,7 @@ class RirWindow(WindowUnion):
                 diameter_paker=122, paker_khost=0, paker_depth=0):
         rir_list = self.need_paker(paker_need_combo, plast_combo, diameter_paker, paker_khost,
                                    paker_depth, pressure_zumpf_question, True)
-        rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
-        if rir_rpk_question == QMessageBox.StandardButton.Yes:
-            rir_rpk_plast_true = True
-        else:
-            rir_rpk_plast_true = False
+        rir_rpk_plast_true = bool(getattr(self, 'rir_between_plasts', False))
         rir_work_list = [
             [None, None,
              f'Вызвать геофизическую партию. Заявку оформить за 24 часов сутки через РИТС {data_list.contractor}". '
@@ -406,11 +402,7 @@ class RirWindow(WindowUnion):
         rir_list = self.need_paker(paker_need_combo, plast_combo, diameter_paker, paker_khost,
                                    paker_depth, pressure_zumpf_question, True)
 
-        rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
-        if rir_rpk_question == QMessageBox.StandardButton.Yes:
-            rir_rpk_plast_true = True
-        else:
-            rir_rpk_plast_true = False
+        rir_rpk_plast_true = bool(getattr(self, 'rir_between_plasts', False))
 
         rir_work_list = [
             [f'СПО РПП до глубины {sole_rir_edit}м', None,
@@ -565,10 +557,7 @@ class RirWindow(WindowUnion):
                 roof_rir_edit, sole_rir_edit, pressure_zumpf_question='Не нужно',
                 diameter_paker=122, paker_khost=0, paker_depth=0):
 
-        rir_rpk_question = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
-        rir_rpk_plast_true = False
-        if rir_rpk_question == QMessageBox.StandardButton.Yes:
-            rir_rpk_plast_true = True
+        rir_rpk_plast_true = bool(getattr(self, 'rir_between_plasts', False))
 
         rir_list = self.need_paker(paker_need_combo, plast_combo, diameter_paker, paker_khost,
                                    paker_depth, pressure_zumpf_question, rir_rpk_plast_true)
@@ -1230,7 +1219,7 @@ class RirWindow(WindowUnion):
             if sole_rir_edit != '':
                 sole_rir_edit = int(float(sole_rir_edit))
 
-            if sole_rir_edit > self.data_well.current_bottom:
+            if sole_rir_edit != '' and sole_rir_edit > self.data_well.current_bottom:
                 QMessageBox.warning(self, 'Ошибка',
                                     f'Подошва ЦМ ниже текущего забоя - {self.data_well.current_bottom}м')
                 return
@@ -1274,6 +1263,17 @@ class RirWindow(WindowUnion):
             pressure_new_edit = current_widget.pressure_new_edit.text()
         except Exception as e:
             QMessageBox.warning(self, 'ОШИБКА', f'Введены не все данные {e}')
+            return
+
+        rir_between_plasts = False
+        if self.rir_type_combo in ('РПП Силами ККТ', 'РИР с РПП', 'РИР с РПК'):
+            mes_bp = QMessageBox.question(self, 'посадку между пластами?', 'посадку между пластами?')
+            rir_between_plasts = mes_bp == QMessageBox.StandardButton.Yes
+        self.rir_between_plasts = rir_between_plasts
+
+        paker_depth_zumpf = 0
+        if paker_need_combo == 'Нужно СПО' and pressure_zumpf_question == 'Да':
+            paker_depth_zumpf = int(float(current_widget.paker_depth_zumpf_edit.text().replace(',', '.')))
 
         self.ozc_str_short, self.ozc_str, self.time_ozc = WindowUnion.calculate_time_ozc(roof_rir_edit)
 
@@ -1301,6 +1301,9 @@ class RirWindow(WindowUnion):
             paker_khost = 10
             paker_depth = 1000
 
+        info_rir_edit = ''
+        self._last_fluid_change_api = None
+
         if self.rir_type_combo == 'РИР на пере':  # ['РИР на пере', 'РИР с пакером с 2С', 'РИР с РПК', 'РИР с РПП']
             if (plast_new_combo == '' or fluid_new_edit == '' or pressure_new_edit == '') and \
                     need_change_zgs_combo == 'Да':
@@ -1318,14 +1321,13 @@ class RirWindow(WindowUnion):
                     need_change_zgs_combo == 'Да':
                 QMessageBox.critical(self, 'Ошибка', 'Введены не все параметры')
                 return
-            if paker_need_combo == 'Да':
+            if paker_need_combo == 'Нужно СПО':
                 if self.check_true_depth_template(paker_depth) is False:
                     return
                 if self.check_depth_paker_in_perforation(paker_depth) is False:
                     return
                 if self.check_depth_in_skm_interval(paker_depth) is False:
                     return
-            info_rir_edit = ''
 
             work_list = self.rir_with_pero_gl(
                 paker_need_combo, plast_combo, roof_rir_edit, sole_rir_edit, volume_cement, info_rir_edit,
@@ -1391,7 +1393,30 @@ class RirWindow(WindowUnion):
                                         need_change_zgs_combo, plast_new_combo, fluid_new_edit, pressure_new_edit,
                                         pressure_zumpf_question, diameter_paker, paker_khost, paker_depth)
 
-        self.populate_row(self.insert_index, work_list, self.table_widget)
+        vc_for_api = None if volume_cement == '' else volume_cement
+        roof_api = roof_rir_edit if roof_rir_edit != '' else None
+        sole_api = sole_rir_edit if sole_rir_edit != '' else None
+        remote_params = {
+            "rir_type": self.rir_type_combo,
+            "plast_combo": plast_combo,
+            "paker_need_combo": paker_need_combo,
+            "roof_rir": roof_api,
+            "sole_rir": sole_api,
+            "volume_cement": vc_for_api,
+            "pressure_zumpf_question": pressure_zumpf_question,
+            "need_change_zgs_combo": need_change_zgs_combo,
+            "diameter_paker": diameter_paker,
+            "paker_khost": paker_khost,
+            "paker_depth": paker_depth,
+            "paker_depth_zumpf": paker_depth_zumpf,
+            "need_privyazka_q": self.need_privyazka_q_combo,
+            "rir_between_plasts": rir_between_plasts,
+            "change_fluid_api": getattr(self, "_last_fluid_change_api", None),
+            "info_rir_edit": info_rir_edit,
+        }
+        self.populate_work_rows_with_remote_fallback(
+            "rir", remote_params, self.table_widget, work_list
+        )
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()

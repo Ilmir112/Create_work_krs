@@ -71,7 +71,7 @@ ctkrs = ''
 DICT_CONTRACTOR = {
     'ООО Ойл-сервис':
         {
-            'Дата ПВО': 'от 03.03.2025'
+            'Дата ПВО': 'от 25.02.2026'
         },
     'ООО РН-Сервис':
         {
@@ -91,6 +91,13 @@ plan_correct_index = 0
 category_h2s_list = []
 user = ['', '']
 operation_window = None
+
+# Текущий контекст для отправки логов на backend
+# (обновляется из `main.py`, используется `log_files/log.py`)
+current_well_number = None
+current_well_area = None
+current_well_region = None
+current_operation_type = None
 
 data_in_base = False
 

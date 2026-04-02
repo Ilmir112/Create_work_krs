@@ -419,7 +419,10 @@ class SaveInExcel(MyWindow):
                 params["type_kr"] = self.data_well.type_kr.split()[0]
             
             if hasattr(self.data_well, 'work_plan') and self.data_well.work_plan:
-                params["work_plan"] = self._work_plan_for_db(self.data_well.work_plan)
+                params["work_plan"] = self._work_plan_for_db(
+                    self.data_well.work_plan,
+                    getattr(self.data_well, "number_dp", 0),
+                )
             
             if hasattr(data_list, 'current_date') and data_list.current_date:
                 params["date_create"] = data_list.current_date.strftime("%Y-%m-%d")
@@ -487,14 +490,23 @@ class SaveInExcel(MyWindow):
             traceback.print_exc()
 
     @staticmethod
-    def _work_plan_for_db(work_plan: str) -> str:
-        """Преобразует work_plan для отправки в БД/API: plan_change → ПРизм, dop_plan_in_base → ДП№."""
+    def _work_plan_for_db(work_plan: str, number_dp=None) -> str:
+        """Преобразует work_plan для отправки в БД/API.
+
+        plan_change → ПРизм
+        dop_plan_in_base → ДП№<number_dp> (или просто "ДП", если number_dp неизвестен)
+        """
         if not work_plan:
             return work_plan or ""
         if work_plan == "plan_change":
             return "ПРизм"
         if work_plan == "dop_plan_in_base":
-            return "ДП"
+            try:
+                # number_dp в UI хранится как int (1..N), но безопасно обработаем строки.
+                num = int(float(number_dp)) if number_dp not in (None, "", 0, "0") else 0
+            except Exception:
+                num = 0
+            return f"ДП№{num}" if num > 0 else "ДП"
         return work_plan.replace("krs", "ПР").replace("dop_plan", "ДП").replace("prs", "ПР_ТРС")
 
     @staticmethod
@@ -550,7 +562,10 @@ class SaveInExcel(MyWindow):
                 "id": 0,  # Backend сам присвоит ID при создании
                 "category_dict": getattr(self.data_well, 'dict_category', {}),
                 "type_kr": getattr(self.data_well, 'type_kr', '').split()[0],
-                "work_plan": self._work_plan_for_db(getattr(self.data_well, 'work_plan', '')),
+                "work_plan": self._work_plan_for_db(
+                    getattr(self.data_well, "work_plan", ""),
+                    getattr(self.data_well, "number_dp", 0),
+                ),
                 "excel_json": excel_data_dict,
                 "data_change_paragraph": data_change_paragraph,
                 "norms_time": getattr(self.data_well, 'norm_of_time', 0.0),

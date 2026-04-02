@@ -12,6 +12,45 @@ from work_py.mkp import mkp_revision_1_kateg
 from work_py.rationingKRS import lifting_nkt_norm, well_jamming_norm, liftingGNO, lifting_sucker_rod
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 
+# Подъём ГНО: хвост на API (сегмент) + begin_work на клиенте
+GNO_LIFT_SEGMENT_REMOTE = {
+    'воронка': 'voronka_tail',
+    'пакер': 'paker_tail',
+    'ОРЗ': 'orz_tail',
+    'ОРД': 'ord_tail',
+    'НН с пакером': 'nn_with_paker_tail',
+    'НВ с пакером': 'nv_with_paker_tail',
+    'ЭЦН с пакером': 'ecn_with_paker_tail',
+    'ЭЦН': 'ecn_tail',
+    'НВ': 'nv_tail',
+    'НН': 'nn_tail',
+    'ЭЦН с автономными пакерами': 'ecn_with_2paker_tail',
+}
+
+
+def _gno_remote_api_params(lift_key, lift_strategy):
+    cat = lift_strategy.data_well.category_pvo
+    cat_i = int(cat.get_value) if hasattr(cat, "get_value") else int(cat)
+    params = {
+        "lift_key": lift_key,
+        "segment": GNO_LIFT_SEGMENT_REMOTE[lift_key],
+        "well_jamming_str": list(lift_strategy.well_jamming_str),
+        "without_damping_true": bool(lift_strategy.without_damping_true),
+        "length_nkt": lift_strategy.length_nkt,
+        "nkt_diam_fond": lift_strategy.nkt_diam_fond,
+        "category_pvo": cat_i,
+        "text_pvo": lift_strategy.text_pvo,
+        "current_month": datetime.now().month,
+    }
+    if lift_key == 'пакер':
+        params["well_jamming_str_in_nkt"] = lift_strategy.well_jamming_str_in_nkt
+    if lift_key == 'ОРД':
+        params["volume_well_jamming"] = lift_strategy.volume_well_jamming
+        params["sucker_pod_jamming"] = lift_strategy.sucker_pod_jamming
+    if lift_key in ('НВ', 'НН'):
+        params["nv_list_prefix"] = "".join(lift_strategy.nv_list)
+    return params
+
 
 class TabPageGno(TabPageUnion):
 
@@ -287,7 +326,18 @@ class GnoWindow(WindowUnion):
             lift_strategy = LiftEcnWith2Paker(self)
 
         if lift_strategy:
-            work_list = lift_strategy.add_work_lift()
+            work_list = None
+            gno_lift_api_params: dict = {}
+            if self.lift_key in GNO_LIFT_SEGMENT_REMOTE:
+                begin = lift_strategy.begin_work()
+                if not begin:
+                    return
+                gno_lift_api_params = _gno_remote_api_params(self.lift_key, lift_strategy)
+                gno_lift_api_params["prepend_rows"] = begin
+                work_list = lift_strategy.add_work_lift()
+            else:
+                work_list = lift_strategy.add_work_lift()
+                gno_lift_api_params = {"_skip_remote": True}
 
             if self.lift_key == 'ЭЦН с автономными пакерами':
                 current_bottom_ecn_edit = self.current_widget.current_bottom_ecn_edit.text()
@@ -307,7 +357,9 @@ class GnoWindow(WindowUnion):
                 if self.data_well.work_plan not in ['krs', 'prs']:
                     work_list = work_list[2:]
 
-                self.populate_row(self.insert_index, work_list, self.table_widget)
+                self.populate_work_rows_with_remote_fallback(
+                    "gno_lift", gno_lift_api_params, self.table_widget, work_list
+                )
 
                 data_list.pause = False
                 self.close()

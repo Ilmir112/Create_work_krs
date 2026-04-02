@@ -154,15 +154,27 @@ class KompressWindow(WindowUnion):
                                 f'это слишком высоко')
             return
 
+        work_list = None
         if kompress_true_combo == 'воронка':
             work_list = self.kompress(plast_combo, kompress_TypeCombo, khvost_edit, kompress_volume, count_muft,
                                       depth_gauge_combo, dictance_without_murt)
-        else:
-            pass
 
-        self.populate_row(self.insert_index, work_list, self.table_widget)
+        if work_list:
+            remote_params = {
+                "plast_combo": plast_combo,
+                "kompress_type_combo": kompress_TypeCombo,
+                "khvost_edit": khvost_edit,
+                "kompress_volume": kompress_volume,
+                "count_muft": count_muft,
+                "depth_gauge_combo": depth_gauge_combo,
+                "dictance_without_murt": dictance_without_murt,
+            }
+            self.populate_work_rows_with_remote_fallback(
+                "kompress", remote_params, self.table_widget, work_list
+            )
         data_list.pause = False
-        self.close()
+        if work_list:
+            self.close()
         self.close_modal_forcefully()
 
     def kompress(self, plast_combo, kompress_TypeCombo, khvost_edit, kompress_volume, count_muft,

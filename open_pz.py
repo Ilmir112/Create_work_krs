@@ -276,7 +276,7 @@ class CreatePZ(MyMainWindow):
 
                 # Для доп. плана КРС добавляем блок заголовков "Порядок работы" / "п/п" в конец ws2,
                 # если его там ещё нет. С границами как у основной таблицы.
-                if self.data_well.work_plan == "dop_plan":
+                if self.data_well.work_plan in ["dop_plan", 'dop_plan_in_base']:
                     header_exists = False
                     for row in range(1, ws2.max_row + 1):
                         cell = ws2.cell(row=row, column=2)  # колонка B

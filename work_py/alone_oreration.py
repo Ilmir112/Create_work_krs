@@ -12,11 +12,16 @@ from selectPlast import CheckBoxDialog
 from .rationingKRS import lifting_nkt_norm, descentNKT_norm, well_volume_norm
 
 
-def kot_select(self, current_bottom):
+def kot_select(self, current_bottom, previous_well_bottom=None):
+    """previous_well_bottom — забой до операции (для согласования с API main_kot_work)."""
+    if previous_well_bottom is None:
+        previous_well_bottom = self.data_well.current_bottom
+        if hasattr(previous_well_bottom, "get_value"):
+            previous_well_bottom = previous_well_bottom.get_value
     kot_select = ''
     if self.data_well.column_additional is False \
             or (
-            self.data_well.column_additional is True and self.data_well.current_bottom <= self.data_well.head_column_additional.get_value):
+            self.data_well.column_additional is True and previous_well_bottom <= self.data_well.head_column_additional.get_value):
         kot_select = f'КОТ-50 (клапан обратный тарельчатый) +НКТ{self.data_well.nkt_diam}мм 10м + репер '
 
     elif self.data_well.column_additional is True and self.data_well.column_additional_diameter.get_value < 110 and \
@@ -33,6 +38,9 @@ def kot_select(self, current_bottom):
 
 
 def kot_work(self, current_bottom=0):
+    prev_cb = self.data_well.current_bottom
+    if hasattr(prev_cb, "get_value"):
+        prev_cb = prev_cb.get_value
     if current_bottom == 0:
         current_bottom, _ = QInputDialog.getDouble(None,
                                                    'Глубина забоя',
@@ -42,12 +50,12 @@ def kot_work(self, current_bottom=0):
     kot_list = [
         [f'статической уровень {self.data_well.static_level.get_value}', None,
          f'При отсутствии циркуляции:\n'
-         f'Спустить {kot_select(self, current_bottom)} на НКТ{self.data_well.nkt_diam}мм до глубины'
+         f'Спустить {kot_select(self, current_bottom, prev_cb)} на НКТ{self.data_well.nkt_diam}мм до глубины'
          f' {current_bottom}м '
          f'с замером, шаблонированием шаблоном {self.data_well.nkt_template}мм.',
          None, None, None, None, None, None, None,
          'мастер КРС', descentNKT_norm(current_bottom, 1)],
-        [f'{kot_select(self, current_bottom)} до H-{current_bottom} закачкой обратной промывкой', None,
+        [f'{kot_select(self, current_bottom, prev_cb)} до H-{current_bottom} закачкой обратной промывкой', None,
          f'Произвести очистку забоя скважины до гл.{current_bottom}м закачкой обратной промывкой тех '
          f'жидкости уд.весом {self.data_well.fluid_work}, по согласованию с Заказчиком',
          None, None, None, None, None, None, None, 'мастер КРС', 0.4],
@@ -56,7 +64,7 @@ def kot_work(self, current_bottom=0):
          None, None, None, None, None, None, None,
          'мастер КРС, предст. заказчика', None],
         [None, None,
-         f'Поднять {kot_select(self, current_bottom)} на НКТ{self.data_well.nkt_diam}мм c глубины '
+         f'Поднять {kot_select(self, current_bottom, prev_cb)} на НКТ{self.data_well.nkt_diam}мм c глубины '
          f'{current_bottom}м с доливом скважины в объеме {round(float(current_bottom) * 1.12 / 1000, 1)}м3 '
          f'удельным весом {self.data_well.fluid_work}',
          None, None, None, None, None, None, None,
@@ -220,9 +228,7 @@ def definition_q(self):
     return definition_q_list
 
 
-def definition_q_nek(self):
-    open_checkbox_dialog(self.data_well)
-    plast = data_list.plast_select
+def definition_q_nek_build_rows(self, plast):
     definition_q_list = [[f'Насыщение 5м3 Q-{plast} при {self.data_well.max_admissible_pressure.get_value}', None,
                           f'Произвести насыщение скважины по затрубу до стабилизации давления закачки не '
                           f'менее 5м3. Опробовать по затрубу'
@@ -233,8 +239,13 @@ def definition_q_nek(self):
                           f'начала работ). ',
                           None, None, None, None, None, None, None,
                           'мастер КРС', 0.17 + 0.2 + 0.2 + 0.2 + 0.15 + 0.52]]
-
     return definition_q_list
+
+
+def definition_q_nek(self):
+    open_checkbox_dialog(self.data_well)
+    plast = data_list.plast_select
+    return definition_q_nek_build_rows(self, plast)
 
 
 def definition_bottom_gklm(self):
@@ -260,6 +271,62 @@ def pressure_gis(self):
     return priv_list
 
 
+def pvo_cat1_build_rows(self, pvo_text, need_paker):
+    paker_str = ("", "")
+    if need_paker == "Да":
+        paker_str = ("Спустить и посадить пакер на глубину 10м.", "сорвать и извлечь пакер.")
+
+    text_pvo = f'на давление {self.data_well.max_expected_pressure.get_value}атм  ' \
+               f'(на максимально ожидаемое давление на устье в течении 30мин (не менее 30атм), но не выше ' \
+               f'давление опрессовки эксплуатационной колонны) '
+
+    if self.data_well.curator == 'ВНС':
+        text_pvo = f'{self.data_well.max_expected_pressure.get_value:.1f}атм  на ' \
+                   f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
+                   f' давление опрессовки эксплуатационной колонны) '
+
+    pvo_1 = f'Установить ПВО по схеме №{pvo_text} утвержденной главным инженером {data_list.contractor} ' \
+            f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}' \
+            f'(тип плашечный сдвоенный ПШП-2ФТ-160х21Г Крестовина КР160х21Г, ' \
+            f'задвижка ЗМС 65х21 (3шт), Шарового крана 1КШ-73х21, авар. трубы (патрубок НКТ73х7-7-Е, ' \
+            f' (при необходимости произвести монтаж переводника' \
+            f' П178х168 или П168 х 146 или ' \
+            f'П178 х 146 в зависимости от типоразмера крестовины и колонной головки). {paker_str[0]} ' \
+            f'Опрессовать ПВО (трубные плашки превентора) на ' \
+            f'Р-{text_pvo}, {paker_str[1]} \n' \
+            f'- Обеспечить о обогрев превентора, станции управления ПВО оборудовать теплоизоляционными ' \
+            f'материалом в зимней период. \n Получить разрешение на производство работ в присутствии представителя ПФС'
+
+    return [
+        [None, None,
+         "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ "
+         "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство "
+         "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность"
+         " для жизни людей"
+         " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. Представитель "
+         "ПАСФ приглашается за 24 часа до проведения "
+         "проверки монтажа ПВО телефонограммой. произвести практическое обучение по команде ВЫБРОС. "
+         "Пусковой комиссией составить акт готовности "
+         "подъёмного агрегата для ремонта скважины.",
+         None, None, None, None, None, None, None,
+         'Мастер КРС', None],
+        [f'монтаж ПВО по схеме №{pvo_text} c гидроПВО', None,
+         pvo_1, None, None,
+         None, None, None, None, None,
+         'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком', 4.67]]
+
+
+def pvo_cat1_side_effects(self):
+    self.text_pvo = f'на давление {self.data_well.max_expected_pressure.get_value}атм  ' \
+                    f'(на максимально ожидаемое давление на устье в течении 30мин (не менее 30атм), но не выше ' \
+                    f'давление опрессовки эксплуатационной колонны) '
+    if self.data_well.curator == 'ВНС':
+        self.text_pvo = f'{self.data_well.max_expected_pressure.get_value:.1f}атм  на ' \
+                        f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
+                        f' давление опрессовки эксплуатационной колонны) '
+    self.data_well.category_pvo = 1
+
+
 def pvo_cat1(self):
     pvo_text, ok = QInputDialog.getItem(
                         self,
@@ -275,49 +342,8 @@ def pvo_cat1(self):
         "Нужно ли спускать пакер?",
         ["Да", "Нет"]
     )
-    paker_str = ("", "")
-    if need_paker == "Да":
-        paker_str = ("Спустить и посадить пакер на глубину 10м.", "сорвать и извлечь пакер.")
-
-    self.text_pvo = f'на давление {self.data_well.max_expected_pressure.get_value}атм  ' \
-                    f'(на максимально ожидаемое давление на устье в течении 30мин (не менее 30атм), но не выше ' \
-                    f'давление опрессовки эксплуатационной колонны) '
-
-    if self.data_well.curator == 'ВНС':
-        self.text_pvo = f'{self.data_well.max_expected_pressure.get_value:.1f}атм  на ' \
-                        f'(на максимально допустимое давление в течении 30мин (не менее 30атм), но не выше ' \
-                        f' давление опрессовки эксплуатационной колонны) '
-
-    pvo_1 = f'Установить ПВО по схеме №{pvo_text} утвержденной главным инженером {data_list.contractor} ' \
-            f'{data_list.DICT_CONTRACTOR[data_list.contractor]["Дата ПВО"]}' \
-            f'(тип плашечный сдвоенный ПШП-2ФТ-160х21Г Крестовина КР160х21Г, ' \
-            f'задвижка ЗМС 65х21 (3шт), Шарового крана 1КШ-73х21, авар. трубы (патрубок НКТ73х7-7-Е, ' \
-            f' (при необходимости произвести монтаж переводника' \
-            f' П178х168 или П168 х 146 или ' \
-            f'П178 х 146 в зависимости от типоразмера крестовины и колонной головки). {paker_str[0]} ' \
-            f'Опрессовать ПВО (трубные плашки превентора) на ' \
-            f'Р-{self.text_pvo}, {paker_str[1]} \n' \
-            f'- Обеспечить о обогрев превентора, станции управления ПВО оборудовать теплоизоляционными ' \
-            f'материалом в зимней период. \n Получить разрешение на производство работ в присутствии представителя ПФС'
-
-    pvo_list = [
-        [None, None,
-         "На скважинах первой категории Подрядчик обязан пригласить представителя ПАСФ " \
-         "для проверки качества м/ж и опрессовки ПВО, документации и выдачи разрешения на производство " \
-         "работ по ремонту скважин. При обнаружении нарушений, которые могут повлечь за собой опасность" \
-         " для жизни людей"
-         " и/или возникновению ГНВП и ОФ, дальнейшие работы должны быть прекращены. Представитель "
-         "ПАСФ приглашается за 24 часа до проведения "
-         "проверки монтажа ПВО телефонограммой. произвести практическое обучение по команде ВЫБРОС. "
-         "Пусковой комиссией составить акт готовности "
-         "подъёмного агрегата для ремонта скважины.",
-         None, None, None, None, None, None, None,
-         'Мастер КРС', None],
-        [f'монтаж ПВО по схеме №{pvo_text} c гидроПВО', None,
-         pvo_1, None, None,
-         None, None, None, None, None,
-         'Мастер КРС, представ-ли ПАСФ и Заказчика, Пуск. ком', 4.67]]
-    self.data_well.category_pvo = 1
+    pvo_list = pvo_cat1_build_rows(self, pvo_text, need_paker)
+    pvo_cat1_side_effects(self)
     return pvo_list
 
 

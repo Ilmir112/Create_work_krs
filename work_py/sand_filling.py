@@ -3,12 +3,37 @@ from PyQt5.QtWidgets import QInputDialog, QMessageBox, QWidget, QLabel, QComboBo
     QMainWindow, QPushButton
 
 import data_list
-from work_py.alone_oreration import volume_vn_ek
+from work_py.alone_oreration import volume_vn_ek, need_h2s
 from work_py.parent_work import TabPageUnion, WindowUnion, TabWidgetUnion
 from work_py.rir import RirWindow
 
 from work_py.opressovka import OpressovkaEK
 from work_py.rationingKRS import descentNKT_norm, lifting_nkt_norm
+
+
+def sand_assembly_description_for_depth(data_well, cb: float) -> str:
+    """Текст компоновки как в sand_select, но для заданного забоя cb (вымыв песка / API)."""
+    nkt_diam = data_well.nkt_diam
+    if hasattr(nkt_diam, "get_value"):
+        nkt_diam = nkt_diam.get_value
+    col_add = data_well.column_additional
+    head_add = data_well.head_column_additional.get_value
+    col_add_d = data_well.column_additional_diameter.get_value
+
+    if col_add is False or (col_add is True and cb <= head_add):
+        return f"перо + НКТ{nkt_diam}мм 20м + реперный патрубок"
+    if col_add is True and col_add_d < 110 and cb >= head_add:
+        return (
+            f"обточную муфту + НКТ{60}мм 20м + реперный патрубок + НКТ60мм "
+            f"{round(cb - head_add, 0)}м "
+        )
+    if col_add is True and col_add_d > 110 and cb >= head_add:
+        return (
+            f"обточную муфту + НКТ{nkt_diam}мм со снятыми фасками {20}м + реперный патрубок + "
+            f"НКТ{nkt_diam}мм со снятыми фасками "
+            f"{round(cb - head_add, 0)}м"
+        )
+    return f"перо + НКТ{nkt_diam}мм 20м + реперный патрубок"
 
 
 class TabPageSoSand(TabPageUnion):
@@ -229,6 +254,10 @@ class SandWindow(WindowUnion):
             QMessageBox.question(self, 'Вопрос', f'Не указан объем цемента')
             return
 
+        roof_rir_edit = None
+        sole_rir_edit = None
+        change_fluid_payload = None
+
         work_list = self.sandFilling(roof_sand_edit, sole_sand_edit, privyazka_question_QCombo)
         if rir_question_qcombo == "Да":
             work_list = work_list[:-1]
@@ -239,7 +268,43 @@ class SandWindow(WindowUnion):
                 need_change_zgs_combo, plast_new_combo, fluid_new_edit, pressure_new_edit)
             work_list.extend(rir_list[1:])
 
-        self.populate_row(self.insert_index, work_list, self.table_widget)
+            if need_change_zgs_combo == "Да":
+                # Серверная сборка смены жидкости не знает Qt-логику need_h2s, поэтому передаём готовые строки.
+                fluid_work, fluid_work_short, _plast, expected_pressure = need_h2s(
+                    self,
+                    float(fluid_new_edit),
+                    plast_new_combo,
+                    float(pressure_new_edit),
+                )
+                change_fluid_payload = {
+                    "mode": "new_plast",
+                    "fluid_new": float(fluid_new_edit),
+                    "fluid_work": fluid_work,
+                    "fluid_work_short": fluid_work_short,
+                    "expected_pressure": expected_pressure,
+                }
+
+        remote_params = {
+            "roof_sand": roof_sand_edit,
+            "sole_sand": sole_sand_edit,
+            "privyazka_question": privyazka_question_QCombo,
+            "rir_question": rir_question_qcombo,
+        }
+        if rir_question_qcombo == "Да":
+            remote_params.update(
+                {
+                    "roof_rir": roof_rir_edit,
+                    "sole_rir": sole_rir_edit,
+                    "volume_cement": volume_cement,
+                    "info_rir_edit": "",
+                    "need_change_zgs_combo": need_change_zgs_combo,
+                    "plast_new_combo": plast_new_combo,
+                    "fluid_new_edit": fluid_new_edit,
+                    "pressure_new_edit": pressure_new_edit,
+                    "change_fluid": change_fluid_payload,
+                }
+            )
+        self.populate_work_rows_with_remote_fallback("sand_filling", remote_params, self.table_widget, work_list)
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()
@@ -441,18 +506,24 @@ class SandWindow(WindowUnion):
 
         nkt_diam = ''.join(['73' if self.data_well.column_diameter.get_value > 110 else '60'])
 
+        cb = self.data_well.current_bottom
+        if hasattr(cb, "get_value"):
+            cb = cb.get_value
+        spo_depth = float(cb)
+
         washingDepth, ok = QInputDialog.getDouble(None, 'вымыв песка',
                                                   'Введите глубину вымыва песчанного моста',
                                                   self.data_well.current_bottom, 0, 6000, 1)
+        sand_txt = sand_assembly_description_for_depth(self.data_well, spo_depth)
         washingOut_list = [
-            [f'СПО пера до {round(self.data_well.current_bottom, 0)}м', None,
-             f'Спустить  {SandWindow.sand_select(self)}  на НКТ{nkt_diam}м до глубины {round(self.data_well.current_bottom, 0)}м с '
+            [f'СПО пера до {round(spo_depth, 0)}м', None,
+             f'Спустить  {sand_txt}  на НКТ{nkt_diam}м до глубины {round(spo_depth, 0)}м с '
              f'замером,'
              f' шаблонированием шаблоном {self.data_well.nkt_template}мм. '
              f'(При СПО первых десяти НКТ на '
              f'спайдере дополнительно устанавливать элеватор ЭХЛ)',
              None, None, None, None, None, None, None,
-             'Мастер КР', descentNKT_norm(self.data_well.current_bottom, 1)],
+             'Мастер КР', descentNKT_norm(spo_depth, 1)],
             [f'вымыв песка до {washingDepth}м',
              None, f'Произвести нормализацию забоя (вымыв кварцевого песка) с наращиванием, комбинированной '
                    f'промывкой по круговой циркуляции '
@@ -461,7 +532,7 @@ class SandWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', 3.5],
             [None, None,
-             f'Поднять {SandWindow.sand_select(self)} НКТ{nkt_diam}м с глубины {washingDepth}м с доливом скважины в объеме '
+             f'Поднять {sand_txt} НКТ{nkt_diam}м с глубины {washingDepth}м с доливом скважины в объеме '
              f'{round(washingDepth * 1.12 / 1000, 1)}м3 тех. '
              f'жидкостью  уд.весом {self.data_well.fluid_work}',
              None, None, None, None, None, None, None,

@@ -194,7 +194,47 @@ class BlockPackWindow(WindowUnion):
 
         self.calculate_chemistry('ЕЛАН', block_type_edit)
 
-        self.populate_row(self.insert_index, work_list, self.table_widget)
+        if 1 < fluid_new_edit < 1.34:
+            type_of_chemistry = 'CaCl'
+            water_fresh = round(
+                data_list.DICT_CALC_CACL[fluid_new_edit][1] * (block_volume_edit - oil_volume_edit - block_type_edit) / 1000,
+                1,
+            )
+            volume_chemistry = round(
+                data_list.DICT_CALC_CACL[fluid_new_edit][0] * (block_volume_edit - oil_volume_edit - block_type_edit) / 1000,
+                1,
+            )
+        elif 1.34 < fluid_new_edit < 1.6:
+            type_of_chemistry = 'CaЖГ'
+            water_fresh = round(
+                data_list.DICT_CALC_CAZHG[fluid_new_edit][1] * block_volume_edit - oil_volume_edit - block_type_edit / 1000,
+                1,
+            )
+            volume_chemistry = round(
+                data_list.DICT_CALC_CAZHG[fluid_new_edit][0] * block_volume_edit - oil_volume_edit - block_type_edit / 1000,
+                1,
+            )
+        else:
+            QMessageBox.warning(self, 'Ошибка', 'Не поддерживаемый удельный вес блок-пачки')
+            return
+
+        remote_params = {
+            "plast_combo": plast_combo,
+            "type_of_block_processing_combo": type_of_block_processing_combo,
+            "current_edit": float(current_edit),
+            "pero_combo": pero_combo,
+            "block_volume_edit": float(block_volume_edit),
+            "oil_volume_edit": float(oil_volume_edit),
+            "fluid_new_edit": float(fluid_new_edit),
+            "block_type_edit": float(block_type_edit),
+            "type_of_chemistry": type_of_chemistry,
+            "water_fresh": float(water_fresh),
+            "volume_chemistry": float(volume_chemistry),
+        }
+
+        self.populate_work_rows_with_remote_fallback(
+            "block_pack_work", remote_params, self.table_widget, work_list
+        )
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()

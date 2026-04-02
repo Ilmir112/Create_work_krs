@@ -736,6 +736,102 @@ class AcidPakerWindow(WindowUnion):
         except (ValueError, TypeError):
             return None
 
+    @staticmethod
+    def _safe_float(value):
+        if value in [None, "", "None"]:
+            return None
+        try:
+            return float(str(value).replace(",", "."))
+        except (TypeError, ValueError):
+            return None
+
+    def _table_item_text(self, row, col):
+        item = self.tableWidget.item(row, col)
+        return item.text().strip() if item else ""
+
+    def _table_combo_text(self, row, col):
+        widget = self.tableWidget.cellWidget(row, col)
+        return widget.currentText().strip() if widget else ""
+
+    def _build_remote_acid_segments(self):
+        layout = str(self.paker_layout_combo)
+        segments = []
+        rows = self.tableWidget.rowCount()
+        for row in range(rows):
+            if layout in ["двухпакерная", "двухпакерная, упорные"]:
+                segment = {
+                    "plast_combo": self._table_item_text(row, 0),
+                    "paker_khost": self._safe_float(self._table_item_text(row, 1)),
+                    "paker_depth": self._safe_float(self._table_item_text(row, 2)),
+                    "paker2_depth": self._safe_float(self._table_item_text(row, 3)),
+                    "svk_true_combo": self._table_combo_text(row, 4),
+                    "acid_edit": self._table_combo_text(row, 5),
+                    "acid_proc_edit": self._safe_float(self._table_item_text(row, 6)),
+                    "acid_volume_edit": self._safe_float(self._table_item_text(row, 7)),
+                    "acid_oil_proc_edit": self._safe_float(self._table_item_text(row, 8)),
+                }
+            elif layout in ["однопакерная", "однопакерная, упорный", "пакер с заглушкой"]:
+                segment = {
+                    "plast_combo": self._table_item_text(row, 0),
+                    "paker_khost": self._safe_float(self._table_item_text(row, 1)),
+                    "paker_depth": self._safe_float(self._table_item_text(row, 2)),
+                    "svk_true_combo": self._table_combo_text(row, 3),
+                    "acid_edit": self._table_combo_text(row, 4),
+                    "acid_proc_edit": self._safe_float(self._table_item_text(row, 5)),
+                    "acid_volume_edit": self._safe_float(self._table_item_text(row, 6)),
+                    "acid_oil_proc_edit": self._safe_float(self._table_item_text(row, 7)),
+                }
+            elif layout in ["воронка", "без монтажа компоновки на спуск"]:
+                segment = {
+                    "plast_combo": self._table_item_text(row, 0),
+                    "paker_khost": self._safe_float(self._table_item_text(row, 1)),
+                    "svk_true_combo": self._table_combo_text(row, 2),
+                    "acid_edit": self._table_combo_text(row, 3),
+                    "acid_proc_edit": self._safe_float(self._table_item_text(row, 4)),
+                    "acid_volume_edit": self._safe_float(self._table_item_text(row, 5)),
+                    "acid_oil_proc_edit": self._safe_float(self._table_item_text(row, 6)),
+                }
+            else:
+                continue
+
+            if getattr(self, "diameter_paker", None) not in [None, "", 0]:
+                segment["diameter_paker"] = self._safe_float(self.diameter_paker)
+            segments.append(segment)
+        return segments
+
+    def _build_remote_swabbing_params(self):
+        if self.swab_true_edit_type != "Нужно освоение":
+            return None
+
+        segment = {
+            "plast": str(getattr(self, "plast_combo", "") or ""),
+            "swab_type_combo": str(getattr(self, "swab_type_combo", "") or ""),
+            "swab_volume_edit": self._safe_float(getattr(self, "swab_volume_edit", None)),
+            "swab_paker_depth": self._safe_float(getattr(self, "swab_paker_depth", None)),
+            "paker_khost": self._safe_float(getattr(self, "paker_khost", None)),
+        }
+
+        if getattr(self, "diameter_paker", None) not in [None, "", 0]:
+            segment["diameter_paker"] = self._safe_float(self.diameter_paker)
+
+        if "двух" in str(self.paker_layout_combo):
+            paker_depth2_swab = getattr(self, "paker_depth2_swab", None)
+            if paker_depth2_swab in [None, "", 0]:
+                try:
+                    paker_depth2_swab = self.swab_paker_depth - (
+                        self.paker_depth - self.paker2_depth
+                    )
+                except Exception:
+                    paker_depth2_swab = None
+            segment["paker2_depth"] = self._safe_float(paker_depth2_swab)
+
+        return {
+            "segments": [segment],
+            "need_change_zgs_combo": "Нет",
+            "pressure_zumph_combo": "Нет",
+            "depth_gauge_combo": self.depth_gauge_combo,
+        }
+
     def add_string(self):
         try:
             self.current_widget = self.tab_widget.currentWidget()
@@ -1686,7 +1782,70 @@ class AcidPakerWindow(WindowUnion):
                 ]
             )
         if work_template_list:
-            self.populate_row(self.insert_index, work_template_list, self.table_widget)
+            acid_segments = self._build_remote_acid_segments()
+            first_segment = acid_segments[0] if acid_segments else {}
+            last_segment = acid_segments[-1] if acid_segments else {}
+            swabbing_params = self._build_remote_swabbing_params()
+            remote_params = {
+                "client_rows": work_template_list,
+                "paker_layout_combo": self.paker_layout_combo,
+                "acid_pack_layout": self.paker_layout_combo,
+                "depth_gauge_combo": self.depth_gauge_combo,
+                "swab_true_edit_type": self.swab_true_edit_type,
+                "sko_volume_all": float(self.sko_volume_all),
+                "svk_true_combo": self.svk_true_combo,
+                "sko_true_combo": self.sko_true_combo,
+                "pressure_zumph_combo": self.pressure_zumph_combo,
+                "paker_depth_zumpf": self.paker_depth_zumpf,
+                "need_privyazka_q_combo": self.need_privyazka_q_combo,
+                "append_acid_work": self.sko_true_combo == "Да",
+                "append_skv_acid": self.svk_true_combo == "Нужно СКВ",
+                "append_swabbing": self.swab_true_edit_type == "Нужно освоение",
+                "append_lift_after": self.swab_true_edit_type != "Нужно освоение",
+                "prepend_krezol_header": True,
+                "append_depth_gauge_out": self.depth_gauge_combo == "Да",
+                "append_tgm_or_kot": (
+                    self.data_well.region == "ТГМ"
+                    and self.data_well.curator == "ОР"
+                    and self.data_well.dict_pump_ecn == 0
+                ),
+                "acid_segments": acid_segments,
+                "swabbing_params": swabbing_params,
+                "segments": acid_segments,
+                "dict_nkt": self.dict_nkt,
+                "paker_select": self.paker_select,
+                "paker_khost": first_segment.get("paker_khost", self._safe_float(getattr(self, "paker_khost", None))),
+                "paker_depth": first_segment.get("paker_depth", self._safe_float(getattr(self, "paker_depth", None))),
+                "paker2_depth": first_segment.get("paker2_depth", self._safe_float(getattr(self, "paker2_depth", None))),
+                "diameter_paker": first_segment.get("diameter_paker", self._safe_float(getattr(self, "diameter_paker", None))),
+                "plast_combo": last_segment.get("plast_combo", str(getattr(self, "plast_combo", "") or "")),
+                "acid_edit": last_segment.get("acid_edit", str(getattr(self, "acid_edit", "") or "")),
+                "acid_proc_edit": last_segment.get("acid_proc_edit", self._safe_float(getattr(self, "acid_proc_edit", None))),
+                "acid_volume_edit": last_segment.get("acid_volume_edit", self._safe_float(getattr(self, "acid_volume_edit", None))),
+                "acid_oil_proc_edit": last_segment.get("acid_oil_proc_edit", self._safe_float(getattr(self, "acid_oil_proc_edit", None))),
+                "Qplast_after_edit": getattr(self, "Qplast_after_edit", None),
+                "qplast_after": getattr(self, "Qplast_after_edit", None),
+                "pressure_three": self._safe_float(getattr(self, "pressure_three", None)),
+                "expected_pickup": self._safe_float(getattr(self, "expected_pickup", None)),
+                "expected_pressure": self._safe_float(getattr(self, "expected_pressure", None)),
+                "skv_acid_edit": str(getattr(self, "skv_acid_edit", "") or ""),
+                "skv_proc_edit": self._safe_float(getattr(self, "skv_proc_edit", None)),
+                "skv_volume_edit": self._safe_float(getattr(self, "skv_volume_edit", None)),
+                "pressure_edit": self._safe_float(getattr(self, "pressure_edit", None)),
+                "iron_true_combo": str(getattr(self, "iron_true_combo", "") or ""),
+                "iron_volume_edit": self._safe_float(getattr(self, "iron_volume_edit", None)),
+                "sko_vt_text": str(
+                    getattr(getattr(self, "current_widget", None), "sko_vt_edit", None).text()
+                    if getattr(getattr(self, "current_widget", None), "sko_vt_edit", None)
+                    else ""
+                ),
+            }
+            self.populate_work_rows_with_remote_fallback(
+                "acid_paker",
+                remote_params,
+                self.table_widget,
+                work_template_list,
+            )
             data_list.pause = False
             self.close()
             self.close_modal_forcefully()

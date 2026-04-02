@@ -152,7 +152,26 @@ class GrpWindow(WindowUnion):
                                   gis_otz_true_quest, gis_otz_after_true_quest,
                                   normalization_true_quest, current_depth)
 
-        self.populate_row(self.insert_index, work_list, self.table_widget)
+        angle_text = ""
+        if self.data_well.angle_data:
+            if self.data_well.max_angle.get_value > 60:
+                angle_text = self.calculate_angle_grad(self.data_well.angle_data)
+        _cd = getattr(data_list, "current_date", None)
+        winter_pvo = (
+            _cd.month in (11, 12, 1, 2, 3) if hasattr(_cd, "month") else (_cd in (11, 12, 1, 2, 3))
+        )
+        remote_params = {
+            "paker_depth": paker_depth,
+            "paker_khost": paker_khost,
+            "gis_otz_true_quest": gis_otz_true_quest,
+            "gis_otz_after_true_quest": gis_otz_after_true_quest,
+            "normalization_true_quest": normalization_true_quest,
+            "current_depth": current_depth,
+            "diameter_paker": diameter_paker,
+            "angle_grad_text": angle_text or None,
+            "pvo_winter_heating_note": winter_pvo,
+        }
+        self.populate_work_rows_with_remote_fallback("grp", remote_params, self.table_widget, work_list)
         data_list.pause = False
         self.close()
         self.close_modal_forcefully()
