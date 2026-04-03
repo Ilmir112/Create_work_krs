@@ -1,13 +1,12 @@
 import json
 import os
 import sqlite3
-import sys
 from datetime import datetime
 from PyQt5.QtWidgets import QMessageBox
-from dotenv import load_dotenv
 import psycopg2
 
 import data_list
+from config import settings
 
 from typing import Any, Dict, List, Optional
 from abc import ABC, abstractmethod
@@ -34,12 +33,7 @@ class PostgresConnection(DatabaseConnection):
         self.path_index = '%s'
 
     def connect_to_database(self) -> Optional[Any]:
-        # Определяем путь к файлу .env
-        ext_data_dir = os.getcwd()
-        if getattr(sys, 'frozen', False):
-            ext_data_dir = getattr(sys, '_MEIPASS', ext_data_dir)
-
-        load_dotenv(dotenv_path=os.path.join(ext_data_dir, '.env'))
+        settings.load_env()
 
         db_user = decrypt('DB_USER')
         db_password = decrypt('DB_PASSWORD')
