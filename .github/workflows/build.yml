@@ -60,10 +60,8 @@ jobs:
 
           Write-Host "Файл .env создан: $envPath"
 
-          # Ленивые импорты (main.py / work_py) — явно в бандл, иначе ModuleNotFoundError в exe
-          pyinstaller --noconfirm main.spec `
-            --hidden-import work_plan_rows_client `
-            --hidden-import work_plan_rows_context
+          # hiddenimports для ленивых импортов заданы в main.spec (CLI --hidden-import с .spec недопустим)
+          pyinstaller --noconfirm main.spec
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
