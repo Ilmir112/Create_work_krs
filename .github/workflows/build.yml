@@ -50,7 +50,8 @@ jobs:
           $lines = @(
             "DB_WELL_DATA=$($env:DB_WELL_DATA)",
             "DB_NAME_GNKT=$($env:DB_NAME_GNKT)",
-            "DB_USER=$($env:DB_NAME_USER)",
+            "DB_NAME_USER=$($env:DB_NAME_USER)",
+            "DB_USER=$($env:DB_USER)",
             "DB_PASSWORD=$($env:DB_PASSWORD)",
             "DB_HOST=$($env:DB_HOST)",
             "DB_PORT=$($env:DB_PORT)"
@@ -58,9 +59,11 @@ jobs:
           [System.IO.File]::WriteAllText($envPath, ($lines -join "`n"))
 
           Write-Host "Файл .env создан: $envPath"
-          Write-Host (Get-Content $envPath -Raw)
 
-          pyinstaller --noconfirm main.spec
+          # Ленивые импорты (main.py / work_py) — явно в бандл, иначе ModuleNotFoundError в exe
+          pyinstaller --noconfirm main.spec `
+            --hidden-import work_plan_rows_client `
+            --hidden-import work_plan_rows_context
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

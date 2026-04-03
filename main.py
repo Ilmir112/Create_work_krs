@@ -989,12 +989,18 @@ class MyMainWindow(QMainWindow):
             if data_list.operation_window is False or self.data_well is None:
                 return
 
-            self.data_well = WellCategory.read_well(
+            updated_data_well = WellCategory.read_well(
                 self.data_well,
                 self.data_well.cat_well_min.get_value,
                 self.data_well.data_well_min.get_value,
             )
-            if data_list.operation_window is False:
+            if updated_data_well is not None:
+                self.data_well = updated_data_well
+            else:
+                logger.warning(
+                    "WellCategory.read_well returned None; keeping current self.data_well"
+                )
+            if data_list.operation_window is False or self.data_well is None:
                 return
 
             if self.data_well.leakiness is True:
