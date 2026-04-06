@@ -6,11 +6,15 @@ from log_files.log import logger
 class CalcFond:
 
     def __init__(self, static_level, len_nkt, fluid, pressure_nkt, distance_between_nkt):
-        self.static_level = static_level
-        self.len_nkt = len_nkt
+        self.static_level = float(static_level)
+        self.len_nkt = float(len_nkt)
         self.fluid = fluid
         self.pressure_nkt = pressure_nkt
-        self.distance_between_nkt = distance_between_nkt
+        try:
+            step = float(distance_between_nkt)
+        except (TypeError, ValueError):
+            step = 300.0
+        self.distance_between_nkt = step if step > 0 else 300.0
 
     def calc_nkt_dict(self):
         distance_between_nkt = self.distance_between_nkt
