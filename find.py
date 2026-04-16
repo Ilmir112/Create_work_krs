@@ -3405,7 +3405,7 @@ class WellCategory(FindIndexPZ):
                 self.well_number.get_value, self.well_area.get_value, self.region
             )
             if stop_app:
-                # self.pause_app()
+                self.pause_app()
                 return
 
             try:
