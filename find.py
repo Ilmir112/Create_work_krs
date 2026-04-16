@@ -1966,7 +1966,7 @@ class WellName(FindIndexPZ):
                     elif "инв. №" in str(value).lower():
                         self.inventory_number = ProtectedIsNonNone(row[col + 1])
                         # self.inventory_number = ProtectedIsNonNone(row[col + 1])
-                    elif "цех" in str(value) and self.cdng.get_value == "":
+                    elif "цех" in str(value) and self.cdng.get_value == "" and len(value) < 5:
                         self.cdng = ProtectedIsDigit(row[col + 1])
                         # self.cdng = ProtectedIsDigit(row[col + 1])
                     elif "назначение" in str(value):

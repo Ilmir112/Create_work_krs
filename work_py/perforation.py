@@ -414,6 +414,14 @@ class PerforationWindow(WindowUnion):
         self.current_widget = self.tab_widget.currentWidget()
         rows = self.tableWidget.rowCount()
         self.type_perforation = self.current_widget.combobox_type_perforation.currentText()
+        # Дефолты нужны для сценариев с кабельной перфорацией, где эти поля UI не создаются.
+        self.swab_true_edit_type = 'без освоения'
+        self.svk_true_combo = 'без СКВ'
+        self.sko_true_combo = 'Нет'
+        self.question_need_paker_combo = 'Нет'
+        self.paker_depth = None
+        self.diameter_paker = None
+        self.nkt_diam = None
         if len(self.data_well.category_pressure_list) > 1:
             self.data_well.category_pressure = self.data_well.category_pressure_list[1]
 
@@ -721,7 +729,7 @@ class PerforationWindow(WindowUnion):
                 "swab_true_edit_type": self.swab_true_edit_type if self.type_perforation in ['Трубная перфорация', 'Трубная перфорация на депрессии'] else 'без освоения',
                 # При dinamическом уровне ниже головы хвостовика Qt интерактивно выбирает 60/73.
                 # Для API этот выбор передаём напрямую.
-                "swab_nkt_diam": self.nkt_diam if self.swab_true_edit_type == 'Нужно освоение' else None,
+                "swab_nkt_diam": self.nkt_diam if self.type_perforation in ['Трубная перфорация', 'Трубная перфорация на депрессии'] and self.swab_true_edit_type == 'Нужно освоение' else None,
             }
             if remote_params["need_skv"]:
                 remote_params.update(
