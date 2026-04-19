@@ -20,8 +20,8 @@ def decrypt(name):
         if plain_value is not None:
             return plain_value
         raise ValueError(
-            f"Переменная окружения '{name}' не задана. Укажите её в системных переменных Windows "
-            f"или в .env рядом с exe (либо '{plain_name}' для значения без шифрования)."
+            f"Переменная окружения '{name}' не задана. Для сборки в CI задайте секрет репозитория GitHub "
+            f"(Actions); локально — системные переменные или .env рядом с exe; без шифрования — '{plain_name}'."
         )
     encrypted_value = value.encode()
 

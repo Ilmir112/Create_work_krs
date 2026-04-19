@@ -11,19 +11,31 @@ class settings:
     def __init__(self):
         pass
 
+    @staticmethod
+    def _is_packaged():
+        """PyInstaller и аналоги: frozen или уже распакованный _MEIPASS."""
+        return bool(getattr(sys, "frozen", False) or getattr(sys, "_MEIPASS", None))
+
     @classmethod
     def _dotenv_candidate_paths(cls):
-        """Порядок: пользовательский .env рядом с exe, затем _internal, затем бандл PyInstaller."""
-        if getattr(sys, "frozen", False):
+        """Порядок: .env рядом с exe (переопределение), _internal/, sys._MEIPASS (бандл onefile/onedir)."""
+        if cls._is_packaged():
             base_dir = os.path.dirname(sys.executable)
+            meipass = getattr(sys, "_MEIPASS", None)
             paths = [
                 os.path.join(base_dir, ".env"),
                 os.path.join(base_dir, "_internal", ".env"),
             ]
-            meipass = getattr(sys, "_MEIPASS", None)
             if meipass:
                 paths.append(os.path.join(meipass, ".env"))
-            return paths
+            seen = set()
+            unique = []
+            for p in paths:
+                ap = os.path.normpath(p)
+                if ap not in seen:
+                    seen.add(ap)
+                    unique.append(p)
+            return unique
         return [os.path.join(os.getcwd(), ".env")]
 
     @classmethod
@@ -35,7 +47,7 @@ class settings:
             if os.path.isfile(path):
                 cls._env_path = path
                 return path
-        if getattr(sys, "frozen", False):
+        if cls._is_packaged():
             cls._env_path = os.path.join(os.path.dirname(sys.executable), ".env")
         else:
             cls._env_path = os.path.join(os.getcwd(), ".env")
@@ -48,5 +60,5 @@ class settings:
             return
         for path in cls._dotenv_candidate_paths():
             if os.path.isfile(path):
-                load_dotenv(dotenv_path=path, override=False)
+                load_dotenv(dotenv_path=path, override=False, encoding="utf-8-sig")
         cls._env_loaded = True

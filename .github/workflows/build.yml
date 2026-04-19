@@ -22,45 +22,15 @@ jobs:
         with:
           python-version: '3.8.8'
 
-      - name: Install, create .env and build
+      # Секреты GitHub пробрасываются в env: выше → write_ci_env.py создаёт .env для PyInstaller.
+      - name: Install, create .env from GitHub Secrets and build
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           Set-Location $env:GITHUB_WORKSPACE
-
-          # Проверка секретов
-          $secrets = @(
-            @{Name='DB_USER'; Value=$env:DB_USER},
-            @{Name='DB_PASSWORD'; Value=$env:DB_PASSWORD},
-            @{Name='DB_HOST'; Value=$env:DB_HOST},
-            @{Name='DB_WELL_DATA'; Value=$env:DB_WELL_DATA},
-            @{Name='DB_NAME_USER'; Value=$env:DB_NAME_USER},
-            @{Name='DB_NAME_GNKT'; Value=$env:DB_NAME_GNKT},
-            @{Name='DB_PORT'; Value=$env:DB_PORT}
-          )
-          foreach ($s in $secrets) {
-            if ([string]::IsNullOrEmpty($s.Value)) { Write-Host "Нет данных: $($s.Name)" } else { Write-Host "OK: $($s.Name)" }
-          }
-
           pip install pyinstaller
           pip install -r requirements.txt
-
-          # .env — запись через .NET (надёжно создаёт файл)
-          $envPath = Join-Path $env:GITHUB_WORKSPACE ".env"
-          $lines = @(
-            "DB_WELL_DATA=$($env:DB_WELL_DATA)",
-            "DB_NAME_GNKT=$($env:DB_NAME_GNKT)",
-            "DB_NAME_USER=$($env:DB_NAME_USER)",
-            "DB_USER=$($env:DB_USER)",
-            "DB_PASSWORD=$($env:DB_PASSWORD)",
-            "DB_HOST=$($env:DB_HOST)",
-            "DB_PORT=$($env:DB_PORT)"
-          )
-          [System.IO.File]::WriteAllText($envPath, ($lines -join "`n"))
-
-          Write-Host "Файл .env создан: $envPath"
-
-          # hiddenimports для ленивых импортов заданы в main.spec (CLI --hidden-import с .spec недопустим)
+          python scripts/write_ci_env.py
           pyinstaller --noconfirm main.spec
 
       - name: Upload artifact
