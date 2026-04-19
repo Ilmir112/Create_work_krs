@@ -472,7 +472,10 @@ class DopPlanWindow(WindowUnion):
         self.perforation_list = []
         self.insert_index2 = None
 
+        plan_work_header_found = False
         for i, row in self.data.items():
+            if plan_work_header_found:
+                break
             if i != 'image':
                 list_row = []
                 for col in range(len(row)):
@@ -501,9 +504,10 @@ class DopPlanWindow(WindowUnion):
                             and self.data_well.work_plan != "plan_change":
                         row[1]['value'] = None
                         row[2]['value'] = None
-                    elif 'Наименование работ' in str(row[2]['value']):
+                    elif 'Наименование работ' in str(row[col]['value']):
                         self.data_well.data_x_max = data_list.ProtectedIsDigit(int(i) - 1)
                         self.data_well.insert_index2 = int(i) + 1
+                        plan_work_header_found = True
                         break
 
                     elif 'ИТОГО:' in str(row[col]['value']) and self.data_well.work_plan in ['plan_change']:

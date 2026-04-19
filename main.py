@@ -2039,6 +2039,36 @@ class MyMainWindow(QMainWindow):
                     else:
                         item = QTableWidgetItem("")
 
+            if sheet and work_plan in (
+                "dop_plan",
+                "dop_plan_in_base",
+                "plan_change",
+            ):
+                need_header_scan = (
+                    not self.data_well.insert_index2
+                    or (
+                        work_plan == "plan_change"
+                        and self.data_well.data_x_max.get_value == 0
+                    )
+                )
+                if need_header_scan:
+                    for tr in range(table_widget.rowCount()):
+                        found_header = False
+                        for tc in range(table_widget.columnCount()):
+                            cell_it = table_widget.item(tr, tc)
+                            if (
+                                cell_it
+                                and "Наименование работ" in cell_it.text()
+                            ):
+                                self.data_well.insert_index2 = tr + 2
+                                self.data_well.data_x_max = data_list.ProtectedIsDigit(tr)
+                                found_header = True
+                                break
+                        if found_header:
+                            break
+
+            if work_plan == "plan_change" and self.data_well.data_x_max.get_value:
+                self.data_well.count_row_well = self.data_well.data_x_max.get_value
 
             if "gnkt" not in work_plan and self.data_well.insert_index2:
                 for row in range(table_widget.rowCount()):
@@ -2049,24 +2079,17 @@ class MyMainWindow(QMainWindow):
                         )  # Номер строки + 1
                         table_widget.setItem(row, 1, item_number)
 
-                row_value_empty = (
-                    True  # Флаг, указывающий, что все ячейки в строке пустые
-                )
-                # Проход по всем колонкам в текущей строке
-                for col in range(table_widget.columnCount()):
-                    item = table_widget.item(row, col)
-                    # Проверка, является ли содержимое ячейки пустым
-                    if item is not None and item.text() != "":
-                        row_value_empty = (
-                            False  # Если хотя бы одна ячейка не пустая, снимаем флаг
-                        )
-                        break
+                    row_value_empty = True
+                    for col in range(table_widget.columnCount()):
+                        item = table_widget.item(row, col)
+                        if item is not None and item.text() != "":
+                            row_value_empty = False
+                            break
 
-                # Если все ячейки в строке пустые, скрываем строку
-                if row_value_empty:
-                    table_widget.setRowHidden(row, True)
-                else:
-                    table_widget.setRowHidden(row, False)
+                    if row_value_empty:
+                        table_widget.setRowHidden(row, True)
+                    else:
+                        table_widget.setRowHidden(row, False)
 
             if work_plan in ["krs", "prs"]:
                 self.work_window = GnoWindow(
@@ -3415,14 +3438,27 @@ class MyWindow(MyMainWindow):
 
     def read_clicked_mouse_data(self, row):
         from work_py.advanted_file import definition_plast_work
-        from data_correct import DataWindow
 
-        aswa = self.data_well.count_row_well
-        row = row - self.data_well.count_row_well + 1
-        # print(self.data_well.column_diameter.get_value)
+        logical_idx = row - self.data_well.count_row_well + 1
         data = self.data_well.data_list
-        if row <= len(data):
-            row = row - 1
+        if not data:
+            logger.warning("read_clicked_mouse_data: data_list пуст")
+            return
+        if logical_idx < 1 or logical_idx > len(data):
+            logger.warning(
+                "read_clicked_mouse_data: клик по строке без записи в data_list "
+                "(idx=%s, доступно записей=%s, count_row_well=%s)",
+                logical_idx,
+                len(data),
+                self.data_well.count_row_well,
+            )
+            return
+        row = logical_idx - 1
+        if len(data[row]) < 17:
+            logger.warning(
+                "read_clicked_mouse_data: повреждённая запись data_list[%s]", row
+            )
+            return
         self.data_well.current_bottom = data[row][1]
         self.data_well.dict_perforation = json.loads(data[row][2])
         self.data_well.plast_all = json.loads(data[row][3])
