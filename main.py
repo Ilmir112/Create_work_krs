@@ -14,7 +14,6 @@ import win32con
 import property_excel.property_excel_pvr
 import threading
 import win32gui
-from exceptions import UncaughtExceptions
 from modal_dialogs import ModalDialog
 from server_response import ApiClient
 from openpyxl.reader.excel import load_workbook
@@ -717,6 +716,7 @@ class MyMainWindow(QMainWindow):
     def add_window(self, window):
         if self.operation_window is None:
             data_list.pause = True
+            self.sync_client_log_context_from_data_well()
             # Сохраняем тип операции для логов (используется log_files/log.py).
             # Если окно не сопоставлено явно — кладём class_name в lower().
             try:
@@ -1652,12 +1652,31 @@ class MyMainWindow(QMainWindow):
 
         return check_true
 
+    def sync_client_log_context_from_data_well(self) -> None:
+        """Обновляет data_list для VK и /prometheus/logger_send из актуального data_well."""
+        dw = getattr(self, "data_well", None)
+        if dw is None:
+            return
+        from work_plan_rows_context import data_well_to_context
+
+        ctx = data_well_to_context(dw, getattr(dw, "work_plan", None))
+        wn = (ctx.get("well_number") or "").strip()
+        wa = (ctx.get("well_area") or "").strip()
+        reg = (ctx.get("region") or "").strip()
+        if wn:
+            data_list.current_well_number = wn
+        if wa:
+            data_list.current_well_area = wa
+        if reg:
+            data_list.current_well_region = reg
+
     def try_populate_work_rows_from_api(
         self, operation: str, params: dict, table_widget, work_plan=None
     ) -> bool:
         """Если операция обслуживается API fastApiZima — вставляет строки и возвращает True."""
         from work_plan_rows_client import try_generate_work_rows
 
+        self.sync_client_log_context_from_data_well()
         data_list.current_operation_type = str(operation)
         wp = work_plan if work_plan is not None else getattr(self.data_well, "work_plan", "krs")
         rows = try_generate_work_rows(operation, self.data_well, params, work_plan=wp)
@@ -1683,6 +1702,7 @@ class MyMainWindow(QMainWindow):
         """Сначала пробует API (если операция в REMOTE_OPERATIONS), иначе вставляет local_rows."""
         from work_plan_rows_client import try_generate_work_rows
 
+        self.sync_client_log_context_from_data_well()
         data_list.current_operation_type = str(operation)
         wp = work_plan if work_plan is not None else getattr(self.data_well, "work_plan", "krs")
         rows = try_generate_work_rows(operation, self.data_well, params, work_plan=wp)
@@ -2195,10 +2215,6 @@ class MyWindow(MyMainWindow):
         # self.log_widget = QPlainTextEditLogger(self)
         # logger.addHandler(self.log_widget)
         # self.setCentralWidget(self.log_widget.widget)
-
-        # Обработка критических ошибок
-        self.excepthook = UncaughtExceptions(self.data_well)
-        self.excepthook._exception_caught.connect(self.excepthook.handle_uncaught_exception)
 
         try:
 

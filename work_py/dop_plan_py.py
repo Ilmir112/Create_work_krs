@@ -849,6 +849,7 @@ class DopPlanWindow(WindowUnion):
                         self.data_well.skm_interval.append(list(map(int, skm_interval_edit.split('-'))))
 
                 rows = self.tableWidget.rowCount()
+                table_pvr_rows = []
 
                 if hasattr(current_widget, "well_data_in_base_combo"):
                     self.work_with_excel(well_number, well_area, work_plan_in_base, type_kr)
@@ -868,6 +869,7 @@ class DopPlanWindow(WindowUnion):
                             else:
                                 list_row.append(None)
                         plast_row.append(list_row)
+                    table_pvr_rows = plast_row
                     data_list.data, data_list.row_heights, data_list.col_width, data_list.boundaries_dict = \
                         self.insert_row_in_pvr(self.data, self.row_heights, self.col_width, self.boundaries_dict, plast_row,
                                                current_bottom, current_bottom_date_edit, method_bottom_combo)
@@ -902,18 +904,50 @@ class DopPlanWindow(WindowUnion):
                         insert_index=self.insert_index + 3,
                     )
 
-                if len(self.data_well.dict_perforation) != 0:
-                    for plast, vertical_line, roof_int, sole_int, date_pvr_edit, count_pvr_edit, \
-                            type_pvr_edit, pressure_pvr_edit, date_pressure_edit in self.data_well.dict_perforation:
-                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отрайбировано', False)
-                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault('Прошаблонировано', False)
+                # Строки ПВР из таблицы: пласт, вертикаль, кровля, подошва, … (см. колонки TabPageDp).
+                # Раньше по ошибке шёл обход dict_perforation как списка кортежей — при итерации по dict
+                # приходили ключи-символы строки (например 5 букв → «expected 9, got 5»).
+                if table_pvr_rows:
+                    for row_cells in table_pvr_rows:
+                        if not row_cells or len(row_cells) < 4:
+                            continue
+                        plast = row_cells[0]
+                        if plast is None or str(plast).strip() == '':
+                            continue
+                        try:
+                            roof_num = float(str(row_cells[2]).replace(",", "."))
+                            sole_num = float(str(row_cells[3]).replace(",", "."))
+                        except (TypeError, ValueError, AttributeError):
+                            continue
+                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault(
+                            "отрайбировано", False
+                        )
+                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault(
+                            "Прошаблонировано", False
+                        )
+                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault("интервал", []).append(
+                            (roof_num, sole_num)
+                        )
+                        self.data_well.dict_perforation_short.setdefault(plast, {}).setdefault(
+                            "интервал", []
+                        ).append((roof_num, sole_num))
+                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault("отключение", False)
+                        self.data_well.dict_perforation_short.setdefault(plast, {}).setdefault(
+                            "отключение", False
+                        )
 
-                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault('интервал', []).append(
-                            (float(roof_int), float(sole_int)))
-                        self.data_well.dict_perforation_short.setdefault(plast, {}).setdefault('интервал', []).append(
-                            (float(roof_int), float(sole_int)))
-                        self.data_well.dict_perforation.setdefault(plast, {}).setdefault('отключение', False)
-                        self.data_well.dict_perforation_short.setdefault(plast, {}).setdefault('отключение', False)
+                if len(self.data_well.dict_perforation) != 0:
+                    for plast_key in list(self.data_well.dict_perforation.keys()):
+                        self.data_well.dict_perforation.setdefault(plast_key, {}).setdefault(
+                            "отрайбировано", False
+                        )
+                        self.data_well.dict_perforation.setdefault(plast_key, {}).setdefault(
+                            "Прошаблонировано", False
+                        )
+                        self.data_well.dict_perforation.setdefault(plast_key, {}).setdefault("отключение", False)
+                        self.data_well.dict_perforation_short.setdefault(plast_key, {}).setdefault(
+                            "отключение", False
+                        )
 
             else:
                 fluid = current_widget.fluid_edit.toPlainText().replace(',', '.')

@@ -279,7 +279,7 @@ class PeroWindow(WindowUnion):
             # Find the index of the solvent step and remove it
             solvent_step_index = -1
             for i, step in enumerate(gips_pero_list):
-                if "Очистить колонну от АСПО растворителем" in step.get('short_description', ''):
+                if "Очистить колонну от АСПО растворителем" in (step.get('short_description') or ''):
                     solvent_step_index = i
                     break
             if solvent_step_index != -1:

@@ -31,9 +31,15 @@ class FastAPILogHandler(logging.Handler):
             error_reason = None
             if exc_info and exc_info[0] is not None:
                 error_reason = "".join(traceback.format_exception(*exc_info))
+            ev = (
+                "client_critical_error"
+                if record.levelname == "CRITICAL"
+                else "client_operation_error"
+            )
             payload = {
                 'log': log_entry,
                 'level': record.levelname,
+                'event': ev,
                 'logger': record.name,
                 'filename': record.filename,
                 'line': record.lineno,
@@ -72,6 +78,8 @@ console_handler = logging.StreamHandler()
 
 # Создаем обработчик для отправки логов на FastAPI
 fastapi_handler = FastAPILogHandler(ApiClient.send_logger_message())  # Укажите ваш URL API
+# На сервер — только WARNING и выше (DEBUG/INFO остаются локально; CRITICAL попадает в Grafana/VK)
+fastapi_handler.setLevel(logging.WARNING)
 
 # Устанавливаем форматтеры
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
