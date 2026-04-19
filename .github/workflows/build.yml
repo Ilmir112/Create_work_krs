@@ -14,6 +14,10 @@ env:
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      # UTF-8 для вывода Python в консоли Windows (иначе кириллица в print даёт UnicodeEncodeError)
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: utf-8
     steps:
       - uses: actions/checkout@v4
 

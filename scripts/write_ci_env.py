@@ -23,6 +23,15 @@ REQUIRED_KEYS = (
 )
 
 
+def _configure_stdio_utf8() -> None:
+    """Windows/GitHub Actions по умолчанию используют cp1252 — русский текст и символы вне ASCII ломают print."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8")  # Python 3.7+
+        except (AttributeError, OSError, ValueError, TypeError):
+            pass
+
+
 def _env_line(key: str) -> str:
     raw = os.environ.get(key)
     if raw is None:
@@ -37,11 +46,12 @@ def _env_line(key: str) -> str:
 
 
 def main() -> int:
+    _configure_stdio_utf8()
     missing = [k for k in REQUIRED_KEYS if not (os.environ.get(k) or "").strip()]
     if missing:
         print(
             "Нет переменных окружения для сборки. Задайте секреты репозитория:",
-            "(GitHub → Settings → Secrets and variables → Actions)",
+            "(GitHub -> Settings -> Secrets and variables -> Actions)",
             file=sys.stderr,
             sep="\n",
         )
