@@ -340,6 +340,16 @@ class FindIndexPZ(MyMainWindow):
     def check_text_in_row(text, row):
         return any([text.lower() in str(col).lower() for col in row])
 
+    @staticmethod
+    def _find_column_by_text(row, text):
+        text_lower = text.lower().strip()
+        for index, col in enumerate(row):
+            if col is None:
+                continue
+            if text_lower in str(col).lower().strip():
+                return index + 1
+        return None
+
     def read_pz(self):
         cat_well_min = []
         self.image_loader = None
@@ -365,10 +375,11 @@ class FindIndexPZ(MyMainWindow):
                     if self.data_x_max.get_value == 0 and row_ind in coord_image:
                         self.work_with_img(self.image_loader, row_ind)
 
-            if "Категория скважины" in row:
+            if any(["Категория скважины" in str(col) for col in row if col]) and row_ind < 20:
                 cat_well_min.append(row_ind + 1)
-
-                self.category_column = row.index("Категория скважины") + 1
+                category_column = self._find_column_by_text(row, "Категория скважины")
+                if category_column:
+                    self.category_column = category_column
                 self.cat_well_min = ProtectedIsDigit(
                     min(cat_well_min)
                 )  # индекс начала категории
@@ -656,12 +667,14 @@ class FindIndexPZ(MyMainWindow):
                 if self.data_x_max.get_value == 0 and row_ind in coord_image:
                     self.work_with_img(self.image_loader, row_ind)
 
-            if "Категория скважины" in row:
+            if any(["Категория скважины" in str(col) for col in row if col]):
                 cat_well_min.append(row_ind + 1)
                 self.cat_well_min = ProtectedIsDigit(
                     min(cat_well_min)
                 )  # индекс начала категории
-                self.category_column = row.index("Категория скважины") + 1
+                category_column = self._find_column_by_text(row, "Категория скважины")
+                if category_column:
+                    self.category_column = category_column
 
             elif (
                     any(

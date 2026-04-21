@@ -54,6 +54,12 @@ from PyQt5.QtGui import QPixmap
 from work_py.rationingKRS import lifting_nkt_norm, descentNKT_norm
 from work_py.data_informations import dict_data_cdng
 
+from excel_date_normalize import normalize_workbook_iso_date_strings
+from excel_post_save import (
+    com_open_workbook_editable,
+    ensure_excel_file_writable_on_disk,
+)
+
 
 class MyMainWindow(QMainWindow):
 
@@ -1449,7 +1455,10 @@ class MyMainWindow(QMainWindow):
                     None, "Save excel-file", f"{full_path}", "Excel Files (*.xlsm)"
                 )
                 if file_name:  # Если имя файла не пустое
+                    ensure_excel_file_writable_on_disk(file_name)
+                    normalize_workbook_iso_date_strings(wb2)
                     wb2.save(file_name)  # Пытаемся сохранить
+                    ensure_excel_file_writable_on_disk(file_name)
                     break  # Если сохранение успешно, выходим из цикла
 
             except Exception as e:
@@ -1462,9 +1471,7 @@ class MyMainWindow(QMainWindow):
             # Создаем объект Excel
             # Создаем объект Excel
             excel = win32com.client.Dispatch("Excel.Application")
-            # win32api.SetFileAttributes(file_name, win32con.FILE_ATTRIBUTE_NORMAL)
-            # Открываем файл
-            workbook = excel.Workbooks.Open(file_name)
+            workbook = com_open_workbook_editable(excel, file_name)
             # Выбираем активный лист
             worksheet = workbook.ActiveSheet
 

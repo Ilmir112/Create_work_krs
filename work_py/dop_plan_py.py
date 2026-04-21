@@ -701,7 +701,7 @@ class DopPlanWindow(WindowUnion):
                     return
 
                 well_data_in_base_combo = well_data_combo.currentText()
-                if well_data_in_base_combo == '':
+                if well_data_in_base_combo == '' and self.data_well.work_plan != 'dop_plan':
                     QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
                     return
 

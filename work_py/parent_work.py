@@ -1688,7 +1688,7 @@ class WindowUnion(MyMainWindow):
 
         # расчет необходимого давления опрессовки НКТ при спуске
         static_level = self.data_well.static_level.get_value
-        fluid = float(self.data_well.fluid_work[:4].replace(',', '.').replace('г', ''))
+        fluid = self._parse_fluid_density(self.data_well.fluid_work, default=1.18)
 
         pressure = 40
 
@@ -1709,6 +1709,17 @@ class WindowUnion(MyMainWindow):
             n = nkt
 
         return press_str
+
+    @staticmethod
+    def _parse_fluid_density(fluid_value, default=1.0):
+        value = str(fluid_value or '').replace(',', '.')
+        filtered = ''.join(ch for ch in value if ch.isdigit() or ch == '.')
+        if not filtered:
+            return default
+        try:
+            return float(filtered)
+        except ValueError:
+            return default
 
     def select_nkt_grp(self):
         head_add = self.data_well.head_column_additional.get_value if self.data_well.head_column_additional else None
@@ -1911,7 +1922,7 @@ class WindowUnion(MyMainWindow):
         self.data_well.fluid_work = result[0][7]
         self.data_well.fluid_work_short = result[0][7]
 
-        self.data_well.fluid = float(result[0][7][:4].replace('г', ''))
+        self.data_well.fluid = self._parse_fluid_density(result[0][7], default=1.0)
         self.data_well.stabilizator_need = False
         self.data_well.current_bottom_second = 0
 

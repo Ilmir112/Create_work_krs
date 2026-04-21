@@ -22,6 +22,12 @@ from server_response import ApiClient
 from work_py.alone_oreration import is_number
 from work_py.progress_bar_save import ProgressBarWindow
 
+from excel_date_normalize import normalize_workbook_iso_date_strings
+from excel_post_save import (
+    com_open_workbook_editable,
+    ensure_excel_file_writable_on_disk,
+)
+
 
 # Я удалил handle_worker_error из этого блока
 
@@ -637,7 +643,10 @@ class SaveInExcel(MyWindow):
                     None, "Save excel-file", f"{full_path}", "Excel Files (*.xlsx)"
                 )
                 if file_name:  # Если имя файла не пустое
+                    ensure_excel_file_writable_on_disk(file_name)
+                    normalize_workbook_iso_date_strings(wb2)
                     wb2.save(file_name)  # Пытаемся сохранить
+                    ensure_excel_file_writable_on_disk(file_name)
                     break  # Если сохранение успешно, выходим из цикла
 
             except Exception as e:
@@ -650,8 +659,7 @@ class SaveInExcel(MyWindow):
         try:
             excel = win32com.client.Dispatch("Excel.Application")
             excel.Visible = True  # Сделать Excel видимым
-            # Открываем файл
-            workbook = excel.Workbooks.Open(file_name)
+            workbook = com_open_workbook_editable(excel, file_name)
             # Выбираем активный лист
             worksheet = workbook.ActiveSheet
 
