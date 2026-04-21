@@ -893,6 +893,9 @@ class MyMainWindow(QMainWindow):
 
                         return
 
+        if self.data_well is None:
+            return None
+
         if data_list.data_well_is_True is False:
             # Сохранение изменений
 
@@ -2044,12 +2047,15 @@ class MyMainWindow(QMainWindow):
                 "dop_plan_in_base",
                 "plan_change",
             ):
+                insert_index2 = getattr(self.data_well, "insert_index2", None)
+                data_x_max = getattr(self.data_well, "data_x_max", None)
+                data_x_max_value = (
+                    data_x_max.get_value
+                    if data_x_max is not None and hasattr(data_x_max, "get_value")
+                    else 0
+                )
                 need_header_scan = (
-                    not self.data_well.insert_index2
-                    or (
-                        work_plan == "plan_change"
-                        and self.data_well.data_x_max.get_value == 0
-                    )
+                    not insert_index2 or (work_plan == "plan_change" and data_x_max_value == 0)
                 )
                 if need_header_scan:
                     for tr in range(table_widget.rowCount()):
@@ -3257,6 +3263,8 @@ class MyWindow(MyMainWindow):
                 QMessageBox.warning(self, "Ошибка", "Сначала вырежьте строки.")
 
     def clickedRowColumn(self, r, c):
+        if self.data_well is None:
+            return
 
         self.insert_index = r + 1
         self.data_well.insert_index = r + 1

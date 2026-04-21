@@ -551,11 +551,16 @@ class GnktModel(WindowUnion):
         self.pipe_fatigue = 0
 
         self.current_bottom_edit = self.current_widget.current_bottom_edit.text()
-        if self.current_bottom_edit == '':
+        current_bottom_raw = str(self.current_bottom_edit).strip()
+        if current_bottom_raw in ['', 'None', 'none', 'null', 'NULL']:
             QMessageBox.warning(self, 'Некорректные данные', f'не указан текущий забоя')
             return
         else:
-            self.current_bottom_edit = float(self.current_bottom_edit.replace(',', '.'))
+            try:
+                self.current_bottom_edit = float(current_bottom_raw.replace(',', '.'))
+            except (TypeError, ValueError):
+                QMessageBox.warning(self, 'Некорректные данные', 'Текущий забой должен быть числом')
+                return
             self.data_well.current_bottom = self.current_bottom_edit
             if self.current_bottom_edit > float(self.data_well.bottom_hole_drill.get_value):
                 QMessageBox.warning(self, 'Некорректные данные',

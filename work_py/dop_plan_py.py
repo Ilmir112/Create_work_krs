@@ -184,15 +184,16 @@ class TabPageDp(TabPageUnion):
             self.change_pvr_combo.setCurrentIndex(1)
             self.change_pvr_combo.setCurrentIndex(0)
 
+            # Виджет выбора файла из базы должен существовать всегда: его используют в add_work/add_perforation_project.
+            self.well_data_label = QLabel('файл excel в базе')
+            self.well_data_in_base_combo = QComboBox()
+            self.well_data_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
+            self.well_data_in_base_combo.currentTextChanged.connect(self.update_well_data_in_base_combo)
+
             if data_list.data_in_base:
                 # self.table_in_base_label = QLabel('данные по скважине')
                 # self.table_in_base_combo = QComboBox()
                 # self.table_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
-
-                self.well_data_label = QLabel('файл excel в базе')
-                self.well_data_in_base_combo = QComboBox()
-                self.well_data_in_base_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
-                self.well_data_in_base_combo.currentTextChanged.connect(self.update_well_data_in_base_combo)
 
                 self.index_change_label = QLabel('пункт после которого происходят изменения')
                 self.index_change_line = QLineEdit(self)
@@ -224,7 +225,7 @@ class TabPageDp(TabPageUnion):
     def update_well_data_in_base_combo(self, index):
         try:
             if index:
-                if index.split(' ')[3] not in ['ПР', "ПРС"]:
+                if index.split(' ')[3] not in ['ПР', "ПРС", "ПРизм"]:
                     number_dp_in_base = [num for num in index.split(' ')[3] if num.isdigit()]
                     if number_dp_in_base:
                         self.number_DP_Combo.setCurrentIndex(int(number_dp_in_base[0]))
@@ -437,7 +438,17 @@ class DopPlanWindow(WindowUnion):
 
     def add_perforation_project(self):
         current_widget = self.tab_widget.currentWidget()
-        table_in_base_combo = str(current_widget.well_data_in_base_combo.currentText())
+        well_data_combo = getattr(current_widget, "well_data_in_base_combo", None)
+        if well_data_combo is None:
+            QMessageBox.critical(
+                self,
+                'ошибка',
+                'Не удалось определить данные скважины из базы. Обновите вкладку и повторите.'
+            )
+            logger.error("add_perforation_project: well_data_in_base_combo is None")
+            return
+
+        table_in_base_combo = str(well_data_combo.currentText())
 
         if ' от' in table_in_base_combo:
             table_in_base = table_in_base_combo.split(' ')[3].replace('krs', 'ПР').replace('dop_plan', 'ДП').replace(
@@ -479,6 +490,7 @@ class DopPlanWindow(WindowUnion):
             if i != 'image':
                 list_row = []
                 for col in range(len(row)):
+                    value = row[col]['value']
                     if 'оризонт' in str(row[1]['value']) or 'пласт/' in str(row[col]['value']).lower():
                         self.target_row_index = int(i) + 1
                     elif 'вскрытия/отключения' in str(row[col]['value']):
@@ -504,9 +516,10 @@ class DopPlanWindow(WindowUnion):
                             and self.data_well.work_plan != "plan_change":
                         row[1]['value'] = None
                         row[2]['value'] = None
-                    elif 'Наименование работ' in str(row[col]['value']):
+                    elif 'Наименование работ' in str(row[2]['value']):
                         self.data_well.data_x_max = data_list.ProtectedIsDigit(int(i) - 1)
                         self.data_well.insert_index2 = int(i) + 1
+                        self.insert_index2 = int(1) + 1
                         plan_work_header_found = True
                         break
 
@@ -519,7 +532,7 @@ class DopPlanWindow(WindowUnion):
                     if int(i) > self.target_row_index:
                         list_row.append(row[col]['value'])
 
-                    if int(i) > self.target_row_index_cancel:
+                    if int(i) > self.target_row_index_cancel and plan_work_header_found:
                         break
             else:
 
@@ -677,7 +690,17 @@ class DopPlanWindow(WindowUnion):
             self.data_well.data_list = []
             current_widget = self.tab_widget.currentWidget()
             if hasattr(current_widget, "well_data_in_base_combo"):
-                well_data_in_base_combo = current_widget.well_data_in_base_combo.currentText()
+                well_data_combo = getattr(current_widget, "well_data_in_base_combo", None)
+                if well_data_combo is None:
+                    QMessageBox.critical(
+                        self,
+                        'ошибка',
+                        'Не удалось определить данные скважины из базы. Обновите вкладку и повторите.'
+                    )
+                    logger.error("add_work: well_data_in_base_combo is None")
+                    return
+
+                well_data_in_base_combo = well_data_combo.currentText()
                 if well_data_in_base_combo == '':
                     QMessageBox.critical(self, 'База данных', 'Необходимо выбрать план работ')
                     return
@@ -686,9 +709,13 @@ class DopPlanWindow(WindowUnion):
                     work_plan_in_base = well_data_in_base_combo.split(' ')[3]
                     type_kr = well_data_in_base_combo.split(' ')[2]
 
-            well_number = current_widget.well_number_edit.text()
-            well_area = current_widget.well_area_edit.text()
-            if well_area != '' and well_area != '':
+            well_number = current_widget.well_number_edit.text().strip()
+            well_area = current_widget.well_area_edit.text().strip()
+            if data_list.data_in_base and (not well_number or not well_area):
+                QMessageBox.critical(self, 'База данных', 'Введите номер и площадь скважины')
+                return
+
+            if well_number != '' and well_area != '':
                 self.data_well.well_number, self.data_well.well_area = \
                     ProtectedIsNonNone(well_number), ProtectedIsNonNone(well_area)
 
@@ -889,12 +916,22 @@ class DopPlanWindow(WindowUnion):
                 # (см. `main.py` → `insert_data_new_excel_file(...)`), поэтому нужно вставлять строки
                 # и в Excel-JSON, а не только в UI-таблицу.
                 if data_list.data_in_base:
+                    insert_index2 = getattr(self.data_well, "insert_index2", None)
+                    if (
+                        self.data_well is None or insert_index2 in (None, "")
+                    ):
+                        QMessageBox.warning(
+                            self,
+                            "Ошибка",
+                            "Не выбрана скважина для доп. плана из базы.",
+                        )
+                        return
                     data_list.data, data_list.row_heights, data_list.boundaries_dict = (
                         self._insert_rows_into_excel_json(
                             data_list.data,
                             data_list.row_heights,
                             data_list.boundaries_dict,
-                            insert_row=self.data_well.insert_index2,
+                            insert_row=insert_index2,
                             rows_values=work_list,
                         )
                     )
