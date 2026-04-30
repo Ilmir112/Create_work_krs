@@ -256,6 +256,18 @@ class SaveInExcel(MyWindow):
                             200,
                             80,
                         )
+                    elif (
+                            "Категория скважины:" in str(value)
+                            and str(getattr(self.data_well, "category_h2s", "")) in ("1", "2")
+                    ):
+                        coordinate = f"I{max(1, row_ind - 5)}"
+                        self.insert_image(
+                            self.ws2,
+                            f"{data_list.path_image}imageFiles/schema_well/сероводород.jpg",
+                            coordinate,
+                            400,
+                            120,
+                        )
                     elif "М.К.Алиев" in str(value):
                         coordinate = f"{get_column_letter(col - 2)}{row_ind - 2}"
                         self.insert_image(
@@ -278,6 +290,13 @@ class SaveInExcel(MyWindow):
                             f"{data_list.path_image}imageFiles/рахимьянов.png",
                             coordinate,
                         )
+                    elif "Галиев Р.Р." in str(value):
+                        coordinate = f"{get_column_letter(col - 3)}{row_ind - 2}"
+                        self.insert_image(
+                            self.ws2,
+                            f"{data_list.path_image}imageFiles/Галиев.png",
+                            coordinate,
+                        )
                         break
                     elif "Расчет жидкости глушения производится согласно МУ" in str(
                             value
@@ -296,7 +315,7 @@ class SaveInExcel(MyWindow):
                             120,
                         )
                         break
-            if self.data_well.work_plan in ["krs", "plan_change"]:
+            if self.data_well.work_plan in ["krs", "plan_change", "dop_plan_in_base", "dop_plan"]:
                 self.create_short_plan(self.wb2, plan_short)
                 # Сохраняем plan_short в data_well для последующего сохранения в БД
                 self.data_well.plan_short = plan_short
@@ -315,9 +334,9 @@ class SaveInExcel(MyWindow):
                 # Отправляем данные в API
                 repair_id = self._send_wells_repair_to_api(excel_data_dict)
                 
-                # # Если есть plan_short и получен ID, обновляем brief_work_plan
-                # if repair_id and hasattr(self.data_well, 'plan_short') and self.data_well.plan_short:
-                #     self._update_brief_work_plan(repair_id, self.data_well.plan_short)
+                # Если есть plan_short и получен ID, обновляем brief_work_plan
+                if repair_id and hasattr(self.data_well, 'plan_short') and self.data_well.plan_short:
+                    self._update_brief_work_plan(repair_id, self.data_well.plan_short)
             
             # Запускаем в отдельном потоке, чтобы не блокировать основной процесс
             thread = threading.Thread(target=send_and_update_brief_plan)

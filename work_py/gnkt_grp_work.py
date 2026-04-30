@@ -493,9 +493,9 @@ class GnktModel(WindowUnion):
                     elif 'Зуфаров' in str(value):
                         coordinate = f'{get_column_letter(col + 1)}{row_ind - 1}'
                         self.insert_image(ws2, f'{data_list.path_image}imageFiles/Зуфаров.png', coordinate)
-                    elif 'Закиев И.Э.' in str(value):
+                    elif 'Галиев Р.Р.' in str(value):
                         coordinate = f'{get_column_letter(col - 1)}{row_ind}'
-                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/Закиев.png', coordinate)
+                        self.insert_image(ws2, f'{data_list.path_image}imageFiles/Галиев.png', coordinate)
                     # elif 'Котиков' in str(value) and 'И.А.' in str(value):
                     #     coordinate = f'{get_column_letter(col - 1)}{row_ind-1}'
                     #     self.insert_image(ws2, f'{data_list.path_image}imageFiles/Котиков.png', coordinate)
