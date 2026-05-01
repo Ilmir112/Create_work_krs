@@ -260,7 +260,7 @@ class SaveInExcel(MyWindow):
                             "Категория скважины:" in str(value)
                             and str(getattr(self.data_well, "category_h2s", "")) in ("1", "2")
                     ):
-                        coordinate = f"I{max(1, row_ind - 5)}"
+                        coordinate = f"G{max(1, row_ind - 3)}"
                         self.insert_image(
                             self.ws2,
                             f"{data_list.path_image}imageFiles/schema_well/сероводород.jpg",
