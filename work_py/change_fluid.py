@@ -60,8 +60,23 @@ class TabPageSoChange(TabPageUnion):
         # self.grid.addWidget(self.pressure_new_label, 3, 5)
         # self.grid.addWidget(self.pressure_new_edit, 4, 5)
         self.need_change_zgs_combo.currentTextChanged.connect(self.update_change_fluid)
+        if isinstance(self.plast_new_combo, QComboBox):
+            self.plast_new_combo.currentTextChanged.connect(self.update_pressure_from_plast)
+        else:
+            self.plast_new_combo.textChanged.connect(self.update_pressure_from_plast)
 
         self.need_change_zgs_combo.setCurrentIndex(1)
+
+    def get_plast_new_value(self):
+        if isinstance(self.plast_new_combo, QComboBox):
+            return self.plast_new_combo.currentText().strip()
+        return self.plast_new_combo.text().strip()
+
+    def update_pressure_from_plast(self, _value=None):
+        plast_name = self.get_plast_new_value()
+        pressure_data = self.data_well.dict_category.get(plast_name, {}).get("по давлению")
+        pressure_value = getattr(pressure_data, "data_pressure", "")
+        self.pressure_new_edit.setText("" if pressure_value in [None, ""] else f"{pressure_value}")
 
     def update_change_fluid(self, index):
         if index == 'Да':
@@ -133,8 +148,7 @@ class TabPageSoChange(TabPageUnion):
 
             self.grid.addWidget(self.pressure_new_label, 9, 4)
             self.grid.addWidget(self.pressure_new_edit, 10, 4)
-            self.pressure_new_edit.setText(
-                f'{self.data_well.dict_category[self.plast_new_combo.currentText()]["по давлению"].data_pressure}')
+            self.update_pressure_from_plast()
         else:
             try:
                 self.category_pressure_label.setParent(None)

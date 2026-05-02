@@ -40,6 +40,7 @@ class SaveInExcel(MyWindow):
             table_title=None,
             table_schema=None,
             gnkt_data=None,
+            excel_source_path=None,
     ):
         # ВАЖНО: SaveInExcel используется как вспомогательный класс при сохранении Excel.
         # Нам НЕ нужна полная инициализация MyWindow (она поднимает UI/логин и дергает connect_to_database).
@@ -52,6 +53,7 @@ class SaveInExcel(MyWindow):
         self.table_schema = table_schema
         self.ws = ws
         self.gnkt_data = gnkt_data
+        self.excel_source_path = excel_source_path or ""
 
     @staticmethod
     def _sanitize_sheet_title(title):
@@ -333,7 +335,19 @@ class SaveInExcel(MyWindow):
             def send_and_update_brief_plan():
                 # Отправляем данные в API
                 repair_id = self._send_wells_repair_to_api(excel_data_dict)
-                
+
+                if repair_id:
+                    try:
+                        from redis_plan_cache import build_cache_key, delete_snapshot
+
+                        path = getattr(self, "excel_source_path", "") or ""
+                        wn = self.data_well.well_number.get_value
+                        wa = self.data_well.well_area.get_value
+                        wp = getattr(self.data_well, "work_plan", "")
+                        delete_snapshot(build_cache_key(path, str(wn), str(wa), wp))
+                    except Exception as e:
+                        print(f"redis_plan_cache: сброс после сохранения в БД: {e}")
+
                 # Если есть plan_short и получен ID, обновляем brief_work_plan
                 if repair_id and hasattr(self.data_well, 'plan_short') and self.data_well.plan_short:
                     self._update_brief_work_plan(repair_id, self.data_well.plan_short)
@@ -593,7 +607,7 @@ class SaveInExcel(MyWindow):
                 ),
                 "excel_json": excel_data_dict,
                 "data_change_paragraph": data_change_paragraph,
-                "norms_time": getattr(self.data_well, 'norm_of_time', 0.0),
+                "norms_time": round(getattr(self.data_well, 'norm_of_time', 0.0),1),
                 "chemistry_need": getattr(self.data_well, 'chemistry_need', {}),
                 "geolog_id": "",  # Backend сам получит из токена пользователя
                 "date_create": data_list.current_date.strftime("%Y-%m-%d") if hasattr(data_list, 'current_date') else datetime.now().strftime("%Y-%m-%d"),

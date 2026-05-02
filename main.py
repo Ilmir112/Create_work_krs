@@ -1311,7 +1311,9 @@ class MyMainWindow(QMainWindow):
                         self.ws = read_pz.open_excel_file(
                             self.ws, self.work_plan, self.ws2_prs
                         )
-                        self.copy_pz(self.ws, self.table_widget, self.work_plan)
+                        if not self._offer_plan_cache_after_excel_read():
+                            self.copy_pz(self.ws, self.table_widget, self.work_plan)
+                        self._plan_cache_ready = True
                         if self.work_plan == "dop_plan":
                             self.rir_window = DopPlanWindow(
                                 self.data_well, self.table_widget
@@ -1342,11 +1344,21 @@ class MyMainWindow(QMainWindow):
                         self.ws = read_pz.open_excel_file(
                             self.ws, self.work_plan, self.ws2_prs
                         )
-                        self.copy_pz(self.ws, self.table_widget, self.work_plan, 15)
+                        if not self._offer_plan_cache_after_excel_read():
+                            self.copy_pz(
+                                self.ws, self.table_widget, self.work_plan, 15
+                            )
+                        self._plan_cache_ready = True
 
         elif self.work_plan in ["plan_change", "dop_plan_in_base"]:
             data_list.data_in_base = True
-            self.data_well = FindIndexPZ
+            if getattr(self, "ws", None) is None:
+                self.wb = Workbook()
+                self.ws = self.wb.active
+            elif getattr(self, "wb", None) is None:
+                self.wb = self.ws.parent
+
+            self.data_well = FindIndexPZ(self.ws, self.work_plan, self)
 
             if self.work_plan == "plan_change":
                 self.data_well.work_plan = self.work_plan
@@ -1374,7 +1386,9 @@ class MyMainWindow(QMainWindow):
                 data_list.boundaries_dict,
             )
 
-            self.copy_pz(self.ws, self.table_widget, self.work_plan)
+            if not self._offer_plan_cache_after_excel_read():
+                self.copy_pz(self.ws, self.table_widget, self.work_plan)
+            self._plan_cache_ready = True
 
         data_list.pause = True
         self.rir_window = None
@@ -2901,6 +2915,114 @@ class MyWindow(MyMainWindow):
             else:
                 self.tab_widget.addTab(self.table_widget, "Ход работ")
 
+            self._install_plan_redis_autosave()
+
+    def _install_plan_redis_autosave(self):
+        if getattr(self, "_plan_redis_installed", False):
+            return
+        if self.table_widget is None:
+            return
+        self._plan_redis_installed = True
+        self._plan_cache_ready = False
+        self._plan_cache_restoring = False
+        self._plan_cache_timer = QTimer(self)
+        self._plan_cache_timer.setSingleShot(True)
+        self._plan_cache_timer.timeout.connect(self._flush_plan_cache_save)
+        m = self.table_widget.model()
+        m.rowsInserted.connect(self._schedule_plan_cache_save)
+        m.columnsInserted.connect(self._schedule_plan_cache_save)
+        m.rowsRemoved.connect(self._schedule_plan_cache_save)
+        m.columnsRemoved.connect(self._schedule_plan_cache_save)
+        m.dataChanged.connect(self._schedule_plan_cache_save)
+
+    def _schedule_plan_cache_save(self, *args):
+        if not getattr(self, "_plan_cache_ready", False):
+            return
+        if getattr(self, "_plan_cache_restoring", False):
+            return
+        self._plan_cache_timer.stop()
+        self._plan_cache_timer.start(400)
+
+    def _flush_plan_cache_save(self):
+        if not getattr(self, "_plan_cache_ready", False):
+            return
+        if getattr(self, "_plan_cache_restoring", False):
+            return
+        if self.table_widget is None or self.data_well is None:
+            return
+        try:
+            from plan_table_snapshot import table_snapshot_to_dict
+            from redis_plan_cache import build_cache_key, save_snapshot
+
+            path = getattr(self, "fname", None) or ""
+            wn = self.data_well.well_number.get_value
+            wa = self.data_well.well_area.get_value
+            wp = self.work_plan
+            snap = table_snapshot_to_dict(self.table_widget, self.data_well)
+            snap["meta"] = {
+                "excel_path": path,
+                "work_plan": wp,
+                "well_number": str(wn),
+                "well_area": str(wa),
+            }
+            key = build_cache_key(path, str(wn), str(wa), wp)
+            save_snapshot(key, snap)
+        except Exception as e:
+            print(f"_flush_plan_cache_save: {e}")
+
+    def _offer_plan_cache_after_excel_read(self) -> bool:
+        """
+        Сразу после загрузки Excel, read_excel_file и подготовки листа (open_excel_file /
+        insert_data_new_excel_file), до заполнения таблицы из листа (copy_pz).
+
+        Возвращает True, если пользователь восстановил черновик из Redis — copy_pz вызывать не нужно.
+        """
+        if self.table_widget is None or self.data_well is None:
+            return False
+        try:
+            from plan_table_snapshot import apply_table_snapshot
+            from redis_plan_cache import build_cache_key, load_snapshot
+        except ImportError:
+            return False
+        path = getattr(self, "fname", None) or ""
+        try:
+            wn = self.data_well.well_number.get_value
+            wa = self.data_well.well_area.get_value
+            wp = self.work_plan
+        except Exception:
+            return False
+        key = build_cache_key(path, str(wn), str(wa), wp)
+        payload = load_snapshot(key)
+        if not payload:
+            return False
+        meta = payload.get("meta") or {}
+        mp = meta.get("excel_path")
+        if path and mp:
+            try:
+                if os.path.normcase(os.path.abspath(path)) != os.path.normcase(
+                    os.path.abspath(str(mp))
+                ):
+                    return False
+            except Exception:
+                if str(path) != str(mp):
+                    return False
+        r = QMessageBox.question(
+            self,
+            "Кэш плана работ",
+            "Найден сохранённый в кэше план работ для этого файла и скважины.\n"
+            "Продолжить с черновика?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes,
+        )
+        if r != QMessageBox.Yes:
+            return False
+        self._plan_cache_restoring = True
+        try:
+            apply_table_snapshot(self.table_widget, self.data_well, payload)
+        finally:
+            self._plan_cache_restoring = False
+        return True
+
     def save_to_excel(self):
         from excel_saver import SaveInExcel
         excel_save_work = SaveInExcel(
@@ -2910,6 +3032,7 @@ class MyWindow(MyMainWindow):
             self.table_title,
             self.table_schema,
             self.gnkt_data,
+            excel_source_path=getattr(self, "fname", None) or "",
         )
 
         if self.work_plan in ["gnkt_frez", "gnkt_after_grp", "gnkt_opz", "gnkt_bopz"]:
@@ -4175,7 +4298,10 @@ class MyWindow(MyMainWindow):
         ws4.cell(row=5, column=7).value = (
             f"Исскус забой {self.data_well.bottom_hole_artificial.get_value}м"
         )
-        ws4.cell(row=6, column=7).value = f"Тек забой {self.data_well.bottom}м"
+        current_bottom = getattr(self.data_well, "bottom", None)
+        if current_bottom in [None, ""]:
+            current_bottom = getattr(self.data_well, "current_bottom", "не корректно")
+        ws4.cell(row=6, column=7).value = f"Тек забой {current_bottom}м"
 
         ws4.cell(row=7, column=7).value = plast_str
         ws4.cell(row=11, column=7).value = (
