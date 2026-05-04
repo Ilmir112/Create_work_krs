@@ -13,6 +13,10 @@ from work_py.rationingKRS import lifting_nkt_norm, well_jamming_norm, liftingGNO
 from work_py.parent_work import TabPageUnion, TabWidgetUnion, WindowUnion
 
 # Подъём ГНО: хвост на API (сегмент) + begin_work на клиенте
+# Совпадает с fastApiZima work_plan_rows/builders/krs_begin_work.KRS_BEGIN_WORK_BASE_ROW_COUNT
+GNO_BEGIN_WORK_BASE_ROW_COUNT = 11
+
+
 GNO_LIFT_SEGMENT_REMOTE = {
     'воронка': 'voronka_tail',
     'пакер': 'paker_tail',
@@ -49,6 +53,9 @@ def _gno_remote_api_params(lift_key, lift_strategy):
         params["sucker_pod_jamming"] = lift_strategy.sucker_pod_jamming
     if lift_key in ('НВ', 'НН'):
         params["nv_list_prefix"] = "".join(lift_strategy.nv_list)
+    params["surfactant_hydrofabizer"] = getattr(
+        lift_strategy, "surfactant_hydrofabizer_combo", ""
+    )
     return params
 
 
@@ -333,7 +340,7 @@ class GnoWindow(WindowUnion):
                 if not begin:
                     return
                 gno_lift_api_params = _gno_remote_api_params(self.lift_key, lift_strategy)
-                gno_lift_api_params["prepend_rows"] = begin
+                gno_lift_api_params["prepend_rows"] = begin[GNO_BEGIN_WORK_BASE_ROW_COUNT:]
                 work_list = lift_strategy.add_work_lift()
             else:
                 work_list = lift_strategy.add_work_lift()
@@ -425,11 +432,11 @@ class GnoParent(ABC):
                     self.data_well.category_pvo, 1, 2)
 
 
-        self.text_pvo = f'на давление {self.data_well.max_expected_pressure.get_value}атм ' \
+        self.text_pvo = f'на давление {self.data_well.max_admissible_pressur.get_value}атм ' \
                         f'(на максимально ожидаемое давление на устье в течении 30мин (не менее 30атм), но не выше ' \
                         f' давление опрессовки эксплуатационной колонны) '
         if self.data_well.curator == 'ВНС':
-            self.text_pvo = f'на давление {self.data_well.max_expected_pressure.get_value * 1.1:.1f}атм на ' \
+            self.text_pvo = f'на давление {self.data_well.max_admissible_pressure.get_value * 1.1:.1f}атм на ' \
                             f'(на максимально ожидаемое давление на устье в течении 30мин (не менее 30атм), но не выше ' \
                             f' давление опрессовки эксплуатационной колонны)'
             # f'максимально не ниже ожидаемого давления с выдержкой в течении 30 минут ' \
@@ -526,29 +533,9 @@ class GnoParent(ABC):
     def add_work_lift(self):
         raise NotImplementedError('Не выбран метод реализации, метод должен быть переопределен')
 
-    def begin_work(self):
-
-        type_of_chemistry = 'СГС-18'
-        surfactant_hydrofabizer_str = ''
-        volume_chemistry = None
-        if self.surfactant_hydrofabizer_combo == 'Да':
-            self.calculate_chemistry('гидрофабизатор', round(self.volume_well_jamming * 0.05, 2))
-            surfactant_hydrofabizer_str = 'с добавлением в жидкость глушения гидрофобизатора из расчёта' \
-                                          ' 0,05% на 1м3 (0,5л)'
-        if 1.2 < float(self.fluid) < 1.62:
-            type_of_chemistry = 'СГС-18'
-            water_fresh = data_list.DICT_SGS[float(self.fluid)][0]
-            volume_chemistry = data_list.DICT_SGS[float(self.fluid)][1]
-        elif 1.19 < float(self.fluid) < 1.34:
-            type_of_chemistry = 'CaCl'
-            water_fresh = data_list.DICT_CALC_CACL[float(self.fluid)][0]
-            volume_chemistry = data_list.DICT_CALC_CACL[float(self.fluid)][1]
-        elif 1.34 <= float(self.fluid) < 1.6:
-            type_of_chemistry = 'CaЖГ'
-            water_fresh = data_list.DICT_CALC_CAZHG[float(self.fluid)][0]
-            volume_chemistry = data_list.DICT_CALC_CAZHG[float(self.fluid)][1]
-
-        krs_begin = [
+    def _krs_begin_work_base_rows(self, surfactant_hydrofabizer_str: str) -> list:
+        """Совпадает с fastApiZima krs_begin_work (для локального add_work_lift; API строит тот же блок на сервере)."""
+        return [
             [None, 'Порядок работы', None, None, None, None, None, None, None, None, None, None, None,
              None, None, None],
             [None, 'п/п', 'Наименование работ', None, None, None, None, None, None, None,
@@ -598,7 +585,7 @@ class GnoParent(ABC):
             [None, None, "Согласно УРОКОВ, ИЗВЛЕЧЕННЫХ ИЗ ПРОИСШЕСТВИЯ №55467 – III – HrC – 11.06.2021\n"
                          "Ремонт скважины производить только при исправности задвижек, предохранительных "
                          "клапанов АГЗУ, коллектора и устьевой арматуры; ", None,
-             None, None, None, None, None, None, None,
+             None, None, None, None, None, None, 'Мастер КРС.',
              None],
             [None, None,
              f'ТЕХНОЛОГИЧЕСКИЕ ОПЕРАЦИИ ПРОИЗВОДИТЬ НА ТЕХ ЖИДКОСТИ УД. ВЕСОМ РАВНОЙ'
@@ -633,6 +620,31 @@ class GnoParent(ABC):
              ' Мастер КРС.', 1.5],
 
         ]
+
+    def begin_work(self):
+
+        type_of_chemistry = 'СГС-18'
+        surfactant_hydrofabizer_str = ''
+        volume_chemistry = None
+        if self.surfactant_hydrofabizer_combo == 'Да':
+            self.calculate_chemistry('гидрофабизатор', round(self.volume_well_jamming * 0.05, 2))
+            surfactant_hydrofabizer_str = 'с добавлением в жидкость глушения гидрофобизатора из расчёта' \
+                                          ' 0,05% на 1м3 (0,5л)'
+        if 1.2 < float(self.fluid) < 1.62:
+            type_of_chemistry = 'СГС-18'
+            water_fresh = data_list.DICT_SGS[float(self.fluid)][0]
+            volume_chemistry = data_list.DICT_SGS[float(self.fluid)][1]
+        elif 1.19 < float(self.fluid) < 1.34:
+            type_of_chemistry = 'CaCl'
+            water_fresh = data_list.DICT_CALC_CACL[float(self.fluid)][0]
+            volume_chemistry = data_list.DICT_CALC_CACL[float(self.fluid)][1]
+        elif 1.34 <= float(self.fluid) < 1.6:
+            type_of_chemistry = 'CaЖГ'
+            water_fresh = data_list.DICT_CALC_CAZHG[float(self.fluid)][0]
+            volume_chemistry = data_list.DICT_CALC_CAZHG[float(self.fluid)][1]
+
+        # На API первые GNO_BEGIN_WORK_BASE_ROW_COUNT строк дублируются на сервере; здесь — для локального add_work_lift.
+        krs_begin = self._krs_begin_work_base_rows(surfactant_hydrofabizer_str)
         if self.data_well.well_number.get_value in ['2010', '5082', "2352", "305г", "343ТНП", "2191", "598", "572",
                                                     "2111", "4152", "6728г", "1002"]:
             QMessageBox.warning(None, 'Опережающее глушение', "В скважине необходимо произвести опережающее глушение")

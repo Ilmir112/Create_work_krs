@@ -310,9 +310,9 @@ class ApiClient:
         elif obj in ["excel", "данные", "сводка"]:
             return obj
         elif isinstance(obj, str):
-            matches = re.findall(r"\b\d{2}\.\d{2}\.\d{4}\b", obj)
-            if matches and len(matches) == 1:
-                obj = datetime.strptime(matches[0], "%d.%m.%Y")
+            s = obj.strip()
+            if re.fullmatch(r"\d{2}\.\d{2}\.\d{4}", s):
+                obj = datetime.strptime(s, "%d.%m.%Y")
 
         if isinstance(obj, datetime):
             return obj.strftime("%Y-%m-%d")
