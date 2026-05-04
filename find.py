@@ -75,6 +75,7 @@ class FindIndexPZ(MyMainWindow):
         self.thread_excel = ExcelWorker(self)
         self.thread_excel.finished.connect(self.thread_excel.deleteLater)
         self.threads.append(self.thread_excel)
+        self._python_bg_threads = []
 
         self.without_damping = False
         self.insert_index = 0
@@ -260,10 +261,14 @@ class FindIndexPZ(MyMainWindow):
 
         self.data_pvr_min = ProtectedIsDigit(0)
 
-        if self.work_plan not in ["prs"]:
-            self.read_pz()
-        else:
+        # prs — отдельный шаблон; dop_plan_in_base / plan_change стартуют с пустого листа до
+        # insert_data_new_excel_file (main.open_read_excel_file_pz): read_pz() на пустом лишь даёт ложные ошибки.
+        if self.work_plan == "prs":
             self.read_pz_prs()
+        elif self.work_plan in ("dop_plan_in_base", "plan_change"):
+            pass
+        else:
+            self.read_pz()
 
     def calculate_max_expected_pressure(self):
         max_expected_pressure_list = []

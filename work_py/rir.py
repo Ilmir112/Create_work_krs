@@ -745,7 +745,7 @@ class RirWindow(WindowUnion):
              None, None, None, None, None, None, None,
              'мастер КРС', 2.5],
             [None, None,
-             f'Приготовить цементный раствор у=1,82-1.92г/см3 в объёме {volume_cement}м3'
+             f'Приготовить цементный раствор у=1,85г/см3 в объёме {volume_cement}м3'
              f' (сухой цемент {round(volume_cement * 1.25, 1)}т) ',
              None, None, None, None, None, None, None,
              'мастер КРС', 0.5],

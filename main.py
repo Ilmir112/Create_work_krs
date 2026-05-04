@@ -76,6 +76,32 @@ class MyMainWindow(QMainWindow):
         self.threads = []
         self.repair_id = None
 
+    @staticmethod
+    def _finish_qthread_list(qthread_list):
+        if not qthread_list:
+            return
+        for thread in list(qthread_list):
+            if thread is None:
+                continue
+            if thread.isRunning():
+                thread.requestInterruption()
+                thread.quit()
+                thread.wait(5000)
+            thread.deleteLater()
+        qthread_list.clear()
+
+    def _finish_project_threads(self, data_well):
+        """QThread и фоновые threading.Thread текущего проекта (data_well)."""
+        self._finish_qthread_list(self.threads)
+        if data_well is not None:
+            self._finish_qthread_list(getattr(data_well, "threads", []))
+            bg = getattr(data_well, "_python_bg_threads", None)
+            if bg:
+                for t in list(bg):
+                    if t is not None and t.is_alive():
+                        t.join(timeout=5.0)
+                bg.clear()
+
     def work_podpisant_list(self, region, contractor):
         with open(
                 f"{data_list.path_image}podpisant.json", "r", encoding="utf-8"
@@ -899,6 +925,17 @@ class MyMainWindow(QMainWindow):
 
                         return
 
+                overwrite = QMessageBox.question(
+                    self,
+                    "Наличие в базе данных",
+                    f"Дополнительный план работ №{self.data_well.number_dp} для данной скважины "
+                    f"уже сохранён в базе. Перезаписать существующую запись данными из Excel?",
+                    QMessageBox.Yes | QMessageBox.No,
+                    QMessageBox.No,
+                )
+                if overwrite != QMessageBox.Yes:
+                    return None
+
         if self.data_well is None:
             return None
 
@@ -1268,7 +1305,7 @@ class MyMainWindow(QMainWindow):
         from work_py.gnkt_frez import WorkWithGnkt
         from find import FindIndexPZ
 
-        if self.work_plan in [
+        use_excel_file_dialog = self.work_plan in [
             "krs",
             "dop_plan",
             "gnkt_opz",
@@ -1276,7 +1313,10 @@ class MyMainWindow(QMainWindow):
             "gnkt_bopz",
             "gnkt_frez",
             "prs",
-        ]:
+        ] or (
+            self.work_plan == "dop_plan_in_base" and not data_list.data_in_base
+        )
+        if use_excel_file_dialog:
             QMessageBox.information(
                 self,
                 "ВНИМАНИЕ",
@@ -1306,7 +1346,7 @@ class MyMainWindow(QMainWindow):
                 self.wb2_prs = Workbook()
                 self.ws2_prs = self.wb2_prs.active
 
-                if self.work_plan in ["krs", "dop_plan"]:
+                if self.work_plan in ["krs", "dop_plan", "dop_plan_in_base"]:
                     if self.wb2_prs:
                         self.ws = read_pz.open_excel_file(
                             self.ws, self.work_plan, self.ws2_prs
@@ -1314,7 +1354,7 @@ class MyMainWindow(QMainWindow):
                         if not self._offer_plan_cache_after_excel_read():
                             self.copy_pz(self.ws, self.table_widget, self.work_plan)
                         self._plan_cache_ready = True
-                        if self.work_plan == "dop_plan":
+                        if self.work_plan in ["dop_plan", "dop_plan_in_base"]:
                             self.rir_window = DopPlanWindow(
                                 self.data_well, self.table_widget
                             )
@@ -1350,7 +1390,9 @@ class MyMainWindow(QMainWindow):
                             )
                         self._plan_cache_ready = True
 
-        elif self.work_plan in ["plan_change", "dop_plan_in_base"]:
+        elif self.work_plan == "plan_change" or (
+            self.work_plan == "dop_plan_in_base" and data_list.data_in_base
+        ):
             data_list.data_in_base = True
             if getattr(self, "ws", None) is None:
                 self.wb = Workbook()
@@ -2753,11 +2795,13 @@ class MyWindow(MyMainWindow):
 
         elif action == self.create_KRS_DP and self.table_widget is None:
             self.work_plan = "dop_plan"
+            data_list.data_in_base = False
 
             self.table_widget_open(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
         elif action == self.create_KRS_DP_in_base and self.table_widget is None:
             self.work_plan = "dop_plan_in_base"
+            data_list.data_in_base = True
 
             self.table_widget_open(self.work_plan)
             self.ws = self.open_read_excel_file_pz()
@@ -2889,6 +2933,8 @@ class MyWindow(MyMainWindow):
     def table_widget_open(self, work_plan="krs"):
 
         if self.table_widget is None:
+            self._plan_redis_installed = False
+            self._plan_cache_ready = False
 
             # Создание объекта TabWidget
             self.tab_widget = QTabWidget()
@@ -3404,11 +3450,7 @@ class MyWindow(MyMainWindow):
             data = self.read_clicked_mouse_data(r)
 
     def closeEvent(self, event):
-        for thread in self.threads:
-            if thread.isRunning():
-                thread.requestInterruption()
-                thread.quit()
-                thread.wait()
+        self._finish_project_threads(self.data_well)
         event.accept()
 
     def list_threads(self):
@@ -3479,12 +3521,18 @@ class MyWindow(MyMainWindow):
 
         temp_folder = r"C:\Windows\Temp"
 
+        data_well = self.data_well
+        self._finish_project_threads(data_well)
+
         self.wb2_prs = None
         self.ws2_prs = None
 
         self.rir_window = None
         self.data_well = None
         self.repair_id = None  # Сбрасываем ID ремонта
+        self.fname = None
+        self._plan_redis_installed = False
+        self._plan_cache_ready = False
         
         # Отключаем кнопку "План работ подписан"
         if hasattr(self, 'signPlanButton'):
@@ -3563,8 +3611,6 @@ class MyWindow(MyMainWindow):
             data_list.condition_of_wells = ProtectedIsNonNone(0)
 
             QMessageBox.information(self, "Обновление", "Данные обнулены")
-
-        self.list_threads()
 
     def on_finished(self):
         print("Работа с файлом Excel завершена.")
@@ -4189,7 +4235,6 @@ class MyWindow(MyMainWindow):
             )
         plast_str = ""
         pressur_set = set()
-        adawdawd = self.data_well.data_list
         dict_perforation = json.loads(self.data_well.data_list[0][2])
         # print(f'После {self.data_well.dict_perforation_short}')
         for plast in list(dict_perforation.keys()):
@@ -4251,22 +4296,27 @@ class MyWindow(MyMainWindow):
         )
         ws4.cell(row=1, column=2).value = self.data_well.cdng.get_value
         try:
-            try:
-                category_pressure = self.data_well.dict_category[
-                    self.data_well.plast_work_short[0]
-                ]["по давлению"].category
-            except:
+            if self.data_well.work_plan == "dop_plan_in_base":
                 category_pressure = self.data_well.category_pressure_second
-            try:
-                category_h2s = self.data_well.dict_category[
-                    self.data_well.plast_work_short[0]
-                ]["по сероводороду"].category
-            except:
                 category_h2s = self.data_well.category_h2s_second
-            try:
-                gaz_f_pr = self.data_well.gaz_factor_percent[0]
-            except:
                 gaz_f_pr = self.data_well.gaz_factor_pr_second
+            else:
+                try:
+                    category_pressure = self.data_well.dict_category[
+                        self.data_well.plast_work_short[0]
+                    ]["по давлению"].category
+                except Exception:
+                    category_pressure = self.data_well.category_pressure_second
+                try:
+                    category_h2s = self.data_well.dict_category[
+                        self.data_well.plast_work_short[0]
+                    ]["по сероводороду"].category
+                except Exception:
+                    category_h2s = self.data_well.category_h2s_second
+                try:
+                    gaz_f_pr = self.data_well.gaz_factor_percent[0]
+                except Exception:
+                    gaz_f_pr = self.data_well.gaz_factor_pr_second
 
             ws4.cell(row=2, column=3).value = (
                 f"Рпл - {category_pressure},"

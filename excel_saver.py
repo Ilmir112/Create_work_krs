@@ -9,6 +9,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment
 from openpyxl.utils.cell import get_column_letter
 from PIL import Image
+from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QFileDialog, QMessageBox, QMainWindow
 
 import data_list
@@ -356,6 +357,9 @@ class SaveInExcel(MyWindow):
             thread = threading.Thread(target=send_and_update_brief_plan)
             thread.daemon = True
             thread.start()
+            if not hasattr(self.data_well, "_python_bg_threads"):
+                self.data_well._python_bg_threads = []
+            self.data_well._python_bg_threads.append(thread)
             self.thread_excel_insert = ExcelWorker(self.data_well)
             # response_answer = MyMainWindow.insert_data_in_database(self, excel_data_dict)
             self.threads.append(self.thread_excel_insert)
@@ -417,8 +421,8 @@ class SaveInExcel(MyWindow):
             self.wb2.calculation.calcMode = "auto"
 
             if self.wb2:
-                self.wb2.close()
                 self.save_file_dialog(self.wb2, full_path)
+                self.wb2.close()
             
 
 
@@ -668,39 +672,42 @@ class SaveInExcel(MyWindow):
         with open(f"{data_list.path_image}work_py/last_save_path.txt", "w") as file:
             file.write(path)
 
+    def _open_saved_workbook_in_excel(self, file_name):
+        """Открыть сохранённый файл в Excel через COM (вынесено из save_file_dialog, чтобы не блокировать UI)."""
+        try:
+            excel = win32com.client.Dispatch("Excel.Application")
+            excel.Visible = True
+            workbook = com_open_workbook_editable(excel, file_name)
+            worksheet = workbook.ActiveSheet
+            worksheet.PageSetup.PrintArea = "B:L"
+        except Exception as e:
+            print(f"Ошибка при работе с Excel: {type(e).__name__}\n\n{str(e)}")
+
     def save_file_dialog(self, wb2, full_path):
 
-        while True:  # Начинаем бесконечный цикл
+        file_name = None
+        while True:
             try:
                 file_name, _ = QFileDialog.getSaveFileName(
-                    None, "Save excel-file", f"{full_path}", "Excel Files (*.xlsx)"
+                    self, "Save excel-file", f"{full_path}", "Excel Files (*.xlsx)"
                 )
-                if file_name:  # Если имя файла не пустое
-                    ensure_excel_file_writable_on_disk(file_name)
-                    normalize_workbook_iso_date_strings(wb2)
-                    wb2.save(file_name)  # Пытаемся сохранить
-                    ensure_excel_file_writable_on_disk(file_name)
-                    break  # Если сохранение успешно, выходим из цикла
+                if not file_name:
+                    return
+                ensure_excel_file_writable_on_disk(file_name)
+                normalize_workbook_iso_date_strings(wb2)
+                wb2.save(file_name)
+                ensure_excel_file_writable_on_disk(file_name)
+                break
 
             except Exception as e:
                 QMessageBox.critical(
-                    None,
+                    self,
                     "Ошибка",
                     f"файл под таким именем открыт, закройте его: {type(e).__name__}\n  {str(e)}",
                 )
 
-        try:
-            excel = win32com.client.Dispatch("Excel.Application")
-            excel.Visible = True  # Сделать Excel видимым
-            workbook = com_open_workbook_editable(excel, file_name)
-            # Выбираем активный лист
-            worksheet = workbook.ActiveSheet
-
-            # Назначаем область печати с колонок B до L
-            worksheet.PageSetup.PrintArea = "B:L"
-
-        except Exception as e:
-            print(f"Ошибка при работе с Excel: {type(e).__name__}\n\n{str(e)}")
+        # COM/Excel часто долго стартует и блокирует главный поток — отложить на следующий цикл event loop
+        QTimer.singleShot(0, lambda: self._open_saved_workbook_in_excel(file_name))
 
     @staticmethod
     def reformated_string_data(num):

@@ -1839,14 +1839,23 @@ class WindowUnion(MyMainWindow):
                 if result_table[0]:
                     result = json.loads(result_table[0])
 
+                    # Номер пункта в UI 1-based; совпадает с insert_data_dop_plan (paragraph_row - 1).
+                    paragraph_index = paragraph_row - 1
+                    if len(result) <= paragraph_index:
+                        QMessageBox.warning(
+                            self, 'Ошибка',
+                            f'В плане работ только {len(result)} пунктов'
+                        )
+                        return None
+
                     self.data_well.type_absorbent = 'EVASORB марки 123'
-                    if 'ХИМТЕХНО 101' in str(result[paragraph_row][7]):
+                    if 'ХИМТЕХНО 101' in str(result[paragraph_index][7]):
                         self.data_well.type_absorbent = 'ХИМТЕХНО 101 Марка А'
-                    elif 'СНПХ-1200' in str(result[paragraph_row][7]):
+                    elif 'СНПХ-1200' in str(result[paragraph_index][7]):
                         self.data_well.type_absorbent = 'СНПХ-1200'
-                    elif 'ПСВ-3401' in str(result[paragraph_row][7]):
+                    elif 'ПСВ-3401' in str(result[paragraph_index][7]):
                         self.data_well.type_absorbent = 'ПСВ-3401'
-                    elif 'Гастрит-К131М' in str(result[paragraph_row][7]):
+                    elif 'Гастрит-К131М' in str(result[paragraph_index][7]):
                         self.data_well.type_absorbent = 'Гастрит-К131М'
 
                     insert_data_well_dop_plan(self, result_table[1])
@@ -1934,8 +1943,6 @@ class WindowUnion(MyMainWindow):
                 self.data_well.category_h2s_second = row[9]
                 self.data_well.gaz_factor_pr_second = row[10]
 
-                self.data_well.plast_work_short = json.dumps(row[3], ensure_ascii=False)
-
             data_in_base_list = []
             for index, data in enumerate(row):
                 if index == 6:
@@ -1989,6 +1996,7 @@ class WindowUnion(MyMainWindow):
             print('отсутствуют данные по интервалам райбирования')
 
         definition_plast_work(self)
+        self.data_well.plast_work_short = self.data_well.plast_work
         return True
 
     @staticmethod
