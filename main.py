@@ -83,11 +83,19 @@ class MyMainWindow(QMainWindow):
         for thread in list(qthread_list):
             if thread is None:
                 continue
-            if thread.isRunning():
-                thread.requestInterruption()
-                thread.quit()
-                thread.wait(5000)
-            thread.deleteLater()
+            try:
+                if thread.isRunning():
+                    thread.requestInterruption()
+                    thread.quit()
+                    thread.wait(5000)
+            except RuntimeError:
+                # Qt object was already destroyed on C++ side.
+                continue
+            try:
+                thread.deleteLater()
+            except RuntimeError:
+                # Object is already deleted, nothing to finalize.
+                pass
         qthread_list.clear()
 
     def _finish_project_threads(self, data_well):
@@ -3027,7 +3035,7 @@ class MyWindow(MyMainWindow):
             return False
         try:
             from plan_table_snapshot import apply_table_snapshot
-            from redis_plan_cache import build_cache_key, load_snapshot
+            from redis_plan_cache import build_cache_key, delete_snapshot, load_snapshot
         except ImportError:
             return False
         path = getattr(self, "fname", None) or ""
@@ -3040,6 +3048,45 @@ class MyWindow(MyMainWindow):
         key = build_cache_key(path, str(wn), str(wa), wp)
         payload = load_snapshot(key)
         if not payload:
+            return False
+        cells = payload.get("cells") or []
+        if isinstance(cells, str):
+            try:
+                cells = json.loads(cells)
+            except Exception:
+                cells = []
+        try:
+            payload_rows = int(payload.get("rows", 0) or 0)
+        except Exception:
+            payload_rows = 0
+        try:
+            payload_cols = int(payload.get("cols", 0) or 0)
+        except Exception:
+            payload_cols = 0
+        if payload_rows <= 0:
+            payload_rows = len(cells) if isinstance(cells, list) else 0
+        if payload_cols <= 0 and isinstance(cells, list) and cells:
+            payload_cols = max(
+                (len(r) for r in cells if isinstance(r, list)),
+                default=0,
+            )
+        non_empty_cells = 0
+        if isinstance(cells, list):
+            for row in cells:
+                if not isinstance(row, list):
+                    continue
+                for cell in row:
+                    if cell is None:
+                        continue
+                    if str(cell).strip() != "":
+                        non_empty_cells += 1
+        if payload_rows <= 0 or payload_cols <= 0 or non_empty_cells <= 0:
+            print(
+                "plan_cache: invalid snapshot detected "
+                f"(rows={payload_rows}, cols={payload_cols}, non_empty={non_empty_cells}), "
+                "deleting cache and fallback to Excel"
+            )
+            delete_snapshot(key)
             return False
         meta = payload.get("meta") or {}
         mp = meta.get("excel_path")
@@ -3055,8 +3102,8 @@ class MyWindow(MyMainWindow):
         r = QMessageBox.question(
             self,
             "Кэш плана работ",
-            "Найден сохранённый в кэше план работ для этого файла и скважины.\n"
-            "Продолжить с черновика?",
+            "Найден начатый план работ для этого файла и скважины.\n"
+            "Продолжить?",
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.Yes,
         )
@@ -3067,6 +3114,9 @@ class MyWindow(MyMainWindow):
             apply_table_snapshot(self.table_widget, self.data_well, payload)
         finally:
             self._plan_cache_restoring = False
+        if self.table_widget.rowCount() <= 0 or self.table_widget.columnCount() <= 0:
+            print("plan_cache: snapshot пустой или повреждён, fallback на Excel")
+            return False
         return True
 
     def save_to_excel(self):

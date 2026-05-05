@@ -732,7 +732,6 @@ class SaveInExcel(MyWindow):
             return num
 
     def count_row_height(self, wb2, ws, ws2, work_list, merged_cells_dict, ind_ins):
-        global cell_num
         from openpyxl.utils.cell import range_boundaries, get_column_letter
         from PIL import Image
 
@@ -795,6 +794,7 @@ class SaveInExcel(MyWindow):
         stop_str = 1500
         row_center = 1
         col_center = 1
+        cell_num = None
         for i in range(1, len(work_list) + 1):  # Добавлением работ
             self.progress_bar_window.start_loading(i)
             if "Наименование работ" in work_list[i - 1][2]:
@@ -964,7 +964,7 @@ class SaveInExcel(MyWindow):
                     end_row=row + 1,
                     end_column=merge_column,
                 )
-            if row == cell_num:
+            if cell_num is not None and row == cell_num:
                 ws2.unmerge_cells(
                     start_row=row, start_column=3, end_row=row, end_column=merge_column
                 )

@@ -64,15 +64,33 @@ def apply_table_snapshot(
     if ver != SNAPSHOT_VERSION:
         print(f"plan_table_snapshot: неизвестная версия снимка {ver}")
 
-    rows = int(payload.get("rows", 0))
-    cols = int(payload.get("cols", 0))
     cells = payload.get("cells") or []
+    try:
+        rows = int(payload.get("rows", 0) or 0)
+    except Exception:
+        rows = 0
+    try:
+        cols = int(payload.get("cols", 0) or 0)
+    except Exception:
+        cols = 0
+    # Совместимость со старыми/частично битыми снимками:
+    # восстанавливаем размер таблицы из cells, если rows/cols отсутствуют или нули.
+    if rows <= 0:
+        rows = len(cells)
+    if cols <= 0 and cells:
+        cols = max((len(row) for row in cells), default=0)
 
     model = table.model()
     table.blockSignals(True)
     model.blockSignals(True)
+    table.setUpdatesEnabled(False)
     try:
+        # Важно сбросить не только данные, но и геометрию (spans/размеры),
+        # иначе восстановленные ячейки могут оказаться "невидимыми" из-за старой разметки.
         table.clearContents()
+        table.clearSpans()
+        table.setRowCount(0)
+        table.setColumnCount(0)
         table.setRowCount(rows)
         table.setColumnCount(cols)
 
@@ -94,7 +112,15 @@ def apply_table_snapshot(
 
         for r, h in enumerate(payload.get("row_heights") or []):
             try:
-                table.setRowHeight(r, int(h))
+                hh = int(h)
+                if hh <= 2:
+                    hh = 18
+                table.setRowHeight(r, hh)
+            except Exception:
+                pass
+        for r in range(rows):
+            try:
+                table.setRowHidden(r, False)
             except Exception:
                 pass
 
@@ -117,5 +143,7 @@ def apply_table_snapshot(
         except Exception:
             pass
     finally:
+        table.viewport().update()
+        table.setUpdatesEnabled(True)
         model.blockSignals(False)
         table.blockSignals(False)

@@ -251,7 +251,7 @@ class ApiClient:
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
-            QMessageBox.warning(None, "Запрос", f"Запрос не удался: {e}")
+            print(f"POST запрос не удался: {e}")
             return None
 
     @staticmethod
@@ -281,11 +281,10 @@ class ApiClient:
             print(f"Детали ошибки: {error_detail}")
             if e.response.status_code == 422:
                 print(f"Ошибка валидации (422). Ответ сервера: {error_detail}")
-            QMessageBox.warning(None, "Запрос", f"Запрос не удался: {e}")
+            print(f"PUT запрос не удался: {e}")
             return None
         except requests.exceptions.RequestException as e:
             print(f"Ошибка при PUT запросе: {e}")
-            QMessageBox.warning(None, "Запрос", f"Запрос не удался: {e}")
             return None
 
     @staticmethod

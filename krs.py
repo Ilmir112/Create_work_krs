@@ -432,7 +432,7 @@ class GnoParent(ABC):
                     self.data_well.category_pvo, 1, 2)
 
 
-        self.text_pvo = f'на давление {self.data_well.max_admissible_pressur.get_value}атм ' \
+        self.text_pvo = f'на давление {self.data_well.max_admissible_pressure.get_value}атм ' \
                         f'(на максимально ожидаемое давление на устье в течении 30мин (не менее 30атм), но не выше ' \
                         f' давление опрессовки эксплуатационной колонны) '
         if self.data_well.curator == 'ВНС':
